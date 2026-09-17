@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 75,
-    "audited_and_excluded": 6,
+    "refined": 85,
+    "audited_and_excluded": 5,
     "out_of_scope": 1,
-    "remaining": 480
+    "remaining": 471
   },
   "remaining": [
     {
@@ -121,26 +121,6 @@
     {
       "id": "bio-blast-searches",
       "upstream_path": "database-access/blast-searches"
-    },
-    {
-      "id": "bio-causal-genomics-effector-gene-prioritization",
-      "upstream_path": "causal-genomics/effector-gene-prioritization"
-    },
-    {
-      "id": "bio-causal-genomics-genetic-correlation",
-      "upstream_path": "causal-genomics/genetic-correlation"
-    },
-    {
-      "id": "bio-causal-genomics-mediation-analysis",
-      "upstream_path": "causal-genomics/mediation-analysis"
-    },
-    {
-      "id": "bio-causal-genomics-pleiotropy-detection",
-      "upstream_path": "causal-genomics/pleiotropy-detection"
-    },
-    {
-      "id": "bio-causal-genomics-proteome-mr-drug-target",
-      "upstream_path": "causal-genomics/proteome-mr-drug-target"
     },
     {
       "id": "bio-causal-genomics-transcriptome-wide-association",
@@ -651,10 +631,6 @@
       "upstream_path": "experimental-design/power-analysis"
     },
     {
-      "id": "bio-experimental-design-randomization-blocking",
-      "upstream_path": "experimental-design/randomization-blocking"
-    },
-    {
       "id": "bio-expression-matrix-counts-ingest",
       "upstream_path": "expression-matrix/counts-ingest"
     },
@@ -1043,10 +1019,6 @@
       "upstream_path": "metabolomics/isotope-tracing"
     },
     {
-      "id": "bio-metabolomics-targeted-analysis",
-      "upstream_path": "metabolomics/targeted-analysis"
-    },
-    {
       "id": "bio-metagenomics-abundance",
       "upstream_path": "metagenomics/abundance-estimation"
     },
@@ -1191,16 +1163,8 @@
       "upstream_path": "sequence-io/paired-end-fastq"
     },
     {
-      "id": "bio-pathway-enrichment-visualization",
-      "upstream_path": "pathway-analysis/enrichment-visualization"
-    },
-    {
-      "id": "bio-pathway-reactome",
-      "upstream_path": "pathway-analysis/reactome-pathways"
-    },
-    {
-      "id": "bio-pathway-wikipathways",
-      "upstream_path": "pathway-analysis/wikipathways"
+      "id": "bio-pathway-kegg-pathways",
+      "upstream_path": "pathway-analysis/kegg-pathways"
     },
     {
       "id": "bio-pharmacophore-modeling",
@@ -1940,7 +1904,9 @@
       "deployable": true,
       "open_p0": 1,
       "audited_on": "2026-09-17",
-      "fix_log": null
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
     },
     {
       "id": "bio-causal-genomics-genomic-sem",
@@ -1950,7 +1916,9 @@
       "deployable": false,
       "open_p0": 2,
       "audited_on": "2026-09-17",
-      "fix_log": "fixes/bio-causal-genomics-genomic-sem.md"
+      "fix_log": "fixes/bio-causal-genomics-genomic-sem.md",
+      "fix_pass": "done",
+      "reaudit": "needed"
     },
     {
       "id": "bio-causal-genomics-heritability-partitioning",
@@ -1960,7 +1928,9 @@
       "deployable": false,
       "open_p0": 2,
       "audited_on": "2026-09-17",
-      "fix_log": null
+      "fix_log": "fixes/bio-causal-genomics-heritability-partitioning.md",
+      "fix_pass": "done",
+      "reaudit": "not needed"
     },
     {
       "id": "bio-experimental-design-multiple-testing",
@@ -1970,7 +1940,9 @@
       "deployable": false,
       "open_p0": 0,
       "audited_on": "2026-09-16",
-      "fix_log": null
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
     },
     {
       "id": "bio-experimental-design-sample-size",
@@ -1980,17 +1952,9 @@
       "deployable": false,
       "open_p0": 2,
       "audited_on": "2026-09-16",
-      "fix_log": null
-    },
-    {
-      "id": "bio-pathway-kegg-pathways",
-      "upstream_path": "pathway-analysis/kegg-pathways",
-      "score": 93,
-      "grade": "Reject",
-      "deployable": false,
-      "open_p0": 1,
-      "audited_on": "2026-09-17",
-      "fix_log": "fixes/bio-pathway-kegg-pathways.md"
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
     }
   ],
   "out_of_scope": [

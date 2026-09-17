@@ -1,10 +1,12 @@
 # Optimized Scientific Skills
 
-Agent Skills for computational science that have been **audited against executed evidence, fixed where
-the audit demonstrated a defect, and re-audited by an agent that did not write the fix**.
+Agent Skills for computational science that have been **audited against executed evidence**. Where the
+audit demonstrated a defect, the Skill is fixed and then re-audited by an agent that did not write the fix.
 
-Nothing enters this repository until it has been through that process. A Skill that has not been
-refined here lives only in its upstream repository — see [REMAINING.json](REMAINING.json).
+Nothing enters this repository without an audit that found it deployable with no open P0 finding. **Not
+every Skill here has finished the process yet.** Each one's status is in [PROVENANCE.json](PROVENANCE.json)
+(`fix_pass`, `reaudit`), and both lists are at the top of [REMAINING.md](REMAINING.md). A Skill that has not
+been audited lives only in its upstream repository.
 
 ## Attribution
 
@@ -19,27 +21,24 @@ and whether the content was modified — is recorded in [PROVENANCE.json](PROVEN
 **We did not write these Skills.** What we added is the audit evidence, and the fixes that evidence
 justified.
 
-## What "refined" means here
+## Status
 
 | | count |
 | --- | ---: |
-| Skills in this repository | **75** |
-| substantively modified by us, each with a fix log | 56 |
-| verified unmodified apart from a declared licence | 19 |
+| Skills in this repository | **85** |
+| substantively modified by us, each with a fix log | 58 |
+| unmodified apart from a declared `license: MIT` | 27 |
+| **fix pass still needed** (first audit only, whatever the score) | **26** |
+| **re-audit still needed** (changed after their latest audit) | **21** |
 | audit coverage | **100%** |
 
-Every Skill here is deployable with no open P0 finding. Each carries a score and grade from a
-skill-auditor run that executed the Skill's own code against real or synthetic data and recorded what
-it produced — not a review of the prose.
+Each Skill carries a score and grade from a skill-auditor run that executed the Skill's own code against
+real or synthetic data and recorded what it produced — not a review of the prose. A Skill flagged
+`fix_pass: needed` still has open findings from that audit; a high score does not exempt it. A Skill
+flagged `reaudit: needed` was changed after its latest audit, so its score describes earlier bytes.
 
-The 19 unmodified Skills passed audit without needing a change. Their only difference from upstream is
-a `license: MIT` declaration added to the frontmatter, so that the licence they already carry is
-machine-readable. The audit report is what we contributed to those, not the text.
-
-Two Skills were audited and **rejected**: `bio-experimental-design-sample-size` (67, Reject, two open
-P0 findings) and `bio-experimental-design-multiple-testing` (82, not deployable). Both are listed in
-`REMAINING.json` under `excluded` with their scores. They are not here, and they are not silently
-omitted either.
+Audited Skills that failed (open P0 or not deployable) are **not here**: they are listed in
+`REMAINING.json` under `excluded`, with their scores, until a fix passes re-audit.
 
 ## Layout
 

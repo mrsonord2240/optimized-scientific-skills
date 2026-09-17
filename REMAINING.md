@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**480 remaining** across 62 folders. 75 are already refined and live in `skills/`.
+**471 remaining** across 62 folders. 85 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 75 refined, 6 audited and excluded, 1 out of scope, 480 remaining.
+The source tree holds 562 Skills: 85 refined, 5 audited and excluded, 1 out of scope, 471 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -41,7 +41,6 @@ The source tree holds 562 Skills: 75 refined, 6 audited and excluded, 1 out of s
 | sequence-manipulation | 7 | 0 |
 | systems-biology | 7 | 0 |
 | variant-calling | 7 | 6 |
-| causal-genomics | 6 | 2 |
 | ecological-genomics | 6 | 0 |
 | gene-regulatory-networks | 6 | 0 |
 | immunoinformatics | 6 | 0 |
@@ -68,10 +67,75 @@ The source tree holds 562 Skills: 75 refined, 6 audited and excluded, 1 out of s
 | rna-quantification | 4 | 0 |
 | rna-structure | 4 | 0 |
 | crispr-screens | 3 | 12 |
-| pathway-analysis | 3 | 2 |
-| experimental-design | 2 | 1 |
-| metabolomics | 2 | 7 |
+| causal-genomics | 1 | 7 |
+| experimental-design | 1 | 2 |
+| metabolomics | 1 | 8 |
+| pathway-analysis | 1 | 5 |
 | proteomics | 1 | 8 |
+
+## Promoted, fix pass still needed
+
+These Skills are in `skills/` because their audit found them deployable with no open P0.
+They have not yet been through a fix pass, however high they scored. Their open findings
+are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
+
+| skill | score | grade |
+| --- | ---: | --- |
+| `bio-admet-prediction` | 86 | Limited Release |
+| `bio-causal-genomics-effector-gene-prioritization` | 84 | Limited Release |
+| `bio-causal-genomics-genetic-correlation` | 89 | Production Ready |
+| `bio-differential-expression-deseq2-basics` | 92 | Production Ready |
+| `bio-experimental-design-randomization-blocking` | 91 | Production Ready |
+| `bio-machine-learning-model-validation` | 93 | Limited Release |
+| `bio-machine-learning-prediction-explanation` | 89 | Limited Release |
+| `bio-metabolomics-targeted-analysis` | 90 | Production Ready |
+| `bio-molecular-descriptors` | 86 | Limited Release |
+| `bio-molecular-io` | 91 | Limited Release |
+| `bio-molecular-standardization` | 90 | Limited Release |
+| `bio-pathway-enrichment-visualization` | 90 | Production Ready |
+| `bio-pathway-reactome` | 91 | Production Ready |
+| `bio-pathway-wikipathways` | 92 | Production Ready |
+| `bio-qsar-modeling` | 88 | Limited Release |
+| `bio-scaffold-analysis` | 88 | Limited Release |
+| `bio-similarity-searching` | 90 | Limited Release |
+| `bio-single-cell-batch-integration` | 90 | Limited Release |
+| `bio-single-cell-cell-annotation` | 87 | Limited Release |
+| `bio-single-cell-clustering` | 89 | Limited Release |
+| `bio-single-cell-differential-abundance` | 88 | Production Ready |
+| `bio-single-cell-doublet-detection` | 85 | Limited Release |
+| `bio-single-cell-markers-annotation` | 88 | Production Ready |
+| `bio-single-cell-preprocessing` | 85 | Limited Release |
+| `bio-substructure-search` | 88 | Limited Release |
+| `bio-workflows-scrnaseq-pipeline` | 85 | Limited Release |
+
+## Promoted, re-audit still needed
+
+Changed in staging after their latest audit, so the score below describes earlier bytes.
+`reaudit` in PROVENANCE.json carries the same flag.
+
+| skill | score at last audit | audited on |
+| --- | ---: | --- |
+| `bio-alignment-multiple` | 85 | 2026-09-11 |
+| `bio-alignment-trimming` | 83 | 2026-09-15 |
+| `bio-clinical-databases-clinvar-lookup` | 84 | 2026-09-15 |
+| `bio-clinical-databases-dbsnp-queries` | 86 | 2026-09-15 |
+| `bio-clinical-databases-gnomad-frequencies` | 86 | 2026-09-15 |
+| `bio-clinical-databases-myvariant-queries` | 84 | 2026-09-15 |
+| `bio-phylo-bayesian-inference` | 87 | 2026-09-15 |
+| `bio-phylo-distance-calculations` | 87 | 2026-09-15 |
+| `bio-phylo-divergence-dating` | 87 | 2026-09-15 |
+| `bio-phylo-modern-tree-inference` | 88 | 2026-09-15 |
+| `bio-phylo-species-trees` | 86 | 2026-09-15 |
+| `bio-phylo-tree-io` | 88 | 2026-09-15 |
+| `bio-phylo-tree-manipulation` | 86 | 2026-09-15 |
+| `bio-phylo-tree-visualization` | 84 | 2026-09-15 |
+| `bio-population-genetics-rare-variant-association` | 89 | 2026-09-15 |
+| `bio-variant-annotation` | 86 | 2026-09-15 |
+| `bio-variant-calling-filtering-best-practices` | 88 | 2026-09-15 |
+| `bio-variant-normalization` | 89 | 2026-09-15 |
+| `bio-vcf-basics` | 90 | 2026-09-11 |
+| `bio-vcf-manipulation` | 90 | 2026-09-15 |
+| `bio-vcf-statistics` | 88 | 2026-09-15 |
 
 ## Audited and excluded
 
@@ -85,7 +149,6 @@ fixed.
 | `bio-causal-genomics-heritability-partitioning` | 75 | Reject | 2 |
 | `bio-experimental-design-multiple-testing` | 82 | Beta Only | 0 |
 | `bio-experimental-design-sample-size` | 67 | Reject | 2 |
-| `bio-pathway-kegg-pathways` | 93 | Reject | 1 |
 
 ## Out of scope
 
@@ -145,11 +208,6 @@ fixed.
 
 ### causal-genomics
 
-- `bio-causal-genomics-effector-gene-prioritization` — `causal-genomics/effector-gene-prioritization`
-- `bio-causal-genomics-genetic-correlation` — `causal-genomics/genetic-correlation`
-- `bio-causal-genomics-mediation-analysis` — `causal-genomics/mediation-analysis`
-- `bio-causal-genomics-pleiotropy-detection` — `causal-genomics/pleiotropy-detection`
-- `bio-causal-genomics-proteome-mr-drug-target` — `causal-genomics/proteome-mr-drug-target`
 - `bio-causal-genomics-transcriptome-wide-association` — `causal-genomics/transcriptome-wide-association`
 
 ### chemoinformatics
@@ -336,7 +394,6 @@ fixed.
 ### experimental-design
 
 - `bio-experimental-design-power-analysis` — `experimental-design/power-analysis`
-- `bio-experimental-design-randomization-blocking` — `experimental-design/randomization-blocking`
 
 ### expression-matrix
 
@@ -470,7 +527,6 @@ fixed.
 ### metabolomics
 
 - `bio-metabolomics-isotope-tracing` — `metabolomics/isotope-tracing`
-- `bio-metabolomics-targeted-analysis` — `metabolomics/targeted-analysis`
 
 ### metagenomics
 
@@ -515,9 +571,7 @@ fixed.
 
 ### pathway-analysis
 
-- `bio-pathway-enrichment-visualization` — `pathway-analysis/enrichment-visualization`
-- `bio-pathway-reactome` — `pathway-analysis/reactome-pathways`
-- `bio-pathway-wikipathways` — `pathway-analysis/wikipathways`
+- `bio-pathway-kegg-pathways` — `pathway-analysis/kegg-pathways`
 
 ### phasing-imputation
 

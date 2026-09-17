@@ -22,6 +22,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
@@ -36,6 +38,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-11",
       "fix_log": "fixes/bio-alignment-multiple.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -52,6 +56,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-alignment-trimming.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -63,6 +69,22 @@
       ]
     },
     {
+      "id": "bio-causal-genomics-effector-gene-prioritization",
+      "upstream_path": "causal-genomics/effector-gene-prioritization",
+      "score": 84,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "id": "bio-causal-genomics-fine-mapping",
       "upstream_path": "causal-genomics/fine-mapping",
       "score": 94,
@@ -71,9 +93,45 @@
       "open_p0": 0,
       "audited_on": "2026-09-17",
       "fix_log": "fixes/bio-causal-genomics-fine-mapping.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-causal-genomics-genetic-correlation",
+      "upstream_path": "causal-genomics/genetic-correlation",
+      "score": 89,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-causal-genomics-mediation-analysis",
+      "upstream_path": "causal-genomics/mediation-analysis",
+      "score": 91,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": "fixes/bio-causal-genomics-mediation-analysis.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "cmaverse_4way.R",
         "usage-guide.md"
       ]
     },
@@ -86,12 +144,48 @@
       "open_p0": 0,
       "audited_on": "2026-09-17",
       "fix_log": "fixes/bio-causal-genomics-mendelian-randomization.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
         "cis_mr_drug_target.R",
         "two_sample_mr.R",
         "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-causal-genomics-pleiotropy-detection",
+      "upstream_path": "causal-genomics/pleiotropy-detection",
+      "score": 89,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": "fixes/bio-causal-genomics-pleiotropy-detection.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "simex_egger_correction.R",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-causal-genomics-proteome-mr-drug-target",
+      "upstream_path": "causal-genomics/proteome-mr-drug-target",
+      "score": 88,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": "fixes/bio-causal-genomics-proteome-mr-drug-target.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
       ]
     },
     {
@@ -103,6 +197,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-clinical-databases-clinvar-lookup.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -119,6 +215,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-clinical-databases-dbsnp-queries.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -134,6 +232,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-clinical-databases-gnomad-frequencies.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -150,6 +250,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-clinical-databases-myvariant-queries.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -166,6 +268,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-crispr-screens-bagel-essentiality.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -182,6 +286,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-crispr-screens-base-editing-analysis.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -197,6 +303,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-crispr-screens-batch-correction.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -212,6 +320,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-crispr-screens-copy-number-correction.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -228,6 +338,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-crispr-screens-crispresso-editing.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -244,6 +356,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-crispr-screens-drugz-chemogenomic.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -259,6 +373,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-crispr-screens-hit-calling.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -275,6 +391,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-crispr-screens-jacks-analysis.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -291,6 +409,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-crispr-screens-library-design.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -307,6 +427,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-crispr-screens-mageck-analysis.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -322,6 +444,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-crispr-screens-prime-editing-screens.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -337,6 +461,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-crispr-screens-screen-qc.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -353,6 +479,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
@@ -367,10 +495,28 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-experimental-design-batch-design.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
         "batch_design.R"
+      ]
+    },
+    {
+      "id": "bio-experimental-design-randomization-blocking",
+      "upstream_path": "experimental-design/randomization-blocking",
+      "score": 91,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
       ]
     },
     {
@@ -382,6 +528,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
@@ -396,6 +544,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
@@ -410,6 +560,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-metabolomics-lipidomics.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md"
@@ -424,6 +576,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-metabolomics-metabolite-annotation.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -439,6 +593,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-metabolomics-msdial-preprocessing.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -455,6 +611,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-metabolomics-normalization-qc.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -471,6 +629,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-metabolomics-pathway-mapping.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -486,10 +646,28 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-metabolomics-statistical-analysis.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
         "metabolomics_stats.R"
+      ]
+    },
+    {
+      "id": "bio-metabolomics-targeted-analysis",
+      "upstream_path": "metabolomics/targeted-analysis",
+      "score": 90,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
       ]
     },
     {
@@ -501,6 +679,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-metabolomics-xcms-preprocessing.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md"
@@ -515,6 +695,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
@@ -529,6 +711,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
@@ -543,6 +727,24 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-pathway-enrichment-visualization",
+      "upstream_path": "pathway-analysis/enrichment-visualization",
+      "score": 90,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
@@ -557,6 +759,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-pathway-go-enrichment.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -573,12 +777,46 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-pathway-gsea.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
         "gsea_go.R",
         "gsea_msigdb.R",
         "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-pathway-reactome",
+      "upstream_path": "pathway-analysis/reactome-pathways",
+      "score": 91,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-pathway-wikipathways",
+      "upstream_path": "pathway-analysis/wikipathways",
+      "score": 92,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
       ]
     },
     {
@@ -590,6 +828,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-phylo-bayesian-inference.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -605,6 +845,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-phylo-distance-calculations.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "README.txt",
@@ -626,6 +868,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-phylo-divergence-dating.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -645,6 +889,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-phylo-modern-tree-inference.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -661,6 +907,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-phylo-species-trees.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -677,6 +925,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-phylo-tree-io.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -692,6 +942,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-phylo-tree-manipulation.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -711,6 +963,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-phylo-tree-visualization.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -726,6 +980,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-population-genetics-rare-variant-association.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -741,6 +997,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-proteomics-data-import.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -757,6 +1015,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-proteomics-dia-analysis.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -773,6 +1033,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-proteomics-differential-abundance.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -791,6 +1053,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-proteomics-peptide-identification.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -809,6 +1073,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-proteomics-protein-inference.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -825,6 +1091,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-proteomics-proteomics-qc.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -841,6 +1109,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-proteomics-ptm-analysis.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -857,6 +1127,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-proteomics-quantification.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -872,6 +1144,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
@@ -886,6 +1160,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
@@ -900,6 +1176,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
@@ -914,6 +1192,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
@@ -928,6 +1208,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
@@ -942,6 +1224,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
@@ -956,6 +1240,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
@@ -970,6 +1256,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
@@ -984,6 +1272,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
@@ -998,6 +1288,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
@@ -1012,6 +1304,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
@@ -1026,6 +1320,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-variant-annotation.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -1042,6 +1338,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-variant-calling-filtering-best-practices.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -1058,6 +1356,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-variant-normalization.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -1073,6 +1373,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-11",
       "fix_log": "fixes/bio-vcf-basics.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -1088,6 +1390,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-vcf-manipulation.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -1103,6 +1407,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-vcf-statistics.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -1118,6 +1424,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-workflows-crispr-screen-pipeline.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -1133,6 +1441,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": "fixes/bio-workflows-metabolomics-pipeline.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -1149,6 +1459,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-15",
       "fix_log": "fixes/bio-workflows-proteomics-pipeline.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -1165,6 +1477,8 @@
       "open_p0": 0,
       "audited_on": "2026-09-16",
       "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
