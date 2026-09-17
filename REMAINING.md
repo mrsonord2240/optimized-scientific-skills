@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**486 remaining** across 62 folders. 73 are already refined and live in `skills/`.
+**480 remaining** across 62 folders. 75 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 73 refined, 2 audited and excluded, 1 out of scope, 486 remaining.
+The source tree holds 562 Skills: 75 refined, 6 audited and excluded, 1 out of scope, 480 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -20,7 +20,6 @@ The source tree holds 562 Skills: 73 refined, 2 audited and excluded, 1 out of s
 | clinical-biostatistics | 12 | 0 |
 | clip-seq | 12 | 0 |
 | spatial-transcriptomics | 12 | 0 |
-| causal-genomics | 11 | 0 |
 | copy-number | 11 | 0 |
 | alignment-files | 10 | 0 |
 | methylation-analysis | 10 | 0 |
@@ -42,6 +41,7 @@ The source tree holds 562 Skills: 73 refined, 2 audited and excluded, 1 out of s
 | sequence-manipulation | 7 | 0 |
 | systems-biology | 7 | 0 |
 | variant-calling | 7 | 6 |
+| causal-genomics | 6 | 2 |
 | ecological-genomics | 6 | 0 |
 | gene-regulatory-networks | 6 | 0 |
 | immunoinformatics | 6 | 0 |
@@ -62,13 +62,13 @@ The source tree holds 562 Skills: 73 refined, 2 audited and excluded, 1 out of s
 | restriction-analysis | 5 | 0 |
 | workflow-management | 5 | 0 |
 | machine-learning | 4 | 2 |
-| pathway-analysis | 4 | 2 |
 | phasing-imputation | 4 | 0 |
 | primer-design | 4 | 0 |
 | read-alignment | 4 | 0 |
 | rna-quantification | 4 | 0 |
 | rna-structure | 4 | 0 |
 | crispr-screens | 3 | 12 |
+| pathway-analysis | 3 | 2 |
 | experimental-design | 2 | 1 |
 | metabolomics | 2 | 7 |
 | proteomics | 1 | 8 |
@@ -80,8 +80,12 @@ fixed.
 
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
+| `bio-causal-genomics-colocalization-analysis` | 86 | Limited Release | 1 |
+| `bio-causal-genomics-genomic-sem` | 69 | Reject | 2 |
+| `bio-causal-genomics-heritability-partitioning` | 75 | Reject | 2 |
 | `bio-experimental-design-multiple-testing` | 82 | Beta Only | 0 |
 | `bio-experimental-design-sample-size` | 67 | Reject | 2 |
+| `bio-pathway-kegg-pathways` | 93 | Reject | 1 |
 
 ## Out of scope
 
@@ -141,14 +145,9 @@ fixed.
 
 ### causal-genomics
 
-- `bio-causal-genomics-colocalization-analysis` — `causal-genomics/colocalization-analysis`
 - `bio-causal-genomics-effector-gene-prioritization` — `causal-genomics/effector-gene-prioritization`
-- `bio-causal-genomics-fine-mapping` — `causal-genomics/fine-mapping`
 - `bio-causal-genomics-genetic-correlation` — `causal-genomics/genetic-correlation`
-- `bio-causal-genomics-genomic-sem` — `causal-genomics/genomic-sem`
-- `bio-causal-genomics-heritability-partitioning` — `causal-genomics/heritability-partitioning`
 - `bio-causal-genomics-mediation-analysis` — `causal-genomics/mediation-analysis`
-- `bio-causal-genomics-mendelian-randomization` — `causal-genomics/mendelian-randomization`
 - `bio-causal-genomics-pleiotropy-detection` — `causal-genomics/pleiotropy-detection`
 - `bio-causal-genomics-proteome-mr-drug-target` — `causal-genomics/proteome-mr-drug-target`
 - `bio-causal-genomics-transcriptome-wide-association` — `causal-genomics/transcriptome-wide-association`
@@ -517,7 +516,6 @@ fixed.
 ### pathway-analysis
 
 - `bio-pathway-enrichment-visualization` — `pathway-analysis/enrichment-visualization`
-- `bio-pathway-kegg-pathways` — `pathway-analysis/kegg-pathways`
 - `bio-pathway-reactome` — `pathway-analysis/reactome-pathways`
 - `bio-pathway-wikipathways` — `pathway-analysis/wikipathways`
 

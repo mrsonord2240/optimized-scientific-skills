@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "558aea51d3476d61727c943cc5d28882bae7d390"
+      "staging_commit": "978ae4ab4f9cc5317433ce6956b37aa1957d8295"
     }
   },
   "skills": [
@@ -59,6 +59,38 @@
         "clipkit_trim.py",
         "selection-analysis-workflow.md",
         "specialist-trimmers.md",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-causal-genomics-fine-mapping",
+      "upstream_path": "causal-genomics/fine-mapping",
+      "score": 94,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": "fixes/bio-causal-genomics-fine-mapping.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-causal-genomics-mendelian-randomization",
+      "upstream_path": "causal-genomics/mendelian-randomization",
+      "score": 87,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": "fixes/bio-causal-genomics-mendelian-randomization.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "cis_mr_drug_target.R",
+        "two_sample_mr.R",
         "usage-guide.md"
       ]
     },

@@ -23,8 +23,8 @@ justified.
 
 | | count |
 | --- | ---: |
-| Skills in this repository | **73** |
-| substantively modified by us, each with a fix log | 54 |
+| Skills in this repository | **75** |
+| substantively modified by us, each with a fix log | 56 |
 | verified unmodified apart from a declared licence | 19 |
 | audit coverage | **100%** |
 

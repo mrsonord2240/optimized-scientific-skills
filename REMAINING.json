@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 73,
-    "audited_and_excluded": 2,
+    "refined": 75,
+    "audited_and_excluded": 6,
     "out_of_scope": 1,
-    "remaining": 486
+    "remaining": 480
   },
   "remaining": [
     {
@@ -123,36 +123,16 @@
       "upstream_path": "database-access/blast-searches"
     },
     {
-      "id": "bio-causal-genomics-colocalization-analysis",
-      "upstream_path": "causal-genomics/colocalization-analysis"
-    },
-    {
       "id": "bio-causal-genomics-effector-gene-prioritization",
       "upstream_path": "causal-genomics/effector-gene-prioritization"
-    },
-    {
-      "id": "bio-causal-genomics-fine-mapping",
-      "upstream_path": "causal-genomics/fine-mapping"
     },
     {
       "id": "bio-causal-genomics-genetic-correlation",
       "upstream_path": "causal-genomics/genetic-correlation"
     },
     {
-      "id": "bio-causal-genomics-genomic-sem",
-      "upstream_path": "causal-genomics/genomic-sem"
-    },
-    {
-      "id": "bio-causal-genomics-heritability-partitioning",
-      "upstream_path": "causal-genomics/heritability-partitioning"
-    },
-    {
       "id": "bio-causal-genomics-mediation-analysis",
       "upstream_path": "causal-genomics/mediation-analysis"
-    },
-    {
-      "id": "bio-causal-genomics-mendelian-randomization",
-      "upstream_path": "causal-genomics/mendelian-randomization"
     },
     {
       "id": "bio-causal-genomics-pleiotropy-detection",
@@ -1215,10 +1195,6 @@
       "upstream_path": "pathway-analysis/enrichment-visualization"
     },
     {
-      "id": "bio-pathway-kegg-pathways",
-      "upstream_path": "pathway-analysis/kegg-pathways"
-    },
-    {
       "id": "bio-pathway-reactome",
       "upstream_path": "pathway-analysis/reactome-pathways"
     },
@@ -1957,6 +1933,36 @@
   ],
   "excluded": [
     {
+      "id": "bio-causal-genomics-colocalization-analysis",
+      "upstream_path": "causal-genomics/colocalization-analysis",
+      "score": 86,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 1,
+      "audited_on": "2026-09-17",
+      "fix_log": null
+    },
+    {
+      "id": "bio-causal-genomics-genomic-sem",
+      "upstream_path": "causal-genomics/genomic-sem",
+      "score": 69,
+      "grade": "Reject",
+      "deployable": false,
+      "open_p0": 2,
+      "audited_on": "2026-09-17",
+      "fix_log": "fixes/bio-causal-genomics-genomic-sem.md"
+    },
+    {
+      "id": "bio-causal-genomics-heritability-partitioning",
+      "upstream_path": "causal-genomics/heritability-partitioning",
+      "score": 75,
+      "grade": "Reject",
+      "deployable": false,
+      "open_p0": 2,
+      "audited_on": "2026-09-17",
+      "fix_log": null
+    },
+    {
       "id": "bio-experimental-design-multiple-testing",
       "upstream_path": "experimental-design/multiple-testing",
       "score": 82,
@@ -1975,6 +1981,16 @@
       "open_p0": 2,
       "audited_on": "2026-09-16",
       "fix_log": null
+    },
+    {
+      "id": "bio-pathway-kegg-pathways",
+      "upstream_path": "pathway-analysis/kegg-pathways",
+      "score": 93,
+      "grade": "Reject",
+      "deployable": false,
+      "open_p0": 1,
+      "audited_on": "2026-09-17",
+      "fix_log": "fixes/bio-pathway-kegg-pathways.md"
     }
   ],
   "out_of_scope": [
