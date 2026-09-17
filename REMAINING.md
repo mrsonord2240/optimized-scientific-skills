@@ -4,9 +4,11 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**486 remaining** across 62 folders. 73 are already done and live in `skills/`.
+**486 remaining** across 62 folders. 73 are already refined and live in `skills/`.
 
-| folder | remaining | done |
+The source tree holds 562 Skills: 73 refined, 2 audited and excluded, 1 out of scope, 486 remaining.
+
+| folder | remaining | refined |
 | --- | ---: | ---: |
 | workflows | 37 | 4 |
 | data-visualization | 20 | 0 |
@@ -73,13 +75,19 @@ Not yet refined. Scope is deliberately limited to the rest of
 
 ## Audited and excluded
 
-These were audited and did not pass. They are not pending; they are rejected until the
-defects behind the score are fixed.
+Audited and did not pass. Not pending — rejected until the defects behind the score are
+fixed.
 
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
 | `bio-experimental-design-multiple-testing` | 82 | Beta Only | 0 |
 | `bio-experimental-design-sample-size` | 67 | Reject | 2 |
+
+## Out of scope
+
+| skill | reason |
+| --- | --- |
+| `clawhub-installer` | upstream's own corpus installer, not a science Skill; declares os: darwin/linux only and exists to install the other Skills |
 
 ## The list
 

@@ -2,6 +2,13 @@
   "schema_version": 1,
   "generated": "2026-09-17",
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
+  "reconciliation": {
+    "skills_in_source_tree": 562,
+    "refined": 73,
+    "audited_and_excluded": 2,
+    "out_of_scope": 1,
+    "remaining": 486
+  },
   "remaining": [
     {
       "id": "bio-alignment-amplicon-clipping",
@@ -1968,6 +1975,13 @@
       "open_p0": 2,
       "audited_on": "2026-09-16",
       "fix_log": null
+    }
+  ],
+  "out_of_scope": [
+    {
+      "id": "clawhub-installer",
+      "upstream_path": "clawhub-installer",
+      "reason": "upstream's own corpus installer, not a science Skill; declares os: darwin/linux only and exists to install the other Skills"
     }
   ]
 }
