@@ -10,6 +10,13 @@ license: MIT
 
 Reference examples tested with: clusterProfiler 4.18+, rWikiPathways 1.26+, org.Hs.eg.db 3.18+.
 
+```r
+if (!require('BiocManager', quietly = TRUE))
+    install.packages('BiocManager')
+
+BiocManager::install(c('clusterProfiler', 'rWikiPathways', 'enrichplot', 'org.Hs.eg.db'))
+```
+
 Before using code patterns, verify installed versions match. If versions differ:
 - R: `packageVersion('<pkg>')` then `?function_name` to verify parameters
 
@@ -31,7 +38,7 @@ Scope: WikiPathways-specific enrichment - the data model, the `current/`-vs-date
 
 WikiPathways is a wiki: anyone can create or edit a pathway, content is CC0, and there is NO formal journal-style peer review gating a pathway's publication (Pico 2008 *PLoS Biol* 6:e184; Martens 2021 *NAR* 49:D613). The collection is republished as a dated GMT archive every MONTH. Three properties every misuse forgets:
 
-1. **`current/` is not a version.** `enrichWP`, `gseWP`, and `gson_WP` all silently download `data.wikipathways.org/current/gmt/` - the latest monthly release. Identical code two months apart returns different pathways and different p-values, with no error and no warning. Reproducibility is NOT a code freeze; it is a dated GMT: `downloadPathwayArchive(date='20240310', organism='Homo sapiens', format='gmt')`, read it, run `enricher`/`GSEA` on the pinned sets, and report the date in methods. `gson_WP()` freezes only within a session (it snapshots `current/`), not across time.
+1. **`current/` is not a version.** `enrichWP`, `gseWP`, and `gson_WP` all silently download `data.wikipathways.org/current/gmt/` - the latest monthly release. Identical code two months apart returns different pathways and different p-values, with no error and no warning. Reproducibility is NOT a code freeze; it is a dated GMT: `downloadPathwayArchive(date='YYYYMM10', organism='Homo sapiens', format='gmt')` (releases land on the 10th of each month), read it, run `enricher`/`GSEA` on the pinned sets, and report the date in methods. **The live archive keeps only the last ~12 months** (data.wikipathways.org's own landing page: "This site hosts monthly data releases for the last 12 months") - never hardcode an old literal date, compute a recent one instead (e.g. `format(Sys.Date() - 60, '%Y%m10')`), and for anything older use the permanent, citable Zenodo GMT/GPML archive (https://zenodo.org/communities/wikipathways). `gson_WP()` freezes only within a session (it snapshots `current/`), not across time.
 
 2. **The WP GMT speaks Entrez, and the wrong ID type fails silently.** The GMT is Entrez-keyed via BridgeDb. Passing SYMBOL or ENSEMBL yields near-zero overlap and an empty or misleading result with NO error - convert to Entrez upstream (`bitr`/OrgDb) before `enrichWP`. Likewise `universe=NULL` makes the background "all genes that happen to be in WP" - a small, biased set that inflates significance; pass the assayed/tested Entrez vector as `universe`.
 
@@ -48,6 +55,16 @@ WikiPathways is a wiki: anyone can create or edit a pathway, content is CC0, and
 | PFOCR (Pathway Figure OCR) | Hanspers 2020 *Genome Biol* 21:273; Shin 2023 *BMC Genomics* 24:713 | machine-OCR'd gene sets from published figures; larger + noisier, no edges | high-recall disease/process coverage as a complement; NOT what `enrichWP` queries |
 | KEGG / Reactome (siblings) | -> kegg-pathways, reactome-pathways | metabolic/signaling maps (live) / curated reactions (local) | the primary databases WP complements |
 
+## WikiPathways vs KEGG/Reactome
+
+| Feature | WikiPathways | KEGG | Reactome |
+|---------|--------------|------|----------|
+| License | CC0 (fully open) | Restrictive (commercial bulk/API) | CC-BY / CC0 |
+| Curation | Community wiki, no formal peer review | Largely automated KO reconstruction | Expert-curated and reviewed |
+| Species | ~30+ | 4000+ (genome-derived) | ~15 (deep human) |
+| Focus | Disease/drug + general | Metabolic/signaling | Reaction-level mechanism |
+| Reproducibility | Pin a dated monthly GMT (live `current/` otherwise) | Live REST API (date-dependent) | Local reactome.db (version-pinned) |
+
 ## Decision Tree by Scenario
 
 | Scenario | Recommended | Why |
@@ -61,6 +78,14 @@ WikiPathways is a wiki: anyone can create or edit a pathway, content is CC0, and
 | Non-model but WP-supported species (zebrafish, fly, worm, Arabidopsis) | `enrichWP(entrez, '<scientific name>')`, verify via `get_wp_organisms()` | WP covers ~30+ species |
 | Compare up- vs down-regulated | `compareCluster(geneClusters=list(up=..,down=..), fun='enrichWP', organism=)` | one model, faceted dotplot |
 | Genes are SYMBOL/ENSEMBL | convert to Entrez first (`bitr`) | the WP GMT is Entrez-keyed; other types overlap nothing |
+
+## Agent Workflow
+
+1. Load DE results and extract the significant gene list (ORA) or build the named decreasing ranking vector (GSEA).
+2. Convert gene IDs to Entrez with `bitr` and set the background universe to the tested genes.
+3. For a reproducible run, pin a dated GMT with `downloadPathwayArchive(date=, format='gmt')`, split the `name%version%wpid%org` term field, and run `enricher`/`GSEA`; otherwise run `enrichWP`/`gseWP` and log that it used the `current/` release.
+4. Make the result readable with `setReadable()` and report `p.adjust`/`qvalue` (not raw p).
+5. Hand the result object to enrichment-visualization for plots and corroborate hits against KEGG/Reactome.
 
 ## Over-Representation Analysis (enrichWP)
 
@@ -100,20 +125,21 @@ as.data.frame(wp_gsea)   # NES, p.adjust, core_enrichment (the leading edge)
 
 **Goal:** Make a WP analysis reproducible across re-runs by pinning a dated release instead of pulling `current/`.
 
-**Approach:** Download a dated GMT (pass `format='gmt'` - the default is `gpml`), split the compound `name%version%wpid%org` term field into TERM2GENE/TERM2NAME, run `enricher`/`GSEA` on the pinned sets, and report the date in methods.
+**Approach:** Download a dated GMT (pass `format='gmt'` - the default is `gpml`), split the compound `name%version%wpid%org` term field into TERM2GENE/TERM2NAME, run `enricher`/`GSEA` on the pinned sets, and report the date in methods. The live archive retains only the last ~12 months of monthly releases (10th of each month) - compute a recent date rather than hardcoding one that will 404 as time passes; for a fixed historical date beyond the window, use the Zenodo GMT/GPML archive instead (https://zenodo.org/communities/wikipathways).
 
 ```r
 library(rWikiPathways)
 library(tidyr)
 
+archive_date <- format(Sys.Date() - 60, '%Y%m10')   # e.g. '20260710'; report this date in methods
 # downloadPathwayArchive needs an organism to actually download a file (organism=NULL opens the index)
-gmt <- downloadPathwayArchive(date='20240310', organism='Homo sapiens', format='gmt', destpath=tempdir())
+gmt <- downloadPathwayArchive(date=archive_date, organism='Homo sapiens', format='gmt', destpath=tempdir())
 wp2gene <- read.gmt(file.path(tempdir(), gmt))
 wp2gene <- separate(wp2gene, term, c('name','version','wpid','org'), sep='%')   # term is a %-joined compound
 t2g <- wp2gene[, c('wpid','gene')]   # TERM2GENE
 t2n <- wp2gene[, c('wpid','name')]   # TERM2NAME
 
-wp_pinned <- enricher(sig, universe=all_entrez, TERM2GENE=t2g, TERM2NAME=t2n)   # report date='20240310'
+wp_pinned <- enricher(sig, universe=all_entrez, TERM2GENE=t2g, TERM2NAME=t2n)   # report date=archive_date
 ```
 
 `gson_WP(organism)` returns a GSON snapshot object, but it still pulls `current/` - it freezes a session, NOT a chosen historical date. Only the dated `downloadPathwayArchive` GMT survives a re-run months later.
@@ -138,6 +164,22 @@ wp_zfish <- enrichWP(gene=zfish_entrez, organism='Danio rerio')
 # verify the exact organism string before running:
 get_wp_organisms()                       # plural accessor; the string must match exactly
 ```
+
+## Understanding Results
+
+| Column | Description |
+|--------|-------------|
+| ID | WikiPathways stable ID (WP####) |
+| Description | Pathway name |
+| GeneRatio | Query genes in the pathway / query genes mapped to any pathway |
+| BgRatio | Pathway genes in the universe / universe genes mapped |
+| pvalue | Raw p-value |
+| p.adjust | BH-adjusted p-value (report this, not raw p) |
+| qvalue | q-value |
+| geneID | Genes in the pathway (symbols after setReadable) |
+| Count | Number of query genes in the pathway |
+
+For GSEA results read `NES` (sign = direction along the ranking) and `core_enrichment` (the leading-edge genes).
 
 ## Per-Method Failure Modes
 
@@ -186,6 +228,7 @@ get_wp_organisms()                       # plural accessor; the string must matc
 | `downloadPathwayArchive` opens a browser / downloads nothing | `organism=NULL` | name the organism to actually download a file |
 | GPML where a GMT was expected | `format` defaulted to `gpml` | pass `format='gmt'` |
 | `gseWP` error about vector names | geneList not named or not sorted decreasing | build a named Entrez vector, `sort(decreasing=TRUE)` |
+| `enrichWP`/`gseWP` returns NULL with no terms | wrong/non-canonical organism string (e.g. a common name like `'zebrafish'`) | verify with `listOrganisms()`/`get_wp_organisms()` first; the string must match exactly |
 
 ## References
 

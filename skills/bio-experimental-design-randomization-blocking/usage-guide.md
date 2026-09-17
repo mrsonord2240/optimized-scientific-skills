@@ -42,28 +42,6 @@ Tell your AI agent what you want to do:
 
 > "I want to test genotype and drug together; design a factorial and tell me how to read the interaction."
 
-## What the Agent Will Do
-
-1. Trace the randomization to identify the experimental unit and the true sample size.
-2. Flag pseudoreplication and recommend aggregation (pseudobulk) or a nested random effect.
-3. Choose a design layout (CRD, RCBD, Latin square, incomplete block, factorial, split-plot, nested) for the question and constraints.
-4. Generate a seeded, optionally restricted randomization including run order.
-5. Write the matching mixed-model random-effects structure and note small-sample degrees-of-freedom corrections.
-
-## Tips
-
-- The experimental unit is the smallest entity independently assigned to a treatment; that count, not the number of measurements, is the sample size.
-- Aggregate observational units to the experimental unit before testing, or model them as a nested random effect.
-- A sequencing lane, chip, or incubator run is almost always a whole-plot factor; analyze it as a split-plot, not a flat factorial.
-- Block only on factors with real between-block variation; blocking on noise wastes degrees of freedom.
-- Always randomize run order, not just treatment assignment, and record the random seed.
-- Analyze as randomized: a blocked or stratified design must include those factors in the model.
-
 ## Related Skills
 
-- batch-design - Assigning samples to sequencing batches/lanes and batch-effect correction
-- sample-size - The experimental unit defines what is replicated and counted
-- power-analysis - Blocking and nesting change the effective error variance
-- multiple-testing - The design fixes what counts as a family of tests
-- single-cell/preprocessing - Pseudobulk aggregation to the donor for scRNA-seq
-- clinical-biostatistics/power-and-sample-size - Randomization and design in the regulated-trial regime
+See SKILL.md's Related Skills section.

@@ -25,13 +25,22 @@ pathway_entrez
 
 # Reproducible pattern: pin a dated GMT, split the compound term, run enricher on the pinned sets.
 # format defaults to gpml -> pass format='gmt'; organism=NULL would open the index, not download.
-gmt <- downloadPathwayArchive(date = '20240310', organism = 'Homo sapiens',
+# Releases land on the 10th of each month and the live archive keeps only ~12 months (see
+# data.wikipathways.org's own landing page) -- compute a recent date instead of hardcoding one
+# that will 404 later; for a fixed historical date beyond the window, use the Zenodo GMT/GPML
+# archive instead (https://zenodo.org/communities/wikipathways).
+archive_date <- format(Sys.Date() - 60, '%Y%m10')   # e.g. '20260710'; report this date in methods
+gmt <- downloadPathwayArchive(date = archive_date, organism = 'Homo sapiens',
                               format = 'gmt', destpath = tempdir())
 wp2gene <- read.gmt(file.path(tempdir(), gmt))
 wp2gene <- separate(wp2gene, term, c('name', 'version', 'wpid', 'org'), sep = '%')
 t2g <- wp2gene[, c('wpid', 'gene')]
 t2n <- wp2gene[, c('wpid', 'name')]
 
-# report date='20240310' in methods; entrez_ids/all_entrez built upstream (see wikipathways_ora.R)
+# self-contained demo of the pinned-archive pattern: reuse the WP554 genes fetched above (line 23)
+# as the query set against the pinned archive's own gene universe (a real analysis instead passes
+# the tested-gene universe -- see wikipathways_ora.R); report date=archive_date in methods
+entrez_ids <- pathway_entrez
+all_entrez <- unique(t2g$gene)
 wp_pinned <- enricher(entrez_ids, universe = all_entrez, TERM2GENE = t2g, TERM2NAME = t2n)
 as.data.frame(wp_pinned)

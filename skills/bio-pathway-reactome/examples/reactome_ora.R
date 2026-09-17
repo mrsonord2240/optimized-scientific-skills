@@ -7,10 +7,16 @@ library(org.Hs.eg.db)
 
 sig_symbols <- c('CDK1','CCNB1','CCNB2','CDC20','BUB1','MAD2L1','PLK1','AURKA','AURKB','CDC25C',
                  'CCNA2','CDK2','E2F1','MCM2','MCM3','MCM4','MCM5','MCM6','MCM7','ORC1')
-all_symbols <- keys(org.Hs.eg.db, keytype = 'SYMBOL')   # stand-in for the genes actually measured
+
+# stand-in for the genes actually measured: a ~3000-gene sample, NOT the whole ~20,000-gene
+# annotated genome (that would be nearly the same size as the implicit default background and
+# would not show universe= changing anything - the exact pitfall this example exists to avoid).
+set.seed(42)
+all_symbols <- keys(org.Hs.eg.db, keytype = 'SYMBOL')
+measured_symbols <- unique(c(sig_symbols, sample(setdiff(all_symbols, sig_symbols), 3000 - length(sig_symbols))))
 
 sig_entrez <- bitr(sig_symbols, fromType = 'SYMBOL', toType = 'ENTREZID', OrgDb = org.Hs.eg.db)$ENTREZID
-universe   <- bitr(all_symbols, fromType = 'SYMBOL', toType = 'ENTREZID', OrgDb = org.Hs.eg.db)$ENTREZID
+universe   <- bitr(measured_symbols, fromType = 'SYMBOL', toType = 'ENTREZID', OrgDb = org.Hs.eg.db)$ENTREZID
 
 pvalue_cutoff <- 0.05   # filters on p.adjust (BH) by default; standard FDR gate
 qvalue_cutoff <- 0.2    # enrichPathway default secondary q-value gate

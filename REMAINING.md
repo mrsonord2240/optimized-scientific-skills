@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**468 remaining** across 59 folders. 88 are already refined and live in `skills/`.
+**468 remaining** across 59 folders. 90 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 88 refined, 5 audited and excluded, 1 out of scope, 468 remaining.
+The source tree holds 562 Skills: 90 refined, 3 audited and excluded, 1 out of scope, 468 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -67,7 +67,7 @@ The source tree holds 562 Skills: 88 refined, 5 audited and excluded, 1 out of s
 | rna-quantification | 4 | 0 |
 | rna-structure | 4 | 0 |
 | crispr-screens | 3 | 12 |
-| causal-genomics | 1 | 7 |
+| causal-genomics | 1 | 9 |
 | proteomics | 1 | 8 |
 
 ## Promoted, fix pass still needed
@@ -82,15 +82,11 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-causal-genomics-effector-gene-prioritization` | 84 | Limited Release |
 | `bio-causal-genomics-genetic-correlation` | 89 | Production Ready |
 | `bio-differential-expression-deseq2-basics` | 92 | Production Ready |
-| `bio-experimental-design-randomization-blocking` | 91 | Production Ready |
 | `bio-machine-learning-model-validation` | 93 | Limited Release |
 | `bio-machine-learning-prediction-explanation` | 89 | Limited Release |
-| `bio-metabolomics-targeted-analysis` | 90 | Production Ready |
 | `bio-molecular-descriptors` | 86 | Limited Release |
 | `bio-molecular-io` | 91 | Limited Release |
 | `bio-molecular-standardization` | 90 | Limited Release |
-| `bio-pathway-reactome` | 91 | Production Ready |
-| `bio-pathway-wikipathways` | 92 | Production Ready |
 | `bio-qsar-modeling` | 88 | Limited Release |
 | `bio-scaffold-analysis` | 88 | Limited Release |
 | `bio-similarity-searching` | 90 | Limited Release |
@@ -142,8 +138,6 @@ fixed.
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
 | `bio-causal-genomics-colocalization-analysis` | 86 | Limited Release | 1 |
-| `bio-causal-genomics-genomic-sem` | 69 | Reject | 2 |
-| `bio-causal-genomics-heritability-partitioning` | 75 | Reject | 2 |
 | `bio-experimental-design-multiple-testing` | 82 | Beta Only | 0 |
 | `bio-experimental-design-sample-size` | 67 | Reject | 2 |
 

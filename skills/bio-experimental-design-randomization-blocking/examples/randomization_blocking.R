@@ -47,8 +47,16 @@ units <- data.frame(id = sprintf('S%02d', 1:24),
 units$condition <- ave(units$id, units$day, FUN = function(ids)
   sample(rep(c('ctrl', 'treat'), length.out = length(ids))))
 units$run_order <- sample(nrow(units))
-# Confirm balance: each day holds equal ctrl/treat -> day is orthogonal to condition
-print(table(units$day, units$condition))
+
+# Confirm balance by assertion, not by eye: each day must hold equal ctrl/treat
+# (day orthogonal to condition), and run_order must be a valid within-day permutation.
+bal <- table(units$day, units$condition)
+print(bal)
+stopifnot(
+  "each day must have exactly 4 ctrl and 4 treat" = all(bal == 4),
+  "run_order must be a permutation of 1:24" = setequal(units$run_order, seq_len(nrow(units)))
+)
+cat('Balance assertions passed.\n')
 
 # ---------------------------------------------------------------------------
 # 3. Mixed model matching a nested design (cells within donor)
@@ -61,3 +69,53 @@ print(anova(fit_nested))   # Satterthwaite df via lmerTest; effective n driven b
 # Split-plot pattern (whole plot = processing day/run, sub-plot = condition):
 #   lmer(response ~ condition + (1 | day/sample), data = df)
 # The whole-plot factor must be tested against whole-plot error, never sub-plot error.
+
+# ---------------------------------------------------------------------------
+# 4. Split-plot Type-I error demonstration: a flat model IS anti-conservative for a
+#    whole-plot fixed effect; the split-plot mixed model is NOT.
+# ---------------------------------------------------------------------------
+# temp is a WHOLE-PLOT factor (assigned per run; true effect = 0, i.e. the null).
+# genotype is a SUB-PLOT factor (randomized within run; true effect = 0.6).
+# Repeat the simulated experiment many times and count how often each model's temp
+# p-value falls below 0.05 under the null -- the nominal Type-I error rate is 5%.
+n_runs      <- 6
+n_sub       <- 4
+sigma_run   <- 1.5   # between-run (whole-plot) SD -- the nuisance a flat model ignores
+sigma_resid <- 0.5
+true_genotype_effect <- 0.6
+true_temp_effect     <- 0    # null: no real whole-plot effect
+nsim  <- 400
+alpha <- 0.05
+
+one_sim <- function() {
+  runs <- data.frame(run = factor(1:n_runs), temp = rep(c('low', 'high'), each = n_runs / 2))
+  runs$temp <- sample(runs$temp)
+  run_effect <- setNames(rnorm(n_runs, 0, sigma_run), runs$run)
+  df <- do.call(rbind, lapply(seq_len(n_runs), function(r) {
+    genotype <- sample(rep(c('WT', 'KO'), each = n_sub / 2))
+    data.frame(run = runs$run[r], temp = runs$temp[r], genotype = genotype)
+  }))
+  df$y <- true_temp_effect * (df$temp == 'high') + true_genotype_effect * (df$genotype == 'KO') +
+    run_effect[df$run] + rnorm(nrow(df), 0, sigma_resid)
+
+  flat    <- lm(y ~ temp + genotype, data = df)                 # WRONG: ignores run clustering
+  correct <- lmer(y ~ temp + genotype + (1 | run), data = df)   # CORRECT: whole-plot error stratum
+  c(flat = coef(summary(flat))['templow', 'Pr(>|t|)'],
+    correct = coef(summary(correct))['templow', 'Pr(>|t|)'])
+}
+
+set.seed(20260917)
+res <- t(replicate(nsim, one_sim()))
+rate_flat    <- mean(res[, 'flat']    < alpha)
+rate_correct <- mean(res[, 'correct'] < alpha)
+cat(sprintf('Flat lm() rejection rate for the null whole-plot effect:    %.3f  (anti-conservative if >> %.2f)\n',
+            rate_flat, alpha))
+cat(sprintf('Split-plot lmer(...+(1|run)) rejection rate:                %.3f  (should be close to %.2f)\n',
+            rate_correct, alpha))
+stopifnot(
+  "flat model must be clearly anti-conservative (>3x nominal alpha)" = rate_flat > 3 * alpha,
+  "correct split-plot model must be within a reasonable band of nominal alpha" =
+    rate_correct > alpha / 2.5 && rate_correct < alpha * 2.5,
+  "flat model's Type-I error must exceed the correct model's by a wide margin" =
+    rate_flat > rate_correct + 0.10
+)

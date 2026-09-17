@@ -4,8 +4,8 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 88,
-    "audited_and_excluded": 5,
+    "refined": 90,
+    "audited_and_excluded": 3,
     "out_of_scope": 1,
     "remaining": 468
   },
@@ -1895,30 +1895,6 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed"
-    },
-    {
-      "id": "bio-causal-genomics-genomic-sem",
-      "upstream_path": "causal-genomics/genomic-sem",
-      "score": 69,
-      "grade": "Reject",
-      "deployable": false,
-      "open_p0": 2,
-      "audited_on": "2026-09-17",
-      "fix_log": "fixes/bio-causal-genomics-genomic-sem.md",
-      "fix_pass": "done",
-      "reaudit": "needed"
-    },
-    {
-      "id": "bio-causal-genomics-heritability-partitioning",
-      "upstream_path": "causal-genomics/heritability-partitioning",
-      "score": 75,
-      "grade": "Reject",
-      "deployable": false,
-      "open_p0": 2,
-      "audited_on": "2026-09-17",
-      "fix_log": "fixes/bio-causal-genomics-heritability-partitioning.md",
-      "fix_pass": "done",
-      "reaudit": "needed"
     },
     {
       "id": "bio-experimental-design-multiple-testing",

@@ -47,23 +47,9 @@ Tell your AI agent what you want to do:
 > "Lay out the ICH M10 parameters I need for a regulated PK assay versus an exploratory study."
 > "Should I use a deuterated or 13C internal standard, and what do I verify before trusting it?"
 
-## What the Agent Will Do
-
-1. Establish the panel, transitions, and internal-standard strategy, and pick a validation tier by application.
-2. Fit weighted calibration on the analyte/IS response ratio and accept it by per-level back-calculated %RE.
-3. Set the LLOQ from accuracy and noise, not from an extrapolated curve.
-4. Normalize samples to the internal standard and back-calculate concentrations within the validated range.
-5. Confirm identity by ion ratio and flag isobaric interferences.
-6. Compute validation metrics (accuracy, precision, matrix factor, recovery, carryover) and export concentrations with quality flags.
-
-## Tips
-
-- Judge a calibration by back-calculated %RE at the low end, never by R-squared alone.
-- One SIL-IS per analyte is the gold standard; the further an analyte is from its IS in retention time and chemistry, the larger the uncorrected matrix error.
-- Prefer 13C/15N internal standards over deuterium; if forced to deuterium, verify co-elution by overlaying analyte and IS chromatograms.
-- Low CV is not evidence of a correct number -- precision and accuracy decouple in shared-IS panels.
-- Pre-analytics is upstream of every assay safeguard and invisible to all of them; quench fast and measure stability for labile metabolites.
-- A single transition has no defense against isobaric interference -- always carry a qualifier where sensitivity allows.
+The full workflow (panel/IS/validation-tier selection, calibration, LOD/LLOQ, IS normalization,
+ion-ratio confirmation, precision, and report format) and every failure-mode tip live in
+SKILL.md -- it is the single source for what the agent does and why.
 
 ## Related Skills
 

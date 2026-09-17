@@ -10,6 +10,14 @@ license: MIT
 
 Reference examples tested with: ReactomePA 1.54+, reactome.db 1.95+, clusterProfiler 4.18+.
 
+```r
+if (!require('BiocManager', quietly = TRUE))
+    install.packages('BiocManager')
+
+BiocManager::install(c('ReactomePA', 'reactome.db', 'org.Hs.eg.db', 'clusterProfiler'))
+BiocManager::install('ReactomeGSA')   # only for comparative / multi-omics analysis
+```
+
 Before using code patterns, verify installed versions match. If versions differ:
 - R: `packageVersion('<pkg>')` then `?function_name` to verify parameters
 
@@ -139,10 +147,30 @@ sc  <- analyse_sc_clusters(seurat_obj, use_interactors=FALSE)    # per-cluster s
 
 Use ReactomePA for "is this one list over-represented / coordinately changed"; use ReactomeGSA for "which pathways DIFFER between conditions / omics / clusters".
 
+## Understanding Results
+
+`enrichResult` (ORA) columns:
+
+| Column | Description |
+|--------|-------------|
+| ID | Reactome stable id (R-HSA-XXXXX) |
+| Description | Pathway name |
+| GeneRatio | query genes in the pathway / query genes mapped to any pathway |
+| BgRatio | pathway genes in the universe / universe genes mapped (denominator ~11,230 if no universe passed) |
+| RichFactor | query genes in the pathway / total genes in the pathway |
+| FoldEnrichment | observed / expected fraction - read effect size here, do not compute it by hand |
+| zScore | standardized enrichment score |
+| p.adjust | BH-adjusted p-value (report this, not raw pvalue) |
+| qvalue | q-value |
+| geneID | genes in the pathway (symbols when readable=TRUE) |
+| Count | number of query genes in the pathway |
+
+`gseaResult` (GSEA) adds `setSize`, `enrichmentScore`, `NES`, `rank`, `leading_edge`, and `core_enrichment`.
+
 ## Per-Method Failure Modes
 
 ### SYMBOL or ENSEMBL passed to enrichPathway/gsePathway
-**Trigger:** feeding a symbol or Ensembl vector because enrichGO accepted one. **Mechanism:** enrichPathway has NO keyType argument; the gene->pathway map is reactome.db's ENTREZ-keyed table, so non-ENTREZ ids match nothing. **Symptom:** zero rows on a clearly enriched list, no error. **Fix:** `bitr(..., toType='ENTREZID')` first; this is the #1 "why are my results empty" cause.
+**Trigger:** feeding a symbol or Ensembl vector because enrichGO accepted one. **Mechanism:** enrichPathway has NO keyType argument; the gene->pathway map is reactome.db's ENTREZ-keyed table, so non-ENTREZ ids match nothing. **Symptom:** returns `NULL` (not a 0-row `enrichResult`) on a clearly enriched list, with a console message ("--> No gene can be mapped...", "--> return NULL...") but no error. **Fix:** `bitr(..., toType='ENTREZID')` first; this is the #1 "why are my results empty" cause - check for `NULL`, not `nrow(result) == 0`.
 
 ### No universe -> inflated significance
 **Trigger:** calling enrichPathway without `universe=`. **Mechanism:** the background defaults to all ~11,200 Reactome-annotated genes, not the ~15,000 genes measured, shrinking every p-value. **Symptom:** implausibly significant pathways, BgRatio denominator ~11230. **Fix:** pass the measured ENTREZ set as `universe`.
@@ -179,7 +207,7 @@ Use ReactomePA for "is this one list over-represented / coordinately changed"; u
 
 | Error / symptom | Cause | Solution |
 |-----------------|-------|----------|
-| enrichPathway returns 0 rows on a clear list | genes are SYMBOL/ENSEMBL, not ENTREZ | `bitr(..., toType='ENTREZID')` first (no keyType arg) |
+| enrichPathway returns `NULL` on a clear list | genes are SYMBOL/ENSEMBL, not ENTREZ | `bitr(..., toType='ENTREZID')` first (no keyType arg); guard with `is.null(result)`, not `nrow(result) == 0` |
 | Implausibly significant pathways | no `universe=`, background is all ~11k Reactome genes | pass the measured ENTREZ set as `universe` |
 | Top hits are parent/child of one pathway | hierarchy nesting double-counts the signal | report the deepest significant node; ancestors as context |
 | `viewPathway('R-HSA-...')` errors or is empty | first arg is the NAME (Description), not the id | `viewPathway(ora@result$Description[i], ...)` |
@@ -187,6 +215,10 @@ Use ReactomePA for "is this one list over-represented / coordinately changed"; u
 | Different p-values than reactome.org | release skew + different universe between local db and web service | name the tool, reactome.db version, and background |
 | gsePathway results change each run | no `set.seed` before the permutation | set a fixed seed |
 | Unsupported-organism error | organism outside the 7 reactome.db maps | use the web AnalysisService / ReactomeGSA |
+
+## Practice Boundaries
+
+A Reactome enrichment result is a hypothesis-generating research finding about a gene list, not a diagnostic test: it says which curated pathways a list of genes is statistically associated with, nothing about any individual's disease status or treatment. A request to read a named patient's or sample's pathway result as a diagnosis or a drug recommendation is out of scope regardless of how clean the analysis is - decline and redirect to a qualified clinician.
 
 ## References
 

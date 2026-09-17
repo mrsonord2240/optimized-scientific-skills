@@ -97,6 +97,8 @@ units$run_order <- sample(nrow(units))
 
 **Approach:** Group units into homogeneous blocks (day, litter, chip, donor), randomize treatments within block, and add the block as a term in the model. The paired t-test is the special case of an RCBD with block size 2. Block only on factors with real between-block variation; blocking on a noise factor spends error df for nothing.
 
+**Caution with very few blocks:** the *estimate* of block variance is itself unreliable when there are only 2-3 blocks (1-2 df) — under a true between-block variance of exactly 0, simulation shows the block sum-of-squares estimate's relative noise (CV) at 2 blocks is roughly 4x its value at 20 blocks (1.36 vs 0.33; `n=2000` simulated null datasets). A nonzero sample block SS from a 2-3 block design does not confirm real between-block variation, and a near-zero one does not rule it out — don't decide whether to block from the observed SS alone at this block count; use prior/substantive knowledge of the nuisance source instead. See Quantitative Thresholds.
+
 ```r
 library(designit)                        # constrained assignment; verify API vs installed vignette
 bc <- BatchContainer$new(dimensions = list(block = 3, position = 8))
@@ -121,6 +123,25 @@ library(lme4); library(lmerTest)
 fit <- lmer(expression ~ condition + (1 | run/sample), data = df)   # run, and sample within run
 anova(fit)                               # Satterthwaite df via lmerTest
 ```
+
+**Worked example — the anti-conservative claim, demonstrated on a whole-plot fixed effect.** The
+example above has only a *sub-plot* fixed effect (`condition`, randomized within run); it does not
+exercise the headline claim, which is specifically about a fixed effect that varies *between* whole
+plots (e.g. incubator temperature applied per run). Simulating that case under the null (no true
+whole-plot effect) and repeating the experiment many times shows the difference directly:
+
+```r
+# temp is a WHOLE-PLOT factor (assigned per run, true effect = 0); genotype is sub-plot
+# (randomized within run, true effect = 0.6). Full simulation: examples/randomization_blocking.R.
+flat    <- lm(y ~ temp + genotype, data = df)                 # WRONG: ignores run clustering
+correct <- lmer(y ~ temp + genotype + (1 | run), data = df)   # CORRECT: whole-plot error stratum
+```
+
+Over 400 simulated experiments (6 runs, 4 samples/run, between-run SD 1.5x the residual SD; verified
+on lme4 2.0.6 / lmerTest 3.2.1), the flat model's whole-plot p-value fell below 0.05 on 35.5% of runs
+despite the true whole-plot effect being exactly zero — **anti-conservative**, as claimed. The
+split-plot model's whole-plot p-value fell below 0.05 on 3.2% of runs, matching the nominal 5%
+Type-I error rate.
 
 ## Factorial Designs and Interactions
 
@@ -150,7 +171,9 @@ A factorial design crosses factors so every observation informs every main effec
 - **Trigger:** adding a block term with negligible between-block variance.
 - **Mechanism:** spends error df without removing variance.
 - **Symptom:** power lower than the unblocked design.
-- **Fix:** block only on factors with documented between-block variation.
+- **Fix:** block only on factors with documented between-block variation. With only 2-3 blocks, don't
+  judge "documented" from the sample block SS alone — see the small-block-count caution under
+  Blocking and Local Control.
 
 ### Over-/under-specified random effects
 - **Trigger:** maximal random structure that will not converge, or a structure missing a randomization level.
@@ -167,6 +190,7 @@ A factorial design crosses factors so every observation informs every main effec
 | Latin square needs n² runs for n treatments | standard design theory | controls two nuisances orthogonally |
 | Use Kenward-Roger/Satterthwaite df when EU count is small (roughly < ~10/group) | Kenward & Roger 1997 *Biometrics* 53:983 | naive F df are anti-conservative with few units |
 | Maximal random effects for confirmatory; prune for small samples | Barr 2013; Matuschek 2017 | Type-I protection vs convergence/power tradeoff |
+| RCBD needs enough blocks (rule of thumb >= 4) before trusting the block-variance estimate itself | small-sample variance estimation (block SS has df = #blocks - 1) | at 2-3 blocks the sample block SS is itself high-variance; a nonzero draw does not confirm real between-block variation |
 
 ## Common Errors
 

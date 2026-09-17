@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "d9971f6e87527b8030c5a702396388c13d1362ab"
+      "staging_commit": "ffa2608603c78360aea038e82a5107a53aa32058"
     }
   },
   "skills": [
@@ -115,6 +115,43 @@
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-causal-genomics-genomic-sem",
+      "upstream_path": "causal-genomics/genomic-sem",
+      "score": 88,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": "fixes/bio-causal-genomics-genomic-sem.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "genomic_sem_commonfactor.R",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-causal-genomics-heritability-partitioning",
+      "upstream_path": "causal-genomics/heritability-partitioning",
+      "score": 88.2,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": "fixes/bio-causal-genomics-heritability-partitioning.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "ldsc_partitioned_h2.sh",
+        "smoke_test_ldsc.sh",
         "usage-guide.md"
       ]
     },
@@ -525,17 +562,19 @@
     {
       "id": "bio-experimental-design-randomization-blocking",
       "upstream_path": "experimental-design/randomization-blocking",
-      "score": 91,
+      "score": 93,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-17",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-experimental-design-randomization-blocking.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "randomization_blocking.R",
+        "usage-guide.md"
       ]
     },
     {
@@ -698,12 +737,13 @@
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-17",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-metabolomics-targeted-analysis.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "usage-guide.md"
       ]
     },
     {
@@ -846,33 +886,38 @@
     {
       "id": "bio-pathway-reactome",
       "upstream_path": "pathway-analysis/reactome-pathways",
-      "score": 91,
+      "score": 95,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-17",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-pathway-reactome.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "reactome_gsea.R",
+        "reactome_ora.R",
+        "usage-guide.md"
       ]
     },
     {
       "id": "bio-pathway-wikipathways",
       "upstream_path": "pathway-analysis/wikipathways",
-      "score": 92,
+      "score": 94,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-17",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-pathway-wikipathways.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "usage-guide.md",
+        "wikipathways_explore.R"
       ]
     },
     {

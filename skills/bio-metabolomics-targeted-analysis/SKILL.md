@@ -134,6 +134,47 @@ lod <- (mean(blank_areas) + 3 * sd(blank_areas)) / slope   # S/N~3 convention
 # LLOQ is the lowest calibrator passing +-20% %RE AND precision -- not 10*SD/slope alone
 ```
 
+### Precision: Intra-Day and Inter-Day (Nested ANOVA, Not Pooled SD)
+
+**Goal:** Accept a QC level only when both intra-day and true inter-day precision meet the
+Quantitative Thresholds table's CV limits (<=15%, <=20% at the LLOQ) -- and compute inter-day
+correctly, because a naive pooled SD across days can pass a level that is actually failing.
+
+**Approach:** Compute intra-day CV per day (SD/mean within each day, replicates only). For
+inter-day, do not simply pool every day's replicates into one SD/mean -- that discards the day
+structure and can understate the true dispersion. Use one-way ANOVA variance components instead:
+within-day variance = MSwithin (mean square error from `aov(conc ~ factor(day))`), between-day
+variance = max(0, (MSbetween - MSwithin) / replicates_per_day), total variance = within +
+between, inter-day CV% = sqrt(total variance) / grand mean * 100.
+
+```r
+# LLOQ-level QC, 2 days x 3 replicates, nominal 2 ng/mL -- planted a low rep-3
+# outlier both days (real within-day imprecision, not a day-to-day shift).
+qc <- data.frame(
+  day = rep(1:2, each = 3),
+  measured_conc = c(2.35, 2.30, 1.55, 2.40, 2.28, 1.60)
+)
+
+intra <- aggregate(measured_conc ~ day, qc, function(x) sd(x) / mean(x) * 100)
+# day 1: 21.7% | day 2: 20.6% -- both FAIL the 20% LLOQ tolerance
+
+naive_pooled_cv <- sd(qc$measured_conc) / mean(qc$measured_conc) * 100
+# 18.9% -- WRONG for inter-day: ignores the day structure and PASSES, masking the failure
+
+fit <- aov(measured_conc ~ factor(day), data = qc)
+ms <- summary(fit)[[1]][["Mean Sq"]]
+n_per_day <- nrow(qc) / length(unique(qc$day))
+var_within <- ms[2]
+var_between <- max(0, (ms[1] - ms[2]) / n_per_day)
+inter_day_cv <- sqrt(var_within + var_between) / mean(qc$measured_conc) * 100
+# 21.1% -- correct nested-ANOVA inter-day (total) precision, correctly FAILS
+```
+
+Both tiers must independently pass. A naive pooled-SD "inter-day" number is not a validated
+inter-day precision estimate -- on this synthetic LLOQ data it reads 18.9% (PASS) against a true
+nested-ANOVA inter-day CV of 21.1% (FAIL), because pooling raw replicates across days into one
+SD/mean uses the wrong degrees of freedom and can dilute a real within-day outlier's leverage.
+
 ## Per-Method Failure Modes
 
 ### Matrix suppression unaccounted
@@ -171,7 +212,7 @@ lod <- (mean(blank_areas) + 3 * sd(blank_areas)) / slope   # S/N~3 convention
 | Threshold | Source | Rationale |
 |---|---|---|
 | Calibrator back-calc within +/-15% (+/-20% at LLOQ), >=75% of >=6 levels pass | ICH M10 (Step 4, 2022) | Per-level accuracy, not correlation, defines a usable curve |
-| QC accuracy +/-15% (+/-20% at LLOQ); precision CV <=15% (<=20% at LLOQ) | ICH M10 | Intra- and inter-day acceptance at >=4 levels |
+| QC accuracy +/-15% (+/-20% at LLOQ); precision CV <=15% (<=20% at LLOQ) | ICH M10 | Intra- and inter-day acceptance at >=4 levels -- compute inter-day by nested ANOVA, not pooled SD (see Precision subsection) |
 | IS-normalized matrix factor CV <=15% across >=6 lots | ICH M10 / Matuszewski 2003 | Proof the IS cancels matrix effect; raw MF may be poor while IS-normalized MF ~1 |
 | Carryover <=20% of LLOQ (analyte), <=5% (IS) | ICH M10 | Measured in a blank after the ULOQ; concentration-dependent, must be quantified not eyeballed |
 | Selectivity: interference at LLOQ <=20% of analyte, <=5% of IS response | ICH M10 | Across >=6 individual matrix lots |
@@ -179,6 +220,23 @@ lod <- (mean(blank_areas) + 3 * sd(blank_areas)) / slope   # S/N~3 convention
 | Ion-ratio tolerance +/-30% relative (LC-MS/MS) | SANTE/2020/12830 | Illustrative codified window; enforce only above a few times the LLOQ |
 | >=10-15 points across a chromatographic peak | Convention | Reliable integration; sets the cycle-time ceiling |
 | S/N ~3 = LOD, ~5-10 = LLOQ | Convention | Detection vs reliable quantification; LLOQ also bounded by accuracy/precision |
+
+## Report Format
+
+**Goal:** Deliver a single table an agent or reviewer can act on without re-deriving units or
+pass/fail status.
+
+**Approach:** One row per sample x analyte, carrying the analyte name, unit, back-calculated
+concentration (or `NA` with a reason if unreportable), and every quality flag computed above.
+
+| sample | analyte | unit | conc | lloq | reportable | id_confirmed | notes |
+|---|---|---|---|---|---|---|---|
+| S1 | caffeine | ng/mL | 14.84 | 2 | TRUE | TRUE | -- |
+| S5 | caffeine | ng/mL | NA | 2 | FALSE | FALSE | ion ratio outside +/-30%, unconfirmed |
+
+Never collapse an unreportable or unconfirmed sample to a blank cell or a zero -- state the
+reason (`below_LLOQ`, `ion_ratio_fail`, `carryover_flagged`) so a downstream reader cannot
+mistake "no data" for "zero concentration."
 
 ## Common Errors
 

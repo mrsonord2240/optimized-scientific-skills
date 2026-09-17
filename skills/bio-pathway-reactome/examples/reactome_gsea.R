@@ -4,12 +4,30 @@
 library(ReactomePA)
 library(clusterProfiler)
 library(org.Hs.eg.db)
+library(reactome.db)
 library(enrichplot)
 
+set.seed(42)
+
+# Plant a real coordinated shift on one Reactome pathway's own member genes so this demo
+# exercises its own reporting/plotting branch instead of returning 0 terms by construction -
+# a pure rnorm() ranking over every gene is a null by definition and cannot enrich.
+planted_id <- 'R-HSA-877300'   # Interferon gamma signaling
+planted_entrez <- unique(na.omit(AnnotationDbi::select(reactome.db, keys = planted_id,
+                          columns = 'ENTREZID', keytype = 'PATHID')$ENTREZID))
+planted_symbols <- unique(na.omit(AnnotationDbi::select(org.Hs.eg.db, keys = planted_entrez,
+                          columns = 'SYMBOL', keytype = 'ENTREZID')$SYMBOL))
+
+# Background: a ~3000-gene sample that includes the planted pathway plus random noise genes -
+# a realistic "genes measured" size, not the whole ~20,000-gene genome.
+all_symbols <- keys(org.Hs.eg.db, keytype = 'SYMBOL')
+noise_bg <- sample(setdiff(all_symbols, planted_symbols), 3000 - length(planted_symbols))
+background_symbols <- unique(c(planted_symbols, noise_bg))
+
 # stand-in ranked statistic: a per-gene value (t-stat / signed -log10 p / shrunken log2FC) for every gene.
-de <- data.frame(symbol = keys(org.Hs.eg.db, keytype = 'SYMBOL'), stringsAsFactors = FALSE)
-set.seed(123)   # only to make this self-contained demo deterministic
+de <- data.frame(symbol = background_symbols, stringsAsFactors = FALSE)
 de$stat <- rnorm(nrow(de))
+de$stat[de$symbol %in% planted_symbols] <- de$stat[de$symbol %in% planted_symbols] + 1.5   # planted shift
 
 mapped <- bitr(de$symbol, fromType = 'SYMBOL', toType = 'ENTREZID', OrgDb = org.Hs.eg.db)
 de <- merge(de, mapped, by.x = 'symbol', by.y = 'SYMBOL')
@@ -25,6 +43,8 @@ gse <- gsePathway(geneList = gene_list, organism = 'human',
                   pvalueCutoff = pvalue_cutoff, pAdjustMethod = 'BH', verbose = FALSE)
 
 results_df <- as.data.frame(gse)
+cat('Rows returned:', nrow(results_df), '\n')
+cat('Is planted pathway', planted_id, 'recovered?', planted_id %in% results_df$ID, '\n')
 results_df
 
 # gseaResult plots are owned by enrichment-visualization; shown here for a Reactome GSEA result.
