@@ -1,0 +1,1142 @@
+{
+  "schema_version": 1,
+  "generated": "2026-09-17",
+  "note": "Provenance is per Skill. The tree is flat by Skill id; upstream_path records where each Skill came from in its source repository.",
+  "sources": {
+    "gptomics-bioskills": {
+      "upstream_repository": "https://github.com/GPTomics/bioSkills",
+      "upstream_commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+      "upstream_licence": "MIT",
+      "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
+      "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
+      "staging_commit": "558aea51d3476d61727c943cc5d28882bae7d390"
+    }
+  },
+  "skills": [
+    {
+      "id": "bio-admet-prediction",
+      "upstream_path": "chemoinformatics/admet-prediction",
+      "score": 86,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": null,
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-alignment-multiple",
+      "upstream_path": "alignment/multiple-alignment",
+      "score": 85,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-11",
+      "fix_log": "fixes/bio-alignment-multiple.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "specialist-tools.md",
+        "tcoffee.md"
+      ]
+    },
+    {
+      "id": "bio-alignment-trimming",
+      "upstream_path": "alignment/alignment-trimming",
+      "score": 83,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-alignment-trimming.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "bmge_trim.py",
+        "clipkit_trim.py",
+        "selection-analysis-workflow.md",
+        "specialist-trimmers.md",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-clinical-databases-clinvar-lookup",
+      "upstream_path": "clinical-databases/clinvar-lookup",
+      "score": 84,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-clinical-databases-clinvar-lookup.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "clinvar_query.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-clinical-databases-dbsnp-queries",
+      "upstream_path": "clinical-databases/dbsnp-queries",
+      "score": 86,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-clinical-databases-dbsnp-queries.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "dbsnp_lookup.py"
+      ]
+    },
+    {
+      "id": "bio-clinical-databases-gnomad-frequencies",
+      "upstream_path": "clinical-databases/gnomad-frequencies",
+      "score": 86,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-clinical-databases-gnomad-frequencies.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "gnomad_query.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-clinical-databases-myvariant-queries",
+      "upstream_path": "clinical-databases/myvariant-queries",
+      "score": 84,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-clinical-databases-myvariant-queries.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "query_myvariant.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-crispr-screens-bagel-essentiality",
+      "upstream_path": "crispr-screens/bagel-essentiality",
+      "score": 88,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-crispr-screens-bagel-essentiality.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "run_bagel2.sh",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-crispr-screens-base-editing-analysis",
+      "upstream_path": "crispr-screens/base-editing-analysis",
+      "score": 92,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-crispr-screens-base-editing-analysis.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-crispr-screens-batch-correction",
+      "upstream_path": "crispr-screens/batch-correction",
+      "score": 91,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-crispr-screens-batch-correction.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-crispr-screens-copy-number-correction",
+      "upstream_path": "crispr-screens/copy-number-correction",
+      "score": 82,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-crispr-screens-copy-number-correction.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "run_crispr_cleanr.R",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-crispr-screens-crispresso-editing",
+      "upstream_path": "crispr-screens/crispresso-editing",
+      "score": 91,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-crispr-screens-crispresso-editing.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "crispresso_analysis.sh",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-crispr-screens-drugz-chemogenomic",
+      "upstream_path": "crispr-screens/drugz-chemogenomic",
+      "score": 90,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-crispr-screens-drugz-chemogenomic.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "run_drugz.py"
+      ]
+    },
+    {
+      "id": "bio-crispr-screens-hit-calling",
+      "upstream_path": "crispr-screens/hit-calling",
+      "score": 90,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-crispr-screens-hit-calling.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "consensus_hits.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-crispr-screens-jacks-analysis",
+      "upstream_path": "crispr-screens/jacks-analysis",
+      "score": 92,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-crispr-screens-jacks-analysis.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "run_jacks.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-crispr-screens-library-design",
+      "upstream_path": "crispr-screens/library-design",
+      "score": 91,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-crispr-screens-library-design.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "design_library.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-crispr-screens-mageck-analysis",
+      "upstream_path": "crispr-screens/mageck-analysis",
+      "score": 88,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-crispr-screens-mageck-analysis.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-crispr-screens-prime-editing-screens",
+      "upstream_path": "crispr-screens/prime-editing-screens",
+      "score": 81.2,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-crispr-screens-prime-editing-screens.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "design_pegrna_pridict2.py"
+      ]
+    },
+    {
+      "id": "bio-crispr-screens-screen-qc",
+      "upstream_path": "crispr-screens/screen-qc",
+      "score": 94,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-crispr-screens-screen-qc.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "screen_qc.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-differential-expression-deseq2-basics",
+      "upstream_path": "differential-expression/deseq2-basics",
+      "score": 92,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": null,
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-experimental-design-batch-design",
+      "upstream_path": "experimental-design/batch-design",
+      "score": 87,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-experimental-design-batch-design.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "batch_design.R"
+      ]
+    },
+    {
+      "id": "bio-machine-learning-model-validation",
+      "upstream_path": "machine-learning/model-validation",
+      "score": 93,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": null,
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-machine-learning-prediction-explanation",
+      "upstream_path": "machine-learning/prediction-explanation",
+      "score": 89,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": null,
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-metabolomics-lipidomics",
+      "upstream_path": "metabolomics/lipidomics",
+      "score": 92,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-metabolomics-lipidomics.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-metabolomics-metabolite-annotation",
+      "upstream_path": "metabolomics/metabolite-annotation",
+      "score": 95,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-metabolomics-metabolite-annotation.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "annotate_features.py"
+      ]
+    },
+    {
+      "id": "bio-metabolomics-msdial-preprocessing",
+      "upstream_path": "metabolomics/msdial-preprocessing",
+      "score": 91,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-metabolomics-msdial-preprocessing.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "process_msdial_output.R",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-metabolomics-normalization-qc",
+      "upstream_path": "metabolomics/normalization-qc",
+      "score": 92,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-metabolomics-normalization-qc.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "normalize_data.R",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-metabolomics-pathway-mapping",
+      "upstream_path": "metabolomics/pathway-mapping",
+      "score": 92,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-metabolomics-pathway-mapping.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-metabolomics-statistical-analysis",
+      "upstream_path": "metabolomics/statistical-analysis",
+      "score": 96,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-metabolomics-statistical-analysis.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "metabolomics_stats.R"
+      ]
+    },
+    {
+      "id": "bio-metabolomics-xcms-preprocessing",
+      "upstream_path": "metabolomics/xcms-preprocessing",
+      "score": 92,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-metabolomics-xcms-preprocessing.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-molecular-descriptors",
+      "upstream_path": "chemoinformatics/molecular-descriptors",
+      "score": 86,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": null,
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-molecular-io",
+      "upstream_path": "chemoinformatics/molecular-io",
+      "score": 91,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": null,
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-molecular-standardization",
+      "upstream_path": "chemoinformatics/molecular-standardization",
+      "score": 90,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": null,
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-pathway-go-enrichment",
+      "upstream_path": "pathway-analysis/go-enrichment",
+      "score": 90,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-pathway-go-enrichment.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "go_all_ontologies.R",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-pathway-gsea",
+      "upstream_path": "pathway-analysis/gsea",
+      "score": 97,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-pathway-gsea.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "gsea_go.R",
+        "gsea_msigdb.R",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-phylo-bayesian-inference",
+      "upstream_path": "phylogenetics/bayesian-inference",
+      "score": 87,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-phylo-bayesian-inference.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "bayesian_convergence.py"
+      ]
+    },
+    {
+      "id": "bio-phylo-distance-calculations",
+      "upstream_path": "phylogenetics/distance-calculations",
+      "score": 87,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-phylo-distance-calculations.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "README.txt",
+        "SKILL.md",
+        "bootstrap_consensus.py",
+        "build_nj_tree.py",
+        "model_corrected_tree.R",
+        "sim8.fasta",
+        "sim8_true.nwk",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-phylo-divergence-dating",
+      "upstream_path": "phylogenetics/divergence-dating",
+      "score": 87,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-phylo-divergence-dating.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "date_randomization.py",
+        "infinite_sites_plot.py",
+        "mcmctree_setup.py",
+        "root_to_tip.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-phylo-modern-tree-inference",
+      "upstream_path": "phylogenetics/modern-tree-inference",
+      "score": 88,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-phylo-modern-tree-inference.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "iqtree_basic.sh",
+        "partitioned_analysis.sh"
+      ]
+    },
+    {
+      "id": "bio-phylo-species-trees",
+      "upstream_path": "phylogenetics/species-trees",
+      "score": 86,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-phylo-species-trees.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "astral_pipeline.sh",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-phylo-tree-io",
+      "upstream_path": "phylogenetics/tree-io",
+      "score": 88,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-phylo-tree-io.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "convert_formats.py"
+      ]
+    },
+    {
+      "id": "bio-phylo-tree-manipulation",
+      "upstream_path": "phylogenetics/tree-manipulation",
+      "score": 86,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-phylo-tree-manipulation.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "collapse_support.py",
+        "common_ancestor.py",
+        "pairwise_tree_distances.py",
+        "root_tree.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-phylo-tree-visualization",
+      "upstream_path": "phylogenetics/tree-visualization",
+      "score": 84,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-phylo-tree-visualization.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "labeled_tree.py"
+      ]
+    },
+    {
+      "id": "bio-population-genetics-rare-variant-association",
+      "upstream_path": "population-genetics/rare-variant-association",
+      "score": 89,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-population-genetics-rare-variant-association.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "rare_variant_test.sh"
+      ]
+    },
+    {
+      "id": "bio-proteomics-data-import",
+      "upstream_path": "proteomics/data-import",
+      "score": 85.2,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-proteomics-data-import.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "load_maxquant.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-proteomics-dia-analysis",
+      "upstream_path": "proteomics/dia-analysis",
+      "score": 86.2,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-proteomics-dia-analysis.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "diann_analysis.sh",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-proteomics-differential-abundance",
+      "upstream_path": "proteomics/differential-abundance",
+      "score": 89,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-proteomics-differential-abundance.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "differential_abundance.py",
+        "limma_analysis.R",
+        "msqrob2_peptide_level.R",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-proteomics-peptide-identification",
+      "upstream_path": "proteomics/peptide-identification",
+      "score": 90,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-proteomics-peptide-identification.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "dda_search.sh",
+        "fdr_filtering.py",
+        "separate_search_fdr.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-proteomics-protein-inference",
+      "upstream_path": "proteomics/protein-inference",
+      "score": 88.8,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-proteomics-protein-inference.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "protein_groups.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-proteomics-proteomics-qc",
+      "upstream_path": "proteomics/proteomics-qc",
+      "score": 88.1,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-proteomics-proteomics-qc.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "qc_analysis.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-proteomics-ptm-analysis",
+      "upstream_path": "proteomics/ptm-analysis",
+      "score": 86.4,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-proteomics-ptm-analysis.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "phospho_analysis.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-proteomics-quantification",
+      "upstream_path": "proteomics/quantification",
+      "score": 89,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-proteomics-quantification.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "lfq_normalization.py"
+      ]
+    },
+    {
+      "id": "bio-qsar-modeling",
+      "upstream_path": "chemoinformatics/qsar-modeling",
+      "score": 88,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": null,
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-scaffold-analysis",
+      "upstream_path": "chemoinformatics/scaffold-analysis",
+      "score": 88,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": null,
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-similarity-searching",
+      "upstream_path": "chemoinformatics/similarity-searching",
+      "score": 90,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": null,
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-single-cell-batch-integration",
+      "upstream_path": "single-cell/batch-integration",
+      "score": 90,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": null,
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-single-cell-cell-annotation",
+      "upstream_path": "single-cell/cell-annotation",
+      "score": 87,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": null,
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-single-cell-clustering",
+      "upstream_path": "single-cell/clustering",
+      "score": 89,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": null,
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-single-cell-differential-abundance",
+      "upstream_path": "single-cell/differential-abundance",
+      "score": 88,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": null,
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-single-cell-doublet-detection",
+      "upstream_path": "single-cell/doublet-detection",
+      "score": 85,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": null,
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-single-cell-markers-annotation",
+      "upstream_path": "single-cell/markers-annotation",
+      "score": 88,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": null,
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-single-cell-preprocessing",
+      "upstream_path": "single-cell/preprocessing",
+      "score": 85,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": null,
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-substructure-search",
+      "upstream_path": "chemoinformatics/substructure-search",
+      "score": 88,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": null,
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-variant-annotation",
+      "upstream_path": "variant-calling/variant-annotation",
+      "score": 86,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-variant-annotation.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "annotate_vcf.sh",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-variant-calling-filtering-best-practices",
+      "upstream_path": "variant-calling/filtering-best-practices",
+      "score": 88,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-variant-calling-filtering-best-practices.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "filter_variants.sh",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-variant-normalization",
+      "upstream_path": "variant-calling/variant-normalization",
+      "score": 89,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-variant-normalization.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "normalize_vcf.sh"
+      ]
+    },
+    {
+      "id": "bio-vcf-basics",
+      "upstream_path": "variant-calling/vcf-basics",
+      "score": 90,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-11",
+      "fix_log": "fixes/bio-vcf-basics.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-vcf-manipulation",
+      "upstream_path": "variant-calling/vcf-manipulation",
+      "score": 90,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-vcf-manipulation.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-vcf-statistics",
+      "upstream_path": "variant-calling/vcf-statistics",
+      "score": 88,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-vcf-statistics.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-workflows-crispr-screen-pipeline",
+      "upstream_path": "workflows/crispr-screen-pipeline",
+      "score": 85,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-workflows-crispr-screen-pipeline.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-workflows-metabolomics-pipeline",
+      "upstream_path": "workflows/metabolomics-pipeline",
+      "score": 92,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": "fixes/bio-workflows-metabolomics-pipeline.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "pipeline_handoff_check.R",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-workflows-proteomics-pipeline",
+      "upstream_path": "workflows/proteomics-pipeline",
+      "score": 87.7,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-15",
+      "fix_log": "fixes/bio-workflows-proteomics-pipeline.md",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "proteomics_workflow.R",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-workflows-scrnaseq-pipeline",
+      "upstream_path": "workflows/scrnaseq-pipeline",
+      "score": 85,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-16",
+      "fix_log": null,
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    }
+  ]
+}
