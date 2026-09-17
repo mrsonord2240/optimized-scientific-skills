@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 85,
+    "refined": 88,
     "audited_and_excluded": 5,
     "out_of_scope": 1,
-    "remaining": 471
+    "remaining": 468
   },
   "remaining": [
     {
@@ -627,10 +627,6 @@
       "upstream_path": "epitranscriptomics/modification-visualization"
     },
     {
-      "id": "bio-experimental-design-power-analysis",
-      "upstream_path": "experimental-design/power-analysis"
-    },
-    {
       "id": "bio-expression-matrix-counts-ingest",
       "upstream_path": "expression-matrix/counts-ingest"
     },
@@ -1015,10 +1011,6 @@
       "upstream_path": "machine-learning/survival-analysis"
     },
     {
-      "id": "bio-metabolomics-isotope-tracing",
-      "upstream_path": "metabolomics/isotope-tracing"
-    },
-    {
       "id": "bio-metagenomics-abundance",
       "upstream_path": "metagenomics/abundance-estimation"
     },
@@ -1161,10 +1153,6 @@
     {
       "id": "bio-paired-end-fastq",
       "upstream_path": "sequence-io/paired-end-fastq"
-    },
-    {
-      "id": "bio-pathway-kegg-pathways",
-      "upstream_path": "pathway-analysis/kegg-pathways"
     },
     {
       "id": "bio-pharmacophore-modeling",
@@ -1930,7 +1918,7 @@
       "audited_on": "2026-09-17",
       "fix_log": "fixes/bio-causal-genomics-heritability-partitioning.md",
       "fix_pass": "done",
-      "reaudit": "not needed"
+      "reaudit": "needed"
     },
     {
       "id": "bio-experimental-design-multiple-testing",

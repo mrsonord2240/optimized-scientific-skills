@@ -6,9 +6,23 @@ primary_tool: enrichplot
 license: MIT
 ---
 
+## Prerequisites
+
+```r
+if (!require('BiocManager', quietly = TRUE)) install.packages('BiocManager')
+BiocManager::install(c('clusterProfiler', 'enrichplot', 'org.Hs.eg.db', 'GOSemSim', 'ggplot2'))
+install.packages(c('ggridges', 'ggarchery', 'ggupset'))   # Suggests-only: ridgeplot needs ggridges,
+                                                            # goplot needs ggarchery, upsetplot needs ggupset
+```
+
+The input is an `enrichResult`/`gseaResult`/`compareClusterResult` produced by the sibling skills
+(go-enrichment, gsea, kegg-pathways, reactome-pathways, wikipathways), not a raw gene list. Plotting
+is offline once that object exists; building it upstream may need internet (see those skills).
+
 ## Version Compatibility
 
-Reference examples tested with: enrichplot 1.30+, clusterProfiler 4.18+, ggplot2 3.5+.
+Reference examples tested with: enrichplot 1.30+, clusterProfiler 4.18+, ggplot2 3.5+. Checked
+against an installed enrichplot 1.26.6 / clusterProfiler 4.14.6 / ggplot2 4.0.3 (2026-09-17).
 
 Before using code patterns, verify installed versions match. If versions differ:
 - R: `packageVersion('<pkg>')` then `?function_name` to verify parameters
@@ -17,6 +31,8 @@ If code throws ImportError, AttributeError, or TypeError, introspect the install
 package and adapt the example to match the actual API rather than retrying.
 
 The single biggest hazard here is the cnetplot/emapplot/goplot API churn. enrichplot 1.25.5 (2024-10) moved these to the ggtangle backend and DROPPED several old arguments (`cex_label_category`, `cex_label_gene`, `circular`, `colorEdge`, `group`/`group_category`/`group_legend`). The examples target the post-churn API (1.30+), but installed bases span three argument generations - run `?cnetplot` / `?emapplot` and adapt rather than pinning one generation.
+
+`treeplot()`'s `nCluster=` argument is deprecated in favor of `cluster.params=list(n=..., method=...)` (both accepted as of 1.26.6; `nCluster` and the top-level `hclust_method=` each print a deprecation warning naming `cluster.params` as the replacement). On a plain `enrichResult`/`gseaResult` either form renders fine. On a `compareClusterResult`, however, `treeplot()` itself crashes with a ggplot2 "Aesthetics must be either length 1 or the same as the data" error under enrichplot 1.26.6/ggplot2 4.0.3 - reproducibly, with every argument combination tried (default call, `nCluster=`, `cluster.params=`, every `showCategory=`), including the package's own `?treeplot` example verbatim (checked 2026-09-17). This is a genuine ggtree/ggplot2-4.0 incompatibility (a `fortify()` argument mismatch inside ggtree's `geom_cladelab` layer), not a usage error - do not spend time trying more argument combinations. Use `emapplot(pairwise_termsim(ck))` for the redundancy structure on a `compareClusterResult` instead; it renders correctly under the same installed versions (`dotplot(ck)` also works for the faceted view).
 
 # Enrichment Visualization
 
@@ -53,7 +69,7 @@ Encoding definitions (verified): **GeneRatio = k/n** (k = query genes annotated 
 | barplot | Count or GeneRatio (height), p.adjust (color) | ORA ONLY | none | no - misuse for GSEA |
 | cnetplot | gene<->term bipartite net; item color = fold change | ORA + GSEA | shows shared genes (gene side) | yes (item color) |
 | emapplot | term net; edge = gene overlap; clusters = redundant groups | ORA + GSEA | SHOWS redundancy (term side) | node color = p.adjust |
-| treeplot | hierarchical Ward clusters of terms | ORA + GSEA | COLLAPSES into nCluster groups | node color = p.adjust |
+| treeplot | hierarchical Ward clusters of terms | ORA + GSEA, NOT compareClusterResult (crashes - see Version Compatibility) | COLLAPSES into `cluster.params=list(n=...)` groups | node color = p.adjust |
 | ridgeplot | leading-edge metric density per set | GSEA ONLY | per-set | YES (left/right shift) |
 | gseaplot2 | running ES + hit ticks + ranked metric | GSEA ONLY | single / few sets | YES (peak sign) |
 | upsetplot | gene-overlap combinations (ORA); per-set metric boxplots (GSEA) | ORA + GSEA | quantifies overlap | metric boxplots for GSEA |
@@ -69,7 +85,7 @@ Citations: dotplot/barplot/cnet/tree/upset/goplot/heatplot are enrichplot, paper
 | Intent | Do this | Why / avoid |
 |--------|---------|-------------|
 | First look at ORA results | `dotplot(simplify(ego))` - collapse GO redundancy THEN dotplot | avoid raw `dotplot(ego, showCategory=20)` (redundant cluster floats up) |
-| Many significant terms, show the structure | `pairwise_termsim()` -> `emapplot` (topology) or `treeplot` (named clusters) | the redundancy becomes the message, not hidden |
+| Many significant terms, show the structure | `pairwise_termsim()` -> `emapplot` (topology) or `treeplot` (named clusters) | the redundancy becomes the message, not hidden; on a `compareClusterResult` use `emapplot` only - `treeplot` crashes there (see Version Compatibility) |
 | Hundreds of sets, manuscript figure | EnrichmentMap (Cytoscape; Reimand 2019 protocol) -> data-visualization/network-visualization | a top-20 list is indefensible at that scale |
 | Flat GO-ID + p-value list from a non-clusterProfiler tool | REVIGO (treemap / MDS) | external semantic collapse |
 | GSEA overview, all sets | `ridgeplot(gse)` | direction + shape preserved; never a barplot of NES |
@@ -111,13 +127,15 @@ barplot(ego, x = 'GeneRatio', showCategory = 15)
 **Approach:** Populate the term-similarity matrix first with `pairwise_termsim` (emapplot/treeplot READ `x@termsim` and do NOT compute it), then draw it as a force-directed map (emapplot, shows topology) or a deterministic Ward tree (treeplot, named clusters). The similarity `method=` and `min_edge=` are modeling choices that change the picture.
 
 ```r
-ego_ts <- pairwise_termsim(ego)                          # JC (Jaccard on gene overlap), the default; any gene-set type
-emapplot(ego_ts, showCategory = 30)                      # nodes = terms, edges = overlap >= min_edge (0.2), clusters = redundant groups
-treeplot(ego_ts, showCategory = 30, nCluster = 5)        # deterministic Ward clustering into 5 labeled groups
+ego_ts <- pairwise_termsim(ego)                                  # JC (Jaccard on gene overlap), the default; any gene-set type
+emapplot(ego_ts, showCategory = 30)                              # nodes = terms, edges = overlap >= min_edge (0.2), clusters = redundant groups
+treeplot(ego_ts, showCategory = 30, cluster.params = list(n = 5)) # deterministic Ward clustering into 5 labeled groups; nCluster= is deprecated
 
 # GO terms, DAG-aware similarity (Wang sees parent/child closeness even with modest gene overlap)
 ego_ts <- pairwise_termsim(ego, method = 'Wang', semData = GOSemSim::godata('org.Hs.eg.db', ont = 'BP'))
 ```
+
+`treeplot` on a `compareClusterResult` crashes under the installed enrichplot/ggplot2 combination regardless of arguments (see Version Compatibility) - use `emapplot(pairwise_termsim(ck))` for that class instead.
 
 `pairwise_termsim` `method` is exactly one of `{Resnik, Lin, Rel, Jiang, Wang, JC}`, default `JC`. Resnik/Lin/Rel/Jiang/Wang are GO-ONLY and need a `GOSemSimDATA` object; JC works for any gene-set type. Lower `min_edge` and everything connects to everything (the "if every node touches every node, the result IS redundant" diagnostic); raise it and only the strongest overlaps survive.
 
@@ -145,7 +163,7 @@ gseaplot2(gse, geneSetID = 1:3, pvalue_table = TRUE)     # overlay three sets' r
 ## Specialized Views -- upsetplot, goplot, heatplot
 
 ```r
-upsetplot(ego, n = 10)                                   # gene-overlap combinations across terms (gseaResult gives per-set metric boxplots)
+upsetplot(ego, n = 10)                                   # gene-overlap combinations across terms (gseaResult gives per-set metric boxplots); needs the ggupset package (enrichplot Suggests)
 goplot(ego)                                              # GO-ONLY: the induced DAG subgraph; needs the ggarchery package (enrichplot Suggests)
 heatplot(ego, foldChange = gene_list, showCategory = 15) # gene x term matrix, color by direction; a flattened cnetplot
 ```
@@ -180,7 +198,10 @@ ggsave('fig.pdf', p, width = 10, height = 8)
 **Trigger:** `showCategory=20` when 200 terms passed FDR. **Mechanism:** showCategory truncates to a top-N window by whatever orderBy used. **Symptom:** a 10% sample read as the complete result. **Fix:** report the total significant count and selection criterion in the caption; the figure is a window, not a census.
 
 ### Pinned deprecated enrichplot args
-**Trigger:** copying `circular=TRUE`, `colorEdge=TRUE`, `cex_label_gene=`, `cex_label_category=`, or `group_category=` from a pre-2024 tutorial. **Mechanism:** enrichplot 1.25.5+ moved cnet/emap/goplot to ggtangle and removed those arguments. **Symptom:** an unused-argument error or a silently ignored arg. **Fix:** `?cnetplot` / `?emapplot` and use the current arguments (`color_item`, `size_category`, `node_label`, `node_label_size`, `min_edge`).
+**Trigger:** copying `circular=TRUE`, `colorEdge=TRUE`, `cex_label_gene=`, `cex_label_category=`, `group_category=`, or `treeplot(nCluster=...)`/`treeplot(hclust_method=...)` from an older tutorial. **Mechanism:** enrichplot 1.25.5+ moved cnet/emap/goplot to ggtangle and removed those arguments; `treeplot` separately renamed `nCluster`/`hclust_method` into `cluster.params=list(n=..., method=...)`. **Symptom:** an unused-argument error (cnet/emap/goplot), a silently ignored arg (`cluster_method=` is not a real name and is dropped without warning), or a deprecation warning naming the replacement (`nCluster`/`hclust_method`). **Fix:** `?cnetplot` / `?emapplot` and use the current arguments (`color_item`, `size_category`, `node_label`, `node_label_size`, `min_edge`); for `treeplot`, use `cluster.params=list(n=5, method='ward.D')`.
+
+### Zero surviving terms or sets
+**Trigger:** `enrichGO`/`enricher`/`gseGO`/`GSEA` returns zero significant rows after FDR correction. **Mechanism:** every plotting function in this Skill expects at least one row; an empty `enrichResult`/`gseaResult` is a valid, non-error return that downstream plots are not designed for. **Symptom:** an empty or malformed figure, or a cryptic `subscript out of bounds`/indexing error deep inside a plot call instead of a clear message. **Fix:** check `nrow(as.data.frame(x)) > 0` before plotting; if zero, report the count and stop rather than attempting to plot an empty object (mirrors the shipped `examples/visualization_gsea.R`, which already guards this way).
 
 ### Wang/IC similarity on non-GO results
 **Trigger:** `pairwise_termsim(kegg_result, method='Wang')`. **Mechanism:** Resnik/Lin/Rel/Jiang/Wang require the GO DAG and a GOSemSimDATA object. **Symptom:** an error or a meaningless similarity for KEGG/Reactome/custom sets. **Fix:** use `method='JC'` (gene overlap) for any non-GO gene set.
@@ -193,7 +214,7 @@ ggsave('fig.pdf', p, width = 10, height = 8)
 | `pairwise_termsim(method='JC')` default | enrichplot | Jaccard on gene overlap; works for any gene-set type; non-JC are GO-only |
 | `simplify(cutoff=0.7)` | clusterProfiler / GOSemSim (Yu 2010 *Bioinformatics* 26:976) | semantic-similarity redundancy cutoff; lower keeps more terms (lives in go-enrichment) |
 | `emapplot(min_edge=0.2)` | enrichplot | draw a term-term edge only above this overlap; if everything still connects, the result is redundant |
-| `treeplot(nCluster=5, cluster_method='ward.D')` | enrichplot | deterministic Ward cut into 5 named groups; an explicit, reproducible alternative to emapplot's stochastic layout |
+| `treeplot(cluster.params=list(n=5, method='ward.D'))` | enrichplot | deterministic Ward cut into 5 named groups; an explicit, reproducible alternative to emapplot's stochastic layout (checked on enrichplot 1.26.6: `cluster_method=` is not a real argument and is silently swallowed - use `cluster.params=list(method=...)`) |
 | cnetplot <=5-8 terms | enrichplot (showCategory default 5) | the bipartite layout hairballs past ~8 terms |
 | diverging color centered at 0 for NES | Subramanian 2005 *PNAS* 102:15545 | NES is signed; a sequential p-value ramp hides activation vs suppression |
 
@@ -209,6 +230,9 @@ ggsave('fig.pdf', p, width = 10, height = 8)
 | Wang similarity errors on KEGG terms | IC/graph methods need the GO DAG | `pairwise_termsim(x, method='JC')` |
 | gene labels are Entrez IDs not symbols | object not made readable | `setReadable(x, OrgDb, 'ENTREZID')` before plotting |
 | two analysts get different emapplot modules | different `method=` / `min_edge=` | record both in the caption; the clustering is a choice |
+| `upsetplot()`: `the package "ggupset" is required` | `ggupset` is a Suggests-only dependency, not installed by default (same class as `ggridges`/`ggarchery`) | `install.packages('ggupset')` (see Prerequisites) |
+| `treeplot()` on a `compareClusterResult`: ggplot2 `Aesthetics must be either length 1 or the same as the data` | genuine enrichplot 1.26.6/ggplot2 4.0.3 incompatibility, reproducible with every argument combination (see Version Compatibility) | use `emapplot(pairwise_termsim(ck))` instead; do not retry with different `treeplot` arguments |
+| zero significant terms/sets | `enrichGO`/`gseGO`/etc. returned an empty result at the chosen cutoff | check `nrow(as.data.frame(x)) > 0`; report the count and stop rather than plotting an empty object |
 
 ## References
 

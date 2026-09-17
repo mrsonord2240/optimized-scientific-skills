@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "978ae4ab4f9cc5317433ce6956b37aa1957d8295"
+      "staging_commit": "d9971f6e87527b8030c5a702396388c13d1362ab"
     }
   },
   "skills": [
@@ -111,10 +111,11 @@
       "audited_on": "2026-09-17",
       "fix_log": null,
       "fix_pass": "needed",
-      "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "reaudit": "needed",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "usage-guide.md"
       ]
     },
     {
@@ -138,7 +139,7 @@
     {
       "id": "bio-causal-genomics-mendelian-randomization",
       "upstream_path": "causal-genomics/mendelian-randomization",
-      "score": 87,
+      "score": 90,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
@@ -504,6 +505,24 @@
       ]
     },
     {
+      "id": "bio-experimental-design-power-analysis",
+      "upstream_path": "experimental-design/power-analysis",
+      "score": 92,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": "fixes/bio-experimental-design-power-analysis.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "scrna_pseudobulk_power.R",
+        "usage-guide.md"
+      ]
+    },
+    {
       "id": "bio-experimental-design-randomization-blocking",
       "upstream_path": "experimental-design/randomization-blocking",
       "score": 91,
@@ -549,6 +568,23 @@
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-metabolomics-isotope-tracing",
+      "upstream_path": "metabolomics/isotope-tracing",
+      "score": 93,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": "fixes/bio-metabolomics-isotope-tracing.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "usage-guide.md"
       ]
     },
     {
@@ -737,17 +773,19 @@
     {
       "id": "bio-pathway-enrichment-visualization",
       "upstream_path": "pathway-analysis/enrichment-visualization",
-      "score": 90,
+      "score": 93,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-17",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-pathway-enrichment-visualization.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "usage-guide.md",
+        "visualization_ora.R"
       ]
     },
     {
@@ -784,6 +822,24 @@
         "SKILL.md",
         "gsea_go.R",
         "gsea_msigdb.R",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-pathway-kegg-pathways",
+      "upstream_path": "pathway-analysis/kegg-pathways",
+      "score": 94,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": "fixes/bio-pathway-kegg-pathways.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "kegg_spia_topology.R",
         "usage-guide.md"
       ]
     },

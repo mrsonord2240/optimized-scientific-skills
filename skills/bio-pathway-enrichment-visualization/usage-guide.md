@@ -3,23 +3,7 @@
 ## Overview
 This skill turns an enrichment result object (an enrichResult from ORA, a gseaResult from GSEA, or a compareClusterResult) into a figure with the enrichplot package. The central decision is not which plotting function to call but how to handle gene-set REDUNDANCY: a default top-20 GO dotplot is usually one biological theme drawn twenty times, because the GO DAG and nested pathway databases guarantee that a real signal surfaces as a cluster of near-identical overlapping terms. The figure either SHOWS that redundancy as structure (emapplot/treeplot via pairwise_termsim, or EnrichmentMap) or DELETES it (simplify/REVIGO). The skill also covers keeping the NES sign for GSEA, distinguishing GeneRatio from fold enrichment, and admitting that showCategory truncates.
 
-## Prerequisites
-```r
-if (!require('BiocManager', quietly = TRUE))
-    install.packages('BiocManager')
-
-BiocManager::install(c('clusterProfiler', 'enrichplot', 'org.Hs.eg.db'))
-BiocManager::install(c('GOSemSim', 'ggplot2'))
-install.packages(c('ggridges', 'ggarchery'))   # ridgeplot needs ggridges; goplot needs ggarchery (enrichplot Suggests-only)
-```
-
-Conceptual prerequisites and notes:
-- The input is an `enrichResult` / `gseaResult` / `compareClusterResult` produced by the sibling skills (go-enrichment, gsea, kegg-pathways, reactome-pathways, wikipathways), not a raw gene list.
-- `ridgeplot()` and `goplot()` depend on packages enrichplot only Suggests (`ggridges` and `ggarchery`); a stock install errors with `the package ... is required` until they are installed (above).
-- enrichplot 1.25.5+ moved cnetplot/emapplot/goplot to the ggtangle backend and removed several arguments (`circular`, `colorEdge`, `cex_label_gene`, `cex_label_category`, `group_category`). Introspect with `?cnetplot` / `?emapplot` and adapt; do not copy pre-2024 tutorial arguments verbatim.
-- `emapplot` and `treeplot` read the `@termsim` slot and do NOT compute it - run `pairwise_termsim()` first, every time.
-- There is no `barplot` method for `gseaResult` by design; GSEA results are signed and a bar cannot carry a sign.
-- The plots are offline once the objects exist; building KEGG/WikiPathways objects upstream needs internet (see those skills).
+Install commands, version notes, and failure modes (including the `ggridges`/`ggarchery`/`ggupset` Suggests-only dependencies and the `treeplot`-on-`compareClusterResult` crash) live in SKILL.md's Prerequisites, Version Compatibility, and Common Errors sections - read those before running anything.
 
 ## Quick Start
 Tell your AI agent what you want to do:
@@ -50,38 +34,7 @@ Tell your AI agent what you want to do:
 
 > "Save my enrichment dotplot as a publication-quality PDF with a viridis color scale and a caption noting the total significant term count."
 
-## What the Agent Will Do
-1. Identify the object class (enrichResult, gseaResult, or compareClusterResult) since enrichplot dispatches on it.
-2. Decide the redundancy strategy: simplify()/REVIGO to delete it, or pairwise_termsim -> emapplot/treeplot to show it; never plot raw top-20 GO without a collapse step.
-3. For emapplot/treeplot, compute pairwise_termsim first (JC by default; Wang with a GOSemSimDATA object for DAG-aware GO clustering).
-4. Pick the encoding deliberately: GeneRatio vs FoldEnrichment for ORA, signed NES with a diverging scale for GSEA; never barplot a gseaResult.
-5. Generate the figure, chain ggplot2 modifiers as needed, and save with ggsave, reporting the total significant term count and the similarity method/min_edge settings.
-
-## Plot-by-Class Quick Reference
-
-| Plot | Function | Class | Owns |
-|------|----------|-------|------|
-| Dot plot | dotplot() | ORA + GSEA | three-channel summary; default x = GeneRatio |
-| Bar plot | barplot() | ORA only | unsigned count/ratio; no GSEA method |
-| Gene-concept net | cnetplot() | ORA + GSEA | shared genes across terms; direction by item color |
-| Enrichment map | emapplot() | ORA + GSEA | term clusters = redundancy shown (needs pairwise_termsim) |
-| Tree | treeplot() | ORA + GSEA | deterministic Ward clusters (needs pairwise_termsim) |
-| Ridge | ridgeplot() | GSEA only | leading-edge metric density, direction preserved |
-| Running score | gseaplot2() | GSEA only | ES curve + hit ticks + ranked metric |
-| Upset | upsetplot() | ORA + GSEA | gene-overlap combinations (boxplots for GSEA) |
-| GO DAG | goplot() | GO only | induced DAG subgraph |
-| Heatmap | heatplot() | ORA + GSEA | gene x term matrix by fold change |
-
-## Tips
-- Start from a collapse decision, not a function. For GO ORA, simplify() before a flat dotplot, or use emapplot/treeplot to show the structure.
-- For emapplot/treeplot, always run pairwise_termsim() first; use method='Wang' with a GOSemSimDATA object for GO (DAG-aware) and the default method='JC' (gene overlap) for KEGG/Reactome/custom sets.
-- The default dotplot orders by GeneRatio (orderBy='x'), not p-value; the top dot is the highest GeneRatio, not the most significant. Order or color by p.adjust if significance is the message.
-- GeneRatio (k/n) is not fold enrichment ((k/n)/(M/N)); use x='FoldEnrichment' when specificity is the point.
-- For GSEA keep the sign: use a diverging color-by-NES dotplot, ridgeplot, or gseaplot2; never coerce a gseaResult into a bar of |NES|.
-- showCategory truncates; report the total number of significant terms in the caption so the figure is not read as complete.
-- Lower emapplot min_edge to diagnose redundancy: if every node connects to every node, the result is one theme.
-- All enrichplot functions return ggplot objects, so chain themes/scales and use ggsave; defer generic ggplot grammar to data-visualization/ggplot2-fundamentals.
-- Make the object readable (setReadable) before plotting so gene labels are symbols, not Entrez IDs.
+The agent's workflow (object-class identification, the redundancy decision, encoding choices, failure modes) and the full plot/class/redundancy reference table live in SKILL.md - see its Tool Taxonomy and Decision Tree sections.
 
 ## Related Skills
 

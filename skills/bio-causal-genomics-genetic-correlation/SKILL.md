@@ -8,7 +8,7 @@ license: MIT
 
 ## Version Compatibility
 
-Reference examples tested with: LDSC v1.0.1+ (Python 3; prefer `abdenlab/ldsc-python3` v2.0.0 -- `belowlab/ldsc` v3.0.1 README states the `--h2 / --rg / --h2-cts` CLI is broken; use Docker `jtb114/ldsc:latest` for the belowlab fallback; original `bulik/ldsc` is Python 2.7 unmaintained since 2019), HDL 1.4.0+ (R; GitHub `zhenin/HDL`), LAVA 0.1.0+ (R; GitHub `josefin-werme/LAVA`), HESS 0.5.4+ (Python; huwenboshi/hess), Popcorn 1.0+ (Python; brielin/Popcorn), GCTA 1.94+ (GREML-bivariate), baselineLD_v2.2 / eur_w_ld_chr LD-score panels from alkesgroup.broadinstitute.org/LDSCORE, UKB-array SVD eigen reference for HDL.
+Reference examples tested with: LDSC (Python 3; `CBIIT/ldsc` commit `1f09cf0`, which `bulik/ldsc`'s README names as its successor -- `abdenlab/ldsc-python3` v2.0.0 and `belowlab/ldsc` v3.0.1 both crash on `--h2`/`--rg`; see Tool Installation Notes), HDL 1.4.0+ (R; GitHub `zhenin/HDL`), LAVA 0.1.0+ (R; GitHub `josefin-werme/LAVA`), HESS 0.5.4+ (Python; huwenboshi/hess), Popcorn 1.0+ (Python; brielin/Popcorn), GCTA 1.94+ (GREML-bivariate), baselineLD_v2.2 / eur_w_ld_chr LD-score panels from alkesgroup.broadinstitute.org/LDSCORE, UKB-array SVD eigen reference for HDL.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - Python: `pip show <package>` then `python -c 'import <module>; help(<module>)'`
@@ -425,12 +425,12 @@ popcorn fit -v 1 \
 ## Tool Installation Notes
 
 ```bash
-# LDSC Python 3 fork (original bulik/ldsc is Python 2.7 unmaintained since 2019).
-# belowlab/ldsc v3.0.1 broke the --h2/--rg/--h2-cts CLI per its README;
-# abdenlab/ldsc-python3 (v2.0.0) retains the working CLI. Docker
-# `jtb114/ldsc:latest` is the recommended belowlab fallback.
-git clone https://github.com/abdenlab/ldsc-python3.git
-cd ldsc-python3 && pip install .   # Poetry project (pyproject.toml); no environment.yml
+# LDSC: CBIIT/ldsc, checked on commit 1f09cf0 with Python 3.9 (--h2 and --rg run unmodified).
+# abdenlab/ldsc-python3 v2.0.0 and belowlab/ldsc v3.0.1 crash on --h2/--rg; do not use them.
+# --h2-cts needs a one-line patch: see causal-genomics/heritability-partitioning.
+git clone https://github.com/CBIIT/ldsc.git && cd ldsc
+micromamba create -n ldsc -c conda-forge -c bioconda python=3.9 bitarray=2 pybedtools=0.10.0 -y
+micromamba run -n ldsc pip install numpy==1.21.5 pandas==1.3.3 scipy==1.7.3
 # pre-computed EUR / EAS / AFR LD scores at alkesgroup.broadinstitute.org/LDSCORE
 
 # HESS

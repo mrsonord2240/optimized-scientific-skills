@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**471 remaining** across 62 folders. 85 are already refined and live in `skills/`.
+**468 remaining** across 59 folders. 88 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 85 refined, 5 audited and excluded, 1 out of scope, 471 remaining.
+The source tree holds 562 Skills: 88 refined, 5 audited and excluded, 1 out of scope, 468 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -68,9 +68,6 @@ The source tree holds 562 Skills: 85 refined, 5 audited and excluded, 1 out of s
 | rna-structure | 4 | 0 |
 | crispr-screens | 3 | 12 |
 | causal-genomics | 1 | 7 |
-| experimental-design | 1 | 2 |
-| metabolomics | 1 | 8 |
-| pathway-analysis | 1 | 5 |
 | proteomics | 1 | 8 |
 
 ## Promoted, fix pass still needed
@@ -92,7 +89,6 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-molecular-descriptors` | 86 | Limited Release |
 | `bio-molecular-io` | 91 | Limited Release |
 | `bio-molecular-standardization` | 90 | Limited Release |
-| `bio-pathway-enrichment-visualization` | 90 | Production Ready |
 | `bio-pathway-reactome` | 91 | Production Ready |
 | `bio-pathway-wikipathways` | 92 | Production Ready |
 | `bio-qsar-modeling` | 88 | Limited Release |
@@ -117,6 +113,7 @@ Changed in staging after their latest audit, so the score below describes earlie
 | --- | ---: | --- |
 | `bio-alignment-multiple` | 85 | 2026-09-11 |
 | `bio-alignment-trimming` | 83 | 2026-09-15 |
+| `bio-causal-genomics-genetic-correlation` | 89 | 2026-09-17 |
 | `bio-clinical-databases-clinvar-lookup` | 84 | 2026-09-15 |
 | `bio-clinical-databases-dbsnp-queries` | 86 | 2026-09-15 |
 | `bio-clinical-databases-gnomad-frequencies` | 86 | 2026-09-15 |
@@ -391,10 +388,6 @@ fixed.
 - `bio-epitranscriptomics-merip-preprocessing` — `epitranscriptomics/merip-preprocessing`
 - `bio-epitranscriptomics-modification-visualization` — `epitranscriptomics/modification-visualization`
 
-### experimental-design
-
-- `bio-experimental-design-power-analysis` — `experimental-design/power-analysis`
-
 ### expression-matrix
 
 - `bio-expression-matrix-counts-ingest` — `expression-matrix/counts-ingest`
@@ -524,10 +517,6 @@ fixed.
 - `bio-machine-learning-omics-classifiers` — `machine-learning/omics-classifiers`
 - `bio-machine-learning-survival-analysis` — `machine-learning/survival-analysis`
 
-### metabolomics
-
-- `bio-metabolomics-isotope-tracing` — `metabolomics/isotope-tracing`
-
 ### metagenomics
 
 - `bio-metagenomics-abundance` — `metagenomics/abundance-estimation`
@@ -568,10 +557,6 @@ fixed.
 - `bio-multi-omics-mixomics-analysis` — `multi-omics-integration/mixomics-analysis`
 - `bio-multi-omics-mofa-integration` — `multi-omics-integration/mofa-integration`
 - `bio-multi-omics-similarity-network` — `multi-omics-integration/similarity-network`
-
-### pathway-analysis
-
-- `bio-pathway-kegg-pathways` — `pathway-analysis/kegg-pathways`
 
 ### phasing-imputation
 

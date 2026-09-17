@@ -88,7 +88,7 @@ Tell the AI agent what to estimate:
 - **|rg| > 0.3 + significant MR estimate REQUIRES CHP-aware sensitivity.** IVW, Egger, and MR-PRESSO are all blind to correlated horizontal pleiotropy. Add CAUSE (if sig SNPs >= 100) or LHC-MR per the pleiotropy-detection skill.
 - **Mean chi-square > 1.02 is the underpower floor.** Below this, no method can rescue rg precision. Meta-analyze first; do not switch methods.
 - **Build matching matters for LAVA and HESS.** Sumstats, LD reference, and partition file must all be on the same build (GRCh37 or GRCh38). Cross-build mixing fails silently with `Insufficient SNPs at locus` errors.
-- **Original LDSC is Python 2.7.** Prefer the `abdenlab/ldsc-python3` fork (v2.0.0) for a working Python 3 CLI; `belowlab/ldsc` v3.0.1 README states the `--h2/--rg/--h2-cts` CLI is currently broken (use Docker `jtb114/ldsc:latest` for the belowlab fallback). The original `bulik/ldsc` repository has not been updated since 2019.
+- **LDSC install:** use `CBIIT/ldsc`; see SKILL.md Tool Installation Notes.
 - **rho_ge and rho_gi can diverge.** Popcorn's effect correlation (causal-effect-size scale) and impact correlation (MAF-weighted) capture different biology; report both.
 
 ## Computational Footprint

@@ -222,7 +222,7 @@ exposure_raw <- read_exposure_data(
     filename = 'exposure_gwas.tsv', sep = '\t',
     snp_col = 'SNP', beta_col = 'BETA', se_col = 'SE',
     effect_allele_col = 'A1', other_allele_col = 'A2',
-    eaf_col = 'EAF', pval_col = 'P'
+    eaf_col = 'EAF', pval_col = 'P', samplesize_col = 'N'  # required for directionality_test() below
 )
 
 exposure_sig <- subset(exposure_raw, pval.exposure < 5e-08)  # genome-wide significance
@@ -243,7 +243,7 @@ outcome_dat <- read_outcome_data(
     filename = 'outcome_gwas.tsv', snps = exposure_dat$SNP, sep = '\t',
     snp_col = 'SNP', beta_col = 'BETA', se_col = 'SE',
     effect_allele_col = 'A1', other_allele_col = 'A2',
-    eaf_col = 'EAF', pval_col = 'P'
+    eaf_col = 'EAF', pval_col = 'P', samplesize_col = 'N'  # required for directionality_test() below
 )
 
 dat <- harmonise_data(exposure_dat, outcome_dat, action = 2)  # infer from EAF; drops MAF~0.5 palindromes
@@ -254,7 +254,14 @@ primary <- mr(dat, method_list = c('mr_ivw', 'mr_egger_regression',
 heterogeneity <- mr_heterogeneity(dat)         # Cochran Q
 pleiotropy <- mr_pleiotropy_test(dat)          # Egger intercept
 loo <- mr_leaveoneout(dat)                     # influential-SNP check
+
 steiger <- directionality_test(dat)            # variance-explained direction
+if (is.null(steiger)) {
+    stop("directionality_test() returned NULL -- dat is missing pval.exposure/pval.outcome/",
+         "samplesize.exposure/samplesize.outcome (or supply pre-computed r.exposure/r.outcome, ",
+         "e.g. via get_r_from_lor() for binary traits). It fails silently, not loudly, so check ",
+         "for NULL rather than trusting a downstream NULL$correct_causal_direction.")
+}
 ```
 
 ## MR-PRESSO Outlier Detection
@@ -303,12 +310,19 @@ mvmr_dat <- format_mvmr(
 
 condF <- strength_mvmr(r_input = mvmr_dat, gencov = 0)  # per-exposure conditional F
 # condF must be > 10 for EACH exposure (Sanderson 2019); total F is misleading
+if (any(condF < 1)) {
+    stop("Conditional F < 1 for at least one exposure -- qhet_mvmr's own estimate is unreliable ",
+         "at this floor (can flip an exposure's sign; see SKILL.md caveat below). Report MVMR-IVW ",
+         "with a weak-instrument caveat instead, or acquire stronger/less-correlated instruments.")
+}
 
 mv_ivw <- ivw_mvmr(r_input = mvmr_dat)
 mv_qa <- pleiotropy_mvmr(r_input = mvmr_dat, gencov = 0)  # Q_A heterogeneity test
 ```
 
-`gencov = 0` is valid ONLY if the exposure GWAS samples don't overlap; for overlapping exposures use the bivariate LDSC intercept matrix as `gencov`. If any conditional F < 10, the IVW point estimate is weak-IV-biased; switch to the Q-minimization estimator: `qhet_mvmr(r_input, pcor, CI = TRUE, iterations = 1000)` (Sanderson 2021 Stat Med 40:5434), which minimizes Q-statistic heterogeneity rather than weighting by inverse variance and is robust to weak conditional instruments.
+`gencov = 0` is valid ONLY if the exposure GWAS samples don't overlap; for overlapping exposures use the bivariate LDSC intercept matrix as `gencov`. If any conditional F < 10, the IVW point estimate is weak-IV-biased; the standard fallback is the Q-minimization estimator `qhet_mvmr(r_input, pcor, CI = TRUE, iterations = 1000)` (Sanderson 2021 Stat Med 40:5434), which minimizes Q-statistic heterogeneity rather than weighting by inverse variance.
+
+**Caveat and guard (verified 2026-09-17, reproduced from an audit run):** qhet_mvmr's robustness to weak conditional instruments has a floor. At conditional F < 1 it does not just lose precision -- it can flip the sign of an exposure's estimate. On synthetic instruments with planted direct effects 0.30 / -0.10 and conditional F = 0.87 / 0.78, MVMR-IVW stayed close to truth (0.298 / -0.099) but qhet_mvmr gave 0.236 / **+0.049** -- the second exposure's sign flipped. Guard: below conditional F = 1, do not trust qhet_mvmr's point estimate as a correction for exposure 1 or 2; report the weak-IV-biased MVMR-IVW estimate with that caveat instead, or acquire stronger/less-correlated instruments before drawing a directional conclusion. The code above raises an error at that floor rather than silently returning a fallback estimate that may be flipped.
 
 ## Bidirectional and Steiger
 
@@ -320,6 +334,9 @@ results_rev <- mr(dat_rev, method_list = 'mr_ivw')
 
 dat_filt <- steiger_filtering(dat)  # per-SNP; flags SNPs where variance(Y) > variance(X)
 dir_test <- directionality_test(dat) # global; correct_causal_direction == TRUE if forward
+if (is.null(dir_test)) stop("directionality_test() returned NULL -- dat needs samplesize_col set ",
+                             "on both read_*_data()/format_data() calls upstream; see the Standard ",
+                             "Workflow section above.")
 ```
 
 **Report direction operationally:** forward p < 5e-8 with reverse p > 0.05; `directionality_test()` `correct_causal_direction == TRUE` with Steiger p < 0.05; point estimate in reverse direction has |effect| substantially smaller than forward (reflecting reverse-instrument-strength asymmetry). Example sentence: "Forward MR showed BMI -> T2D (IVW beta = 0.85, p = 2e-15); reverse MR was null (IVW beta = 0.02, p = 0.61); Steiger directionality test favored the forward direction (p = 3e-7)."
