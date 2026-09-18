@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "2b281a5f0874fb0ea36813676b2c6d45dc8a004b"
+      "staging_commit": "1f0728137385aee6316d2d4a89163dc08e1dfcb5"
     }
   },
   "skills": [
@@ -669,6 +669,24 @@
       "changed_files": [
         "SKILL.md",
         "randomization_blocking.R",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-experimental-design-sample-size",
+      "upstream_path": "experimental-design/sample-size",
+      "score": 89,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-18",
+      "fix_log": "fixes/bio-experimental-design-sample-size.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "sample_size_estimation.R",
         "usage-guide.md"
       ]
     },
