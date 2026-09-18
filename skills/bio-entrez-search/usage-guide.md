@@ -2,7 +2,7 @@
 
 ## Overview
 
-Search NCBI databases with Biopython's `Bio.Entrez` (ESearch, EInfo, EGQuery, ESpell). The skill emphasizes the parts of the API that bite real users: the Entrez Query Translator rewriting unqualified queries, the 9,999 silent cap on non-history responses, history-server semantics (8-hour TTL, idle eviction, QueryKey chaining), `[Organism]` taxonomy walks, and the weekly index lag that breaks 'I just submitted my data' expectations.
+Search NCBI databases with Biopython's `Bio.Entrez` (ESearch, EInfo, ESpell), including cross-database counts via an ESearch loop (EGQuery is broken on current Biopython/NCBI — see SKILL.md). The skill emphasizes the parts of the API that bite real users: the Entrez Query Translator rewriting unqualified queries, the 9,999 silent cap on non-history responses, history-server semantics (8-hour TTL, idle eviction, QueryKey chaining), `[Organism]` taxonomy walks, and the weekly index lag that breaks 'I just submitted my data' expectations.
 
 ## Prerequisites
 
@@ -10,15 +10,10 @@ Search NCBI databases with Biopython's `Bio.Entrez` (ESearch, EInfo, EGQuery, ES
 pip install biopython
 ```
 
-Set the required Entrez identifiers globally:
-
-```python
-from Bio import Entrez
-Entrez.email = 'researcher@institution.edu'
-Entrez.api_key = 'optional_api_key'  # raises rate from 3 to 10 req/sec
-```
-
-Get an API key at `https://www.ncbi.nlm.nih.gov/account/settings/`. Without it, the 3 req/sec ceiling makes any non-trivial workflow painful.
+Set `Entrez.email` (and, ideally, `Entrez.api_key` sourced from an environment variable) before any
+call — see SKILL.md's "Required Setup" for the exact pattern. Get an API key at
+`https://www.ncbi.nlm.nih.gov/account/settings/`; without one, the 3 req/sec ceiling makes any
+non-trivial workflow painful.
 
 ## Quick Start
 
@@ -40,7 +35,7 @@ Get an API key at `https://www.ncbi.nlm.nih.gov/account/settings/`. Without it, 
 
 ### Cross-database discovery
 
-> "I have the gene symbol DDX3X. Use EGQuery to show which NCBI databases contain records mentioning it, then drill into the gene database with a field-qualified search to get the canonical Gene UID."
+> "I have the gene symbol DDX3X. Loop ESearch over the curated database list to show which NCBI databases contain records mentioning it (EGQuery is broken on current Biopython/NCBI — see SKILL.md), then drill into the gene database with a field-qualified search to get the canonical Gene UID."
 
 ### Chaining queries on the history server
 
@@ -48,7 +43,7 @@ Get an API key at `https://www.ncbi.nlm.nih.gov/account/settings/`. Without it, 
 
 ### Diagnosing a 'wrong count' bug
 
-> "My esearch for 'MARCH1 AND human' returned no hits. Print the QueryTranslation, then re-run with the proper field-qualified form using the HGNC-permanent symbol MARCHF1."
+> "My esearch for 'MARCH1 AND human' returns a big pile of loosely-related hits because the gene symbol collides with the Excel-mangled month abbreviation and other unrelated text. Print the QueryTranslation, then re-run with the proper field-qualified form using the HGNC-permanent symbol MARCHF1 to get the precise match."
 
 ## What the Agent Will Do
 
@@ -67,7 +62,7 @@ Get an API key at `https://www.ncbi.nlm.nih.gov/account/settings/`. Without it, 
 - Fresh deposits (< 48h) often aren't searchable yet but are EFetch-able by accession -- use EFetch directly when the accession is known.
 - For very large result sets, push to the history server once with ESearch then iterate EFetch -- never re-send 50,000 IDs in successive calls.
 - PMC subset filtering uses `pubmed pmc[sb]` not a separate db; the underlying records are PubMed UIDs.
-- EGQuery counts can lag the per-database indexes by 1-2 days; for authoritative counts loop ESearch over the db list.
+- `Entrez.egquery()` doesn't exist on current Biopython — for cross-database counts use the ESearch-loop pattern in SKILL.md's decision table.
 
 ## Related Skills
 

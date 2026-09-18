@@ -17,7 +17,8 @@ def all_databases():
 def db_info(db):
     h = Entrez.einfo(db=db)
     r = Entrez.read(h); h.close()
-    return r['DbInfo']
+    # Biopython 1.88 wraps DbInfo as a one-element list, not a dict -- index [0] first.
+    return r['DbInfo'][0]
 
 
 print('=== All Entrez databases ===')

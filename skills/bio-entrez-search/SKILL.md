@@ -1,6 +1,6 @@
 ---
 name: bio-entrez-search
-description: Search NCBI databases using Biopython Bio.Entrez (ESearch, EInfo, EGQuery, ESpell). Use when finding records by keyword, building reproducible field-qualified queries, navigating the Entrez Query Translator, exploiting the history server for large result sets, handling retmax caps, or interpreting weekly index lag. Covers PubMed, Nucleotide, Protein, Gene, SRA, GEO, Assembly, Taxonomy, ClinVar, dbSNP.
+description: Search NCBI databases using Biopython Bio.Entrez (ESearch, EInfo, ESpell), including cross-database counts via an ESearch loop (EGQuery is broken on current Biopython/NCBI — see below). Use when finding records by keyword, building reproducible field-qualified queries, navigating the Entrez Query Translator, exploiting the history server for large result sets, handling retmax caps, or interpreting weekly index lag. Covers PubMed, Nucleotide, Protein, Gene, SRA, GEO, Assembly, Taxonomy, ClinVar, dbSNP.
 tool_type: python
 primary_tool: Bio.Entrez
 license: MIT
@@ -19,7 +19,7 @@ package and adapt the example to match the actual API rather than retrying.
 
 # Entrez Search
 
-**"Find NCBI records matching a query"** -> ESearch returns matching record UIDs (not full records) from one NCBI database; EGQuery returns counts across all databases; EInfo describes a database's searchable fields and update timestamp.
+**"Find NCBI records matching a query"** -> ESearch returns matching record UIDs (not full records) from one NCBI database; looping ESearch over a curated database list returns counts across all databases (`Bio.Entrez.egquery()` is broken — see "Cross-database counts" below); EInfo describes a database's searchable fields and update timestamp.
 
 The single most important fact: ESearch returns *UIDs* (PMIDs, GI numbers, gene IDs, etc.), not records. To get content the agent must call EFetch or ESummary. Forgetting this is the most common Entrez mistake.
 
@@ -31,12 +31,16 @@ The single most important fact: ESearch returns *UIDs* (PMIDs, GI numbers, gene 
 
 ```python
 from Bio import Entrez
+import os
 import time
 
-Entrez.email = 'researcher@institution.edu'  # NCBI requires; sets User-Agent
-Entrez.api_key = 'YOUR_KEY'                  # 3 -> 10 req/sec; get at ncbi.nlm.nih.gov/account/settings/
-Entrez.tool = 'project-name'                 # appears in NCBI usage logs; helps if rate-throttled
+Entrez.email = 'researcher@institution.edu'       # NCBI requires; sets User-Agent
+Entrez.api_key = os.environ.get('NCBI_API_KEY')   # 3 -> 10 req/sec; get at ncbi.nlm.nih.gov/account/settings/
+Entrez.tool = 'project-name'                      # appears in NCBI usage logs; helps if rate-throttled
 ```
+
+Never hardcode a real key in source. `Entrez.api_key` is `None` if the env var is unset, which Biopython
+treats the same as not passing a key (falls back to the 3 req/sec ceiling).
 
 ## What ESearch actually does
 
@@ -60,12 +64,37 @@ The translator may expand `human` to the full taxonomy subtree, or coerce a gene
 | "Give me 20 matching UIDs" | ESearch | UIDs | 1 call |
 | "Give me ALL matching UIDs (>10K)" | ESearch + `usehistory='y'` | WebEnv/QueryKey | 1 call (then EFetch chunks server-side) |
 | "Does record X exist in db Y?" | ESearch with `term='X[Accn]'` | UIDs | 1 call |
-| "Which NCBI databases mention X at all?" | EGQuery | Counts across every db | 1 call |
+| "Which NCBI databases mention X at all?" | ESearch loop over `CURATED_DBS` (`retmax=0`) — see `examples/global_query.py` | Counts per db | N calls, ~N x 0.34s |
 | "What searchable fields does db Y have?" | EInfo with `db=Y` | FieldList | 1 call |
 | "Last update timestamp for db Y?" | EInfo with `db=Y` | `LastUpdate` | 1 call |
 | "Did the user misspell X?" | ESpell | Spelling suggestion | 1 call |
 
-EGQuery has been semi-deprecated since the 2022 site refactor — it still works but counts can lag the per-database indexes by 1-2 days. For authoritative cross-database counts, loop ESearch over a curated db list instead.
+### Cross-database counts (EGQuery is broken — use the ESearch loop)
+
+`Bio.Entrez.egquery()` does not exist on Biopython >=1.85: `AttributeError: module 'Bio.Entrez' has
+no attribute 'egquery'` (confirmed on the installed 1.88). `Bio/Entrez/__init__.py`'s own module
+docstring still lists `egquery` as a provided utility, but the function was dropped from the public
+API without a docstring update. Calling the underlying NCBI endpoint directly is not a working
+workaround either: as of 2026-09-17 `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/egquery.fcgi`
+301-redirects to `ext-http-eutils.linkerd.ncbi.nlm.nih.gov`, an internal-only NCBI hostname that does
+not resolve outside their network.
+
+Use the documented fallback instead: loop ESearch with `retmax=0` over a curated database list. It's
+slower (N calls instead of 1) but never lags the per-database index the way EGQuery's counts could.
+See `examples/global_query.py` for the runnable pattern, reproduced here:
+
+```python
+CURATED_DBS = ['pubmed', 'pmc', 'nucleotide', 'protein', 'gene', 'sra', 'gds', 'bioproject', 'biosample', 'clinvar']
+
+def cross_db_counts(term, dbs=CURATED_DBS):
+    counts = {}
+    for db in dbs:
+        h = Entrez.esearch(db=db, term=term, retmax=0)
+        r = Entrez.read(h); h.close()
+        counts[db] = int(r['Count'])
+        time.sleep(0.34)
+    return counts
+```
 
 ## retmax silent caps
 
@@ -140,6 +169,9 @@ term = 'CRISPR[Title] AND humans[MeSH Terms] AND last 30 days[EDAT] AND pubmed p
 
 ## Code patterns
 
+Runnable versions of the ESearch/EInfo/cross-database patterns below live in `examples/basic_search.py`,
+`examples/database_info.py`, and `examples/global_query.py` respectively.
+
 ### Single search with explicit retmax
 
 **Goal:** Get matching UIDs for a focused query without hitting silent caps.
@@ -213,7 +245,8 @@ print(r['QueryTranslation'])
 ```python
 def list_fields(db):
     h = Entrez.einfo(db=db); r = Entrez.read(h); h.close()
-    return [(f['Name'], f['FullName'], f['Description']) for f in r['DbInfo']['FieldList']]
+    # Biopython 1.88 wraps DbInfo as a one-element list, not a dict -- index [0] first.
+    return [(f['Name'], f['FullName'], f['Description']) for f in r['DbInfo'][0]['FieldList']]
 ```
 
 ### Spell-check before searching (catches typo-driven empty results)
