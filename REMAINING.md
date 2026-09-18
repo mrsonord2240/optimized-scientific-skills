@@ -4,15 +4,14 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**468 remaining** across 59 folders. 90 are already refined and live in `skills/`.
+**463 remaining** across 59 folders. 95 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 90 refined, 3 audited and excluded, 1 out of scope, 468 remaining.
+The source tree holds 562 Skills: 95 refined, 3 audited and excluded, 1 out of scope, 463 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
 | workflows | 37 | 4 |
 | data-visualization | 20 | 0 |
-| database-access | 15 | 0 |
 | comparative-genomics | 13 | 0 |
 | atac-seq | 12 | 0 |
 | chemoinformatics | 12 | 8 |
@@ -22,6 +21,7 @@ The source tree holds 562 Skills: 90 refined, 3 audited and excluded, 1 out of s
 | spatial-transcriptomics | 12 | 0 |
 | copy-number | 11 | 0 |
 | alignment-files | 10 | 0 |
+| database-access | 10 | 5 |
 | methylation-analysis | 10 | 0 |
 | single-cell | 10 | 7 |
 | structural-biology | 10 | 0 |
@@ -82,6 +82,7 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-causal-genomics-effector-gene-prioritization` | 84 | Limited Release |
 | `bio-causal-genomics-genetic-correlation` | 89 | Production Ready |
 | `bio-differential-expression-deseq2-basics` | 92 | Production Ready |
+| `bio-entrez-search` | 83 | Limited Release |
 | `bio-machine-learning-model-validation` | 93 | Limited Release |
 | `bio-machine-learning-prediction-explanation` | 89 | Limited Release |
 | `bio-molecular-descriptors` | 86 | Limited Release |
@@ -334,19 +335,14 @@ fixed.
 ### database-access
 
 - `bio-batch-downloads` — `database-access/batch-downloads`
-- `bio-biomart-queries` — `database-access/biomart-queries`
 - `bio-blast-searches` — `database-access/blast-searches`
 - `bio-ensembl-rest` — `database-access/ensembl-rest`
-- `bio-entrez-fetch` — `database-access/entrez-fetch`
 - `bio-entrez-link` — `database-access/entrez-link`
-- `bio-entrez-search` — `database-access/entrez-search`
 - `bio-geo-data` — `database-access/geo-data`
 - `bio-interaction-databases` — `database-access/interaction-databases`
-- `bio-local-blast` — `database-access/local-blast`
 - `bio-ncbi-datasets-cli` — `database-access/ncbi-datasets-cli`
 - `bio-ortholog-inference` — `database-access/ortholog-inference`
 - `bio-remote-homology` — `database-access/remote-homology`
-- `bio-sra-data` — `database-access/sra-data`
 - `bio-uniprot-access` — `database-access/uniprot-access`
 
 ### differential-expression

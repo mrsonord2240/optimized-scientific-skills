@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 90,
+    "refined": 95,
     "audited_and_excluded": 3,
     "out_of_scope": 1,
-    "remaining": 468
+    "remaining": 463
   },
   "remaining": [
     {
@@ -113,10 +113,6 @@
     {
       "id": "bio-batch-processing",
       "upstream_path": "sequence-io/batch-processing"
-    },
-    {
-      "id": "bio-biomart-queries",
-      "upstream_path": "database-access/biomart-queries"
     },
     {
       "id": "bio-blast-searches",
@@ -575,16 +571,8 @@
       "upstream_path": "database-access/ensembl-rest"
     },
     {
-      "id": "bio-entrez-fetch",
-      "upstream_path": "database-access/entrez-fetch"
-    },
-    {
       "id": "bio-entrez-link",
       "upstream_path": "database-access/entrez-link"
-    },
-    {
-      "id": "bio-entrez-search",
-      "upstream_path": "database-access/entrez-search"
     },
     {
       "id": "bio-epidemiological-genomics-amr-surveillance",
@@ -945,10 +933,6 @@
     {
       "id": "bio-isoform-switching",
       "upstream_path": "alternative-splicing/isoform-switching"
-    },
-    {
-      "id": "bio-local-blast",
-      "upstream_path": "database-access/local-blast"
     },
     {
       "id": "bio-long-read-sequencing-basecalling",
@@ -1553,10 +1537,6 @@
     {
       "id": "bio-splicing-quantification",
       "upstream_path": "alternative-splicing/splicing-quantification"
-    },
-    {
-      "id": "bio-sra-data",
-      "upstream_path": "database-access/sra-data"
     },
     {
       "id": "bio-structural-biology-alphafold-predictions",

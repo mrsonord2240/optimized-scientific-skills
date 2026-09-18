@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "ffa2608603c78360aea038e82a5107a53aa32058"
+      "staging_commit": "49aef6ad496292fcad78360ca4c4c6a7331d62ad"
     }
   },
   "skills": [
@@ -65,6 +65,26 @@
         "clipkit_trim.py",
         "selection-analysis-workflow.md",
         "specialist-trimmers.md",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-biomart-queries",
+      "upstream_path": "database-access/biomart-queries",
+      "score": 87,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": "fixes/bio-biomart-queries.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "bulk_id_mapping.py",
+        "coordinate_table.sh",
+        "ortholog_table.py",
         "usage-guide.md"
       ]
     },
@@ -525,6 +545,41 @@
       ]
     },
     {
+      "id": "bio-entrez-fetch",
+      "upstream_path": "database-access/entrez-fetch",
+      "score": 89,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": "fixes/bio-entrez-fetch.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "fetch_pubmed.py",
+        "fetch_summaries.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-entrez-search",
+      "upstream_path": "database-access/entrez-search",
+      "score": 83,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "id": "bio-experimental-design-batch-design",
       "upstream_path": "experimental-design/batch-design",
       "score": 87,
@@ -574,6 +629,24 @@
       "changed_files": [
         "SKILL.md",
         "randomization_blocking.R",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-local-blast",
+      "upstream_path": "database-access/local-blast",
+      "score": 93,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": "fixes/bio-local-blast.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "create_database.sh",
         "usage-guide.md"
       ]
     },
@@ -1394,6 +1467,26 @@
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-sra-data",
+      "upstream_path": "database-access/sra-data",
+      "score": 82,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-17",
+      "fix_log": "fixes/bio-sra-data.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "download_batch.sh",
+        "download_single.sh",
+        "prefetch_large.sh",
+        "usage-guide.md"
       ]
     },
     {
