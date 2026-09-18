@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "be834571742571b602ce5ec5dec83fadaa1caca1"
+      "staging_commit": "659c780ba818fb627d3dc85b1925a6aef70885a9"
     }
   },
   "skills": [
@@ -85,6 +85,25 @@
         "bulk_id_mapping.py",
         "coordinate_table.sh",
         "ortholog_table.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-causal-genomics-colocalization-analysis",
+      "upstream_path": "causal-genomics/colocalization-analysis",
+      "score": 96,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-18",
+      "fix_log": "fixes/bio-causal-genomics-colocalization-analysis.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "coloc_susie.R",
+        "coloc_susie_multicausal.R",
         "usage-guide.md"
       ]
     },

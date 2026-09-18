@@ -4,8 +4,8 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 95,
-    "audited_and_excluded": 3,
+    "refined": 96,
+    "audited_and_excluded": 2,
     "out_of_scope": 1,
     "remaining": 463
   },
@@ -1864,18 +1864,6 @@
     }
   ],
   "excluded": [
-    {
-      "id": "bio-causal-genomics-colocalization-analysis",
-      "upstream_path": "causal-genomics/colocalization-analysis",
-      "score": 86,
-      "grade": "Limited Release",
-      "deployable": true,
-      "open_p0": 1,
-      "audited_on": "2026-09-17",
-      "fix_log": null,
-      "fix_pass": "needed",
-      "reaudit": "not needed"
-    },
     {
       "id": "bio-experimental-design-multiple-testing",
       "upstream_path": "experimental-design/multiple-testing",
