@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "0ffa663a96ad0353182d70fe18d880b4705d63bd"
+      "staging_commit": "9482919d151e6954b3ea600604d088351a2b9f64"
     }
   },
   "skills": [
@@ -515,18 +515,19 @@
     {
       "id": "bio-crispr-screens-prime-editing-screens",
       "upstream_path": "crispr-screens/prime-editing-screens",
-      "score": 81.2,
-      "grade": "Limited Release",
+      "score": 87.2,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-16",
+      "audited_on": "2026-09-18",
       "fix_log": "fixes/bio-crispr-screens-prime-editing-screens.md",
       "fix_pass": "done",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
-        "design_pegrna_pridict2.py"
+        "design_pegrna_pridict2.py",
+        "usage-guide.md"
       ]
     },
     {

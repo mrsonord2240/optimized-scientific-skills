@@ -93,31 +93,8 @@ Tell the AI agent what to do:
 - Pilot PRIDICT2 predictions in your specific cell line. The deep-learning model was trained on HEK293T (MMR-deficient) and K562 (MMR-proficient); other lines may have different chromatin and RT-activity profiles.
 - For BE-PE comparison, design parallel libraries targeting the same variants. Concordant hits represent strong biology.
 
-## Decision Cheat Sheet
-
-| Question | Answer |
-|----------|--------|
-| C->T or A->G at editing window pos 4-8 | BE (preferred; higher efficiency) |
-| Multi-base edit | PE |
-| Transversion (C->G, C->A) | PE |
-| Out-of-window single base | PE |
-| Cancer-line variant scanning | PE or BE; cross-validate |
-| iPSC / primary cell variant | PE (no bystander confounding) |
-| Variant for drug-resistance | PE or BE; depends on chemistry |
-| LoF / KO only | Cas9 (no template needed) |
-
-## Thresholds
-
-| Threshold | Value | Rationale |
-|-----------|-------|-----------|
-| PRIDICT2 prediction threshold | >50% efficiency | Project-chosen cutoff; PRIDICT2 prescribes none |
-| Intended edit % for screen | >5% | Field convention |
-| Scaffold incorporation | <2% (clean); <5% (acceptable) | Empirical |
-| Indel byproduct (PE2) | <3% | Anzalone 2019 |
-| PBS GC content | 40-55% | PRIDICT2 |
-| PBS length | 11-13 nt | PRIDICT2 |
-| RTT length | 10-20 nt | PRIDICT2 |
-| Edit position from cut | 1-30 nt | Anzalone 2019 |
+For the BE/PE/Cas9 decision tree, see SKILL.md's "Cas9 vs BE vs PE for Variant Installation".
+For efficiency/QC thresholds, see SKILL.md's "Quantitative Thresholds".
 
 ## Validation Checklist
 

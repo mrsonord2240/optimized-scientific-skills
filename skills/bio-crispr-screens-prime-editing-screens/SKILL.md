@@ -94,6 +94,11 @@ python pridict2_pegRNA_design.py single \
     --use_5folds                                              # 5-fold ensemble averaging
 
 # Batch input from CSV:
+# PRIDICT2's --input-dir defaults to ./input, NOT the current directory -- the CSV must live there
+# (or pass --input-dir explicitly). --output-dir must also already exist before running with
+# --summarize (it lists existing .csv files there first; a missing directory raises FileNotFoundError).
+mkdir -p input predictions
+mv variants_to_design.csv input/
 python pridict2_pegRNA_design.py batch \
     --input-fname variants_to_design.csv \                    # CSV: sequence_name, editseq (NOT "sequence" -- see below)
     --output-dir predictions/ \
@@ -174,13 +179,18 @@ def load_pridict2_predictions(prediction_dir):
 # Step 1: prepare batch input CSV -- real required header is "editseq", NOT "sequence"
 # (documenting it as "sequence" makes the CLI exit 0 while writing an empty summary file,
 # with no error beyond a "Missing editseq column" warning -- verified on real PRIDICT2 CLI)
-cat > variants.csv <<EOF
+# PRIDICT2's --input-dir defaults to ./input, NOT the current directory -- write the CSV there
+# (or pass --input-dir explicitly), and pre-create --output-dir (see Step 2).
+mkdir -p input predictions
+cat > input/variants.csv <<EOF
 sequence_name,editseq
 BRCA1_R71X,AGCAGCCT(C/T)CTGAATGCCC...
 MLH1_c677,GAGCTGAGC(A/G)GAGGCTCTTGAAGC...
 EOF
 
-# Step 2: run PRIDICT2 batch (--summarize takes a cell-line value, not a bare flag)
+# Step 2: run PRIDICT2 batch (--summarize takes a cell-line value, not a bare flag;
+# --output-dir must already exist -- --summarize lists .csv files there before the run starts,
+# and a missing directory raises FileNotFoundError there rather than a "nothing found" no-op)
 python pridict2_pegRNA_design.py batch \
     --input-fname variants.csv \
     --output-dir predictions/ \
@@ -304,7 +314,10 @@ comes back near-zero on a library-wide basis, check element order before assumin
 after printing "Missing editseq column" and writing a summary file containing only `""`.
 **Symptom:** Either a crash, or a "completed successfully" run whose output file is empty.
 **Fix:** Always pass `--summarize <K562|HEK>` and confirm the input CSV header is `sequence_name,editseq`;
-treat an empty-looking summary file as a column-name bug, not evidence PRIDICT2 found nothing.
+treat an empty-looking summary file as a column-name bug, not evidence PRIDICT2 found nothing. Also
+confirm the CSV lives under `./input/` (the CLI's own `--input-dir` default, verified against its
+`--help`) and that `--output-dir` already exists (`--summarize` lists `.csv` files there before the
+run starts) -- both raise `FileNotFoundError` rather than a helpful message.
 
 ## Cas9 vs BE vs PE for Variant Installation
 
@@ -320,6 +333,8 @@ treat an empty-looking summary file as a column-name bug, not evidence PRIDICT2 
 - Multi-base / transversion / out-of-window: PE
 - LoF without specifying variant: Cas9
 - Random insertions: HDR (lower throughput than PE)
+- iPSC / primary-cell variant: PE (no bystander confounding)
+- Cancer-line variant scanning or drug-resistance variant: PE or BE; cross-validate both (chemistry-dependent)
 
 ## Quantitative Thresholds
 
@@ -347,6 +362,8 @@ treat an empty-looking summary file as a column-name bug, not evidence PRIDICT2 
 | CRISPResso2 reports ~0% Prime-edited on a library that should edit | pegRNA extension built PBS-then-RTT instead of RTT-then-PBS | Rebuild extension as RTT-revcomp + PBS-revcomp |
 | PRIDICT2 batch: `--summarize: expected one argument` | Bare `--summarize` flag | Pass a value: `--summarize K562` (or `HEK`) |
 | PRIDICT2 batch: summary file is `""` | Input CSV header is `sequence`, not `editseq` | Rename the header column to `editseq` |
+| PRIDICT2 batch: `FileNotFoundError` referencing `input/<file>` | CSV not placed in the CLI's default `./input` directory | `mkdir input` and move the CSV there, or pass `--input-dir` explicitly |
+| PRIDICT2 batch `--summarize`: `FileNotFoundError` on the output directory itself | `--output-dir` does not exist yet -- `--summarize` lists existing `.csv` files there before the run starts | `mkdir -p <output-dir>` before running with `--summarize` |
 | PE concordant with BE on transitions, disagrees on transversions | PE handles transversions BE doesn't | Expected; trust PE |
 
 ## References
