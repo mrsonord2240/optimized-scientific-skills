@@ -19,7 +19,7 @@ non-trivial workflow painful.
 
 - "Find PubMed articles about CRISPR published in 2024, return the first 50 PMIDs"
 - "How many SRA runs exist for BioProject PRJNA123456?"
-- "Show me which NCBI databases contain records mentioning BRCA1"
+- "Show me which of the curated databases contain records mentioning BRCA1"
 - "Search nucleotide for human RefSeq mRNAs between 500 and 5000 nt"
 - "List the searchable fields for the ClinVar database"
 
@@ -35,7 +35,7 @@ non-trivial workflow painful.
 
 ### Cross-database discovery
 
-> "I have the gene symbol DDX3X. Loop ESearch over the curated database list to show which NCBI databases contain records mentioning it (EGQuery is broken on current Biopython/NCBI — see SKILL.md), then drill into the gene database with a field-qualified search to get the canonical Gene UID."
+> "I have the gene symbol DDX3X. Loop ESearch over the curated database list (10 of NCBI's 38 databases — EGQuery, which checked all of them, is broken on current Biopython/NCBI, see SKILL.md) to show which of those 10 contain records mentioning it, then drill into the gene database with a field-qualified search to get the canonical Gene UID."
 
 ### Chaining queries on the history server
 
@@ -54,15 +54,6 @@ non-trivial workflow painful.
 5. For ambiguous gene symbols, look up the canonical HGNC name first.
 6. Respect rate limits (0.34s no key, 0.10s with key) and surface warnings if hitting the 9999 cap.
 7. Hand off WebEnv/QueryKey to downstream EFetch or ESummary workflows.
-
-## Tips
-
-- For multi-token or ambiguous gene symbols (MARCHF1, SEPTIN9, the Excel-renamed set), always go through `gene` db lookup first and use the resulting GeneID downstream -- gene symbols are unstable.
-- `[Organism]` defaults to a taxonomy walk; for a single species use a binomial like `Homo sapiens[ORGN]`; to disable the walk use `[Organism:exp]`.
-- Fresh deposits (< 48h) often aren't searchable yet but are EFetch-able by accession -- use EFetch directly when the accession is known.
-- For very large result sets, push to the history server once with ESearch then iterate EFetch -- never re-send 50,000 IDs in successive calls.
-- PMC subset filtering uses `pubmed pmc[sb]` not a separate db; the underlying records are PubMed UIDs.
-- `Entrez.egquery()` doesn't exist on current Biopython — for cross-database counts use the ESearch-loop pattern in SKILL.md's decision table.
 
 ## Related Skills
 

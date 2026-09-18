@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "892698972c233b884d41496e2b7c2d4456950bd1"
+      "staging_commit": "be834571742571b602ce5ec5dec83fadaa1caca1"
     }
   },
   "skills": [
@@ -566,7 +566,7 @@
     {
       "id": "bio-entrez-search",
       "upstream_path": "database-access/entrez-search",
-      "score": 86,
+      "score": 88,
       "grade": "Limited Release",
       "deployable": true,
       "open_p0": 0,

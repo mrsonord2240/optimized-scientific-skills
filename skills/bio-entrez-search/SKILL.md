@@ -42,6 +42,12 @@ Entrez.tool = 'project-name'                      # appears in NCBI usage logs; 
 Never hardcode a real key in source. `Entrez.api_key` is `None` if the env var is unset, which Biopython
 treats the same as not passing a key (falls back to the 3 req/sec ceiling).
 
+**`term` strings are URL query parameters, not code** — Biopython URL-encodes them automatically (do
+not pre-encode); there is no shell/eval injection risk. Do sanity-check length and count before a
+large batch loop: an extremely long term (hundreds of IDs `OR`-joined into one string) is a common,
+silent way to trip `HTTPError 400` — see "Common errors" below. Chunk large ID sets through EPost
+(200 IDs/call, see "retmax silent caps") instead of building one giant `term`.
+
 ## What ESearch actually does
 
 ESearch sends the query string through the **Entrez Query Translator (EQT)**, which rewrites unqualified terms into the canonical `term[field]` form, then runs the rewritten query against the per-database index. The result is a list of UIDs plus a `QueryTranslation` string showing exactly what was searched. Reproducible work always inspects `QueryTranslation` and builds queries that are translation-stable from the start.
@@ -64,7 +70,7 @@ The translator may expand `human` to the full taxonomy subtree, or coerce a gene
 | "Give me 20 matching UIDs" | ESearch | UIDs | 1 call |
 | "Give me ALL matching UIDs (>10K)" | ESearch + `usehistory='y'` | WebEnv/QueryKey | 1 call (then EFetch chunks server-side) |
 | "Does record X exist in db Y?" | ESearch with `term='X[Accn]'` | UIDs | 1 call |
-| "Which NCBI databases mention X at all?" | ESearch loop over `CURATED_DBS` (`retmax=0`) — see `examples/global_query.py` | Counts per db | N calls, ~N x 0.34s |
+| "Which of the 10 `CURATED_DBS` databases mention X?" | ESearch loop over `CURATED_DBS` (`retmax=0`) — see `examples/global_query.py` | Counts per db | N calls, ~N x 0.34s |
 | "What searchable fields does db Y have?" | EInfo with `db=Y` | FieldList | 1 call |
 | "Last update timestamp for db Y?" | EInfo with `db=Y` | `LastUpdate` | 1 call |
 | "Did the user misspell X?" | ESpell | Spelling suggestion | 1 call |
@@ -81,6 +87,13 @@ not resolve outside their network.
 
 Use the documented fallback instead: loop ESearch with `retmax=0` over a curated database list. It's
 slower (N calls instead of 1) but never lags the per-database index the way EGQuery's counts could.
+
+**`CURATED_DBS` covers 10 of the 38 databases EInfo currently lists (confirmed live 2026-09-17) — it
+is not exhaustive.** EGQuery, which it replaces, really did query every database in one call; this
+loop only checks the 10 named below. To widen it, pass any EInfo-listed db name(s) in — e.g.
+`cross_db_counts(term, dbs=Entrez.read(Entrez.einfo())['DbList'])` — at the cost of one ESearch call
+per database instead of 10.
+
 See `examples/global_query.py` for the runnable pattern, reproduced here:
 
 ```python
@@ -141,7 +154,7 @@ NCBI's Entrez indexer runs nightly (US Eastern). Records submitted Monday mornin
 
 | Database | Common fields | Notes |
 |---|---|---|
-| pubmed | `[Title]`, `[TIAB]` (title+abstract), `[MeSH]`, `[Author]`, `[Journal]`, `[PDAT]`, `[DCOM]`, `[PMC]` | `[TIAB]` is more permissive than `[Title]`; `[MeSH]` requires the term to be indexed (lags) |
+| pubmed | `[Title]`, `[TIAB]` (title+abstract), `[MeSH]`, `[Author]`, `[Journal]`, `[PDAT]`, `[DCOM]`, `[PMC]` | `[TIAB]` is more permissive than `[Title]`; `[MeSH]` requires the term to be indexed (lags); PMC full-text subset is `pubmed pmc[sb]`, not a separate db — the underlying UIDs are still PubMed's |
 | nucleotide | `[Organism]`, `[Gene Name]`, `[Accn]`, `[SLEN]`, `[Filter]`, `[PROP]` | `srcdb_refseq[PROP]` restricts to RefSeq; `biomol_genomic[PROP]` filters molecule type |
 | protein | `[Organism]`, `[Gene Name]`, `[Accn]`, `[MOLWT]`, `[PROP]` | `swissprot[Filter]` restricts to reviewed |
 | gene | `[Gene/Locus]`, `[Organism]`, `[Chromosome]`, `[Gene Type]` | `[Gene Type]` includes `protein-coding`, `pseudo`, `ncRNA` |
@@ -260,9 +273,7 @@ print(r['CorrectedQuery'])  # 'breast cancer'
 ## Failure modes
 
 ### Silent retmax cap
-- **Trigger:** `Count > 9999` with no `usehistory='y'`; `IdList` capped at 9999.
-- **Mechanism:** Legacy esearch.fcgi enforces a 9999 cap for non-history responses.
-- **Symptom:** Pipeline returns "the first 9999" with no error; downstream stats are wrong.
+Trigger and mechanism: see "retmax silent caps" above (9,999-record non-history cap).
 - **Fix:** Always check `int(record['Count']) <= len(record['IdList'])`; switch to history server above ~5000.
 
 ### Query translation mismatch
@@ -272,21 +283,15 @@ print(r['CorrectedQuery'])  # 'breast cancer'
 - **Fix:** Use field-qualified terms; for gene symbols, use HGNC ID via `gene` db lookup first.
 
 ### WebEnv expiration mid-pipeline
-- **Trigger:** Long-running batch job; session > 8 hours or idle > 15 min.
-- **Mechanism:** Server evicts WebEnv; subsequent EFetch returns `<ERROR>` body with HTTP 200.
-- **Symptom:** Silent empty results halfway through a download.
+Trigger and mechanism: see "History server (WebEnv/QueryKey) semantics" above (TTL, idle eviction, error body).
 - **Fix:** Parse error bodies (not just status codes); re-run ESearch and resume from `retstart`.
 
 ### Index lag for fresh deposits
-- **Trigger:** Querying a record submitted < 48h ago.
-- **Mechanism:** Indexer is batch (Tue/Fri primary); record exists but not searchable.
-- **Symptom:** ESearch by accession returns empty; direct EFetch by accession succeeds.
+Trigger and mechanism: see "Index lag" above.
 - **Fix:** If the accession is known, use EFetch directly; only use ESearch for content-based discovery.
 
 ### Organism over-expansion
-- **Trigger:** `[ORGN]` query on a higher taxon (e.g. `Vertebrata[ORGN]`).
-- **Mechanism:** Default behavior walks the entire taxonomy subtree.
-- **Symptom:** 1000x more hits than intended.
+Trigger and mechanism: see "Organism field gotcha" above.
 - **Fix:** Use `[Organism:exp]` to disable the walk, or constrain to a specific species/genus.
 
 ### Empty IdList with no error
