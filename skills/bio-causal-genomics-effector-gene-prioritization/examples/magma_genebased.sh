@@ -32,24 +32,50 @@ magma --bfile "$REF_BFILE" \
     --gene-annot "${OUT_PREFIX}_annot.genes.annot" \
     --out "${OUT_PREFIX}_gene"
 
+# Windows note: MAGMA 1.10 on Windows writes "<prefix>.genes.out.txt" (extra .txt)
+# instead of "<prefix>.genes.out" -- the same mismatch documented in SKILL.md's "PoPS
+# Polygenic Priority Score" section for pops.py. Resolve it here too, since the
+# Bonferroni/top-50 steps below read .genes.out directly (verified: this script fails
+# with "No such file or directory" on Windows without this).
+GENES_OUT="${OUT_PREFIX}_gene.genes.out"
+if [ ! -f "$GENES_OUT" ] && [ -f "${GENES_OUT}.txt" ]; then
+    cp "${GENES_OUT}.txt" "$GENES_OUT"
+fi
+
 # Step 3: Gene-set enrichment (competitive test; preferred over self-contained)
-magma --gene-results "${OUT_PREFIX}_gene.genes.raw" \
-    --set-annot "$GENESET_GMT" \
-    --out "${OUT_PREFIX}_geneset"
+# MINIMUM GENE COUNT: this regression conditions on 6 internal covariates (gene size,
+# log(gene size), gene density, log(gene density), inverse MAC, log(inverse MAC)).
+# With too few genes in --gene-results relative to those 6 covariates, the regression
+# is structurally unidentifiable and MAGMA aborts with "ERROR: insufficient degrees of
+# freedom to run analyses" (or, with even fewer genes, "no input variables to analyse"
+# from a gene-set variance check that runs first) -- verified on real locus-scale runs
+# with 3 and 5 genes. Rule of thumb: gene-set enrichment needs several hundred+ genes;
+# a single-locus run (a handful of genes) should SKIP this step entirely -- gene-set
+# enrichment is a genome-wide- or many-loci-scale analysis, not a per-locus one.
+N_GENES_STEP3=$(grep -vc '^#' "${OUT_PREFIX}_gene.genes.raw")
+if [ "$N_GENES_STEP3" -lt 200 ]; then
+    echo "Skipping Step 3 (gene-set enrichment): only ${N_GENES_STEP3} genes in" \
+         "${OUT_PREFIX}_gene.genes.raw, well under the several-hundred+ this competitive" \
+         "regression needs. Run gene-set enrichment only on genome-wide (or many-loci) MAGMA output."
+else
+    magma --gene-results "${OUT_PREFIX}_gene.genes.raw" \
+        --set-annot "$GENESET_GMT" \
+        --out "${OUT_PREFIX}_geneset"
+fi
 
 # Outputs:
 #   ${OUT_PREFIX}_gene.genes.out: per-gene Z, p, n_SNPs
 #   ${OUT_PREFIX}_geneset.gsa.out: per-set p, beta, beta_se
 
 # Bonferroni threshold for ~20k autosomal protein-coding genes
-N_GENES=$(wc -l < "${OUT_PREFIX}_gene.genes.out")
+N_GENES=$(wc -l < "$GENES_OUT")
 echo "Bonferroni threshold at alpha=0.05 across ${N_GENES} genes: $(echo "0.05 / ${N_GENES}" | bc -l)"
 
 # Top 50 genes by p
 # MAGMA .genes.out columns: GENE CHR START STOP NSNPS NPARAM N ZSTAT P
 # P is the 9th whitespace-separated field; sort ascending numerically.
-{ head -1 "${OUT_PREFIX}_gene.genes.out"
-  tail -n +2 "${OUT_PREFIX}_gene.genes.out" | sort -k9,9g
+{ head -1 "$GENES_OUT"
+  tail -n +2 "$GENES_OUT" | sort -k9,9g
 } | head -51 > "${OUT_PREFIX}_top50.tsv"
 
 echo "MAGMA gene-based and gene-set complete."

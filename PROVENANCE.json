@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "9482919d151e6954b3ea600604d088351a2b9f64"
+      "staging_commit": "03f50579746751de1c42969a9ae48b26d1faa80f"
     }
   },
   "skills": [
@@ -110,17 +110,28 @@
     {
       "id": "bio-causal-genomics-effector-gene-prioritization",
       "upstream_path": "causal-genomics/effector-gene-prioritization",
-      "score": 84,
-      "grade": "Limited Release",
+      "score": 91,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-17",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "audited_on": "2026-09-18",
+      "fix_log": "fixes/bio-causal-genomics-effector-gene-prioritization.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "algorithmic-taxonomy.md",
+        "failure-modes.md",
+        "magma_genebased.sh",
+        "make_toy_fixture.py",
+        "opentargets_l2g_query.py",
+        "pops_run.py",
+        "quantitative-thresholds.md",
+        "toy_gene_loc.txt",
+        "toy_gwas_sumstats.tsv",
+        "toy_snp_loc.txt",
+        "usage-guide.md"
       ]
     },
     {

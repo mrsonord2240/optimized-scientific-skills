@@ -26,8 +26,8 @@ justified.
 | | count |
 | --- | ---: |
 | Skills in this repository | **98** |
-| substantively modified by us, each with a fix log | 77 |
-| unmodified apart from a declared `license: MIT` | 21 |
+| substantively modified by us, each with a fix log | 78 |
+| unmodified apart from a declared `license: MIT` | 20 |
 | **fix pass still needed** (first audit only, whatever the score) | **21** |
 | **re-audit still needed** (changed after their latest audit) | **22** |
 | audit coverage | **100%** |

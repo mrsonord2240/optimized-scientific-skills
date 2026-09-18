@@ -30,23 +30,52 @@ If a script throws an error about an argument that has moved (e.g. an Open Targe
 
 V2G is not one method but a portfolio. Open Targets L2G aggregates per-locus per-gene features (distance + coloc + chromatin + V2G) trained on curated gold-standard genes; PoPS adds an orthogonal genome-wide polygenic prior from gene-pathway co-membership; MAGMA provides the lightweight gene-level p-value baseline. Strong effector calls emerge from concordance across these orthogonal signal types, not from any single tool.
 
+## Scope
+
+Every method here nominates a candidate causal gene at the population level, from GWAS
+summary statistics -- it is hypothesis-generating research output, not an individual clinical
+determination. A gene scoring as a locus's effector (even a well-known drug-target gene like
+PCSK9, LDLR, or APOE) says nothing about which treatment is right for a specific patient with a
+specific variant, comorbidities, and clinical history. If a request asks this Skill's output to
+drive a per-patient prescribing, diagnostic, or treatment-selection decision, decline that framing
+explicitly and redirect to the patient's treating clinician or a clinical genetics / pharmacogenomics
+pathway; offer the population-level evidence (concordance tier, evidence streams) as context for that
+clinician, not as a substitute for their judgment.
+
+## Prerequisites
+
+- GWAS summary statistics (SNP, CHR, BP, A1, A2, BETA or Z, SE, P, N)
+- Fine-mapping output (SuSiE / FINEMAP credible sets) from causal-genomics/fine-mapping
+- Colocalization output (coloc.abf or coloc.susie PP.H4) from causal-genomics/colocalization-analysis
+- Ancestry-matched LD reference panel (e.g. 1000 Genomes EUR PLINK bfile)
+- Pre-computed integrative scores when available: Open Targets L2G, cS2G, PoPS feature matrix
+- For matched-tissue enhancer-gene linking: ATAC-seq + H3K27ac ChIP + Hi-C/Micro-C in the candidate causal tissue (cross-reference atac-seq/enhancer-gene-linking)
+
+### eQTL / pQTL Panel Selection
+
+Panel choice dominates coloc and TWAS sensitivity (see "eQTL tissue mis-specification" in `references/failure-modes.md`). Match to the causal tissue identified via LDSC-SEG or stratified LDSC before locking in.
+
+| Panel | N donors | Tissues / cells | Use case |
+|-------|----------|-----------------|----------|
+| GTEx v8 | 838 | 49 tissues | PredictDB standard for 2026 TWAS pipelines |
+| GTEx v10 (2024) | ~1,000 | 49 tissues | Limited PredictDB coverage; transitional |
+| eQTLGen | 31,684 | Whole blood | Maximum statistical power for blood-relevant traits |
+| eQTLGen Phase 2 (sc) | ~30,000 | sc immune | Cell-type-resolved blood eQTLs |
+| OneK1K | 982 | PBMC, 14 cell types | sc-eQTL discovery for immune traits |
+| INTERVAL pQTL | 3,301 | Plasma proteome | Drug-target cross-reference via pQTL-MR |
+
 ## Algorithmic Taxonomy
 
-| Tool | Model | Inputs | Output | Strength | Fails when |
-|------|-------|--------|--------|----------|------------|
-| Open Targets L2G (Mountjoy 2021 Nat Genet 53:1527) | Gradient-boosting classifier on per-(locus, gene) features (distance, fine-mapping, coloc, chromatin, V2G) trained on curated gold standards | Pre-computed per study; queried via API | Per-(study, locus, gene) L2G score 0-1 | Most validated integrative scorer; built into Open Targets Platform; updated quarterly | Trait must be in OT release; custom traits need re-training; coverage limited to OT-curated GWAS catalog |
-| V2G (Ghoussaini 2021 Nucleic Acids Res 49:D1311) | Open Targets V2G feature aggregator: per-variant eQTL/sQTL/pQTL + chromatin + distance | OT pre-computed | Per-(variant, gene) score | Variant-resolution; complements locus-resolution L2G | Feature weights are fixed; cannot tune per-trait |
-| MAGMA (de Leeuw 2015 PLoS Comput Biol 11:e1004219) | SNP-to-gene window aggregation + multiple regression on summary statistics | GWAS sumstats + gene annotation + LD reference (PLINK bfile) | Gene-level Z, p; gene-set p | Mature, fast, lightweight; supports gene-set enrichment in same pass; widely cited | Window choice (0+0 vs 35kb+10kb vs 50kb+50kb) shifts top genes; cannot detect distal regulation outside window |
-| FUMA SNP2GENE (Watanabe 2017 Nat Commun 8:1826) | Web platform combining positional + eQTL + Hi-C + chromatin annotation + MAGMA | Sumstats upload to fuma.ctglab.nl | Annotated locus + prioritised gene table | One-click integrative analysis; no local install needed; community standard for GWAS post-hoc | Web-only; no API for high-throughput; pre-baked annotations may lag latest reference releases |
-| cS2G (Gazal 2022 Nat Genet 54:827) | Weighted aggregation of 7 constituent SNP-to-gene strategies (Exon, Promoter, fine-mapped cis-eQTL, EpiMap enhancer-gene, ABC, Cicero, etc.) calibrated on heritability enrichment | Per-SNP lookup | Combined per-SNP score allocated to genes | Heritability-calibrated; pre-computed gene scores for downstream filtering | Aggregation weights are population-averaged; cell-type-specific signal averaged out; coverage limited to baseline-LF SNP universe |
-| PoPS (Weeks 2023 Nat Genet 55:1267) | Ridge (L2-penalized) regression of per-gene MAGMA Z on genome-wide gene-feature matrix (pathway membership, co-expression, PPI) | MAGMA Z + gene-feature matrix | Per-gene priority score (PoPS); per-locus relative ranking | Orthogonal to distance / proximity; identifies genes with similar pathway / co-expression profile to other GWAS hits | Pathway co-membership similarity is similarity-based; can hand-feed bias if features are not curated; complementary to L2G, not redundant |
-| FLAMES (Schipper M et al 2025 Nat Genet 57:323) | Combined per-feature scoring with a machine-learning (XGBoost) classifier + convergence module | Sumstats + features | Per-gene prioritisation | Recent integrative method | Limited validation outside the publication test set; method choice still evolving |
-| INQUISIT (Fachal 2020 Nat Genet 52:56) | Three-level scoring for coding, regulatory-proximal, regulatory-distal; trait-specific (breast cancer) | Sumstats + cancer-specific annotation panel | Per-gene INQUISIT score | Cancer-tuned; integrates expression and chromatin context | Originally trait-specific (breast cancer); adapting to other diseases requires re-curation |
-| DEPICT (Pers 2015 Nat Commun 6:5890) | Empirical Bayes; gene set enrichment + tissue prioritisation + reconstituted gene sets | Sumstats | Per-gene p; pathway enrichment; tissue priority | Old but still cited; combines three useful outputs | Reconstituted gene sets are dated (2015 expression panel); largely superseded by L2G + PoPS combination |
-| ABC + ENCODE-rE2G | Activity x Contact enhancer-gene model (Fulco 2019) and logistic-regression refinement (Gschwind 2023 preprint) | ATAC + H3K27ac + Hi-C/Micro-C | Per-(enhancer, gene) score | Direct mechanistic enhancer-gene link in matched cell type; gold-standard for distal regulation | Requires matched epigenome data; cell-type-specific; covered in detail in atac-seq/enhancer-gene-linking |
-| sc-eQTL + cell-type-specific TWAS (e.g. Yazar 2022 OneK1K) | Per-cell-type eQTL panels + per-cell-type prediction weights | sc-eQTL panel + sumstats | Cell-type-resolved gene candidates | Resolves cell-type-specific causal genes that bulk-tissue TWAS averages out | Requires matched single-cell eQTL panel; not yet pre-built for most cell types |
-
-Methodology evolves; verify against the current Open Targets release (platform-docs.opentargets.org), the latest PoPS feature matrix at FinucaneLab/pops, and ABC / ENCODE-rE2G releases before locking on a single prioritiser. The L2G + PoPS combination is the current de facto two-method baseline; cS2G is the heritability-calibrated lookup; FUMA is the no-install community standard.
+Ten tools compete for this job: Open Targets L2G, V2G, MAGMA, FUMA SNP2GENE, cS2G, PoPS, FLAMES,
+INQUISIT, DEPICT, and ABC/ENCODE-rE2G (plus sc-eQTL/cell-type TWAS). Each has a distinct model,
+input/output shape, and failure regime. See `references/algorithmic-taxonomy.md` for the full
+per-tool comparison table (model, inputs, output, strength, fails-when) before picking or
+contrasting specific tools. The load-bearing summary: L2G + PoPS is the current de facto
+two-method baseline (orthogonal by construction -- see Reconciliation below); cS2G is the
+heritability-calibrated per-SNP lookup; FUMA is the no-install community standard. Methodology
+evolves; verify against the current Open Targets release (platform-docs.opentargets.org), the
+latest PoPS feature matrix at FinucaneLab/pops, and ABC / ENCODE-rE2G releases before locking
+on a single prioritiser.
 
 ## Decision Tree by Scenario
 
@@ -65,67 +94,11 @@ Methodology evolves; verify against the current Open Targets release (platform-d
 
 ## Per-Method Failure Modes
 
-### Nearest-gene assumption fails (most common pitfall)
-
-**Trigger:** Assigning the GWAS lead variant to the closest gene without checking long-range regulation.
-
-**Mechanism:** Approximately 30-50% of well-fine-mapped GWAS variants regulate a gene that is NOT the nearest TSS (Mountjoy 2021; Fulco 2019 Nat Genet 51:1664). Distal enhancer-promoter contacts span 50 kb to > 1 Mb; LD around the lead variant often spans only kilobases, so the credible-set centroid may sit closer to a passenger gene than to the true target.
-
-**Symptom:** Distance-based prioritisation names the nearest gene; subsequent eQTL coloc, ABC, and ENCODE-rE2G converge on a different gene at the same locus. Functional validation (CRISPRi at the variant) confirms the distal gene.
-
-**Fix:** Use L2G (which includes distance but does not let it dominate), PoPS (which is distance-orthogonal by construction), and ABC / ENCODE-rE2G when matched epigenome data are available. Report all candidate genes at the locus with their evidence-stream contributions; do not collapse to the nearest by default.
-
-### eQTL tissue mis-specification
-
-**Trigger:** Using a single-tissue eQTL panel (e.g. whole blood) when the causal tissue is different (e.g. liver for lipid traits, hypothalamus for energy balance).
-
-**Mechanism:** Cis-eQTL effect sizes are tissue-specific; eQTLs in the wrong tissue still tag the GWAS signal via LD and produce spurious colocalisations or TWAS hits. The right gene at the wrong tissue is statistically detectable but biologically uninterpretable.
-
-**Symptom:** Strong colocalisation in a tissue biologically irrelevant to the trait; null in the expected tissue. LDSC-SEG / CELLEX / EWCE prioritisation on the GWAS sumstats independently disagrees with the eQTL tissue.
-
-**Fix:** Run multi-tissue eQTL coloc (e.g. all GTEx tissues via S-MultiXcan + per-tissue coloc) and prioritise the tissue identified by LDSC-SEG (Finucane 2018 Nat Genet 50:621) or CELLEX. For cell-type-specific traits, move to sc-eQTL panels (OneK1K, Yazar 2022 Science 376:eabf3041). S-MultiXcan (Barbeira 2019 PLoS Genet 15:e1007889) jointly tests per-tissue z-scores via PC-decomposition of LD-induced covariance and is preferred for standard GTEx v8 panels (pre-computed weights available); UTMOST (Hu 2019 Nat Genet 51:568) imputes cross-tissue expression weights before testing and is preferred when retraining cross-tissue weights for a custom panel.
-
-### MAGMA gene-window choice
-
-**Trigger:** Default `--gene-loc` with 0kb upstream / 0kb downstream window assigns all SNPs only within annotated gene bodies.
-
-**Mechanism:** A wide window (e.g. 35kb upstream + 10kb downstream) captures more regulatory SNPs per gene but assigns each tag-SNP to multiple genes simultaneously, diluting per-gene signal and inflating false positives at gene-dense regions. A narrow window misses regulatory SNPs outside the gene body and loses true positives at intergenic enhancers. The three window conventions in circulation are not interchangeable: MAGMA-native default is 0+0 (no expansion); the MAGMA paper recommended a 50+50 sensitivity check; FUMA SNP2GENE uses 35+10 (35 kb upstream + 10 kb downstream) which is FUMA's convention, NOT MAGMA's default. For brain traits, 50+50 captures distal cis-eQTL signal; for cardiometabolic traits a tighter 10+10 is more conservative. State explicitly which window was used in methods reporting.
-
-**Symptom:** Many genes per locus flagged at p < 0.05/22k with the wide window; few genes at all flagged with the narrow window; top genes change substantially across window choices.
-
-**Fix:** Use a sensible default (35kb upstream + 10kb downstream is the FUMA recommendation; 0+0 is MAGMA-native; 50+50 is the MAGMA-paper sensitivity window). Always pair MAGMA with eQTL-based mapping (S-PrediXcan, coloc) for distal-regulatory signal; MAGMA alone is the lightweight baseline, not the full answer.
-
-**Wide-window 1Mb warning:** Going to 100+100 kb or 1 Mb assigns one SNP to 8-12 genes simultaneously at gene-dense loci (e.g. MHC, chr19q13, chr17q21), diluting power and creating interpretation ambiguity. Avoid 1Mb windows; if distal regulation is suspected supplement with ABC / ENCODE-rE2G enhancer-gene linkage (cross-reference atac-seq/enhancer-gene-linking) rather than widening the MAGMA window.
-
-### Coloc fails when the locus has multiple causal variants
-
-**Trigger:** PP.H4 < threshold despite biological evidence that the gene is causal.
-
-**Mechanism:** coloc.abf's single-causal-variant assumption forces posterior mass to PP.H3 (distinct causal variants) when 2+ independent signals in moderate LD drive both traits. The result is a false-negative coloc call at a true effector-gene locus.
-
-**Symptom:** Visual LocusZoom overlap is convincing but PP.H4 stays in 0.3-0.6; coloc.susie or eCAVIAR reveals multiple credible sets and a per-credible-set PP.H4 > 0.7.
-
-**Fix:** Run coloc.susie (not coloc.abf) at gene-dense / signal-rich loci. Cross-reference causal-genomics/colocalization-analysis; do not rely on coloc.abf as the sole coloc evidence stream when allelic heterogeneity is plausible.
-
-### PoPS vs L2G discordance
-
-**Trigger:** PoPS top-ranked gene at locus disagrees with L2G top-ranked gene.
-
-**Mechanism:** PoPS uses similarity-based features (pathway membership, co-expression, PPI), L2G uses per-locus features (distance, fine-mapping, coloc, chromatin). They are orthogonal by construction; disagreement is informative, not a failure.
-
-**Symptom:** Same locus, different top gene under each method.
-
-**Fix:** Use BOTH and treat concordance (top gene matches across L2G and PoPS) as the strongest single-locus signal short of CRISPR validation. Concordance between PoPS and locus-based methods markedly increases positive predictive value over either method alone (Weeks 2023 Nat Genet 55:1267). Report both ranks; flag concordance.
-
-### Pleiotropic locus / multiple causal genes per locus
-
-**Trigger:** Two or more genes at a single GWAS locus are each independently causal (different SNPs or different mechanisms).
-
-**Mechanism:** Standard V2G frameworks assume one causal gene per locus. Real biology violates this: an estimated 5-10% of GWAS loci have multiple causal genes (a working convention; CRISPRi-FlowFISH catalogs document multi-gene loci).
-
-**Symptom:** Two genes at the locus both pass conditional independence checks (FUSION.post_process.R conditional/joint analysis, GCTA-COJO); both show strong eQTL coloc; both have CRISPRi support.
-
-**Fix:** Allow multi-gene reporting. Each candidate gene needs its own credible variant set (SuSiE / coloc.susie). Report the locus as multi-effector; consider CRISPRi-FlowFISH or MPRA for ground-truth resolution. Do not force a single-gene assignment. Existing CRISPRi enhancer-gene perturbation catalogs for cross-checking computational predictions: Fulco 2019 Nat Genet 51:1664 (>3,500 CRISPRi-FlowFISH enhancer-gene connections for 30 genes in K562); Gasperini 2019 Cell 176:377 (~75,000 pairs at-scale); Schraivogel 2020 Nat Methods 17:629 (TAP-seq / targeted Perturb-seq enhancer-gene screen in K562). Cite the specific catalog when reporting "validated against CRISPRi" rather than the generic term.
+Six recurring pitfalls, each with trigger / mechanism / symptom / fix: the nearest-gene
+assumption (wrong 30-50% of the time), eQTL tissue mis-specification, MAGMA gene-window choice,
+coloc failing at multi-causal-variant loci, PoPS-vs-L2G discordance, and pleiotropic loci with
+multiple true effector genes. See `references/failure-modes.md` for the full write-up of each --
+consult it when diagnosing a specific discordance rather than before every run.
 
 ## Per-Credible-Set Gene-Assignment Hierarchy
 
@@ -157,21 +130,13 @@ A strong candidate causal gene at a GWAS locus requires concordance across multi
 
 ## Quantitative Thresholds
 
-| Quantity | Threshold | Source / Rationale |
-|----------|-----------|---------------------|
-| L2G score (high-confidence) | >= 0.5 | Open Targets default; gradient-boosted classifier calibrated against curated gold standards |
-| L2G score (suggestive) | >= 0.2 | Open Targets exploratory threshold |
-| MAGMA gene-wide p | < 2.5e-6 (Bonferroni 0.05 / 20k genes) | Standard genome-wide gene-level significance |
-| coloc PP.H4 (triangulation) | >= 0.7 | Open Targets / common practice; >= 0.8 for stringent |
-| PoPS score (high-confidence) | Top decile per locus | Weeks 2023 Nat Genet 55:1267; threshold is relative per-locus rank, NOT an absolute cutoff. Absolute PoPS score is scale-dependent on trait polygenicity, so an absolute "PoPS >= 0.5" rule is incorrect across traits |
-| ABC enhancer-gene score | >= 0.02 (standard) or >= 0.04 (stringent) | Fulco 2019; cross-reference atac-seq/enhancer-gene-linking |
-| ENCODE-rE2G probability | >= 0.5 (binarised) | Gschwind 2023 |
-| cS2G aggregate score | >= 0.5 per SNP-gene allocation | Gazal 2022; heritability-calibrated aggregator |
-| Distance to TSS (regulatory window) | <= 100 kb (default); <= 500 kb (liberal); <= 1 Mb (absolute) | Convention; Mountjoy 2021. Beyond 100 kb distance ceases to be a reliable single feature |
-| MAGMA gene-window | 35 kb upstream + 10 kb downstream | FUMA default; balances regulatory capture vs gene-dense dilution |
-| Fine-mapping PIP (causal variant) | > 0.5 (suggestive); > 0.9 (strong) | Convention (cross-reference causal-genomics/fine-mapping) |
-| Multi-evidence concordance | >= 3 of 6 streams | Operational rule from Open Targets Genetics and Mountjoy 2021 |
-| Single-cell eQTL panel size | >= 200 donors per cell type | Below this, per-cell-type eQTL discovery underpowered |
+Canonical pass/fail thresholds for every evidence stream (L2G, MAGMA gene-wide p, coloc PP.H4,
+PoPS decile, ABC/ENCODE-rE2G, cS2G, distance-to-TSS, MAGMA window, fine-mapping PIP,
+multi-evidence concordance, single-cell eQTL panel size) live in
+`references/quantitative-thresholds.md`. Consult it when scoring or reporting a specific
+evidence stream -- the two thresholds used constantly are repeated inline where needed
+(coloc PP.H4 >= 0.7 in the Multi-Evidence table below; >= 3 of 6 concordance in the
+Operational rule).
 
 ## MAGMA Gene-Based and Gene-Set Pipeline
 
@@ -201,6 +166,10 @@ magma --gene-results gene_step.genes.raw \
 ```
 
 The `--gene-annot` window choice is the dominant methodological lever; 35kb upstream + 10kb downstream is the FUMA recommendation but is not universally accepted. Sensitivity over 0+0, 35+10, and 50+50 is good practice for high-stakes reports.
+
+**Step 3 has an undocumented minimum gene count.** MAGMA's `--set-annot` competitive regression conditions on 6 internal covariates (gene size, log(gene size), gene density, log(gene density), inverse MAC, log(inverse MAC)). With too few genes in `--gene-results` relative to those 6 covariates, the regression is structurally unidentifiable: MAGMA aborts with `ERROR: insufficient degrees of freedom to run analyses` (verified on a real 5-gene locus run), or, with even fewer genes, fails earlier with `no input variables to analyse` from a gene-set-variance check (verified on a real 3-gene run). Rule of thumb: gene-set enrichment needs several hundred+ genes -- **a single-locus MAGMA run (a handful of genes) should skip Step 3 entirely**; gene-set enrichment is a genome-wide- or many-loci-scale analysis, not a per-locus one. `examples/magma_genebased.sh` checks the gene count and skips Step 3 automatically below this threshold. Windows note: this MAGMA 1.10 build also writes `<prefix>.genes.out.txt` (extra `.txt`) instead of `<prefix>.genes.out`; `examples/magma_genebased.sh` resolves this automatically, and the same mismatch matters for PoPS below.
+
+A tiny offline smoke-test fixture (`examples/toy_gwas_sumstats.tsv` + `examples/toy_gene_loc.txt` + `examples/toy_snp_loc.txt`, ~1,800 real 1000G-EUR SNPs across 3 gene bins spanning the real PCSK9 locus, chr1:55.4-55.6Mb hg19) ships with this Skill for sanity-checking the Steps 1-2 pipeline against a real MAGMA + PLINK reference before pointing it at real data; regenerate or rescale it with `examples/make_toy_fixture.py`.
 
 ## Open Targets L2G via GraphQL
 
@@ -258,6 +227,8 @@ l2g_df = pd.json_normalize(preds).sort_values('score', ascending=False)
 
 The headline `score` (Platform) corresponds to `yProbaModel` (legacy). Platform `features[].shapValue` values replace the legacy `yProba*` sub-scores and explain what drove the prediction. Genes whose SHAP is dominated by the distance feature but minimal on QTL or chromatin features are distance-only candidates; trust the integrated `score` as primary.
 
+**L2G is populated for GWAS-type credible sets, not molecular-QTL ones.** Querying a gene's own `credibleSets` (e.g. via `target(ensemblId)`) mostly returns eqtl/pqtl/sqtl-type loci with `l2GPredictions.count == 0` -- L2G is computed against GWAS-trait credible sets, at the trait's own lead locus. Use the top-level `credibleSets(studyTypes: [gwas], ...)` query to find a GWAS-type `studyLocusId` first (verified live, 2026-09-18). `examples/opentargets_l2g_query.py` is a runnable, dependency-free (stdlib `urllib`/`json` only) template implementing exactly this two-step lookup and the modern query above; run it directly against the live, unauthenticated API.
+
 ## PoPS Polygenic Priority Score
 
 **Goal:** Add a distance-orthogonal similarity-based prior to ranked gene candidates.
@@ -281,6 +252,10 @@ python pops.py \
 ```
 
 PoPS is biology-agnostic; the feature matrix encodes biology. Bias in the features (e.g. cancer-pathway-heavy gene sets for a non-cancer trait) propagates to the output; verify feature coverage matches the trait.
+
+**Windows: rename MAGMA's output before running PoPS.** MAGMA 1.10 on Windows writes `<magma_prefix>.genes.out.txt` (extra `.txt`), but `pops.py` hard-codes `<magma_prefix>.genes.out` and raises `FileNotFoundError` if the exact name is missing -- following this section verbatim on Windows fails with no explanation (verified end-to-end: PoPS confirmed working immediately after `cp <prefix>.genes.out.txt <prefix>.genes.out`; corroborated independently in this Skill's tooling environment, `mendelian-randomization-analyst/TOOLS.md`). `examples/pops_run.py` wraps this exact PoPS invocation and performs the rename automatically (no-op on Linux/Mac, where MAGMA writes `.genes.out` directly) -- prefer it over calling `pops.py` directly on Windows.
+
+**PoPS needs genome-wide, multi-chromosome MAGMA input to be meaningful.** With only one chromosome (or a single locus) of genes, PoPS's held-out-chromosome ridge CV has no held-out fold to validate against, `SELECTED_CV_ALPHA` saturates at its maximum, and every `PoPS_Score` collapses toward 0 -- the code path still runs to completion (exit 0, real output files), but the scores carry no signal at that scale (verified on a real 3-gene single-locus run). Do not present a locus-scale PoPS run's scores as a real result; use it only to confirm the pipeline is wired correctly, and require genome-wide MAGMA output for an actual PoPS-based effector-gene call.
 
 ## Multi-Evidence Integration: Concordance Scoring
 
@@ -342,9 +317,11 @@ Concordance scoring is conservative; some real causal genes score 2-of-6 because
 | Error / symptom | Cause | Solution |
 |-----------------|-------|----------|
 | MAGMA error `--gene-loc file required` | Path mismatch or wrong reference build | Provide hg19 or hg38 gene location file matching the GWAS build |
+| MAGMA `--set-annot` errors `insufficient degrees of freedom` or `no input variables to analyse` | Too few genes in `--gene-results` for the 6-covariate competitive regression (see MAGMA pipeline section) | Skip Step 3 at locus scale; gene-set enrichment needs several hundred+ genes (genome-wide or many-loci input) |
 | All MAGMA genes show p ~ 1 | LD reference panel mismatch (ancestry or sample size) | Use 1000G EUR g1000_eur reference for EUR GWAS; verify with `--gene-results` summary |
 | Open Targets API returns empty | Study not in the OT release OR wrong study ID format | Verify study ID via OT study search; some studies require GCST prefix |
-| PoPS output has all genes scoring near 0 | Feature matrix mis-aligned to gene_annot OR MAGMA gene Z scale wrong | Verify column ordering in feature matrix; check MAGMA `genes.raw` parsing |
+| PoPS output has all genes scoring near 0 | Feature matrix mis-aligned to gene_annot OR MAGMA gene Z scale wrong; OR MAGMA input is single-chromosome / locus-scale (ridge CV has no held-out fold, see PoPS section) | Verify column ordering in feature matrix; check MAGMA `genes.raw` parsing; confirm MAGMA input is genome-wide, multi-chromosome before trusting scores |
+| PoPS raises `FileNotFoundError` on `<prefix>.genes.out` | Windows MAGMA wrote `<prefix>.genes.out.txt` (extra `.txt`); pops.py expects the exact name | `cp <prefix>.genes.out.txt <prefix>.genes.out` before running, or use `examples/pops_run.py` (handles this automatically) |
 | cS2G gene allocation differs from L2G | Different aggregation strategies; cS2G heritability-calibrated, L2G classifier-trained | Both informative; cS2G is a per-SNP aggregator, L2G is per-(locus, gene) |
 | ABC predicts a passenger gene | Wrong cell-type Hi-C or H3K27ac in ABC input | Verify cell-type-matched epigenome; cross-reference atac-seq/enhancer-gene-linking |
 | FUMA SNP2GENE job stuck | Web platform queue OR exceeded GWAS size limit | Re-submit; reduce sumstats to genome-wide-significant loci if oversize |
@@ -354,7 +331,7 @@ Concordance scoring is conservative; some real causal genes score 2-of-6 because
 
 ## Tool Install Notes
 
-- **MAGMA**: Pre-compiled binary from cncr.nl/research/magma. Linux / Mac / Windows. Ships as `magma` CLI; needs PLINK bfile reference (e.g. 1000G g1000_eur).
+- **MAGMA**: Pre-compiled binary from cncr.nl/research/magma. Linux / Mac / Windows. Ships as `magma` CLI; needs PLINK bfile reference (e.g. 1000G g1000_eur). MAGMA ships as a pre-compiled zip, not a git repo -- the old `ctg.cncr.nl` and `vu.data.surfsara.nl` direct links now redirect to an HTML landing page, so a hard-coded `wget` would save that page AS the zip and `unzip` would fail; download the current zip manually from the CNCR page, then `unzip magma_v*.zip` (filename tracks the version).
 - **FUMA**: Web platform at fuma.ctglab.nl/snp2gene. No local install. Requires user account; SNP2GENE jobs run server-side with current reference annotations.
 - **Open Targets Platform (current)**: GraphQL at `api.platform.opentargets.org/api/v4/graphql`. Query L2G via `credibleSet(studyLocusId)` -> `l2GPredictions { rows { target, score, features } }`. Recommended for new pipelines.
 - **Open Targets Genetics (legacy, deprecated)**: GraphQL at `api.genetics.opentargets.org/graphql`. Python `pip install gentropy` (official Open Targets) or `pip install otargenpy` (community GraphQL wrapper) OR direct GraphQL queries via `requests`. Genetics Portal was consolidated into the integrated Open Targets Platform in 2024; legacy endpoint still responds but new work should target the Platform.
