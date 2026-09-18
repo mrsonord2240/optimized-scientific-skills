@@ -203,6 +203,7 @@ For cloud-native analysis pipelines (Nextflow on AWS Batch, Cromwell, etc.), STR
 **Reference (ENA portal API 2.0+, curl; checked 2026-09-17):**
 ```bash
 #!/bin/bash
+set -euo pipefail
 SRR="${1:-SRR12345678}"
 OUT="${2:-./fastq}"
 mkdir -p "${OUT}"
@@ -215,8 +216,14 @@ mkdir -p "${OUT}"
 RESPONSE=$(curl -s "https://www.ebi.ac.uk/ena/portal/api/filereport?accession=${SRR}&result=read_run&fields=fastq_ftp,fastq_md5&format=tsv")
 HEADER=$(echo "${RESPONSE}" | head -1)
 ROW=$(echo "${RESPONSE}" | tail -1)
-FTP_COL=$(echo "${HEADER}" | tr '\t' '\n' | grep -nx 'fastq_ftp' | cut -d: -f1)
-MD5_COL=$(echo "${HEADER}" | tr '\t' '\n' | grep -nx 'fastq_md5' | cut -d: -f1)
+FTP_COL=$(echo "${HEADER}" | tr '\t' '\n' | grep -nx 'fastq_ftp' | cut -d: -f1) || true
+MD5_COL=$(echo "${HEADER}" | tr '\t' '\n' | grep -nx 'fastq_md5' | cut -d: -f1) || true
+# fastq_ftp genuinely absent (not just this pipeline's exit status) is a real signal, not
+# an error to swallow -- check it explicitly instead of letting a fixed-index cut fail silently.
+if [ -z "${FTP_COL}" ] || [ -z "${MD5_COL}" ]; then
+    echo "fastq_ftp not found in ENA response for ${SRR} -- may indicate controlled-access (dbGaP) data, see SKILL.md 'Controlled-access (dbGaP) data' section" >&2
+    exit 1
+fi
 URLS=$(echo "${ROW}" | cut -f"${FTP_COL}" | tr ';' '\n')
 MD5S=$(echo "${ROW}" | cut -f"${MD5_COL}" | tr ';' '\n')
 

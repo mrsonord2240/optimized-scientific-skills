@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "1f0728137385aee6316d2d4a89163dc08e1dfcb5"
+      "staging_commit": "0ffa663a96ad0353182d70fe18d880b4705d63bd"
     }
   },
   "skills": [
@@ -1530,11 +1530,11 @@
     {
       "id": "bio-sra-data",
       "upstream_path": "database-access/sra-data",
-      "score": 82,
-      "grade": "Limited Release",
+      "score": 87,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-17",
+      "audited_on": "2026-09-18",
       "fix_log": "fixes/bio-sra-data.md",
       "fix_pass": "done",
       "reaudit": "not needed",

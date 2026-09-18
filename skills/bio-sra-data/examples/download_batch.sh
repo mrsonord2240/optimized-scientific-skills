@@ -40,8 +40,17 @@ while read -r ACC; do
     }
     HEADER=$(echo "${RESPONSE}" | head -1)
     ROW=$(echo "${RESPONSE}" | tail -1)
-    FTP_COL=$(echo "${HEADER}" | tr '\t' '\n' | grep -nx 'fastq_ftp' | cut -d: -f1)
-    MD5_COL=$(echo "${HEADER}" | tr '\t' '\n' | grep -nx 'fastq_md5' | cut -d: -f1)
+    # `|| true` on each: under set -euo pipefail, a `grep -nx` non-match makes the whole
+    # pipeline's exit status non-zero (pipefail), and `x=$(...)` propagates that to `set -e`
+    # -- which would abort the ENTIRE batch on the first accession missing a column, instead
+    # of skipping just that one accession. Check explicitly instead.
+    FTP_COL=$(echo "${HEADER}" | tr '\t' '\n' | grep -nx 'fastq_ftp' | cut -d: -f1) || true
+    MD5_COL=$(echo "${HEADER}" | tr '\t' '\n' | grep -nx 'fastq_md5' | cut -d: -f1) || true
+    if [ -z "${FTP_COL}" ] || [ -z "${MD5_COL}" ]; then
+        echo "  fastq_ftp not found in ENA response for ${ACC} -- may indicate controlled-access (dbGaP) data, see SKILL.md 'Controlled-access (dbGaP) data' section"
+        echo "${ACC}" >> "${FAILED}"
+        continue
+    fi
 
     URLS=$(echo "${ROW}" | cut -f"${FTP_COL}" | tr ';' '\n')
     MD5S=$(echo "${ROW}" | cut -f"${MD5_COL}" | tr ';' '\n')
