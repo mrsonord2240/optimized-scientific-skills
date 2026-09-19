@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 125,
+    "refined": 126,
     "audited_and_excluded": 0,
     "out_of_scope": 1,
-    "remaining": 436
+    "remaining": 435
   },
   "remaining": [
     {
@@ -1341,10 +1341,6 @@
     {
       "id": "bio-sequence-statistics",
       "upstream_path": "sequence-io/sequence-statistics"
-    },
-    {
-      "id": "bio-single-cell-metabolite-communication",
-      "upstream_path": "single-cell/metabolite-communication"
     },
     {
       "id": "bio-single-cell-splicing",
