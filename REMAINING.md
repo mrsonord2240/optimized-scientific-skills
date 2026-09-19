@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**449 remaining** across 58 folders. 112 are already refined and live in `skills/`.
+**447 remaining** across 58 folders. 113 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 112 refined, 0 audited and excluded, 1 out of scope, 449 remaining.
+The source tree holds 562 Skills: 113 refined, 1 audited and excluded, 1 out of scope, 447 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -20,19 +20,19 @@ The source tree holds 562 Skills: 112 refined, 0 audited and excluded, 1 out of 
 | spatial-transcriptomics | 12 | 0 |
 | copy-number | 11 | 0 |
 | alignment-files | 10 | 0 |
-| chemoinformatics | 10 | 10 |
 | methylation-analysis | 10 | 0 |
 | structural-biology | 10 | 0 |
 | alternative-splicing | 9 | 0 |
+| chemoinformatics | 9 | 11 |
 | genome-assembly | 9 | 0 |
 | hi-c-analysis | 9 | 0 |
 | long-read-sequencing | 9 | 0 |
 | sequence-io | 9 | 0 |
-| single-cell | 9 | 8 |
 | clinical-databases | 8 | 4 |
 | flow-cytometry | 8 | 0 |
 | genome-intervals | 8 | 0 |
 | metagenomics | 8 | 0 |
+| single-cell | 8 | 8 |
 | genome-annotation | 7 | 0 |
 | imaging-mass-cytometry | 7 | 0 |
 | liquid-biopsy | 7 | 0 |
@@ -86,6 +86,7 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-molecular-descriptors` | 86 | Limited Release |
 | `bio-molecular-io` | 91 | Limited Release |
 | `bio-molecular-standardization` | 90 | Limited Release |
+| `bio-pharmacophore-modeling` | 86 | Production Ready |
 | `bio-qsar-modeling` | 88 | Limited Release |
 | `bio-scaffold-analysis` | 88 | Limited Release |
 | `bio-similarity-searching` | 90 | Limited Release |
@@ -135,6 +136,7 @@ fixed.
 
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
+| `bio-single-cell-trajectory-inference` | 84 | Beta Only | 0 |
 
 ## Out of scope
 
@@ -202,7 +204,6 @@ fixed.
 - `bio-free-energy-calculations` — `chemoinformatics/free-energy-calculations`
 - `bio-generative-design` — `chemoinformatics/generative-design`
 - `bio-ml-docking-rescoring` — `chemoinformatics/ml-docking-rescoring`
-- `bio-pharmacophore-modeling` — `chemoinformatics/pharmacophore-modeling`
 - `bio-protac-degraders` — `chemoinformatics/protac-degraders`
 - `bio-reaction-enumeration` — `chemoinformatics/reaction-enumeration`
 - `bio-retrosynthesis` — `chemoinformatics/retrosynthesis`
@@ -642,7 +643,6 @@ fixed.
 - `bio-single-cell-multimodal-integration` — `single-cell/multimodal-integration`
 - `bio-single-cell-perturb-seq` — `single-cell/perturb-seq`
 - `bio-single-cell-scatac-analysis` — `single-cell/scatac-analysis`
-- `bio-single-cell-trajectory-inference` — `single-cell/trajectory-inference`
 
 ### small-rna-seq
 

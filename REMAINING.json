@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 112,
-    "audited_and_excluded": 0,
+    "refined": 113,
+    "audited_and_excluded": 1,
     "out_of_scope": 1,
-    "remaining": 449
+    "remaining": 447
   },
   "remaining": [
     {
@@ -1095,10 +1095,6 @@
       "upstream_path": "sequence-io/paired-end-fastq"
     },
     {
-      "id": "bio-pharmacophore-modeling",
-      "upstream_path": "chemoinformatics/pharmacophore-modeling"
-    },
-    {
       "id": "bio-phasing-imputation-genotype-imputation",
       "upstream_path": "phasing-imputation/genotype-imputation"
     },
@@ -1393,10 +1389,6 @@
     {
       "id": "bio-single-cell-splicing",
       "upstream_path": "alternative-splicing/single-cell-splicing"
-    },
-    {
-      "id": "bio-single-cell-trajectory-inference",
-      "upstream_path": "single-cell/trajectory-inference"
     },
     {
       "id": "bio-small-rna-seq-differential-mirna",
@@ -1807,7 +1799,20 @@
       "upstream_path": "sequence-io/write-sequences"
     }
   ],
-  "excluded": [],
+  "excluded": [
+    {
+      "id": "bio-single-cell-trajectory-inference",
+      "upstream_path": "single-cell/trajectory-inference",
+      "score": 84,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    }
+  ],
   "out_of_scope": [
     {
       "id": "clawhub-installer",
