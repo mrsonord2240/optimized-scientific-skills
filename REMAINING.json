@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 108,
+    "refined": 109,
     "audited_and_excluded": 0,
     "out_of_scope": 1,
-    "remaining": 453
+    "remaining": 452
   },
   "remaining": [
     {
@@ -1057,10 +1057,6 @@
     {
       "id": "bio-methylation-methylkit",
       "upstream_path": "methylation-analysis/methylkit-analysis"
-    },
-    {
-      "id": "bio-microbiome-qiime2-workflow",
-      "upstream_path": "microbiome/qiime2-workflow"
     },
     {
       "id": "bio-ml-docking-rescoring",

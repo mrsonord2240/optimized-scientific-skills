@@ -1035,6 +1035,22 @@
       ]
     },
     {
+      "id": "bio-microbiome-qiime2-workflow",
+      "upstream_path": "microbiome/qiime2-workflow",
+      "score": 92,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "id": "bio-microbiome-taxonomy-assignment",
       "upstream_path": "microbiome/taxonomy-assignment",
       "score": 93,

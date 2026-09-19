@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**453 remaining** across 59 folders. 108 are already refined and live in `skills/`.
+**452 remaining** across 58 folders. 109 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 108 refined, 0 audited and excluded, 1 out of scope, 453 remaining.
+The source tree holds 562 Skills: 109 refined, 0 audited and excluded, 1 out of scope, 452 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -67,7 +67,6 @@ The source tree holds 562 Skills: 108 refined, 0 audited and excluded, 1 out of 
 | rna-structure | 4 | 0 |
 | crispr-screens | 3 | 12 |
 | causal-genomics | 1 | 10 |
-| microbiome | 1 | 5 |
 | proteomics | 1 | 8 |
 
 ## Promoted, fix pass still needed
@@ -83,6 +82,7 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-differential-expression-deseq2-basics` | 92 | Production Ready |
 | `bio-machine-learning-model-validation` | 93 | Limited Release |
 | `bio-machine-learning-prediction-explanation` | 89 | Limited Release |
+| `bio-microbiome-qiime2-workflow` | 92 | Production Ready |
 | `bio-molecular-descriptors` | 86 | Limited Release |
 | `bio-molecular-io` | 91 | Limited Release |
 | `bio-molecular-standardization` | 90 | Limited Release |
@@ -519,10 +519,6 @@ fixed.
 - `bio-methylation-epigenetic-clocks` — `methylation-analysis/epigenetic-clocks`
 - `bio-methylation-ewas-design` — `methylation-analysis/ewas-design`
 - `bio-methylation-methylkit` — `methylation-analysis/methylkit-analysis`
-
-### microbiome
-
-- `bio-microbiome-qiime2-workflow` — `microbiome/qiime2-workflow`
 
 ### multi-omics-integration
 
