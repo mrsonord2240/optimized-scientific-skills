@@ -33,7 +33,10 @@ sc.pp.highly_variable_genes(rna, n_top_genes=2000)
 sc.pp.scale(rna, max_value=10)
 sc.tl.pca(rna, n_comps=30)
 
-# ADT preprocessing: CLR rescales but does NOT remove background; prefer DSB when empty droplets are available
+# ADT preprocessing: CLR rescales but does NOT remove background. This is a CLR-only
+# fallback path -- muon/Python has no first-party DSB equivalent (dsb is R-only). When
+# empty droplets are available, prefer SKILL.md's "CITE-seq: totalVI" section instead,
+# which models the ADT background explicitly (or run DSB in R and re-import the result).
 # axis is genuinely ambiguous across versions (axis=0 ~ per-feature ~ Seurat margin=2); verify with the muon docs
 mu.prot.pp.clr(adt, axis=0)
 sc.pp.scale(adt, max_value=10)

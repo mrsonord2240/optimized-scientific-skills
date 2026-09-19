@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "a5c1e4f2d48a31064607b1c75d6972110674fa46"
+      "staging_commit": "3442cc9597615385fbc82ac035522e6df7856c48"
     }
   },
   "skills": [
@@ -1804,22 +1804,6 @@
       ]
     },
     {
-      "id": "bio-single-cell-cnv-inference",
-      "upstream_path": "single-cell/cnv-inference",
-      "score": 87,
-      "grade": "Limited Release",
-      "deployable": true,
-      "open_p0": 0,
-      "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
-      "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
-      "changed_files": [
-        "SKILL.md"
-      ]
-    },
-    {
       "id": "bio-single-cell-data-io",
       "upstream_path": "single-cell/data-io",
       "score": 92,
@@ -1887,17 +1871,20 @@
     {
       "id": "bio-single-cell-multimodal-integration",
       "upstream_path": "single-cell/multimodal-integration",
-      "score": 79,
-      "grade": "Limited Release",
+      "score": 87,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
       "fix_log": "fixes/bio-single-cell-multimodal-integration.md",
       "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "cite_seq_analysis.R",
+        "cite_seq_analysis.py",
+        "usage-guide.md"
       ]
     },
     {
