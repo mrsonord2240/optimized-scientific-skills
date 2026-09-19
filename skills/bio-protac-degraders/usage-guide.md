@@ -7,11 +7,14 @@ Design PROTACs (bivalent molecules recruiting E3 ligase to target for proteasoma
 ## Prerequisites
 
 ```bash
-pip install rdkit
-# PRosettaC: web service (prosettac.weizmann.ac.il)
-# DeepTernary: GitHub installation
-# AlphaFold3: use AlphaFold Server or a licensed local installation; arbitrary distance restraints are not supported
+pip install rdkit numpy scipy
 ```
+
+`examples/protac_enumerate.py` and `examples/cooperativity_dc50.py` run with the above alone.
+`examples/ternary_geometry_screen.py` needs only RDKit too, and is a local linker-reach
+pre-filter, not a ternary complex prediction. PRosettaC, DeepTernary, AlphaFold3, Boltz, and
+HADDOCK are external services/gated local tools -- see SKILL.md's "Ternary Complex Prediction
+Tools" for how to invoke each one; this Skill does not install or run them.
 
 ## Quick Start
 
@@ -41,17 +44,8 @@ Tell the AI agent what to do:
 2. Compute distance between attachment points on each ligand.
 3. Enumerate a linker series around geometries supported by the binary structures.
 4. Combine target-linker-E3 SMILES.
-5. Predict ternary complex via PRosettaC (or DeepTernary).
+5. Predict ternary complex via an external submission (PRosettaC, AlphaFold3, Boltz, or DeepTernary -- see SKILL.md's "Ternary Complex Prediction Tools" for how to invoke each).
 6. Score by linker geometry and structural/interface metrics; report experimental cooperativity separately when available.
-
-## Tips
-
-- CRBN and VHL have extensively published recruiter series, but choose the E3 using target/E3 geometry, expression in the intended system, ligand availability, and known liabilities.
-- Optimal linker length is target-specific; use structural hypotheses to choose an exploratory series rather than a universal range.
-- Positive cooperativity may be beneficial, but alpha is assay- and system-dependent and must be measured experimentally.
-- Hook effect at high concentration; bell-shaped dose-response.
-- Permeability can be a bottleneck; compare measured permeability and cellular activity across the series rather than applying a universal MW or TPSA cutoff.
-- The linker-enumeration example requires each explicit dummy attachment to use a single bond; reject other dummy-bond orders unless the intended connection chemistry has a separately validated bond-order rule.
 
 ## Related Skills
 

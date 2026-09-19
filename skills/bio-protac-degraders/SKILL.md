@@ -8,7 +8,14 @@ license: MIT
 
 ## Version Compatibility
 
-Reference examples tested with: PRosettaC (web service), DeepTernary research code, AlphaFold3, Boltz-1 / Boltz-2, RDKit 2024.09+, OpenMM 8.1+ (for ternary MD).
+The two shipped scripts (`examples/protac_enumerate.py`, `examples/ternary_geometry_screen.py`,
+`examples/cooperativity_dc50.py`) need only RDKit, numpy, and scipy -- checked on RDKit 2026.03.6,
+numpy 2.x, scipy 1.18. RDKit 2024.09+ should also work via the introspect-and-adapt pattern below.
+
+PRosettaC, DeepTernary, AlphaFold3, Boltz-1/2, and HADDOCK are external services or
+GPU/licence-gated tools this Skill does not install or run locally -- see "Ternary Complex
+Prediction Tools" below for how to invoke each one directly, and OpenMM 8.1+ if you refine a
+ternary pose returned by one of them.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - Python: `pip show <package>` then `help(module.function)` to check signatures
@@ -77,6 +84,23 @@ Linkers tune ternary complex geometry and stability. The ranges below are explor
 
 **Decision:** Use a PROTAC-specific method such as **PRosettaC** for first-pass ternary modeling. AlphaFold3 or Boltz can provide unrestrained whole-complex predictions, but should be benchmarked on relevant ternary complexes. **DeepTernary** is released research code rather than a hosted API; validate it against relevant structures before prospective ranking.
 
+**None of these tools run locally through this Skill.** All are external submissions or gated
+local installs -- this Skill's only local, runnable content for ternary hypotheses is
+`examples/ternary_geometry_screen.py`, a linker-reach pre-filter (see "Ternary Complex Modeling
+Workflow" below); it does not predict a structure or an interface score. To actually run one of
+the methods above:
+
+| Tool | How to invoke | Turnaround | What you get back |
+|------|----------------|------------|--------------------|
+| PRosettaC | Web submission at prosettac.weizmann.ac.il (free registration); upload target PDB + target-ligand pose, E3 PDB + E3-ligand pose, and the PROTAC SMILES | Hours to ~1 day (queued Rosetta job) | Ranked/clustered ternary poses + interface scores; download the top pose's exit-vector distance to sanity-check candidate linkers against `ternary_geometry_screen.py` |
+| AlphaFold3 | AlphaFold Server (web, request access) for a quick check, or a licensed local install (request model weights from Google DeepMind) for batch/automated use; submit full protein sequences + PROTAC SMILES as one unrestrained complex | Minutes (server) to GPU-hours (local) | A single predicted complex + per-residue confidence (pLDDT/PAE); no arbitrary distance restraint, so compare the predicted interface against known ternary structures rather than trusting confidence alone |
+| Boltz-1 / Boltz-2 | Open-source, pip-installable (`pip install boltz`), but needs a local CUDA GPU and a multi-GB weights download on first run; `boltz predict input.yaml` per the project's README | GPU-minutes locally | A predicted complex structure, same caveats as AlphaFold3 (limited PROTAC-specific validation) |
+| DeepTernary | Clone the research repo from GitHub and follow its own install/checkpoint instructions; no hosted API, no pip package | GPU-minutes locally, plus one-time setup | SE(3)-equivariant ternary pose; validate against known structures before using it to rank |
+| HADDOCK | HADDOCK3 local install (compiles against CNS, which is itself registration-gated academically), or the HADDOCK web portal at bonvinlab.org (free academic account, upload structures + manual restraints) | Local: setup-heavy. Web: minutes to hours queued | Restraint-guided docking poses; you must supply the restraints yourself |
+
+Do not fabricate a numeric score from any of these tools when they have not actually been run --
+state plainly that the step requires the external submission above.
+
 ## Cooperativity (Alpha)
 
 Cooperativity quantifies how the ternary complex stabilizes (or destabilizes) the binary binding:
@@ -93,6 +117,9 @@ Positive cooperativity can favor ternary-complex formation, but the preferred al
 
 Measure with ITC (isothermal titration calorimetry) or SPR/BLI titrations of binary vs ternary.
 
+Runnable: `examples/cooperativity_dc50.py`'s `cooperativity_alpha(kd_binary, kd_ternary)` applies
+this formula to your measured Kd pair and labels positive/negative/no cooperativity.
+
 ## DC50 / Dmax Characterization
 
 In cellular assays:
@@ -108,26 +135,27 @@ In cellular assays:
 
 **Hook effect**: at high PROTAC concentrations, binary complexes (PROTAC-target alone, PROTAC-E3 alone) dominate, and ternary complex formation drops. Dose-response curves are bell-shaped.
 
+Runnable: `examples/cooperativity_dc50.py` fits DC50/Dmax with a 3-parameter Hill curve, flags a
+hook effect from a >15-percentage-point downturn after the peak, and -- when a hook is flagged --
+restricts the DC50/Dmax fit to the ascending arm rather than fitting a monotonic sigmoid to
+non-monotonic data. It ships a seeded synthetic dose-response curve and checks the fit recovers
+the curve's own planted DC50/Dmax within tolerance.
+
 ## Ternary Complex Modeling Workflow
 
 **Goal:** Predict 3D structure of target-PROTAC-E3 ternary complex.
 
-**Approach:**
+**What this Skill runs locally (linker pre-filter only, not a structure prediction):**
 1. Start with binary co-crystals: target + target-ligand pose; E3 + E3-ligand pose
-2. Connect via linker enumeration (combinatorial)
-3. Score by geometric feasibility (linker length, no clashes)
-4. Refine with energy minimization
-
-```python
-# Pseudo-code workflow
-def predict_ternary(target_pdb, target_ligand_sdf,
-                    e3_pdb, e3_ligand_sdf, linker_smiles):
-    # 1. Place binary complexes in same coordinate frame
-    # 2. Enumerate linker connectivity from target-ligand exit vector to e3-ligand entry vector
-    # 3. Score by total linker length, RMSD to expected geometry
-    # 4. Apply a documented refinement protocol and test convergence
-    return ternary_poses
-```
+2. Measure the target-ligand / E3-ligand exit-vector distance yourself with
+   `attachment_distance()` (below) once both are placed in a shared coordinate frame
+3. Enumerate candidate linkers (`examples/protac_enumerate.py`) and screen them against that
+   required span with `examples/ternary_geometry_screen.py`'s `screen_linker_library()` -- it
+   embeds 3D conformers of each linker and reports whether its sampled reach range can plausibly
+   span the requirement, as a cheap filter before spending an external ternary submission
+4. **Structure prediction/refinement itself is external** -- submit the surviving candidates to
+   PRosettaC, AlphaFold3, Boltz, DeepTernary, or HADDOCK per the invocation table above; none of
+   that happens locally
 
 For a production workflow, use PRosettaC or provide both proteins and the complete PROTAC as components of an unrestrained AlphaFold3 input. AlphaFold3 does not expose arbitrary chain-chain distance restraints; compare predicted interfaces and confidence with known complexes or a PROTAC-specific method.
 
@@ -149,6 +177,12 @@ def attachment_distance(target_ligand, e3_ligand,
 ```
 
 An attachment-point distance does not map uniquely to a linker atom count: bond geometry, rigidity, branching, solvation, and the relative protein orientation all matter. Enumerate chemically synthesizable linker candidates, sample their conformers in the ternary geometry, and retain candidates that can connect without severe strain or clashes.
+
+Runnable: `examples/ternary_geometry_screen.py`'s `linker_reach()` embeds standalone-linker
+conformers (RDKit ETKDG + MMFF) and reports the min/mean/max attachment-point distance each
+named linker can achieve; `screen_linker_library()` compares that range against a required span
+(from `attachment_distance()` on your own structures) with a tolerance. This has no knowledge of
+the target/E3 protein context -- it bounds linker reach only, not ternary-complex feasibility.
 
 ## Generative Linker Design
 
@@ -240,6 +274,7 @@ Use PRosettaC or another benchmarked structural method to generate hypotheses, t
 | Degradation decreases at high PROTAC concentration | Hook effect from competing binary complexes | Confirm with a broad dose range; optimize ternary geometry and exposure |
 | Synthesis is impractical | Proposed connectivity lacks a credible route | Obtain medicinal-chemistry review and redesign attachment chemistry or linker |
 | Poor permeability or intracellular exposure | Size, exposed polarity, conformation, or efflux | Measure the bottleneck and optimize the series; avoid a universal size cutoff |
+| `protac_enumerate.build_protac()` raises "Attachment dummy bonds must be single bonds" | An explicit `[*]` exit-vector dummy is attached via a double bond or other non-single bond | Use a single-bond attachment point; only relax this if the intended connection chemistry has its own, separately validated bond-order rule |
 
 ## References
 

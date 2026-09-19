@@ -8,7 +8,7 @@ license: MIT
 
 ## Version Compatibility
 
-Reference examples tested with: AutoDock Vina 1.2.5+, SMINA 2020-12+, GNINA 1.1+ for `rescore` (GNINA 1.3+ for the six-mode interface documented below), RDKit 2024.09+, meeko 0.5+, P2Rank 2.4+, ProDy 2.4+, pdb2pqr 3.6+.
+Reference examples tested with: AutoDock Vina 1.2.5+, SMINA 2020-12+, GNINA 1.1+ for `rescore` (GNINA 1.3+ for the six-mode interface documented below), RDKit 2024.09+, meeko 0.5+, P2Rank 2.4+, ProDy 2.4+, pdb2pqr 3.6+. Receptor prep verified end-to-end (pdb2pqr 3.7.1, meeko 0.8.0) against PDB 3PTB. Vina 1.1.2 vs 1.2 may give different poses for the same input -- check the installed major version before comparing runs.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - Python: `pip show <package>` then `help(module.function)` to check signatures
@@ -17,11 +17,22 @@ Before using code patterns, verify installed versions match. If versions differ:
 If code throws ImportError, AttributeError, or TypeError, introspect the installed
 package and adapt the example to match the actual API rather than retrying.
 
+**meeko's CLI entry point has no `.py` suffix.** `pip install meeko` (0.5+) registers a
+console-script named `mk_prepare_receptor` and `mk_prepare_ligand` -- not
+`mk_prepare_receptor.py`. The `.py`-suffixed form raises `FileNotFoundError` once
+installed via pip; use the bare name, as in the code below.
+
+**On Windows, `pip install vina` has no wheel** (`ValueError: Boost library location was
+not found!` at build time). Use the Vina CLI via `subprocess` instead of `from vina import
+Vina` -- see the CLI-fallback comment in "Vina Docking (Single Ligand)" below.
+
 # Virtual Screening
 
 Screen chemical libraries against protein targets via molecular docking. Vina is the de-facto default, SMINA adds flexibility (Vinardo scoring, custom scoring), and GNINA adds CNN-based pose scoring (Top-1 redock 58%->73% over Vina, cross-dock 27%->37%). Deep-learning docking (DiffDock-L, EquiBind, NeuralPLexer) competes in pose accuracy, but physical validity is method- and dataset-dependent; the workflow therefore combines ML pose sampling with classical scoring and explicit geometry checks. For ultralarge libraries (>1M), library preparation, hierarchical filtering, and HPC orchestration become the limiting steps.
 
 For pose physical-validity QC, see `chemoinformatics/pose-validation`. For ML-driven docking + rescoring, see `chemoinformatics/ml-docking-rescoring`. For covalent docking, see `chemoinformatics/covalent-design`. For affinity calculations (FEP), see `chemoinformatics/free-energy-calculations`.
+
+**Handoff caveat:** converting a docked PDBQT pose to SDF for PoseBusters or another downstream tool can lose formal bond order/charge for charged ligands (PDBQT does not encode bond order; reconstructing it from atom types and coordinates is unreliable for charged or aromatic-adjacent groups), causing an RDKit sanitization failure even when the pose's spatial placement is valid. Where possible, carry the original RDKit `Mol` (with correct formal charges, from `prepare_ligand`) alongside the docked PDBQT instead of reconstructing bonds from the pose alone.
 
 ## Docking Tool Taxonomy
 
@@ -70,16 +81,22 @@ from pathlib import Path
 def prepare_receptor(repaired_pdb, pdbqt_out, pH=7.4):
     # Decide which waters/cofactors/metals to retain before this function.
     base = str(Path(repaired_pdb).with_suffix(''))
+    protonated_pdb = f'{base}_pH{pH}.pdb'
     pqr_file = f'{base}_pH{pH}.pqr'
+    # --pdb-output writes a protonated PDB alongside the PQR; hand that PDB to
+    # mk_prepare_receptor --read_pdb rather than --read_pqr (see pitfall below).
     subprocess.run(['pdb2pqr', '--ff=AMBER', f'--with-ph={pH}',
+                    '--pdb-output', protonated_pdb,
                     repaired_pdb, pqr_file], check=True)
     output_basename = str(Path(pdbqt_out).with_suffix(''))
-    subprocess.run(['mk_prepare_receptor.py', '--read_pqr', pqr_file,
+    subprocess.run(['mk_prepare_receptor', '--read_pdb', protonated_pdb,
                     '-o', output_basename, '-p'], check=True)
     return pdbqt_out
 ```
 
 **Common pitfall:** Forgetting to add hydrogens at protein pH (7.4) but using pH 7.0 ligand charges. Hist mistakenly protonated. Use PROPKA + manual review of catalytic residues.
+
+**Common pitfall:** Feeding pdb2pqr's default `.pqr` output straight into `mk_prepare_receptor --read_pqr`. meeko 0.8.0's PQR reader assumes an all-integer residue-number column and raises `ValueError: invalid literal for int() with base 10` on any residue with a PDB insertion code (e.g. `184A`). Chymotrypsin-numbered serine proteases (trypsin, chymotrypsin, and relatives -- a standard docking-benchmark family) hit this on real structures, not just edge cases. Use `pdb2pqr --pdb-output` and `mk_prepare_receptor --read_pdb` as above; verified on PDB 3PTB (trypsin, insertion-code residues 184A/188A/221A).
 
 ## Ligand Preparation
 
@@ -143,19 +160,32 @@ P2Rank output `<receptor>_predictions.csv` lists pocket centers with scores. The
 ```python
 # AutoDock Vina Python API requires Vina 1.2+; for Vina 1.1 use subprocess CLI:
 # subprocess.run(['vina', '--receptor', ..., '--ligand', ..., '--center_x', ...], check=True)
+# On Windows, pip install vina does not build a wheel (no Boost found); use the
+# Vina CLI via subprocess instead -- pass --seed the same way (see below).
 from vina import Vina
 
 def dock_single(receptor_pdbqt, ligand_pdbqt, center, box_size,
-                exhaustiveness=8, n_poses=10):
-    v = Vina(sf_name='vina')
+                exhaustiveness=8, n_poses=10, seed=42):
+    v = Vina(sf_name='vina', seed=seed)
     v.set_receptor(receptor_pdbqt)
     v.set_ligand_from_file(ligand_pdbqt)
     v.compute_vina_maps(center=center, box_size=box_size)
     v.dock(exhaustiveness=exhaustiveness, n_poses=n_poses)
-    return v.energies(), v.poses()
+    energies, poses = v.energies(), v.poses()
+    # Filter search artifacts: Vina occasionally emits a physically nonsensical
+    # positive-energy mode among the returned poses (e.g. +68 kcal/mol seen in
+    # testing) -- see "Sanity-filter reported poses" below.
+    valid = [i for i, e in enumerate(energies) if e[0] < 0]
+    if len(valid) < len(energies):
+        energies = [energies[i] for i in valid]
+    return energies, poses
 ```
 
 **Exhaustiveness:** `8` is the Vina default. Increasing it increases search effort, but runtime and pose recovery depend on hardware, ligand flexibility, box size, and software version. Benchmark settings such as 8, 16, 32, and 64 on target-relevant controls instead of assigning universal timing or quality labels.
+
+**Seed and reproducibility:** `dock_single()`/`virtual_screen()` accept a `seed` (CLI: `--seed`). Top-1 affinity is empirically stable run-to-run without a fixed seed, but poses ranked 2+ reorder between runs on the same input. Set and record a seed (default `42` above) whenever the top-N poses -- not only the single best -- will be reported or compared.
+
+**Sanity-filter reported poses:** Vina's raw mode list can include a physically nonsensical outlier (a positive-energy mode was observed among 9 returned modes in testing). Filter or flag `affinity >= 0` poses before reporting or ranking; do not assume every mode Vina returns is a plausible binder.
 
 Vina's `rmsd_lb` and `rmsd_ub` are lower and upper heavy-atom RMSD bounds between a reported mode and the best-scoring mode; the bounds differ in how symmetry-equivalent atoms are handled. They are not pose-versus-experimental-reference RMSDs. Use an external symmetry-aware RMSD to a reference pose for accuracy QC.
 
@@ -328,7 +358,10 @@ Lyu et al. (2019) screened 170 million make-on-demand compounds against AmpC and
 | Identical affinity across ligands | Receptor grid not computed | Call `v.compute_vina_maps()` before dock |
 | Pose poses make no sense | Receptor and ligand in different frames | Ensure same coordinate origin |
 | Metal-coordination pose is wrong | The selected scoring/preparation protocol lacks a validated model for that metal geometry | Use a metal-specific validated workflow; the Vina executable can use AutoDock4Zn maps with `--scoring ad4` for zinc, while other metals require separately supported parameters/protocols |
-| GPU mode slow | Vina is CPU-only; only GNINA is GPU | Use GNINA for GPU; Vina is multi-core CPU |
+| GPU mode slow | Vina is CPU-only; only GNINA is GPU | Use GNINA for GPU; if using a third-party GPU port of Vina, benchmark it on the same hardware, target, library tranche, and search settings before adopting it |
+| `mk_prepare_receptor.py: command not found` | meeko's pip-installed console-script has no `.py` suffix | Call `mk_prepare_receptor` (no `.py`), as in the code above |
+| `ValueError: invalid literal for int() with base 10: '184A'` from `mk_prepare_receptor --read_pqr` | pdb2pqr's default `.pqr` output has no room for insertion-code residue numbers (e.g. chymotrypsin-numbered serine proteases); meeko's PQR reader can't parse them | Use `pdb2pqr --pdb-output` + `mk_prepare_receptor --read_pdb` instead of `--read_pqr` |
+| `pip install vina` fails with "Boost library location was not found" | No Windows wheel for the `vina` PyPI package | Use the Vina CLI via `subprocess` instead of `from vina import Vina` |
 
 ## References
 

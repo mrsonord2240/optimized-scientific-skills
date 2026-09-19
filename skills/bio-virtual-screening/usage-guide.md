@@ -41,12 +41,7 @@ Tell your AI agent what you want to do:
 5. Collect and rank results by affinity
 
 ## Tips
-- AutoDock Vina 1.2.x is an open baseline; benchmark any GPU port on the same hardware, target, library tranche, and search settings before adopting it
-- Set the box from the known ligand/pocket and intended ligand-size range; confirm that ligands can translate and rotate inside it instead of enforcing a universal 30 A limit
-- Vina's documented default exhaustiveness is 8. Use it as a baseline, then increase effort geometrically and compare redocking recovery, score/pose stability, and runtime on target-relevant controls; values such as 32 or 64 are test points, not universal production settings
-- Center binding box on co-crystallized ligand if available
-- Review waters, cofactors, metals, alternate locations, missing atoms, and protonation explicitly; retain conserved structural waters when they mediate binding
-- Note: Vina 1.1.2 vs 1.2 may give different poses
+See SKILL.md's "Exhaustiveness", "Box too small" (Common Pitfalls/Per-Tool Failure Modes), "Receptor Preparation", "Version Compatibility", and "Common Errors" sections for box sizing, exhaustiveness, receptor-prep, and version-drift guidance -- kept in one place there.
 
 ## Related Skills
 - molecular-io - Load and convert molecules

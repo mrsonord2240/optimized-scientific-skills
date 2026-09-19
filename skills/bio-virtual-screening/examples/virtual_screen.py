@@ -36,20 +36,33 @@ def prepare_ligand(smiles, output_pdbqt):
 
 
 def prepare_receptor(protonated_pdb, output_pdbqt):
-    '''Convert an already reviewed/repaired/protonated receptor with Meeko.'''
+    '''Convert an already reviewed/repaired/protonated receptor with Meeko.
+
+    protonated_pdb: produced by `pdb2pqr --pdb-output <this file> ...` (NOT
+    the default .pqr output -- meeko's PQR reader cannot parse insertion-code
+    residue numbers, e.g. chymotrypsin-numbered serine proteases like trypsin).
+    '''
     output_basename = str(Path(output_pdbqt).with_suffix(''))
     subprocess.run([
-        'mk_prepare_receptor.py', '--read_pdb', protonated_pdb,
+        # meeko's console-script entry point has no .py suffix once pip-installed.
+        'mk_prepare_receptor', '--read_pdb', protonated_pdb,
         '-o', output_basename, '-p'
     ], check=True)
     return output_pdbqt
 
 
-def dock_single(receptor_pdbqt, ligand_pdbqt, center, box_size, exhaustiveness=8, n_poses=10):
-    '''Dock a single ligand using AutoDock Vina.'''
+def dock_single(receptor_pdbqt, ligand_pdbqt, center, box_size, exhaustiveness=8, n_poses=10, seed=42):
+    '''Dock a single ligand using AutoDock Vina.
+
+    seed: record and fix this for any run whose poses beyond rank 1 will be
+    reported or compared -- top-1 affinity is stable run-to-run without a
+    fixed seed, but lower-ranked poses reorder. On Windows, `pip install vina`
+    has no wheel (Boost not found); use the Vina CLI via subprocess with
+    `--seed` instead of this Python-API path.
+    '''
     from vina import Vina
 
-    v = Vina(sf_name='vina')
+    v = Vina(sf_name='vina', seed=seed)
     v.set_receptor(receptor_pdbqt)
     v.set_ligand_from_file(ligand_pdbqt)
     v.compute_vina_maps(center=center, box_size=box_size)
@@ -59,7 +72,7 @@ def dock_single(receptor_pdbqt, ligand_pdbqt, center, box_size, exhaustiveness=8
     return energies
 
 
-def virtual_screen(receptor_pdbqt, ligand_dict, center, box_size, output_dir, exhaustiveness=8):
+def virtual_screen(receptor_pdbqt, ligand_dict, center, box_size, output_dir, exhaustiveness=8, seed=42):
     '''
     Screen compound library against receptor.
 
@@ -70,13 +83,15 @@ def virtual_screen(receptor_pdbqt, ligand_dict, center, box_size, output_dir, ex
         box_size: (x, y, z) search box dimensions
         output_dir: Directory for output
         exhaustiveness: Search thoroughness
+        seed: Vina random seed -- record it; poses ranked 2+ vary run-to-run
+            without a fixed seed even though top-1 affinity is stable
     '''
     from vina import Vina
     import pandas as pd
 
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
-    v = Vina(sf_name='vina')
+    v = Vina(sf_name='vina', seed=seed)
     v.set_receptor(receptor_pdbqt)
     v.compute_vina_maps(center=center, box_size=box_size)
 
@@ -91,6 +106,9 @@ def virtual_screen(receptor_pdbqt, ligand_dict, center, box_size, output_dir, ex
             v.dock(exhaustiveness=exhaustiveness, n_poses=5)
 
             energies = v.energies()
+            # Filter search artifacts: Vina can return a physically nonsensical
+            # positive-energy mode among the ranked poses.
+            energies = [e for e in energies if e[0] < 0] or energies
             has_poses = len(energies) > 0
             best_affinity = energies[0][0] if has_poses else None
 

@@ -85,7 +85,6 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-molecular-descriptors` | 86 | Limited Release |
 | `bio-molecular-io` | 91 | Limited Release |
 | `bio-molecular-standardization` | 90 | Limited Release |
-| `bio-protac-degraders` | 90 | Production Ready |
 | `bio-qsar-modeling` | 88 | Limited Release |
 | `bio-scaffold-analysis` | 88 | Limited Release |
 | `bio-similarity-searching` | 90 | Limited Release |
@@ -97,7 +96,6 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-single-cell-markers-annotation` | 88 | Production Ready |
 | `bio-single-cell-preprocessing` | 85 | Limited Release |
 | `bio-substructure-search` | 88 | Limited Release |
-| `bio-virtual-screening` | 86 | Limited Release |
 | `bio-workflows-scrnaseq-pipeline` | 85 | Limited Release |
 
 ## Promoted, re-audit still needed

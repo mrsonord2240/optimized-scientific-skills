@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "eba37f4599e8fdb2d3ac29b21071c200cc6fe603"
+      "staging_commit": "adc52d385926a7e7e8be9308d2a6dcac1b7dce8d"
     }
   },
   "skills": [
@@ -1492,17 +1492,20 @@
     {
       "id": "bio-protac-degraders",
       "upstream_path": "chemoinformatics/protac-degraders",
-      "score": 90,
+      "score": 92,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-protac-degraders.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "cooperativity_dc50.py",
+        "ternary_geometry_screen.py",
+        "usage-guide.md"
       ]
     },
     {
@@ -2119,17 +2122,19 @@
     {
       "id": "bio-virtual-screening",
       "upstream_path": "chemoinformatics/virtual-screening",
-      "score": 86,
-      "grade": "Limited Release",
+      "score": 93,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-virtual-screening.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "usage-guide.md",
+        "virtual_screen.py"
       ]
     },
     {
