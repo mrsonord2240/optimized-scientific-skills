@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "563b0986791399643304e4e28e64fa6d3e82c4f0"
+      "staging_commit": "3f9ec6a8739ece56e6ea9f8a179bb4f245feb5a4"
     }
   },
   "skills": [
@@ -1868,6 +1868,25 @@
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-single-cell-lineage-tracing",
+      "upstream_path": "single-cell/lineage-tracing",
+      "score": 86,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": "fixes/bio-single-cell-lineage-tracing.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "cassiopeia_reconstruction.py",
+        "cospar_dynamics.py",
+        "usage-guide.md"
       ]
     },
     {
