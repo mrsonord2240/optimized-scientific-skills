@@ -4,12 +4,21 @@
 from rdkit import Chem
 
 
+# NOTE: acrylamide / alpha_substituted_acrylamide / methacrylamide are not mutually
+# exclusive by construction -- an alpha-substituted or alpha-methyl acrylamide co-matches
+# all three keys (verified: C=C(C)C(=O)N1CCCCC1 matches all three). classify_warheads()
+# correctly returns every matched key; a caller that only wants one tier per compound
+# must pick the MOST SPECIFIC matched key (methacrylamide > alpha_substituted_acrylamide
+# > acrylamide), never a fixed lookup/iteration order, or it will silently report the
+# least-specific (and often less accurate) reactivity tier.
 WARHEAD_SMARTS = {
     'acrylamide': '[CX3](=[OX1])([NX3])[CX3]=[CX3]',
     'alpha_substituted_acrylamide': '[CX3](=[OX1])([NX3])[CX3]([!#1])=[CX3]',
     'methacrylamide': '[CX3](=[OX1])([NX3])[CX3]([#6])=[CX3]',
     'chloroacetamide': '[CX3](=[OX1])([NX3])[CH2][Cl]',
     'bromoacetamide': '[CX3](=[OX1])([NX3])[CH2][Br]',
+    'alpha_haloketone': '[#6][CX3](=[OX1])[CH2][F,Cl,Br]',
+    'alpha_beta_unsaturated_ketone': '[#6][CX3](=[OX1])[CX3]=[CX3]',
     'vinyl_sulfone': '[SX4](=O)(=O)[CX3]=[CX3]',
     'sulfonyl_fluoride': '[SX4](=O)(=O)[F]',
     'fluorosulfate_sufex': '[O][SX4](=O)(=O)[F]',
@@ -27,6 +36,8 @@ WARHEAD_SMARTS = {
 REACTIVITY_TIER = {
     'chloroacetamide': 'high',
     'bromoacetamide': 'high',
+    'alpha_haloketone': 'very_high',
+    'alpha_beta_unsaturated_ketone': 'moderate',
     'maleimide': 'very_high',
     'isothiocyanate': 'high',
     'isocyanate': 'high',
@@ -47,6 +58,8 @@ REACTIVITY_TIER = {
 RESIDUE_SELECTIVITY = {
     'chloroacetamide': ['Cys'],
     'bromoacetamide': ['Cys'],
+    'alpha_haloketone': ['Cys'],
+    'alpha_beta_unsaturated_ketone': ['Cys'],
     'acrylamide': ['Cys'],
     'alpha_substituted_acrylamide': ['Cys'],
     'methacrylamide': ['Cys'],
@@ -103,3 +116,31 @@ if __name__ == '__main__':
 
     print(has_recognized_warhead(acrylamide_example))
     print(has_recognized_warhead(abpp))
+
+    # Regression: every SKILL.md Warhead Chemistry row has a matching catalog key.
+    # (Cysteine-selective heterocycle is "various" SMARTS in SKILL.md -- not a single
+    # substructure -- and is intentionally excluded from this catalog.)
+    _skill_md_table_rows = {
+        'acrylamide', 'chloroacetamide', 'alpha_haloketone', 'vinyl_sulfone',
+        'sulfonyl_fluoride', 'fluorosulfate_sufex', 'aldehyde', 'boronate', 'nitrile',
+        'epoxide', 'alpha_beta_unsaturated_ketone', 'isothiocyanate', 'maleimide',
+    }
+    assert _skill_md_table_rows <= set(WARHEAD_SMARTS), (
+        _skill_md_table_rows - set(WARHEAD_SMARTS)
+    )
+
+    # Phenacyl chloride: real Cys-reactive alpha-haloketone test compound
+    phenacyl_chloride = 'ClCC(=O)c1ccccc1'
+    print(classify_warheads(phenacyl_chloride))
+    assert 'alpha_haloketone' in classify_warheads(phenacyl_chloride)
+
+    # Chalcone: real Michael-acceptor alpha,beta-unsaturated ketone test compound
+    chalcone = 'O=C(/C=C/c1ccccc1)c1ccccc1'
+    print(classify_warheads(chalcone))
+    assert 'alpha_beta_unsaturated_ketone' in classify_warheads(chalcone)
+
+    # Overlap check: alpha-methylacrylamide co-matches all three acrylamide-family keys
+    # (see the WARHEAD_SMARTS note above) -- callers must not assume a single tier.
+    methacrylamide_example = 'C=C(C)C(=O)N1CCCCC1'
+    overlap = classify_warheads(methacrylamide_example)
+    assert {'acrylamide', 'alpha_substituted_acrylamide', 'methacrylamide'} <= set(overlap)

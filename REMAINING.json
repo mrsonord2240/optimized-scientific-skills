@@ -1151,10 +1151,6 @@
       "upstream_path": "primer-design/qpcr-primers"
     },
     {
-      "id": "bio-protac-degraders",
-      "upstream_path": "chemoinformatics/protac-degraders"
-    },
-    {
       "id": "bio-proteomics-spectral-libraries",
       "upstream_path": "proteomics/spectral-libraries"
     },
@@ -1345,6 +1341,10 @@
     {
       "id": "bio-sequence-statistics",
       "upstream_path": "sequence-io/sequence-statistics"
+    },
+    {
+      "id": "bio-shape-similarity",
+      "upstream_path": "chemoinformatics/shape-similarity"
     },
     {
       "id": "bio-single-cell-hashing-demultiplexing",

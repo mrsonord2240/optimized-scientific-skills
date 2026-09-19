@@ -79,16 +79,15 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | --- | ---: | --- |
 | `bio-admet-prediction` | 86 | Limited Release |
 | `bio-causal-genomics-genetic-correlation` | 89 | Production Ready |
-| `bio-covalent-design` | 88 | Limited Release |
 | `bio-differential-expression-deseq2-basics` | 92 | Production Ready |
 | `bio-machine-learning-model-validation` | 93 | Limited Release |
 | `bio-machine-learning-prediction-explanation` | 89 | Limited Release |
 | `bio-molecular-descriptors` | 86 | Limited Release |
 | `bio-molecular-io` | 91 | Limited Release |
 | `bio-molecular-standardization` | 90 | Limited Release |
+| `bio-protac-degraders` | 90 | Production Ready |
 | `bio-qsar-modeling` | 88 | Limited Release |
 | `bio-scaffold-analysis` | 88 | Limited Release |
-| `bio-shape-similarity` | 81 | Limited Release |
 | `bio-similarity-searching` | 90 | Limited Release |
 | `bio-single-cell-batch-integration` | 90 | Limited Release |
 | `bio-single-cell-cell-annotation` | 87 | Limited Release |
@@ -97,7 +96,6 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-single-cell-differential-abundance` | 88 | Production Ready |
 | `bio-single-cell-doublet-detection` | 85 | Limited Release |
 | `bio-single-cell-markers-annotation` | 88 | Production Ready |
-| `bio-single-cell-multimodal-integration` | 79 | Limited Release |
 | `bio-single-cell-preprocessing` | 85 | Limited Release |
 | `bio-substructure-search` | 88 | Limited Release |
 | `bio-workflows-scrnaseq-pipeline` | 85 | Limited Release |
@@ -204,9 +202,9 @@ fixed.
 - `bio-free-energy-calculations` — `chemoinformatics/free-energy-calculations`
 - `bio-generative-design` — `chemoinformatics/generative-design`
 - `bio-ml-docking-rescoring` — `chemoinformatics/ml-docking-rescoring`
-- `bio-protac-degraders` — `chemoinformatics/protac-degraders`
 - `bio-reaction-enumeration` — `chemoinformatics/reaction-enumeration`
 - `bio-retrosynthesis` — `chemoinformatics/retrosynthesis`
+- `bio-shape-similarity` — `chemoinformatics/shape-similarity`
 - `bio-virtual-screening` — `chemoinformatics/virtual-screening`
 
 ### chip-seq

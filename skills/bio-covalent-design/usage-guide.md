@@ -46,11 +46,7 @@ Tell the AI agent what to do:
 
 ## Tips
 
-- Cysteine is a common covalent target, but prevalence depends on the drug set and counting method.
-- Acrylamide and haloacetamide behavior depends on the complete compound and target context; do not assign suitability from warhead class alone.
-- Report GSH assay conditions and measured kinetics rather than applying a universal half-life cutoff.
-- Calibrate geometric criteria for the reaction and docking protocol; no universal distance cutoff replaces reaction-specific angles and atom identities.
-- Use `kinact/Ki` for irreversible two-step systems that fit that model; use mechanism-appropriate reversible-covalent measurements otherwise.
+For reactivity, GSH-stability, geometry, and kinact/Ki caveats, see SKILL.md's Reactive Residue Taxonomy, Intrinsic Reactivity Assays, Reactivity Surrogates, Kinetics: kinact/Ki, and Per-Tool Failure Modes sections — do not restate them here.
 
 ## Related Skills
 

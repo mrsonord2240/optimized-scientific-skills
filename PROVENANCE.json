@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "85ca33b24d8051f169a523020c52a57cd97ae3ed"
+      "staging_commit": "729d19213479bc6d189f47710213a2b394b37d8a"
     }
   },
   "skills": [
@@ -386,17 +386,19 @@
     {
       "id": "bio-covalent-design",
       "upstream_path": "chemoinformatics/covalent-design",
-      "score": 88,
-      "grade": "Limited Release",
+      "score": 90,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-covalent-design.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "usage-guide.md",
+        "warhead_classifier.py"
       ]
     },
     {
@@ -1488,6 +1490,22 @@
       ]
     },
     {
+      "id": "bio-protac-degraders",
+      "upstream_path": "chemoinformatics/protac-degraders",
+      "score": 90,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "id": "bio-proteomics-data-import",
       "upstream_path": "proteomics/data-import",
       "score": 85.2,
@@ -1688,22 +1706,6 @@
       ]
     },
     {
-      "id": "bio-shape-similarity",
-      "upstream_path": "chemoinformatics/shape-similarity",
-      "score": 81,
-      "grade": "Limited Release",
-      "deployable": true,
-      "open_p0": 0,
-      "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
-      "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
-      "changed_files": [
-        "SKILL.md"
-      ]
-    },
-    {
       "id": "bio-similarity-searching",
       "upstream_path": "chemoinformatics/similarity-searching",
       "score": 90,
@@ -1873,8 +1875,8 @@
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-single-cell-multimodal-integration.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [

@@ -23,6 +23,10 @@ Design molecules that form covalent bonds with target protein residues. Clinical
 
 For warhead substructure filtering (in non-covalent contexts), see `chemoinformatics/substructure-search`. For non-covalent docking, see `chemoinformatics/virtual-screening`. For pose validation, see `chemoinformatics/pose-validation`.
 
+## Scope
+
+This Skill supports lead-optimization and covalent-SAR research design: warhead selection, reactivity/selectivity reasoning, and covalent-docking workflow guidance for a medicinal-chemistry or chemical-biology project. It does not diagnose disease, predict an individual patient's treatment outcome, or substitute for oncology clinical judgment. `kinact`/`Ki`, GSH-reactivity, or warhead-classification output must not be used to make or inform an individual patient's diagnostic or treatment decision; decline requests framed that way and redirect to a qualified clinician.
+
 ## Reactive Residue Taxonomy
 
 | Residue | Nucleophile | Example compatible warheads | Design note |
@@ -56,6 +60,8 @@ Cysteine is frequently targeted because its thiol/thiolate can be nucleophilic a
 | Cysteine-selective heterocycle | various | Moderate | Variable | Yes (designed) |
 
 **Practical hierarchy:** Acrylamides are common attenuated electrophiles in cysteine-directed TCIs, including KRAS G12C, EGFR, and BTK programs. Haloacetamides are generally more intrinsically reactive, but actual selectivity must be measured for the complete molecule and target context.
+
+**Overlapping SMARTS keys:** in `examples/warhead_classifier.py`'s `WARHEAD_SMARTS`, `acrylamide`, `alpha_substituted_acrylamide`, and `methacrylamide` are not mutually exclusive by construction — an alpha-substituted or alpha-methyl acrylamide co-matches all three (verified on `C=C(C)C(=O)N1CCCCC1`). `classify_warheads()` correctly returns every matched key; a consumer that reduces this to one tier must pick the most specific matched key (`methacrylamide` > `alpha_substituted_acrylamide` > `acrylamide`), never a fixed lookup order, or it will silently report the least-specific tier.
 
 ## Decision Tree by Scenario
 
