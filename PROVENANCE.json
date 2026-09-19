@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "7644996d50c764115eccfe29490b2536605dd449"
+      "staging_commit": "37a8f98be9b6b8457eef807706a3ea0edb78194a"
     }
   },
   "skills": [
@@ -1018,17 +1018,19 @@
     {
       "id": "bio-microbiome-functional-prediction",
       "upstream_path": "microbiome/functional-prediction",
-      "score": 80,
-      "grade": "Limited Release",
+      "score": 90,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-microbiome-functional-prediction.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "run_picrust2.sh",
+        "usage-guide.md"
       ]
     },
     {

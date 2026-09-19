@@ -1,12 +1,15 @@
 #!/bin/bash
-# Reference: PICRUSt2 2.5+ | Verify API if version differs
+# Reference: PICRUSt2 2.6.3 | Verify API if version differs
 # Predict community functional POTENTIAL from 16S ASVs with PICRUSt2.
 # This is PREDICTED gene-content potential interpolated from reference genomes,
 # never measured gene content and never activity. NSTI gates and quantifies it.
 set -euo pipefail
 
 ASV_SEQS='asv_seqs.fna'        # representative ASV sequences (FASTA), from amplicon-processing
-ASV_TABLE='asv_table.tsv'      # ASV abundance table (TSV or BIOM, samples as columns)
+ASV_TABLE='asv_table.tsv'      # ASV abundance table (TSV or BIOM, samples as columns).
+                               # If this came from `biom convert --to-tsv`, strip its leading
+                               # '# Constructed from biom file' comment line first (tail -n +2),
+                               # or pass the .biom file directly - see SKILL.md Run the Pipeline.
 OUTPUT_DIR='picrust2_out'
 THREADS=8
 MAX_NSTI=2.0                   # PICRUSt2 default; ASVs ABOVE this are dropped before inference
@@ -29,9 +32,10 @@ add_descriptions.py \
     -o "$OUTPUT_DIR/pathways_out/path_abun_described.tsv.gz"
 
 # Mandatory: report the NSTI distribution and the fraction of reads dropped by the gate.
-# The real quality file is marker_predicted_and_nsti.tsv.gz; the column is metadata_NSTI.
-# A run that loses a large read fraction predicted function for a different community than was sampled.
-python3 - "$OUTPUT_DIR/marker_predicted_and_nsti.tsv.gz" "$ASV_TABLE" "$MAX_NSTI" <<'PY'
+# The real quality file (combined bac+arc run, PICRUSt2 2.6.3) is combined_marker_predicted_and_nsti.tsv.gz;
+# the column is metadata_NSTI. A run that loses a large read fraction predicted function for a
+# different community than was sampled.
+python3 - "$OUTPUT_DIR/combined_marker_predicted_and_nsti.tsv.gz" "$ASV_TABLE" "$MAX_NSTI" <<'PY'
 import sys
 import pandas as pd
 

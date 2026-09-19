@@ -1,6 +1,6 @@
 ---
 name: bio-microbiome-functional-prediction
-description: Predicts community functional POTENTIAL from 16S/ITS amplicon ASVs with PICRUSt2 (or q2-picrust2) by phylogenetic interpolation of reference-genome gene content - EPA-ng placement, gappa, castor hidden-state prediction of KO/EC/Pfam copy number, 16S copy-number normalization, and MinPath MetaCyc/KEGG pathways - gated by the NSTI quality index. Covers why predicted function is taxonomy re-encoded (never measured gene content and never activity), the mandatory NSTI report (--max_nsti 2 silently drops novel ASVs), why accuracy IS reference coverage (gut Spearman ~0.8, soil/marine collapse), the circularity trap, and Tax4Fun2/FAPROTAX/BugBase alternatives. Use when inferring KO/EC/MetaCyc potential from an ASV table, gating on NSTI, or choosing a prediction method. For MEASURED shotgun function see metagenomics/functional-profiling; for enrichment of KO lists see pathway-analysis/go-enrichment; for DA of predicted tables see differential-abundance.
+description: Predicts community functional POTENTIAL from 16S amplicon ASVs with PICRUSt2 (or q2-picrust2) by phylogenetic interpolation of reference-genome gene content - EPA-ng placement, gappa, castor hidden-state prediction of KO/EC/Pfam copy number, 16S copy-number normalization, and MinPath MetaCyc/KEGG pathways - gated by the NSTI quality index. Covers why predicted function is taxonomy re-encoded (never measured gene content and never activity), the mandatory NSTI report (--max_nsti 2 silently drops novel ASVs), why accuracy IS reference coverage (gut Spearman ~0.8, soil/marine collapse), the circularity trap, and Tax4Fun2/FAPROTAX/BugBase alternatives. Use when inferring KO/EC/MetaCyc potential from an ASV table, gating on NSTI, or choosing a prediction method. For MEASURED shotgun function see metagenomics/functional-profiling; for enrichment of KO lists see pathway-analysis/go-enrichment; for DA of predicted tables see differential-abundance.
 tool_type: cli
 primary_tool: PICRUSt2
 license: MIT
@@ -8,7 +8,7 @@ license: MIT
 
 ## Version Compatibility
 
-Reference examples tested with: PICRUSt2 2.5+, pandas 2.2+.
+Reference examples tested with: PICRUSt2 2.6.3, pandas 2.2+. Checked against a real PICRUSt2 2.6.3 run (see "Run the Pipeline" and "Report NSTI" for the confirmed 2.6.3 output filenames).
 
 Before using code patterns, verify installed versions match. If versions differ:
 - CLI: `<tool> --version` then `<tool> --help` to confirm flags
@@ -82,6 +82,11 @@ FAPROTAX is conceptually different: a curated taxon-to-function lookup answering
 ## Run the Pipeline
 
 ```bash
+# Install (own env; pulls EPA-ng, gappa, hmmer, castor):
+conda create -n picrust2 -c bioconda -c conda-forge picrust2
+# Or the QIIME2 plugin path (into a QIIME2 env) - see qiime2-workflow:
+conda install -c conda-forge -c bioconda q2-picrust2
+
 # Full pipeline: place -> HSP -> 16S-normalize -> metagenome -> MetaCyc pathways
 picrust2_pipeline.py \
     -s asv_seqs.fna \              # representative ASV sequences (FASTA)
@@ -91,12 +96,14 @@ picrust2_pipeline.py \
     --hsp_method mp \              # maximum parsimony (recommended default); pic is faster but not recommended
     --max_nsti 2 \                 # ASVs ABOVE 2 are DROPPED before inference; report how many (see below)
     --verbose
-# Key outputs (gzipped):
-#   KO_metagenome_out/pred_metagenome_unstrat.tsv.gz   KEGG ortholog abundances
-#   EC_metagenome_out/pred_metagenome_unstrat.tsv.gz   EC-number abundances
-#   pathways_out/path_abun_unstrat.tsv.gz              MetaCyc pathway abundances
-#   marker_predicted_and_nsti.tsv.gz                   per-ASV 16S copies + metadata_NSTI (the quality file)
+# Key outputs (gzipped), on a combined bacterial+archaeal run (the default, PICRUSt2 2.6.3):
+#   KO_metagenome_out/pred_metagenome_unstrat.tsv.gz            KEGG ortholog abundances
+#   EC_metagenome_out/pred_metagenome_unstrat.tsv.gz            EC-number abundances
+#   pathways_out/path_abun_unstrat.tsv.gz                       MetaCyc pathway abundances
+#   combined_marker_predicted_and_nsti.tsv.gz                   per-ASV 16S copies + metadata_NSTI (the quality file)
 ```
+
+**Input format trap:** `-i` takes the ASV table as BIOM or TSV. The standard `biom convert -i feature-table.biom -o feature-table.tsv --to-tsv` export (the normal QIIME2/amplicon-processing provenance) prepends a `# Constructed from biom file` comment line that `picrust2_pipeline.py` cannot parse - it only fails at the very last stage (`metagenome_pipeline.py`), AFTER the full placement + HSP compute has already run (minutes, not seconds, on a real ASV set), discarding the whole output directory. Either strip the comment line first (`tail -n +2 feature-table.tsv > asv_table.tsv`) or pass the `.biom` file directly to `-i` and skip the TSV conversion entirely.
 
 `--stratified` additionally emits per-ASV contribution tables (large, much slower); `--per_sequence_contrib` is only meaningful with it. `--coverage` adds pathway coverage (a different question from abundance). The unrolled per-step scripts are `place_seqs.py` -> `hsp.py -i {16S,KO,EC} -m mp [-n]` -> `metagenome_pipeline.py --max_nsti 2` -> `pathway_pipeline.py`; `--max_nsti` filtering and 16S normalization happen in `metagenome_pipeline.py`. `add_descriptions.py -m METACYC` attaches human-readable names.
 
@@ -104,12 +111,12 @@ picrust2_pipeline.py \
 
 **Goal:** Quantify how much of the prediction is extrapolation and how much of the sampled community the NSTI gate discarded, so the result is interpretable.
 
-**Approach:** Read `marker_predicted_and_nsti.tsv.gz`, summarize the `metadata_NSTI` distribution, and report the number of ASVs AND the fraction of READS dropped at `--max_nsti 2` (a study that loses 40% of reads predicted function for a different community than it sampled).
+**Approach:** Read `combined_marker_predicted_and_nsti.tsv.gz` (the file PICRUSt2 2.6.3's default combined bacterial+archaeal run actually produces - `bac_`/`arc_`/`combined_` prefixed files, never an unprefixed `marker_predicted_and_nsti.tsv.gz`), summarize the `metadata_NSTI` distribution, and report the number of ASVs AND the fraction of READS dropped at `--max_nsti 2` (a study that loses 40% of reads predicted function for a different community than it sampled).
 
 ```python
 import pandas as pd
 
-nsti = pd.read_csv('picrust2_out/marker_predicted_and_nsti.tsv.gz', sep='\t')   # cols: sequence, metadata_NSTI
+nsti = pd.read_csv('picrust2_out/combined_marker_predicted_and_nsti.tsv.gz', sep='\t')   # cols: sequence, metadata_NSTI
 asv_counts = pd.read_csv('asv_table.tsv', sep='\t', index_col=0)                # ASVs x samples
 nsti = nsti.set_index('sequence')
 reads_per_asv = asv_counts.sum(axis=1)
@@ -139,7 +146,7 @@ print(f'ASVs dropped at NSTI>{max_nsti}: {len(dropped)}/{len(nsti)}  reads dropp
 **Trigger:** reporting "groups differed taxonomically AND functionally" as two lines of evidence. **Mechanism:** predicted function is a deterministic function of the ASV table, so the functional difference IS the taxonomic difference re-encoded. **Symptom:** a predicted-function DA result presented as orthogonal corroboration of a taxonomic result. **Fix:** present predicted function as a hypothesis-generating summary of the taxonomic signal; for orthogonal functional evidence use shotgun/metatranscriptomics.
 
 ### DA without compositional correction
-**Trigger:** uncorrected Wilcoxon/t-test on relative abundances of the predicted table. **Mechanism:** the table is compositional, depth-confounded, and zero-inflated, on top of prediction error. **Symptom:** a long list of "significant" pathways that do not replicate across methods. **Fix:** use >=2 CoDA tools (ALDEx2, ANCOM-BC2, MaAsLin2, LinDA) and report the intersection (Nearing 2022 *Nat Commun* 13:342); ALDEx2 wants count-like features-as-rows, NOT relab-normalized output - see differential-abundance.
+**Trigger:** uncorrected Wilcoxon/t-test on relative abundances of the predicted table. **Mechanism:** the table is compositional, depth-confounded, and zero-inflated, on top of prediction error. **Symptom:** a long list of "significant" pathways that do not replicate across methods. **Fix:** use >=2 CoDA tools (ALDEx2, ANCOM-BC2, MaAsLin2, LinDA) and report the intersection (Nearing 2022 *Nat Commun* 13:342); ALDEx2 wants count-like features-as-rows, NOT relab-normalized output - see differential-abundance. Before intersecting, normalize feature names on both sides: tools disagree on how they sanitize MetaCyc pathway IDs (MaAsLin2's `make.names()` turns `PWY-6829` into `PWY.6829`; ALDEx2 and LinDA keep the raw hyphenated ID), so a naive `intersect()` on raw names can silently return an empty consensus set even when the tools agree on every hit.
 
 ### Strain-level function invisible
 **Trigger:** inferring strain-specific function (toxin, resistance, pathogenicity island) from a 16S-based prediction. **Mechanism:** 16S resolves to roughly genus/species; accessory genome, HGT, plasmids, and prophage-borne genes vary within a species and are assigned the reference neighbors' core content. **Symptom:** a strain-level functional claim from amplicon data. **Fix:** state that the species core is the ceiling regardless of NSTI; strain function needs isolate genomes or shotgun.
@@ -154,18 +161,21 @@ print(f'ASVs dropped at NSTI>{max_nsti}: {len(dropped)}/{len(nsti)}  reads dropp
 | `--min_align` 0.8 (default) | PICRUSt2 manual | an ASV must align over >=80% of its length to be placed; poorly aligning ASVs are excluded |
 | Predicted-vs-shotgun Spearman ~0.79-0.88 (gut) | Douglas 2020 *Nat Biotechnol* 38:685 | the empirical ceiling in the BEST case (dense human-gut references); lower elsewhere - the anchor for every accuracy caveat |
 | NSTI ~0.5 / ~0.5-1 / ->2 (heuristic bands) | community practice | rough well-characterized / moderate / weak guide; no NSTI value converts predicted potential into measured function |
-| DA: >=2 CoDA tools, report intersection | Nearing 2022 *Nat Commun* 13:342 | tool choice changes the predicted-pathway hit list; consensus beats any single tool |
+| DA: >=2 CoDA tools, report intersection (normalize IDs first) | Nearing 2022 *Nat Commun* 13:342 | tool choice changes the predicted-pathway hit list; consensus beats any single tool - but only after normalizing each tool's feature-name sanitization |
 
 ## Common Errors
 
 | Error / symptom | Cause | Solution |
 |-----------------|-------|----------|
-| `metadata_NSTI` / NSTI file not found | reading `marker_nsti_predicted.tsv` (does not exist) | the real file is `marker_predicted_and_nsti.tsv.gz`; the column is `metadata_NSTI` |
-| Near-empty output / most ASVs dropped | high NSTI (wrong environment) | check the NSTI distribution; consider FAPROTAX or shotgun; do not just lower `--max_nsti` to keep them |
+| `metadata_NSTI` / NSTI file not found | reading `marker_predicted_and_nsti.tsv.gz` (does not exist as an unprefixed file) | a combined run (default, 2.6.3) writes `bac_`/`arc_`/`combined_`/`*_reduced_` prefixed files; read `combined_marker_predicted_and_nsti.tsv.gz` - the column is `metadata_NSTI` |
+| Near-empty output / many ASVs dropped, but the run completed | high NSTI on placed ASVs (post-hoc `--max_nsti` gate, wrong environment) | check the NSTI distribution; consider FAPROTAX or shotgun; do not just lower `--max_nsti` to keep them |
+| Hard failure, no output directory created at all: "all N input sequences aligned poorly to reference sequences" | `--min_align 0.8` gate: ASVs too diverged from the reference tree to place - this aborts BEFORE any NSTI file exists, it is not the partial/near-empty case above | same fix (FAPROTAX/shotgun for sparse-reference environments); do not lower `--min_align` to force a placement |
+| `metagenome_pipeline.py` table-parsing error ("this line ... differing number of fields") after a long placement+HSP run | `-i` table is a `biom convert --to-tsv` export with a leading `# Constructed from biom file` comment line PICRUSt2 cannot parse | strip the comment line (`tail -n +2 feature-table.tsv > asv_table.tsv`) or pass the `.biom` file directly to `-i` instead of converting |
 | ALDEx2 gives implausible results on predicted table | fed relab-normalized output, features-as-columns | pass raw (count-like) predicted abundances with features as rows - see differential-abundance |
 | Predicted and shotgun pathway tables disagree | comparing PICRUSt2 to HUMAnN as if interchangeable | they are different objects (predicted vs measured); do not merge |
 | `--per_sequence_contrib` produces nothing | used without `--stratified` | it is only meaningful with `--stratified` |
 | Pathway "presence" and "abundance" conflated | reading `path_abun` as coverage | abundance and `--coverage` are different questions |
+| Cross-tool DA intersection comes back empty even though tools agree | different R tools sanitize MetaCyc pathway IDs differently (e.g. MaAsLin2's `make.names()` turns `PWY-6829` into `PWY.6829`; ALDEx2/LinDA keep the raw ID) | normalize feature names on both sides (e.g. run `make.names()` on both hit lists) before computing the intersection |
 
 ## References
 
