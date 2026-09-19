@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 124,
+    "refined": 125,
     "audited_and_excluded": 0,
     "out_of_scope": 1,
-    "remaining": 437
+    "remaining": 436
   },
   "remaining": [
     {
@@ -1345,10 +1345,6 @@
     {
       "id": "bio-single-cell-metabolite-communication",
       "upstream_path": "single-cell/metabolite-communication"
-    },
-    {
-      "id": "bio-single-cell-scatac-analysis",
-      "upstream_path": "single-cell/scatac-analysis"
     },
     {
       "id": "bio-single-cell-splicing",

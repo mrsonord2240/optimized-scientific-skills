@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "2810ac22b83cf97ca2d921c1085da24ed2f52056"
+      "staging_commit": "4b22889326905f518bc16073242a798ca46f4a60"
     }
   },
   "skills": [
@@ -1977,6 +1977,23 @@
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-single-cell-scatac-analysis",
+      "upstream_path": "single-cell/scatac-analysis",
+      "score": 91.8,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": "fixes/bio-single-cell-scatac-analysis.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "usage-guide.md"
       ]
     },
     {
