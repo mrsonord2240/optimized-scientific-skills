@@ -83,6 +83,9 @@ factory = ChemicalFeatures.BuildFeatureFactory(fdef_file)
 # This is an already defined model. Coordinates and bounds must come from a
 # validated consensus-derivation workflow or another justified source. RDKit
 # requires FreeChemicalFeature objects, not feature-family strings.
+# PLACEHOLDER COORDINATES -- do not reuse without deriving from a validated
+# workflow. On a real 5-active/5-inactive HIV protease inhibitor retrospective
+# set, this literal 2-feature model gave enrichment 0.5 (worse than random).
 query_features = [
     ChemicalFeatures.FreeChemicalFeature(
         'Aromatic', Geometry.Point3D(0.0, 0.0, 0.0)),
@@ -271,6 +274,7 @@ Choose between ligand- and receptor-based models using the available structural/
 | Pharmacophore-conformer mismatch | Wrong conformer used | Use bioactive conformer from crystal |
 | Pharmit search timeout | Library too large | Pre-filter by 2D fingerprint Tanimoto |
 | apo2ph4 PML has no useful model | No robust pocket hot spots at selected settings | Recheck pocket definition and documented thresholds; inspect alternative models |
+| PLIP `analyze()` raises `ValueError: inchikey is not a recognised Open Babel format` | `openbabel-wheel` (the standard pip build, checked 3.1.1.23 on Windows) ships no InChI writer at all, and PLIP's `Ligand.__init__` unconditionally calls `pybel.write(format='inchikey')` | Use a conda-forge Open Babel build with InChI support, or monkeypatch `pybel.Molecule.write` to no-op for `format='inchikey'` |
 
 ## References
 

@@ -29,7 +29,9 @@ def shared_feature_types_prefilter(active_mols, factory, n_conf=20):
         if mol is None:
             continue
         m = Chem.AddHs(mol)
-        AllChem.EmbedMultipleConfs(m, numConfs=n_conf, params=AllChem.ETKDGv3())
+        params = AllChem.ETKDGv3()
+        params.randomSeed = 23  # fixed seed for reproducible conformers
+        AllChem.EmbedMultipleConfs(m, numConfs=n_conf, params=params)
         AllChem.MMFFOptimizeMoleculeConfs(m)
         embedded.append(m)
 
@@ -47,9 +49,13 @@ def shared_feature_types_prefilter(active_mols, factory, n_conf=20):
 
 
 def has_feature_types(query_features, target_mol, factory):
-    '''Check feature-family presence only; this is not a 3D distance match.'''
+    '''Check feature-family presence only; this is not a 3D distance match.
+    Returns (is_match, missing_feature_types) so a caller can report which
+    query feature(s) a rejected molecule lacks.'''
     target = Chem.AddHs(target_mol)
-    AllChem.EmbedMolecule(target, AllChem.ETKDGv3())
+    params = AllChem.ETKDGv3()
+    params.randomSeed = 23  # fixed seed for reproducible conformers
+    AllChem.EmbedMolecule(target, params)
     AllChem.MMFFOptimizeMolecule(target)
 
     target_features = molecule_features(target, factory)
@@ -57,11 +63,23 @@ def has_feature_types(query_features, target_mol, factory):
     # Simple feature-type match (loose); production: distance-constrained
     target_types = set([(f[0], f[1]) for f in target_features])
     query_types = set([(qf[0], qf[1]) for qf in query_features])
-    return query_types.issubset(target_types)
+    missing = query_types - target_types
+    return (not missing), missing
 
 
 def feature_family_prefilter(query_mol_list, library_smiles):
-    '''Prefilter by feature families before a distance-constrained 3D search.'''
+    '''Prefilter by feature families before a distance-constrained 3D search.
+
+    Caution: this intersects feature-type sets across ALL supplied actives
+    with no fallback. On a small or scaffold-diverse active set, the
+    resulting common set can incidentally include non-essential features
+    that a genuine active from the same mechanistic class lacks, silently
+    rejecting it. If a known true positive is rejected, check
+    `rejected_missing` below for which feature(s) it lacks, and see
+    SKILL.md's Per-Tool Failure Modes table ("Ligand-based -- diverse actives
+    confound"): cluster actives by scaffold first and derive a per-cluster
+    pharmacophore instead of pooling unrelated actives into one intersection.
+    '''
     factory = get_feature_factory()
     active_mols = [Chem.MolFromSmiles(s) if isinstance(s, str) else s
                    for s in query_mol_list]
@@ -71,12 +89,22 @@ def feature_family_prefilter(query_mol_list, library_smiles):
         return []
 
     hits = []
+    rejected_missing = {}
     for smi in library_smiles:
         mol = Chem.MolFromSmiles(smi)
         if mol is None:
             continue
-        if has_feature_types(list(common), mol, factory):
+        is_match, missing = has_feature_types(list(common), mol, factory)
+        if is_match:
             hits.append(smi)
+        else:
+            rejected_missing[smi] = sorted(missing)
+
+    if rejected_missing:
+        print('Rejected (missing query feature types):')
+        for smi, missing in rejected_missing.items():
+            print(f'  {smi}: missing {missing}')
+
     return hits
 
 

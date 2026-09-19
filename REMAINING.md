@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**444 remaining** across 58 folders. 116 are already refined and live in `skills/`.
+**443 remaining** across 58 folders. 118 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 116 refined, 1 audited and excluded, 1 out of scope, 444 remaining.
+The source tree holds 562 Skills: 118 refined, 0 audited and excluded, 1 out of scope, 443 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -31,13 +31,12 @@ The source tree holds 562 Skills: 116 refined, 1 audited and excluded, 1 out of 
 | flow-cytometry | 8 | 0 |
 | genome-intervals | 8 | 0 |
 | metagenomics | 8 | 0 |
-| chemoinformatics | 7 | 12 |
+| chemoinformatics | 7 | 13 |
 | genome-annotation | 7 | 0 |
 | imaging-mass-cytometry | 7 | 0 |
 | liquid-biopsy | 7 | 0 |
 | read-qc | 7 | 0 |
 | sequence-manipulation | 7 | 0 |
-| single-cell | 7 | 10 |
 | systems-biology | 7 | 0 |
 | variant-calling | 7 | 6 |
 | ecological-genomics | 6 | 0 |
@@ -46,6 +45,7 @@ The source tree holds 562 Skills: 116 refined, 1 audited and excluded, 1 out of 
 | population-genetics | 6 | 1 |
 | reporting | 6 | 0 |
 | ribo-seq | 6 | 0 |
+| single-cell | 6 | 11 |
 | small-rna-seq | 6 | 0 |
 | tcr-bcr-analysis | 6 | 0 |
 | temporal-genomics | 6 | 0 |
@@ -88,6 +88,7 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-molecular-standardization` | 90 | Limited Release |
 | `bio-qsar-modeling` | 88 | Limited Release |
 | `bio-scaffold-analysis` | 88 | Limited Release |
+| `bio-shape-similarity` | 81 | Limited Release |
 | `bio-similarity-searching` | 90 | Limited Release |
 | `bio-single-cell-batch-integration` | 90 | Limited Release |
 | `bio-single-cell-cell-annotation` | 87 | Limited Release |
@@ -95,6 +96,7 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-single-cell-differential-abundance` | 88 | Production Ready |
 | `bio-single-cell-doublet-detection` | 85 | Limited Release |
 | `bio-single-cell-markers-annotation` | 88 | Production Ready |
+| `bio-single-cell-multimodal-integration` | 79 | Limited Release |
 | `bio-single-cell-preprocessing` | 85 | Limited Release |
 | `bio-substructure-search` | 88 | Limited Release |
 | `bio-workflows-scrnaseq-pipeline` | 85 | Limited Release |
@@ -135,7 +137,6 @@ fixed.
 
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
-| `bio-shape-similarity` | 81 | Limited Release | 1 |
 
 ## Out of scope
 
@@ -636,7 +637,6 @@ fixed.
 - `bio-single-cell-hashing-demultiplexing` — `single-cell/hashing-demultiplexing`
 - `bio-single-cell-lineage-tracing` — `single-cell/lineage-tracing`
 - `bio-single-cell-metabolite-communication` — `single-cell/metabolite-communication`
-- `bio-single-cell-multimodal-integration` — `single-cell/multimodal-integration`
 - `bio-single-cell-perturb-seq` — `single-cell/perturb-seq`
 - `bio-single-cell-scatac-analysis` — `single-cell/scatac-analysis`
 

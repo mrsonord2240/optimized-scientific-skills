@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "0df43b5801d4a9f1705a43eb6434a9b8c95f8682"
+      "staging_commit": "85ca33b24d8051f169a523020c52a57cd97ae3ed"
     }
   },
   "skills": [
@@ -1283,7 +1283,7 @@
     {
       "id": "bio-pharmacophore-modeling",
       "upstream_path": "chemoinformatics/pharmacophore-modeling",
-      "score": 86,
+      "score": 88,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
@@ -1291,9 +1291,11 @@
       "fix_log": "fixes/bio-pharmacophore-modeling.md",
       "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "pharmacophore.py",
+        "usage-guide.md"
       ]
     },
     {
@@ -1686,6 +1688,22 @@
       ]
     },
     {
+      "id": "bio-shape-similarity",
+      "upstream_path": "chemoinformatics/shape-similarity",
+      "score": 81,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "id": "bio-similarity-searching",
       "upstream_path": "chemoinformatics/similarity-searching",
       "score": 90,
@@ -1823,6 +1841,22 @@
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-16",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-single-cell-multimodal-integration",
+      "upstream_path": "single-cell/multimodal-integration",
+      "score": 79,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",

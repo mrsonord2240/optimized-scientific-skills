@@ -47,10 +47,9 @@ Tell the AI agent what to do:
 
 - Compare ligand- and receptor-based models on target-relevant validation; neither is universally more reliable.
 - Use bioactive conformer when possible; not first-generated conformer.
-- Calibrate geometric tolerances per feature and model; any tabulated ranges in the skill are repository starting heuristics. Flexible ligands or uncertain coordinates may justify wider starting values, but there is no universal drug-like tolerance.
+- Geometric-tolerance and retrospective-enrichment calibration rules live in SKILL.md's "Pharmacophore Feature Types" and "Pharmacophore Quality Validation" sections -- do not treat the tabulated ranges or the 5x heuristic as fixed.
 - Measure specificity and recall on the project dataset; they depend on feature count, tolerances, conformers, and the fingerprint baseline.
 - Combine pharmacophore + 2D fingerprint for hybrid search.
-- Validate on a retrospective active/decoy set; enrichment >5x is only a repository starting heuristic and must be calibrated for the dataset and decoy construction.
 
 ## Related Skills
 
