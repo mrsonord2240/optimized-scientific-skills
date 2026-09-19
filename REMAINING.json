@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 123,
-    "audited_and_excluded": 0,
+    "refined": 124,
+    "audited_and_excluded": 1,
     "out_of_scope": 1,
-    "remaining": 438
+    "remaining": 436
   },
   "remaining": [
     {
@@ -1347,14 +1347,6 @@
       "upstream_path": "single-cell/metabolite-communication"
     },
     {
-      "id": "bio-single-cell-perturb-seq",
-      "upstream_path": "single-cell/perturb-seq"
-    },
-    {
-      "id": "bio-single-cell-scatac-analysis",
-      "upstream_path": "single-cell/scatac-analysis"
-    },
-    {
       "id": "bio-single-cell-splicing",
       "upstream_path": "alternative-splicing/single-cell-splicing"
     },
@@ -1763,7 +1755,20 @@
       "upstream_path": "sequence-io/write-sequences"
     }
   ],
-  "excluded": [],
+  "excluded": [
+    {
+      "id": "bio-single-cell-perturb-seq",
+      "upstream_path": "single-cell/perturb-seq",
+      "score": 75,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    }
+  ],
   "out_of_scope": [
     {
       "id": "clawhub-installer",

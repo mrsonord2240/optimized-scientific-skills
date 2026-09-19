@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**438 remaining** across 58 folders. 123 are already refined and live in `skills/`.
+**436 remaining** across 58 folders. 124 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 123 refined, 0 audited and excluded, 1 out of scope, 438 remaining.
+The source tree holds 562 Skills: 124 refined, 1 audited and excluded, 1 out of scope, 436 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -65,9 +65,9 @@ The source tree holds 562 Skills: 123 refined, 0 audited and excluded, 1 out of 
 | rna-quantification | 4 | 0 |
 | rna-structure | 4 | 0 |
 | crispr-screens | 3 | 12 |
-| single-cell | 3 | 14 |
 | causal-genomics | 1 | 10 |
 | proteomics | 1 | 8 |
+| single-cell | 1 | 15 |
 
 ## Promoted, fix pass still needed
 
@@ -95,6 +95,7 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-single-cell-doublet-detection` | 85 | Limited Release |
 | `bio-single-cell-markers-annotation` | 88 | Production Ready |
 | `bio-single-cell-preprocessing` | 85 | Limited Release |
+| `bio-single-cell-scatac-analysis` | 89 | Limited Release |
 | `bio-substructure-search` | 88 | Limited Release |
 | `bio-workflows-scrnaseq-pipeline` | 85 | Limited Release |
 
@@ -134,6 +135,7 @@ fixed.
 
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
+| `bio-single-cell-perturb-seq` | 75 | Beta Only | 0 |
 
 ## Out of scope
 
@@ -629,8 +631,6 @@ fixed.
 ### single-cell
 
 - `bio-single-cell-metabolite-communication` — `single-cell/metabolite-communication`
-- `bio-single-cell-perturb-seq` — `single-cell/perturb-seq`
-- `bio-single-cell-scatac-analysis` — `single-cell/scatac-analysis`
 
 ### small-rna-seq
 

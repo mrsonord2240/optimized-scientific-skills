@@ -1962,6 +1962,22 @@
       ]
     },
     {
+      "id": "bio-single-cell-scatac-analysis",
+      "upstream_path": "single-cell/scatac-analysis",
+      "score": 89,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "id": "bio-single-cell-trajectory-inference",
       "upstream_path": "single-cell/trajectory-inference",
       "score": 92,
