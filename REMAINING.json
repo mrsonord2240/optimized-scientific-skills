@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 113,
+    "refined": 114,
     "audited_and_excluded": 1,
     "out_of_scope": 1,
-    "remaining": 447
+    "remaining": 446
   },
   "remaining": [
     {
@@ -1353,10 +1353,6 @@
     {
       "id": "bio-shape-similarity",
       "upstream_path": "chemoinformatics/shape-similarity"
-    },
-    {
-      "id": "bio-single-cell-cell-communication",
-      "upstream_path": "single-cell/cell-communication"
     },
     {
       "id": "bio-single-cell-cnv-inference",

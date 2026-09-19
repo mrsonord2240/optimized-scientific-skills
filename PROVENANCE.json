@@ -1718,6 +1718,22 @@
       ]
     },
     {
+      "id": "bio-single-cell-cell-communication",
+      "upstream_path": "single-cell/cell-communication",
+      "score": 86,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "id": "bio-single-cell-clustering",
       "upstream_path": "single-cell/clustering",
       "score": 89,

@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**447 remaining** across 58 folders. 113 are already refined and live in `skills/`.
+**446 remaining** across 58 folders. 114 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 113 refined, 1 audited and excluded, 1 out of scope, 447 remaining.
+The source tree holds 562 Skills: 114 refined, 1 audited and excluded, 1 out of scope, 446 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -32,12 +32,12 @@ The source tree holds 562 Skills: 113 refined, 1 audited and excluded, 1 out of 
 | flow-cytometry | 8 | 0 |
 | genome-intervals | 8 | 0 |
 | metagenomics | 8 | 0 |
-| single-cell | 8 | 8 |
 | genome-annotation | 7 | 0 |
 | imaging-mass-cytometry | 7 | 0 |
 | liquid-biopsy | 7 | 0 |
 | read-qc | 7 | 0 |
 | sequence-manipulation | 7 | 0 |
+| single-cell | 7 | 9 |
 | systems-biology | 7 | 0 |
 | variant-calling | 7 | 6 |
 | ecological-genomics | 6 | 0 |
@@ -92,6 +92,7 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-similarity-searching` | 90 | Limited Release |
 | `bio-single-cell-batch-integration` | 90 | Limited Release |
 | `bio-single-cell-cell-annotation` | 87 | Limited Release |
+| `bio-single-cell-cell-communication` | 86 | Limited Release |
 | `bio-single-cell-clustering` | 89 | Limited Release |
 | `bio-single-cell-differential-abundance` | 88 | Production Ready |
 | `bio-single-cell-doublet-detection` | 85 | Limited Release |
@@ -635,7 +636,6 @@ fixed.
 
 ### single-cell
 
-- `bio-single-cell-cell-communication` — `single-cell/cell-communication`
 - `bio-single-cell-cnv-inference` — `single-cell/cnv-inference`
 - `bio-single-cell-hashing-demultiplexing` — `single-cell/hashing-demultiplexing`
 - `bio-single-cell-lineage-tracing` — `single-cell/lineage-tracing`
