@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 115,
-    "audited_and_excluded": 0,
+    "refined": 116,
+    "audited_and_excluded": 1,
     "out_of_scope": 1,
-    "remaining": 446
+    "remaining": 444
   },
   "remaining": [
     {
@@ -405,10 +405,6 @@
     {
       "id": "bio-copy-number-subclonal-copy-number",
       "upstream_path": "copy-number/subclonal-copy-number"
-    },
-    {
-      "id": "bio-covalent-design",
-      "upstream_path": "chemoinformatics/covalent-design"
     },
     {
       "id": "bio-crispr-screens-combinatorial-screens",
@@ -1351,10 +1347,6 @@
       "upstream_path": "sequence-io/sequence-statistics"
     },
     {
-      "id": "bio-shape-similarity",
-      "upstream_path": "chemoinformatics/shape-similarity"
-    },
-    {
       "id": "bio-single-cell-cnv-inference",
       "upstream_path": "single-cell/cnv-inference"
     },
@@ -1795,7 +1787,20 @@
       "upstream_path": "sequence-io/write-sequences"
     }
   ],
-  "excluded": [],
+  "excluded": [
+    {
+      "id": "bio-shape-similarity",
+      "upstream_path": "chemoinformatics/shape-similarity",
+      "score": 81,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 1,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    }
+  ],
   "out_of_scope": [
     {
       "id": "clawhub-installer",

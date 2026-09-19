@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**446 remaining** across 58 folders. 115 are already refined and live in `skills/`.
+**444 remaining** across 58 folders. 116 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 115 refined, 0 audited and excluded, 1 out of scope, 446 remaining.
+The source tree holds 562 Skills: 116 refined, 1 audited and excluded, 1 out of scope, 444 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -23,7 +23,6 @@ The source tree holds 562 Skills: 115 refined, 0 audited and excluded, 1 out of 
 | methylation-analysis | 10 | 0 |
 | structural-biology | 10 | 0 |
 | alternative-splicing | 9 | 0 |
-| chemoinformatics | 9 | 11 |
 | genome-assembly | 9 | 0 |
 | hi-c-analysis | 9 | 0 |
 | long-read-sequencing | 9 | 0 |
@@ -32,6 +31,7 @@ The source tree holds 562 Skills: 115 refined, 0 audited and excluded, 1 out of 
 | flow-cytometry | 8 | 0 |
 | genome-intervals | 8 | 0 |
 | metagenomics | 8 | 0 |
+| chemoinformatics | 7 | 12 |
 | genome-annotation | 7 | 0 |
 | imaging-mass-cytometry | 7 | 0 |
 | liquid-biopsy | 7 | 0 |
@@ -79,14 +79,13 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | --- | ---: | --- |
 | `bio-admet-prediction` | 86 | Limited Release |
 | `bio-causal-genomics-genetic-correlation` | 89 | Production Ready |
+| `bio-covalent-design` | 88 | Limited Release |
 | `bio-differential-expression-deseq2-basics` | 92 | Production Ready |
 | `bio-machine-learning-model-validation` | 93 | Limited Release |
 | `bio-machine-learning-prediction-explanation` | 89 | Limited Release |
-| `bio-microbiome-qiime2-workflow` | 92 | Production Ready |
 | `bio-molecular-descriptors` | 86 | Limited Release |
 | `bio-molecular-io` | 91 | Limited Release |
 | `bio-molecular-standardization` | 90 | Limited Release |
-| `bio-pharmacophore-modeling` | 86 | Production Ready |
 | `bio-qsar-modeling` | 88 | Limited Release |
 | `bio-scaffold-analysis` | 88 | Limited Release |
 | `bio-similarity-searching` | 90 | Limited Release |
@@ -136,6 +135,7 @@ fixed.
 
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
+| `bio-shape-similarity` | 81 | Limited Release | 1 |
 
 ## Out of scope
 
@@ -199,14 +199,12 @@ fixed.
 
 ### chemoinformatics
 
-- `bio-covalent-design` — `chemoinformatics/covalent-design`
 - `bio-free-energy-calculations` — `chemoinformatics/free-energy-calculations`
 - `bio-generative-design` — `chemoinformatics/generative-design`
 - `bio-ml-docking-rescoring` — `chemoinformatics/ml-docking-rescoring`
 - `bio-protac-degraders` — `chemoinformatics/protac-degraders`
 - `bio-reaction-enumeration` — `chemoinformatics/reaction-enumeration`
 - `bio-retrosynthesis` — `chemoinformatics/retrosynthesis`
-- `bio-shape-similarity` — `chemoinformatics/shape-similarity`
 - `bio-virtual-screening` — `chemoinformatics/virtual-screening`
 
 ### chip-seq

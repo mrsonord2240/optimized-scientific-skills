@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "d89e84a0a8222123302b8633b1869613b0e3ebfc"
+      "staging_commit": "0df43b5801d4a9f1705a43eb6434a9b8c95f8682"
     }
   },
   "skills": [
@@ -381,6 +381,22 @@
       "changed_files": [
         "SKILL.md",
         "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-covalent-design",
+      "upstream_path": "chemoinformatics/covalent-design",
+      "score": 88,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
       ]
     },
     {
@@ -1054,15 +1070,15 @@
     {
       "id": "bio-microbiome-qiime2-workflow",
       "upstream_path": "microbiome/qiime2-workflow",
-      "score": 92,
+      "score": 95,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-microbiome-qiime2-workflow.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md"
       ]
@@ -1272,8 +1288,8 @@
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-pharmacophore-modeling.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [

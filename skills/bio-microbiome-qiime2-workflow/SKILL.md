@@ -186,10 +186,10 @@ Export DROPS the QIIME2 wrapper and the provenance - the exported TSV has no his
 **Trigger:** feeding a `Phylogeny[Unrooted]` or a `FeatureData[Taxonomy]` where a `FeatureTable[Frequency]` is required. **Mechanism:** the type system refuses incompatible inputs at the interface boundary before running. **Symptom:** "expected an artifact of type ..." error. **Fix:** this is the guard WORKING; `qiime tools peek` to read the actual Type, then fix the UPSTREAM action that produced the wrong type - do not re-import to coerce it.
 
 ### Classifier / artifact version break across releases
-**Trigger:** a `silva-138-99-nb-classifier.qza` from 2024.x used under 2026.x. **Mechanism:** the sklearn naive-Bayes classifier is pinned to its scikit-learn version; provenance replay assumes recorded plugin versions. **Symptom:** scikit-learn version-mismatch warning/error, or refusal to load. **Fix:** download/train the classifier for YOUR release (the `data.qiime2.org/<release>/common/...` URLs are release-namespaced); retrain or pin the whole env if reusing an old one.
+**Trigger:** a `silva-138-99-nb-classifier.qza` from 2024.x used under 2026.x. **Mechanism:** the sklearn naive-Bayes classifier is pinned to its scikit-learn version; provenance replay assumes recorded plugin versions. **Symptom:** scikit-learn version-mismatch warning/error, or refusal to load. **Fix:** download/train the classifier for YOUR release (the `data.qiime2.org/<release>/common/...` URLs are release-namespaced); retrain or pin the whole env if reusing an old one. Do not hand-edit an artifact's embedded `metadata.yaml` to force a version match - the pinned pickled model object itself is what's incompatible, not just the recorded version string; retrain or redownload instead.
 
 ### Manifest Phred / format error on import
-**Trigger:** `Phred64V2` on modern Illumina, V1-vs-V2 manifest confusion, relative paths, or `SampleData[...]` for still-multiplexed EMP data. **Mechanism:** the Phred offset is baked into the format name and is applied without checking. **Symptom:** silently mis-decoded quality scores, or an import that "works" but `demux summarize` shows garbage qualities. **Fix:** modern Illumina = Phred33; V2 TSV manifests with absolute paths; `qiime demux summarize` immediately after import; EMP data needs `EMPPairedEndSequences` + `qiime demux`.
+**Trigger:** `Phred64V2` on modern Illumina, V1-vs-V2 manifest confusion, relative paths, or `SampleData[...]` for still-multiplexed EMP data. **Mechanism:** the Phred offset is baked into the format name and is applied without checking. **Symptom:** on real Illumina quality ranges, a hard crash at import time (`ValueError: Decoded Phred score is out of range [0, 62]`) is at least as likely as a silent mis-decode where the import "works" but `demux summarize` shows garbage qualities - which outcome you get depends on the actual quality byte range. **Fix:** modern Illumina = Phred33; V2 TSV manifests with absolute paths; `qiime demux summarize` immediately after import; EMP data needs `EMPPairedEndSequences` + `qiime demux`.
 
 ### A .qzv treated as data
 **Trigger:** trying to feed a `.qzv` into the next action. **Mechanism:** a Visualizer's output is terminal by the framework's type contract. **Symptom:** the action will not accept it as an input. **Fix:** keep and feed the `.qza` the Visualizer was MADE from; a `.qzv` is for viewing only (browser or view.qiime2.org).
@@ -206,7 +206,7 @@ Export DROPS the QIIME2 wrapper and the provenance - the exported TSV has no his
 |-----------|--------|-----------|
 | `--sampling-depth` (rarefaction depth) | -> diversity-analysis | required by `core-metrics`; pick from `alpha-rarefaction`, not a default - the 10000 in examples is a placeholder |
 | `--p-formula` integer columns annotated `categorical` | use.qiime2.org metadata reference | otherwise inferred numeric and used as a continuous covariate |
-| Phred offset = 33 (modern Illumina) | Illumina format history | Phred64 only for pre-2011 pipelines; wrong choice silently mis-decodes quality |
+| Phred offset = 33 (modern Illumina) | Illumina format history | Phred64 only for pre-2011 pipelines; wrong choice commonly raises a hard decode error at import, or silently mis-decodes quality |
 | Classifier release-match | Bokulich 2018 *Microbiome* 6:90 | the classifier is pinned to its scikit-learn version; cross-release reuse breaks |
 | denoise / taxonomy / DA tuning | -> the owning sibling skill | this skill owns no scientific thresholds by design |
 
@@ -218,7 +218,7 @@ Most scientific magic numbers live in the five sibling skills, not here - this s
 |-----------------|-------|----------|
 | "The scikit-learn version ... could not be found" / classifier won't load | classifier `.qza` trained under a different release | use the release-namespaced classifier or retrain under the current release |
 | "Argument ... is not a subtype of ..." / type error | wrong semantic type wired into an action | `qiime tools peek`; fix the upstream action, do not re-import |
-| `demux summarize` shows nonsense quality scores | wrong Phred offset in the import format name | re-import with `...Phred33V2`; modern Illumina is Phred33 |
+| `ValueError: Decoded Phred score is out of range` at import, or `demux summarize` shows nonsense quality scores | wrong Phred offset in the import format name | re-import with `...Phred33V2`; modern Illumina is Phred33 |
 | Import fails on the manifest | V1/V2 confusion, relative paths, wrong delimiter | V2 TSV, absolute paths, tab-separated header `sample-id` |
 | A `.qzv` rejected as an action input | Visualizations are terminal | feed the `.qza` it was made from |
 | Action treats an ID column as continuous | no `#q2:types` row | annotate the column `categorical`; validate with Keemei |
