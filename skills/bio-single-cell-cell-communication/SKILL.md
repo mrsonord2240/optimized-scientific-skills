@@ -17,6 +17,20 @@ Before using code patterns, verify installed versions match. If versions differ:
 If code throws ImportError, AttributeError, or TypeError, introspect the installed
 package and adapt the example to match the actual API rather than retrying.
 
+## Prerequisites
+
+```bash
+# Consensus + specificity (Python)
+pip install liana cellphonedb scanpy anndata
+```
+
+```r
+# Pathway probability + downstream activity (R)
+install.packages('Seurat')                         # CellChat and nichenetr build on Seurat objects
+devtools::install_github('jinworks/CellChat')      # repo moved from sqjin
+devtools::install_github('saeyslab/nichenetr')     # plus NicheNet model files from Zenodo
+```
+
 # Cell-Cell Communication Analysis
 
 **"Find which cell types signal to each other"** -> Score ligand-receptor pairs from co-expression in sender and receiver populations, rank them, and assess specificity or downstream effect.
@@ -65,7 +79,7 @@ In dissociated scRNA-seq, proximity is UNKNOWN - only spatial methods constrain 
 
 **Goal:** Rank ligand-receptor pairs robustly without committing to one method's estimand.
 
-**Approach:** Run LIANA's rank aggregation over many scoring functions on one input and one resource, then read BOTH the magnitude and specificity ranks (a pair can score high on one and low on the other). CCC needs >=2 cell types in `groupby`; a single group yields only autocrine self-edges, not intercellular signaling.
+**Approach:** Run LIANA's rank aggregation over many scoring functions on one input and one resource, then read BOTH the magnitude and specificity ranks (a pair can score high on one and low on the other). CCC needs >=2 cell types in `groupby`; a single group raises a `ValueError` (log2FC has no comparison group), not a silent autocrine-only result.
 
 ```python
 import liana as li
@@ -109,14 +123,22 @@ from cellphonedb.src.core.methods import cpdb_statistical_analysis_method
 
 # threshold=0.1: a gene must be expressed in >=10% of a cluster's cells to count
 # iterations=1000: label-permutation null; pvalue=0.05 reports per-pair significance
-results = cpdb_statistical_analysis_method.call(
-    cpdb_file_path='cellphonedb.zip',          # cellphonedb-data v5 release
-    meta_file_path='meta.tsv',                  # barcode -> cell_type
-    counts_file_path='counts_normalized.h5ad',  # normalized, NOT scaled
-    counts_data='hgnc_symbol',
-    threshold=0.1, iterations=1000, pvalue=0.05,
-    score_interactions=True, threads=4, output_path='cpdb_out')
-# DEG-driven escape from one-vs-rest: cpdb_degs_analysis_method.call(..., degs_file_path=...)
+# debug_seed fixes the permutation RNG for reproducible p-values (default -1 is unseeded)
+# score_interactions=True uses multiprocessing.Pool internally, so the __main__ guard below
+# is required on Windows -- without it the call crashes with RuntimeError
+def main():
+    results = cpdb_statistical_analysis_method.call(
+        cpdb_file_path='cellphonedb.zip',          # cellphonedb-data v5 release
+        meta_file_path='meta.tsv',                  # barcode -> cell_type
+        counts_file_path='counts_normalized.h5ad',  # normalized, NOT scaled
+        counts_data='hgnc_symbol',
+        threshold=0.1, iterations=1000, pvalue=0.05, debug_seed=1337,
+        score_interactions=True, threads=4, output_path='cpdb_out')
+    return results
+    # DEG-driven escape from one-vs-rest: cpdb_degs_analysis_method.call(..., degs_file_path=...)
+
+if __name__ == '__main__':
+    results = main()
 ```
 
 ## Pathway Probability (CellChat v2)
@@ -172,12 +194,37 @@ ligand_activities <- predict_ligand_activities(
 best_ligands <- ligand_activities %>% top_n(30, aupr_corrected) %>% arrange(-aupr_corrected) %>% pull(test_ligand)
 ```
 
+## Condition Comparison
+
+**Goal:** Identify which ligand-receptor pairs are gained or lost between two conditions without comparing raw, abundance/depth-confounded interaction counts (see Confounds table).
+
+**Approach:** Run the same consensus method independently on each condition's subset (same `resource_name`, same thresholds), then diff the robust sets rather than raw counts. A pair robust in one condition and absent from the other's robust set is a gained/lost candidate; report it alongside the underlying scores, not as a bare count. For a decomposition across many samples/conditions/time rather than a two-condition diff, feed each condition's LIANA output into Tensor-cell2cell instead (see Method Decision Table).
+
+```python
+import liana as li
+
+conditions = {'control': adata[adata.obs['condition'] == 'control'].copy(),
+              'stimulated': adata[adata.obs['condition'] == 'stimulated'].copy()}
+
+robust = {}
+for name, ad in conditions.items():
+    li.mt.rank_aggregate(ad, groupby='cell_type', resource_name='consensus',
+                         expr_prop=0.1, use_raw=False, n_perms=1000, verbose=False)
+    res = ad.uns['liana_res']
+    sig = res[(res['specificity_rank'] < 0.05) & (res['magnitude_rank'] < 0.05)]
+    robust[name] = set(sig.apply(lambda r: (r['source'], r['target'], r['ligand_complex'], r['receptor_complex']), axis=1))
+
+gained = robust['stimulated'] - robust['control']   # robust only in stimulated
+lost = robust['control'] - robust['stimulated']     # robust only in control
+```
+
 ## Threshold and Permutation Rationale
 
 | Parameter | Default | Rationale |
 |-----------|---------|-----------|
 | `expr_prop` / `threshold` | 0.10 | A gene expressed in <10% of a cluster is mostly dropout; below this, scores are noise - but real low-abundance signaling is also discarded (the "not necessary" side of the proxy) |
 | `n_perms` / `iterations` | 1000 | Stable label-permutation p-values; 100 is fine for exploration, 1000 for reporting; the p-value is about label shuffling, not binding |
+| `debug_seed` (CellPhoneDB) | 1337 | Default (`-1`) is unseeded: two identical runs flipped 252/120,375 (p<0.05) significance flags on marginal calls; set it explicitly for reproducible reporting, mirroring LIANA's own fixed `seed=1337` default |
 | `min.cells` (CellChat) | 10 | Populations under ~10 cells give unstable mean expression and inflated probabilities |
 | trimean (CellChat) | type='triMean' | 25% truncated mean is conservative, yielding fewer, higher-confidence calls than CellPhoneDB's mean |
 | `aupr_corrected` top-N | 30 | NicheNet ligand cutoff is a display choice, not a significance threshold; inspect the activity-score elbow |

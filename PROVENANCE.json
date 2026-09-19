@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "7315545ca5cc1e9a713b349b8f0431bdc8da8891"
+      "staging_commit": "fb4c87aba2ec681adbe6ee01bd2dba2f4480822e"
     }
   },
   "skills": [
@@ -1720,17 +1720,18 @@
     {
       "id": "bio-single-cell-cell-communication",
       "upstream_path": "single-cell/cell-communication",
-      "score": 86,
-      "grade": "Limited Release",
+      "score": 87,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-single-cell-cell-communication.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "usage-guide.md"
       ]
     },
     {

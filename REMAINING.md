@@ -92,7 +92,6 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-similarity-searching` | 90 | Limited Release |
 | `bio-single-cell-batch-integration` | 90 | Limited Release |
 | `bio-single-cell-cell-annotation` | 87 | Limited Release |
-| `bio-single-cell-cell-communication` | 86 | Limited Release |
 | `bio-single-cell-clustering` | 89 | Limited Release |
 | `bio-single-cell-differential-abundance` | 88 | Production Ready |
 | `bio-single-cell-doublet-detection` | 85 | Limited Release |

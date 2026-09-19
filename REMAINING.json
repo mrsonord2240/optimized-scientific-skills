@@ -1804,8 +1804,8 @@
       "deployable": false,
       "open_p0": 0,
       "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-single-cell-trajectory-inference.md",
+      "fix_pass": "done",
       "reaudit": "not needed"
     }
   ],
