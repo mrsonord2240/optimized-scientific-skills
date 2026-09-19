@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**462 remaining** across 59 folders. 99 are already refined and live in `skills/`.
+**461 remaining** across 59 folders. 100 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 99 refined, 0 audited and excluded, 1 out of scope, 462 remaining.
+The source tree holds 562 Skills: 100 refined, 0 audited and excluded, 1 out of scope, 461 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -25,12 +25,12 @@ The source tree holds 562 Skills: 99 refined, 0 audited and excluded, 1 out of s
 | single-cell | 10 | 7 |
 | structural-biology | 10 | 0 |
 | alternative-splicing | 9 | 0 |
-| database-access | 9 | 6 |
 | genome-assembly | 9 | 0 |
 | hi-c-analysis | 9 | 0 |
 | long-read-sequencing | 9 | 0 |
 | sequence-io | 9 | 0 |
 | clinical-databases | 8 | 4 |
+| database-access | 8 | 7 |
 | flow-cytometry | 8 | 0 |
 | genome-intervals | 8 | 0 |
 | metagenomics | 8 | 0 |
@@ -328,7 +328,6 @@ fixed.
 
 ### database-access
 
-- `bio-batch-downloads` — `database-access/batch-downloads`
 - `bio-blast-searches` — `database-access/blast-searches`
 - `bio-ensembl-rest` — `database-access/ensembl-rest`
 - `bio-geo-data` — `database-access/geo-data`

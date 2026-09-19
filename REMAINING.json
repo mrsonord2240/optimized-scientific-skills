@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 99,
+    "refined": 100,
     "audited_and_excluded": 0,
     "out_of_scope": 1,
-    "remaining": 462
+    "remaining": 461
   },
   "remaining": [
     {
@@ -105,10 +105,6 @@
     {
       "id": "bio-bam-statistics",
       "upstream_path": "alignment-files/bam-statistics"
-    },
-    {
-      "id": "bio-batch-downloads",
-      "upstream_path": "database-access/batch-downloads"
     },
     {
       "id": "bio-batch-processing",

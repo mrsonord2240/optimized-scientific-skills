@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "1332462"
+      "staging_commit": "4ed3e17"
     }
   },
   "skills": [
@@ -65,6 +65,25 @@
         "clipkit_trim.py",
         "selection-analysis-workflow.md",
         "specialist-trimmers.md",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-batch-downloads",
+      "upstream_path": "database-access/batch-downloads",
+      "score": 91,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": "fixes/bio-batch-downloads.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "batch_fasta.py",
+        "robust_download.py",
         "usage-guide.md"
       ]
     },
