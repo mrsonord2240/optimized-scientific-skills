@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**452 remaining** across 58 folders. 109 are already refined and live in `skills/`.
+**449 remaining** across 58 folders. 112 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 109 refined, 0 audited and excluded, 1 out of scope, 452 remaining.
+The source tree holds 562 Skills: 112 refined, 0 audited and excluded, 1 out of scope, 449 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -14,21 +14,21 @@ The source tree holds 562 Skills: 109 refined, 0 audited and excluded, 1 out of 
 | data-visualization | 20 | 0 |
 | comparative-genomics | 13 | 0 |
 | atac-seq | 12 | 0 |
-| chemoinformatics | 12 | 8 |
 | chip-seq | 12 | 0 |
 | clinical-biostatistics | 12 | 0 |
 | clip-seq | 12 | 0 |
 | spatial-transcriptomics | 12 | 0 |
 | copy-number | 11 | 0 |
 | alignment-files | 10 | 0 |
+| chemoinformatics | 10 | 10 |
 | methylation-analysis | 10 | 0 |
-| single-cell | 10 | 7 |
 | structural-biology | 10 | 0 |
 | alternative-splicing | 9 | 0 |
 | genome-assembly | 9 | 0 |
 | hi-c-analysis | 9 | 0 |
 | long-read-sequencing | 9 | 0 |
 | sequence-io | 9 | 0 |
+| single-cell | 9 | 8 |
 | clinical-databases | 8 | 4 |
 | flow-cytometry | 8 | 0 |
 | genome-intervals | 8 | 0 |
@@ -79,6 +79,7 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | --- | ---: | --- |
 | `bio-admet-prediction` | 86 | Limited Release |
 | `bio-causal-genomics-genetic-correlation` | 89 | Production Ready |
+| `bio-conformer-generation` | 86 | Limited Release |
 | `bio-differential-expression-deseq2-basics` | 92 | Production Ready |
 | `bio-machine-learning-model-validation` | 93 | Limited Release |
 | `bio-machine-learning-prediction-explanation` | 89 | Limited Release |
@@ -86,12 +87,14 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-molecular-descriptors` | 86 | Limited Release |
 | `bio-molecular-io` | 91 | Limited Release |
 | `bio-molecular-standardization` | 90 | Limited Release |
+| `bio-pose-validation` | 89 | Limited Release |
 | `bio-qsar-modeling` | 88 | Limited Release |
 | `bio-scaffold-analysis` | 88 | Limited Release |
 | `bio-similarity-searching` | 90 | Limited Release |
 | `bio-single-cell-batch-integration` | 90 | Limited Release |
 | `bio-single-cell-cell-annotation` | 87 | Limited Release |
 | `bio-single-cell-clustering` | 89 | Limited Release |
+| `bio-single-cell-data-io` | 86 | Limited Release |
 | `bio-single-cell-differential-abundance` | 88 | Production Ready |
 | `bio-single-cell-doublet-detection` | 85 | Limited Release |
 | `bio-single-cell-markers-annotation` | 88 | Production Ready |
@@ -198,13 +201,11 @@ fixed.
 
 ### chemoinformatics
 
-- `bio-conformer-generation` — `chemoinformatics/conformer-generation`
 - `bio-covalent-design` — `chemoinformatics/covalent-design`
 - `bio-free-energy-calculations` — `chemoinformatics/free-energy-calculations`
 - `bio-generative-design` — `chemoinformatics/generative-design`
 - `bio-ml-docking-rescoring` — `chemoinformatics/ml-docking-rescoring`
 - `bio-pharmacophore-modeling` — `chemoinformatics/pharmacophore-modeling`
-- `bio-pose-validation` — `chemoinformatics/pose-validation`
 - `bio-protac-degraders` — `chemoinformatics/protac-degraders`
 - `bio-reaction-enumeration` — `chemoinformatics/reaction-enumeration`
 - `bio-retrosynthesis` — `chemoinformatics/retrosynthesis`
@@ -638,7 +639,6 @@ fixed.
 
 - `bio-single-cell-cell-communication` — `single-cell/cell-communication`
 - `bio-single-cell-cnv-inference` — `single-cell/cnv-inference`
-- `bio-single-cell-data-io` — `single-cell/data-io`
 - `bio-single-cell-hashing-demultiplexing` — `single-cell/hashing-demultiplexing`
 - `bio-single-cell-lineage-tracing` — `single-cell/lineage-tracing`
 - `bio-single-cell-metabolite-communication` — `single-cell/metabolite-communication`

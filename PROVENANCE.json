@@ -367,6 +367,22 @@
       ]
     },
     {
+      "id": "bio-conformer-generation",
+      "upstream_path": "chemoinformatics/conformer-generation",
+      "score": 86,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "id": "bio-crispr-screens-bagel-essentiality",
       "upstream_path": "crispr-screens/bagel-essentiality",
       "score": 88,
@@ -1417,6 +1433,22 @@
       ]
     },
     {
+      "id": "bio-pose-validation",
+      "upstream_path": "chemoinformatics/pose-validation",
+      "score": 89,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "id": "bio-proteomics-data-import",
       "upstream_path": "proteomics/data-import",
       "score": 85.2,
@@ -1672,6 +1704,22 @@
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-16",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-single-cell-data-io",
+      "upstream_path": "single-cell/data-io",
+      "score": 86,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
