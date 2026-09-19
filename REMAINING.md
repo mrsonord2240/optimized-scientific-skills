@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**435 remaining** across 57 folders. 126 are already refined and live in `skills/`.
+**434 remaining** across 56 folders. 127 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 126 refined, 0 audited and excluded, 1 out of scope, 435 remaining.
+The source tree holds 562 Skills: 127 refined, 0 audited and excluded, 1 out of scope, 434 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -65,7 +65,6 @@ The source tree holds 562 Skills: 126 refined, 0 audited and excluded, 1 out of 
 | rna-quantification | 4 | 0 |
 | rna-structure | 4 | 0 |
 | crispr-screens | 3 | 12 |
-| causal-genomics | 1 | 10 |
 | proteomics | 1 | 8 |
 
 ## Promoted, fix pass still needed
@@ -78,6 +77,7 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | --- | ---: | --- |
 | `bio-admet-prediction` | 86 | Limited Release |
 | `bio-causal-genomics-genetic-correlation` | 89 | Production Ready |
+| `bio-causal-genomics-transcriptome-wide-association` | 80 | Limited Release |
 | `bio-differential-expression-deseq2-basics` | 92 | Production Ready |
 | `bio-machine-learning-model-validation` | 93 | Limited Release |
 | `bio-machine-learning-prediction-explanation` | 89 | Limited Release |
@@ -190,10 +190,6 @@ fixed.
 - `bio-atac-seq-motif-deviation` — `atac-seq/motif-deviation`
 - `bio-atac-seq-nucleosome-positioning` — `atac-seq/nucleosome-positioning`
 - `bio-atac-seq-single-cell-atac` — `atac-seq/single-cell-atac`
-
-### causal-genomics
-
-- `bio-causal-genomics-transcriptome-wide-association` — `causal-genomics/transcriptome-wide-association`
 
 ### chemoinformatics
 
