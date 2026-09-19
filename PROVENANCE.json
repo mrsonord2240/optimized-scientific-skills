@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "0776dc98d8bb65533c81a9afa8fb594aae0c2466"
+      "staging_commit": "7315545ca5cc1e9a713b349b8f0431bdc8da8891"
     }
   },
   "skills": [
@@ -369,17 +369,18 @@
     {
       "id": "bio-conformer-generation",
       "upstream_path": "chemoinformatics/conformer-generation",
-      "score": 86,
+      "score": 90,
       "grade": "Limited Release",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-conformer-generation.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "usage-guide.md"
       ]
     },
     {
@@ -1435,17 +1436,21 @@
     {
       "id": "bio-pose-validation",
       "upstream_path": "chemoinformatics/pose-validation",
-      "score": 89,
-      "grade": "Limited Release",
+      "score": 92.0,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-pose-validation.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "docked_pose.sdf",
+        "receptor.pdb",
+        "usage-guide.md",
+        "validate_poses.py"
       ]
     },
     {
@@ -1715,17 +1720,18 @@
     {
       "id": "bio-single-cell-data-io",
       "upstream_path": "single-cell/data-io",
-      "score": 86,
-      "grade": "Limited Release",
+      "score": 92,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-single-cell-data-io.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "usage-guide.md"
       ]
     },
     {

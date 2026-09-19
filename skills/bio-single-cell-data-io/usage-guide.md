@@ -6,20 +6,7 @@ This skill covers reading, writing, creating, and converting single-cell objects
 
 ## Prerequisites
 
-**Python (Scanpy/AnnData):**
-```bash
-pip install scanpy anndata
-# multimodal: pip install muon mudata
-```
-
-**R (Seurat + conversion):**
-```r
-install.packages('Seurat')
-# Conversion (prefer maintained tools; SeuratDisk is abandoned):
-remotes::install_github('scverse/anndataR')          # pure-R h5ad/zarr I/O + conversion
-BiocManager::install('zellkonverter')                # SCE <-> AnnData
-remotes::install_github('cellgeni/schard')           # robust pure-R h5ad reading
-```
+See SKILL.md's Installation section for install commands (Python: scanpy/anndata/muon; R: Seurat, anndataR, zellkonverter, schard).
 
 ## Quick Start
 
@@ -49,25 +36,7 @@ Tell the AI agent what is needed:
 
 > "Why did my gene and cell axes swap after conversion?"
 
-## What the Agent Will Do
-
-1. Identify the input format and whether the raw (unfiltered) 10X matrix is available
-2. Choose gene identifiers (Ensembl IDs for reproducibility) and whether to retain non-GEX features
-3. Read into AnnData or Seurat, placing counts/normalized/embeddings in conventional slots
-4. For conversion, select a maintained converter, apply the transpose, and remap metadata axes
-5. Diff slot inventories before and after conversion to confirm nothing was silently dropped
-6. Write to the appropriate format (h5ad/zarr/RDS/h5mu) and keep the original
-
-## Tips
-
-- **Keep the raw matrix** - EmptyDrops, SoupX, CellBender, and DecontX all need the unfiltered Cell Ranger output; filtered-only storage is irreversible.
-- **Filtered is not decontaminated** - Cell Ranger filtered output is cell-CALLED, not ambient-corrected; that is a separate step.
-- **Use gene IDs for joins** - gene symbols are non-unique and change across annotation releases; Ensembl IDs are stable.
-- **Mind the transpose** - AnnData is cells x genes; Seurat/SCE are genes x cells. Conversion transposes the matrix AND swaps which axis the metadata annotates.
-- **Conversion is lossy by default** - layers, obsp/varp, nested uns, and categoricals can vanish; diff slots before and after.
-- **Avoid SeuratDisk** - abandoned since 2023 and broken on Seurat v5; prefer anndataR, zellkonverter, or schard.
-- **Keep matrices sparse** - dense materialization of a large object exhausts memory; check `scipy.sparse.issparse(adata.X)`.
-- **Set drop_single_values=FALSE** - sceasy deletes constant metadata columns by default, losing single-sample batch labels.
+What the agent does and the traps it avoids (transpose, sparsity, lossy conversion, raw-vs-filtered) are in SKILL.md's Governing Principle, Common Errors, and API Defaults sections.
 
 ## Related Skills
 

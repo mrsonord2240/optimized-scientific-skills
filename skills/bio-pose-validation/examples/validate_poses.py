@@ -109,7 +109,15 @@ def pose_qc_pipeline(docked_sdf, receptor_pdb, strain_cutoff=None, ref_sdf=None)
 
 
 if __name__ == '__main__':
-    # Example usage (requires real SDF + PDB)
-    # results = pose_qc_pipeline('docked.sdf', 'receptor.pdb')
-    # print(results[['pose_idx', 'pb_valid', 'strain_kcal']])
-    print('Example: provide docked.sdf and receptor.pdb to run')
+    # Smoke test: a real AutoDock Vina redock of benzamidine into PDB 3PTB
+    # (trypsin, RCSB CC0) bundled under fixtures/. Swap in your own
+    # docked.sdf / receptor.pdb to adapt this to real data.
+    import os
+    fixtures = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fixtures')
+    docked_sdf = os.path.join(fixtures, 'docked_pose.sdf')
+    receptor_pdb = os.path.join(fixtures, 'receptor.pdb')
+
+    results = pose_qc_pipeline(docked_sdf, receptor_pdb)
+    print(results[['pose_idx', 'pb_valid', 'strain_kcal']])
+    assert bool(results['pb_valid'].iloc[0]) is True, 'expected the bundled fixture pose to be PB-valid'
+    print('OK: fixture pose is PB-valid, strain computed successfully.')

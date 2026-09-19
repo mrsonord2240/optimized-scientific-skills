@@ -6,11 +6,7 @@ Generate 3D conformer ensembles for molecules from 2D structures. Default to ETK
 
 ## Prerequisites
 
-```bash
-pip install rdkit
-# For CREST + GFN2-xTB (semi-empirical):
-conda install -c conda-forge xtb crest
-```
+See SKILL.md's Installation section (includes the Windows/CREST caveat).
 
 ## Quick Start
 
@@ -35,24 +31,8 @@ Tell the AI agent what to do:
 ### Docking input
 > "Generate a single low-energy ETKDGv3 + MMFF94 conformer for each SMILES; write to multi-SDF for downstream Vina docking."
 
-## What the Agent Will Do
-
-1. Parse SMILES, add hydrogens, embed initial 3D coordinates with ETKDGv3.
-2. Generate the requested number of conformers (using `EmbedMultipleConfs`).
-3. Optimize each conformer with MMFF94s; fall back to UFF only after checking parameter coverage, and record convergence failures.
-4. Compute energy of each conformer.
-5. Prune by RMSD and energy window.
-6. For macrocycles or complex molecules: optionally pipe to CREST + GFN2-xTB.
-7. Output: SDF / XYZ with conformer ensemble + energies + properties.
-
-## Tips
-
-- As a starting repository heuristic, use n_conf = max(10, 5 * NumRotatableBonds + 10), then increase sampling until the downstream metric is stable.
-- For docking and 3D descriptors, increase the ensemble until the downstream result is stable; fixed counts are only starting budgets.
-- Do not interpret raw MMFF/UFF energies as thermodynamic populations without validating the population model.
-- For macrocycles: use `useMacrocycleTorsions=True`; benchmark difficult cases with the higher-cost CREST workflow.
-- Set `randomSeed` for reproducibility.
-- Always `AddHs()` before embedding.
+For the step-by-step workflow, decision tree, n_conf heuristic, and per-method tips, see SKILL.md
+(its Decision Tree, Macrocycle Handling, and Common Errors sections cover all of this once).
 
 ## Related Skills
 

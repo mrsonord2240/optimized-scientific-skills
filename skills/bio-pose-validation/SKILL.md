@@ -8,6 +8,8 @@ license: MIT
 
 ## Version Compatibility
 
+Install: `pip install posebusters rdkit pandas`
+
 Reference examples tested with: PoseBusters 0.6+, RDKit 2024.09+, pandas 2.2+, posecheck 0.5+ (optional).
 
 Before using code patterns, verify installed versions match. If versions differ:
@@ -40,6 +42,8 @@ The thresholds below are the benchmark criteria reported by Buttenschoen et al. 
 | Volume overlap | vdW overlap with protein | < 7.5% of ligand vdW volume |
 | Minimum distance | No severe protein-ligand clash | Distance >= 0.75 times the sum of vdW radii |
 | Chirality | R/S preserved from input | Match input SMILES |
+
+Double-bond stereo, chirality, molecular formula, and molecular bond identity are reference checks: they only run when `mol_true` is supplied (`config='redock'`). Without a reference (`config='dock'`), those checks -- and RMSD -- are absent from the results, not merely unreported (verified against PoseBusters 0.6.5: `dock` returns 22 boolean columns, `redock` returns 28, the difference being `rmsd_<=_2å`, `mol_true_loaded`, `molecular_formula`, `molecular_bonds`, `double_bond_stereochemistry`, and `tetrahedral_chirality`).
 
 A pose passing ALL tests is "PB-valid". Combined PB-valid + RMSD <= 2 Å is the modern criterion.
 
@@ -74,7 +78,7 @@ Common configurations and their included checks are:
 | Config | Includes | When to use |
 |--------|----------|-------------|
 | `redock` | All checks + RMSD vs reference + protein vdW overlap | Self-docking benchmarks, retrospective validation |
-| `dock` | All checks except RMSD reference | Blind docking, prospective virtual screening |
+| `dock` | All non-reference checks; drops RMSD plus the four reference-dependent checks (molecular formula, molecular bonds, double-bond stereo, chirality) since those need `mol_true` | Blind docking, prospective virtual screening |
 | `mol` | Intra-ligand only (sanity, bonds, angles, rings, stereo, energy) | Conformer QC; no protein context |
 
 PoseBusters also ships additional and faster configurations in some releases. Treat the table as a workflow guide, not an exhaustive registry, and inspect the configurations available in the installed version.
@@ -211,7 +215,7 @@ def aromatic_planarity(mol):
     return max(deviations) if deviations else 0
 ```
 
-Aromatic ring deviation > 0.25 Å is implausible; flag.
+This reimplementation approximates PoseBusters' internal flatness computation; it does not reproduce it exactly. Verified against installed PoseBusters 0.6.5 (`aromatic_ring_flatness`) on a displacement series of the same pose: this formula's deviation reliably passes at 0.29 Å and reliably fails at 0.45 Å and above -- roughly double the 0.25 Å figure sometimes quoted for this check. Treat `bust()`'s own `aromatic_ring_flatness` column as authoritative for pass/fail; use this snippet only as a supplementary diagnostic, not a gate.
 
 ## Model-Specific Failure Diagnosis
 
@@ -272,6 +276,7 @@ def pose_qc_pipeline(docked_sdfs, receptor_pdb):
 | Strain calculation slow | Too many reference conformers | Reduce `n_ref` to 5-10 |
 | PoseBusters config error | Wrong or version-incompatible config name | Inspect the installed configuration registry; `redock`, `dock`, and `mol` are common configurations |
 | posecheck unavailable | Different tool, similar purpose | `pip install posecheck` for alternative |
+| Otherwise-reasonable pose rejected on one borderline check | Binary PB-valid used as an absolute reject | Use PoseBusters as a filter, not an absolute reject; inspect which check failed and by how much before discarding the pose |
 
 ## References
 

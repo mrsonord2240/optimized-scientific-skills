@@ -23,6 +23,21 @@ Generate 3D conformer ensembles for molecules from 2D structures. The choice of 
 
 For docking pose validation, see `chemoinformatics/pose-validation`. For free-energy methods (which require ensemble sampling), see `chemoinformatics/free-energy-calculations`.
 
+## Installation
+
+```bash
+pip install rdkit
+# For CREST + GFN2-xTB (semi-empirical):
+conda install -c conda-forge xtb crest
+```
+
+**Windows:** CREST publishes no Windows build anywhere upstream -- Linux/macOS binaries only, no
+`win-64` conda-forge package -- so `conda install crest` will not resolve on native Windows and
+invoking `crest` raises `FileNotFoundError`. `xtb` itself does ship a Windows build and works
+standalone. On native Windows, either run CREST under WSL, or skip CREST and use RDKit ETKDGv3
+macrocycle-aware embedding (see Macrocycle Handling) plus a standalone `xtb --opt` semi-empirical
+refinement in place of the full CREST metadynamics search.
+
 ## Conformer Method Taxonomy
 
 | Method | Cost / mol | Quality | Use case | Fails when |
@@ -65,6 +80,8 @@ from rdkit.Chem import AllChem
 
 def gen_conformers(smiles, n_conf=20, seed=42):
     mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        raise ValueError(f'Invalid SMILES: {smiles!r}')
     mol = Chem.AddHs(mol)
     params = AllChem.ETKDGv3()
     params.randomSeed = seed
@@ -75,6 +92,8 @@ def gen_conformers(smiles, n_conf=20, seed=42):
 ```
 
 `useRandomCoords=True` can improve convergence for macrocycles and highly flexible molecules. On an `EmbedParameters` object the documented limit is `maxIterations`; `maxAttempts` is only present in legacy positional overloads.
+
+A runnable reference implementation of this pipeline ships in `examples/gen_conformers.py`; there the equivalent functions are named `gen_conformer_ensemble` (this `gen_conformers`), `prune_rmsd` (this `prune_conformers_rmsd`, below), and `filter_energy_window` (this `filter_by_energy`, below) -- same operations, shorter names.
 
 ## Force-Field Optimization
 
@@ -195,6 +214,8 @@ For difficult macrocycles, CREST + GFN2-xTB is a useful higher-cost option; vali
 ## CREST + GFN2-xTB for High-Quality Sampling
 
 CREST (Pracht et al. 2024) performs iterative meta-dynamics + GFN2-xTB optimization for conformer sampling.
+
+**Platform:** CREST is Linux/macOS only -- no Windows build (see Installation). On native Windows, run it under WSL, or use the RDKit macrocycle-aware fallback above plus standalone `xtb --opt`.
 
 **Goal:** Sample high-quality conformer ensembles for macrocycles, peptides, or molecules where ETKDGv3 + MMFF94 is inadequate.
 

@@ -23,6 +23,21 @@ package and adapt the example to match the actual API rather than retrying.
 - Python: `sc.read_10x_mtx()` / `sc.read_10x_h5()` -> AnnData
 - R: `Read10X()` / `Read10X_h5()` -> `CreateSeuratObject()`
 
+## Installation
+
+```bash
+pip install scanpy anndata
+# multimodal: pip install muon mudata
+```
+
+```r
+install.packages('Seurat')
+# Conversion (prefer maintained tools; SeuratDisk is abandoned):
+remotes::install_github('scverse/anndataR')          # pure-R h5ad/zarr I/O + conversion; requires R >= 4.5
+BiocManager::install('zellkonverter')                # SCE <-> AnnData
+remotes::install_github('cellgeni/schard')           # robust pure-R h5ad reading
+```
+
 ## Governing Principle
 
 The dominant failure in single-cell I/O is not a crash; it is a silent semantic change to the matrix during read or conversion. Three traps drive almost every lost-data bug.
@@ -112,9 +127,9 @@ Seurat v5 stores `counts`/`data`/`scale.data` as layers in an `Assay5`; v4 used 
 
 | Tool | Direction | Maintained 2026 | Use when |
 |------|-----------|-----------------|----------|
-| anndataR | AnnData <-> SCE <-> Seurat; h5ad+zarr R/W | Yes (v1.2.0, pure R, no Python) | First choice for R-native, Python-free h5ad/zarr I/O and conversion |
-| zellkonverter | AnnData <-> SCE | Yes (Bioc 3.23) | Mature SCE<->AnnData; robust Python reader with pinned anndata |
-| schard | h5ad -> Seurat/SCE (read-only) | Yes | Robust pure-R READING of h5ad (SeuratDisk replacement) |
+| anndataR | AnnData <-> SCE <-> Seurat; h5ad+zarr R/W | Yes (v1.2.0, pure R, no Python) | First choice for R-native, Python-free h5ad/zarr I/O and conversion. Requires R >= 4.5 (`getRversion()`); falls back to zellkonverter/schard on R 4.4 |
+| zellkonverter | AnnData <-> SCE | Yes (Bioc 3.23) | Mature SCE<->AnnData; robust Python reader with pinned anndata. `raw=TRUE` can silently fail to populate `altExp` on h5ad written by current anndata (0.13.x) -- verify with `length(altExpNames(sce)) > 0`; if empty, use schard's `use.raw=TRUE` below |
+| schard | h5ad -> Seurat/SCE (read-only) | Yes | Robust pure-R READING of h5ad (SeuratDisk replacement); the reliable route to recover `.raw` when zellkonverter's `raw=TRUE` fails (`use.raw=TRUE`). Reads `X` only -- does not carry a `counts` layer; pair with zellkonverter or reattach the counts matrix manually if one is needed downstream |
 | anndata2ri | AnnData <-> SCE (rpy2) | Yes | Live mixed Python+R sessions / Jupyter `%%R` |
 | sceasy | everything -> AnnData hub | Aging | Quick one-call conversion (mind `drop_single_values` data loss) |
 | SeuratDisk | AnnData <-> h5Seurat | NO (last commit 2023, broken on Seurat v5) | Avoid for new work; legacy only |
@@ -128,7 +143,28 @@ seurat_obj <- adata$to_Seurat()
 # library(zellkonverter); sce <- readH5AD('data.h5ad'); writeH5AD(sce, 'out.h5ad')
 ```
 
-zellkonverter maps asymmetrically: `obsm`->`reducedDims`, `varm`->a `rowData` matrix column (NOT reducedDims), `obsp`/`varp`->`colPairs`/`rowPairs`, `uns`->`metadata()` (lossy), and `raw`->`altExp(sce,'raw')` only when `raw=TRUE` (default FALSE). sceasy's `drop_single_values=TRUE` silently deletes every obs/var column with one unique value (a one-sample object loses its constant batch/condition label), so set `FALSE`.
+**Recovering `.raw`.** `zellkonverter::readH5AD(reader='R', raw=TRUE)` is the documented route but is unreliable: verified against a real h5ad with a genuine `.raw` group (anndata 0.13.x write, zellkonverter 1.16.0), it returns an SCE with `altExpNames` empty -- the `.raw` group exists in the file but the R-side reader does not surface it. `schard::h5ad2sce(path, use.raw=TRUE)` reliably recovers it instead:
+
+```r
+library(schard)
+sce_raw <- schard::h5ad2sce('data.h5ad', use.raw = TRUE)   # full-gene raw snapshot
+sce_hvg <- schard::h5ad2sce('data.h5ad', use.raw = FALSE)  # default: X as stored (e.g. HVG-subsetted)
+length(SingleCellExperiment::altExpNames(sce_hvg))          # runnable "diff slot inventories" check for zellkonverter's raw=TRUE -- 0 means it silently failed
+```
+
+**Seurat -> h5ad.** No tool converts this direction directly; the route below is `as.SingleCellExperiment()` + `zellkonverter::writeH5AD()`, verified end to end on a real Seurat 5.5.0 PBMC object (h5ad reloaded correctly in Python):
+
+```r
+library(Seurat)
+library(zellkonverter)
+
+sce <- as.SingleCellExperiment(seurat_obj)   # counts -> counts, data -> logcounts, reductions -> reducedDims
+writeH5AD(sce, 'out.h5ad')
+```
+
+`scale.data` is silently dropped by `as.SingleCellExperiment()`: a Seurat object with `counts`/`data`/`scale.data` layers keeps only `counts`/`logcounts` (`assayNames(sce)`), and the resulting h5ad has no trace of `scale.data` after reload in Python. Reductions (e.g. PCA) survive into `obsm`. Save `scale.data` separately first if it is needed downstream: `as.matrix(LayerData(seurat_obj, layer='scale.data'))`.
+
+zellkonverter maps asymmetrically: `obsm`->`reducedDims`, `varm`->a `rowData` matrix column (NOT reducedDims), `obsp`/`varp`->`colPairs`/`rowPairs`, `uns`->`metadata()` (lossy). sceasy's `drop_single_values=TRUE` silently deletes every obs/var column with one unique value (a one-sample object loses its constant batch/condition label), so set `FALSE`.
 
 ## API Defaults That Surprise
 
@@ -147,7 +183,7 @@ zellkonverter maps asymmetrically: `obsm`->`reducedDims`, `varm`->a `rowData` ma
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | Converted object has genes and cells swapped | Transpose not applied (or applied without swapping metadata axis) | Transpose the matrix AND move `obs`<->col-meta, `var`<->row-meta |
-| Layers / embeddings / `raw` missing after conversion | Lossy converter dropped non-`X` slots | Diff slot inventories; use anndataR/zellkonverter; re-attach manually |
+| Layers / embeddings / `raw` missing after conversion | Lossy converter dropped non-`X` slots | Diff slot inventories; for `.raw` specifically use `schard::h5ad2sce(use.raw=TRUE)`, not zellkonverter's `raw=TRUE` (unreliable, see Converting section); re-attach other slots manually |
 | Cannot run EmptyDrops/SoupX/CellBender | Only the filtered matrix was kept | Re-obtain and store the RAW (unfiltered) Cell Ranger matrix |
 | ADT/guide counts absent after loading 10X | `gex_only=True` (default) dropped non-GEX features | Reload with `gex_only=False`, split by `var['feature_types']` |
 | Kernel/session dies reading a large object | Dense materialization of a sparse matrix | Keep sparse; use `backed='r'` (Python) or BPCells/on-disk layers (Seurat v5) |
