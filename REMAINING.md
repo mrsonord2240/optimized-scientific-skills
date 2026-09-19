@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**456 remaining** across 59 folders. 105 are already refined and live in `skills/`.
+**457 remaining** across 59 folders. 104 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 105 refined, 0 audited and excluded, 1 out of scope, 456 remaining.
+The source tree holds 562 Skills: 104 refined, 0 audited and excluded, 1 out of scope, 457 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -33,6 +33,7 @@ The source tree holds 562 Skills: 105 refined, 0 audited and excluded, 1 out of 
 | flow-cytometry | 8 | 0 |
 | genome-intervals | 8 | 0 |
 | metagenomics | 8 | 0 |
+| database-access | 7 | 8 |
 | genome-annotation | 7 | 0 |
 | imaging-mass-cytometry | 7 | 0 |
 | liquid-biopsy | 7 | 0 |
@@ -40,7 +41,6 @@ The source tree holds 562 Skills: 105 refined, 0 audited and excluded, 1 out of 
 | sequence-manipulation | 7 | 0 |
 | systems-biology | 7 | 0 |
 | variant-calling | 7 | 6 |
-| database-access | 6 | 9 |
 | ecological-genomics | 6 | 0 |
 | gene-regulatory-networks | 6 | 0 |
 | immunoinformatics | 6 | 0 |
@@ -114,7 +114,6 @@ Changed in staging after their latest audit, so the score below describes earlie
 | `bio-clinical-databases-dbsnp-queries` | 86 | 2026-09-15 |
 | `bio-clinical-databases-gnomad-frequencies` | 86 | 2026-09-15 |
 | `bio-clinical-databases-myvariant-queries` | 84 | 2026-09-15 |
-| `bio-geo-data` | 84 | 2026-09-19 |
 | `bio-phylo-bayesian-inference` | 87 | 2026-09-15 |
 | `bio-phylo-distance-calculations` | 87 | 2026-09-15 |
 | `bio-phylo-divergence-dating` | 87 | 2026-09-15 |
@@ -332,6 +331,7 @@ fixed.
 
 - `bio-blast-searches` — `database-access/blast-searches`
 - `bio-ensembl-rest` — `database-access/ensembl-rest`
+- `bio-geo-data` — `database-access/geo-data`
 - `bio-interaction-databases` — `database-access/interaction-databases`
 - `bio-ncbi-datasets-cli` — `database-access/ncbi-datasets-cli`
 - `bio-ortholog-inference` — `database-access/ortholog-inference`

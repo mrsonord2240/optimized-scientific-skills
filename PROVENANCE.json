@@ -741,22 +741,6 @@
       ]
     },
     {
-      "id": "bio-geo-data",
-      "upstream_path": "database-access/geo-data",
-      "score": 84,
-      "grade": "Limited Release",
-      "deployable": true,
-      "open_p0": 0,
-      "audited_on": "2026-09-19",
-      "fix_log": "fixes/bio-geo-data.md",
-      "fix_pass": "done",
-      "reaudit": "needed",
-      "relative_to_upstream": "licence-declaration-only",
-      "changed_files": [
-        "SKILL.md"
-      ]
-    },
-    {
       "id": "bio-local-blast",
       "upstream_path": "database-access/local-blast",
       "score": 93,
