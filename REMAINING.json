@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 120,
-    "audited_and_excluded": 0,
+    "refined": 121,
+    "audited_and_excluded": 2,
     "out_of_scope": 1,
-    "remaining": 441
+    "remaining": 438
   },
   "remaining": [
     {
@@ -1343,14 +1343,6 @@
       "upstream_path": "sequence-io/sequence-statistics"
     },
     {
-      "id": "bio-single-cell-hashing-demultiplexing",
-      "upstream_path": "single-cell/hashing-demultiplexing"
-    },
-    {
-      "id": "bio-single-cell-lineage-tracing",
-      "upstream_path": "single-cell/lineage-tracing"
-    },
-    {
       "id": "bio-single-cell-metabolite-communication",
       "upstream_path": "single-cell/metabolite-communication"
     },
@@ -1599,10 +1591,6 @@
       "upstream_path": "variant-calling/structural-variant-calling"
     },
     {
-      "id": "bio-virtual-screening",
-      "upstream_path": "chemoinformatics/virtual-screening"
-    },
-    {
       "id": "bio-workflow-management-cwl-workflows",
       "upstream_path": "workflow-management/cwl-workflows"
     },
@@ -1775,7 +1763,32 @@
       "upstream_path": "sequence-io/write-sequences"
     }
   ],
-  "excluded": [],
+  "excluded": [
+    {
+      "id": "bio-single-cell-hashing-demultiplexing",
+      "upstream_path": "single-cell/hashing-demultiplexing",
+      "score": 78,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 1,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-single-cell-lineage-tracing",
+      "upstream_path": "single-cell/lineage-tracing",
+      "score": 77,
+      "grade": "Reject",
+      "deployable": false,
+      "open_p0": 2,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    }
+  ],
   "out_of_scope": [
     {
       "id": "clawhub-installer",

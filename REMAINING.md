@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**441 remaining** across 58 folders. 120 are already refined and live in `skills/`.
+**438 remaining** across 58 folders. 121 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 120 refined, 0 audited and excluded, 1 out of scope, 441 remaining.
+The source tree holds 562 Skills: 121 refined, 2 audited and excluded, 1 out of scope, 438 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -38,7 +38,6 @@ The source tree holds 562 Skills: 120 refined, 0 audited and excluded, 1 out of 
 | sequence-manipulation | 7 | 0 |
 | systems-biology | 7 | 0 |
 | variant-calling | 7 | 6 |
-| chemoinformatics | 6 | 14 |
 | ecological-genomics | 6 | 0 |
 | gene-regulatory-networks | 6 | 0 |
 | immunoinformatics | 6 | 0 |
@@ -49,6 +48,7 @@ The source tree holds 562 Skills: 120 refined, 0 audited and excluded, 1 out of 
 | tcr-bcr-analysis | 6 | 0 |
 | temporal-genomics | 6 | 0 |
 | alignment | 5 | 2 |
+| chemoinformatics | 5 | 15 |
 | database-access | 5 | 10 |
 | differential-expression | 5 | 1 |
 | epidemiological-genomics | 5 | 0 |
@@ -57,7 +57,6 @@ The source tree holds 562 Skills: 120 refined, 0 audited and excluded, 1 out of 
 | genome-engineering | 5 | 0 |
 | multi-omics-integration | 5 | 0 |
 | restriction-analysis | 5 | 0 |
-| single-cell | 5 | 12 |
 | workflow-management | 5 | 0 |
 | machine-learning | 4 | 2 |
 | phasing-imputation | 4 | 0 |
@@ -66,6 +65,7 @@ The source tree holds 562 Skills: 120 refined, 0 audited and excluded, 1 out of 
 | rna-quantification | 4 | 0 |
 | rna-structure | 4 | 0 |
 | crispr-screens | 3 | 12 |
+| single-cell | 3 | 12 |
 | causal-genomics | 1 | 10 |
 | proteomics | 1 | 8 |
 
@@ -97,6 +97,7 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-single-cell-markers-annotation` | 88 | Production Ready |
 | `bio-single-cell-preprocessing` | 85 | Limited Release |
 | `bio-substructure-search` | 88 | Limited Release |
+| `bio-virtual-screening` | 86 | Limited Release |
 | `bio-workflows-scrnaseq-pipeline` | 85 | Limited Release |
 
 ## Promoted, re-audit still needed
@@ -135,6 +136,8 @@ fixed.
 
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
+| `bio-single-cell-hashing-demultiplexing` | 78 | Limited Release | 1 |
+| `bio-single-cell-lineage-tracing` | 77 | Reject | 2 |
 
 ## Out of scope
 
@@ -203,7 +206,6 @@ fixed.
 - `bio-ml-docking-rescoring` — `chemoinformatics/ml-docking-rescoring`
 - `bio-reaction-enumeration` — `chemoinformatics/reaction-enumeration`
 - `bio-retrosynthesis` — `chemoinformatics/retrosynthesis`
-- `bio-virtual-screening` — `chemoinformatics/virtual-screening`
 
 ### chip-seq
 
@@ -630,8 +632,6 @@ fixed.
 
 ### single-cell
 
-- `bio-single-cell-hashing-demultiplexing` — `single-cell/hashing-demultiplexing`
-- `bio-single-cell-lineage-tracing` — `single-cell/lineage-tracing`
 - `bio-single-cell-metabolite-communication` — `single-cell/metabolite-communication`
 - `bio-single-cell-perturb-seq` — `single-cell/perturb-seq`
 - `bio-single-cell-scatac-analysis` — `single-cell/scatac-analysis`
