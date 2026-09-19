@@ -1785,6 +1785,22 @@
       ]
     },
     {
+      "id": "bio-single-cell-cnv-inference",
+      "upstream_path": "single-cell/cnv-inference",
+      "score": 87,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "id": "bio-single-cell-data-io",
       "upstream_path": "single-cell/data-io",
       "score": 92,
