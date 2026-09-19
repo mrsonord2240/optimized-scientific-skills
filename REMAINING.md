@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**461 remaining** across 59 folders. 100 are already refined and live in `skills/`.
+**460 remaining** across 59 folders. 101 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 100 refined, 0 audited and excluded, 1 out of scope, 461 remaining.
+The source tree holds 562 Skills: 101 refined, 0 audited and excluded, 1 out of scope, 460 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -44,7 +44,6 @@ The source tree holds 562 Skills: 100 refined, 0 audited and excluded, 1 out of 
 | ecological-genomics | 6 | 0 |
 | gene-regulatory-networks | 6 | 0 |
 | immunoinformatics | 6 | 0 |
-| microbiome | 6 | 0 |
 | population-genetics | 6 | 1 |
 | reporting | 6 | 0 |
 | ribo-seq | 6 | 0 |
@@ -57,6 +56,7 @@ The source tree holds 562 Skills: 100 refined, 0 audited and excluded, 1 out of 
 | epitranscriptomics | 5 | 0 |
 | expression-matrix | 5 | 0 |
 | genome-engineering | 5 | 0 |
+| microbiome | 5 | 1 |
 | multi-omics-integration | 5 | 0 |
 | restriction-analysis | 5 | 0 |
 | workflow-management | 5 | 0 |
@@ -525,7 +525,6 @@ fixed.
 
 ### microbiome
 
-- `bio-microbiome-amplicon-processing` — `microbiome/amplicon-processing`
 - `bio-microbiome-differential-abundance` — `microbiome/differential-abundance`
 - `bio-microbiome-diversity-analysis` — `microbiome/diversity-analysis`
 - `bio-microbiome-functional-prediction` — `microbiome/functional-prediction`
