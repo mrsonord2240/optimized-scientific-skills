@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**446 remaining** across 58 folders. 114 are already refined and live in `skills/`.
+**446 remaining** across 58 folders. 115 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 114 refined, 1 audited and excluded, 1 out of scope, 446 remaining.
+The source tree holds 562 Skills: 115 refined, 0 audited and excluded, 1 out of scope, 446 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -37,7 +37,7 @@ The source tree holds 562 Skills: 114 refined, 1 audited and excluded, 1 out of 
 | liquid-biopsy | 7 | 0 |
 | read-qc | 7 | 0 |
 | sequence-manipulation | 7 | 0 |
-| single-cell | 7 | 9 |
+| single-cell | 7 | 10 |
 | systems-biology | 7 | 0 |
 | variant-calling | 7 | 6 |
 | ecological-genomics | 6 | 0 |
@@ -136,7 +136,6 @@ fixed.
 
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
-| `bio-single-cell-trajectory-inference` | 84 | Beta Only | 0 |
 
 ## Out of scope
 

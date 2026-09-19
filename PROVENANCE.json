@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "fb4c87aba2ec681adbe6ee01bd2dba2f4480822e"
+      "staging_commit": "d89e84a0a8222123302b8633b1869613b0e3ebfc"
     }
   },
   "skills": [
@@ -1829,6 +1829,24 @@
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-single-cell-trajectory-inference",
+      "upstream_path": "single-cell/trajectory-inference",
+      "score": 92,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": "fixes/bio-single-cell-trajectory-inference.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "scvelo_velocity.py",
+        "usage-guide.md"
       ]
     },
     {
