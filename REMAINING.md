@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**456 remaining** across 59 folders. 105 are already refined and live in `skills/`.
+**455 remaining** across 59 folders. 106 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 105 refined, 0 audited and excluded, 1 out of scope, 456 remaining.
+The source tree holds 562 Skills: 106 refined, 0 audited and excluded, 1 out of scope, 455 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -40,7 +40,6 @@ The source tree holds 562 Skills: 105 refined, 0 audited and excluded, 1 out of 
 | sequence-manipulation | 7 | 0 |
 | systems-biology | 7 | 0 |
 | variant-calling | 7 | 6 |
-| database-access | 6 | 9 |
 | ecological-genomics | 6 | 0 |
 | gene-regulatory-networks | 6 | 0 |
 | immunoinformatics | 6 | 0 |
@@ -51,6 +50,7 @@ The source tree holds 562 Skills: 105 refined, 0 audited and excluded, 1 out of 
 | tcr-bcr-analysis | 6 | 0 |
 | temporal-genomics | 6 | 0 |
 | alignment | 5 | 2 |
+| database-access | 5 | 10 |
 | differential-expression | 5 | 1 |
 | epidemiological-genomics | 5 | 0 |
 | epitranscriptomics | 5 | 0 |
@@ -331,7 +331,6 @@ fixed.
 - `bio-blast-searches` — `database-access/blast-searches`
 - `bio-ensembl-rest` — `database-access/ensembl-rest`
 - `bio-interaction-databases` — `database-access/interaction-databases`
-- `bio-ncbi-datasets-cli` — `database-access/ncbi-datasets-cli`
 - `bio-ortholog-inference` — `database-access/ortholog-inference`
 - `bio-uniprot-access` — `database-access/uniprot-access`
 

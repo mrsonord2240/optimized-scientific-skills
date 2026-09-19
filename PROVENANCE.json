@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "339f73efbc330ab7478bdf285fd5140c0b80f7a5"
+      "staging_commit": "7644996d50c764115eccfe29490b2536605dd449"
     }
   },
   "skills": [
@@ -1061,6 +1061,26 @@
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-ncbi-datasets-cli",
+      "upstream_path": "database-access/ncbi-datasets-cli",
+      "score": 87.8,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": "fixes/bio-ncbi-datasets-cli.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "bulk_dehydrated.sh",
+        "download_genome.sh",
+        "gene_metadata.sh",
+        "usage-guide.md"
       ]
     },
     {
