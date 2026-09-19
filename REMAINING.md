@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**454 remaining** across 59 folders. 107 are already refined and live in `skills/`.
+**453 remaining** across 59 folders. 108 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 107 refined, 0 audited and excluded, 1 out of scope, 454 remaining.
+The source tree holds 562 Skills: 108 refined, 0 audited and excluded, 1 out of scope, 453 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -66,8 +66,8 @@ The source tree holds 562 Skills: 107 refined, 0 audited and excluded, 1 out of 
 | rna-quantification | 4 | 0 |
 | rna-structure | 4 | 0 |
 | crispr-screens | 3 | 12 |
-| microbiome | 2 | 4 |
 | causal-genomics | 1 | 10 |
+| microbiome | 1 | 5 |
 | proteomics | 1 | 8 |
 
 ## Promoted, fix pass still needed
@@ -523,7 +523,6 @@ fixed.
 ### microbiome
 
 - `bio-microbiome-qiime2-workflow` — `microbiome/qiime2-workflow`
-- `bio-microbiome-taxonomy-assignment` — `microbiome/taxonomy-assignment`
 
 ### multi-omics-integration
 
