@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "7b1e6b9"
+      "staging_commit": "1332462"
     }
   },
   "skills": [
@@ -591,6 +591,25 @@
         "SKILL.md",
         "fetch_pubmed.py",
         "fetch_summaries.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-entrez-link",
+      "upstream_path": "database-access/entrez-link",
+      "score": 90.5,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": "fixes/bio-entrez-link.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "basic_linking.py",
+        "discover_links.py",
         "usage-guide.md"
       ]
     },
