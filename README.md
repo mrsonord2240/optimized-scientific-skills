@@ -28,8 +28,8 @@ justified.
 | Skills in this repository | **98** |
 | substantively modified by us, each with a fix log | 78 |
 | unmodified apart from a declared `license: MIT` | 20 |
-| **fix pass still needed** (first audit only, whatever the score) | **21** |
-| **re-audit still needed** (changed after their latest audit) | **22** |
+| **fix pass still needed** (first audit only, whatever the score) | **20** |
+| **re-audit still needed** (changed after their latest audit) | **21** |
 | audit coverage | **100%** |
 
 Each Skill carries a score and grade from a skill-auditor run that executed the Skill's own code against

@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**463 remaining** across 59 folders. 98 are already refined and live in `skills/`.
+**462 remaining** across 59 folders. 98 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 98 refined, 0 audited and excluded, 1 out of scope, 463 remaining.
+The source tree holds 562 Skills: 98 refined, 1 audited and excluded, 1 out of scope, 462 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -21,11 +21,11 @@ The source tree holds 562 Skills: 98 refined, 0 audited and excluded, 1 out of s
 | spatial-transcriptomics | 12 | 0 |
 | copy-number | 11 | 0 |
 | alignment-files | 10 | 0 |
-| database-access | 10 | 5 |
 | methylation-analysis | 10 | 0 |
 | single-cell | 10 | 7 |
 | structural-biology | 10 | 0 |
 | alternative-splicing | 9 | 0 |
+| database-access | 9 | 5 |
 | genome-assembly | 9 | 0 |
 | hi-c-analysis | 9 | 0 |
 | long-read-sequencing | 9 | 0 |
@@ -120,7 +120,6 @@ Changed in staging after their latest audit, so the score below describes earlie
 | `bio-phylo-species-trees` | 86 | 2026-09-15 |
 | `bio-phylo-tree-io` | 88 | 2026-09-15 |
 | `bio-phylo-tree-manipulation` | 86 | 2026-09-15 |
-| `bio-phylo-tree-visualization` | 84 | 2026-09-15 |
 | `bio-population-genetics-rare-variant-association` | 89 | 2026-09-15 |
 | `bio-variant-annotation` | 86 | 2026-09-15 |
 | `bio-variant-calling-filtering-best-practices` | 88 | 2026-09-15 |
@@ -136,6 +135,7 @@ fixed.
 
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
+| `bio-entrez-link` | 80 | Beta Only | 1 |
 
 ## Out of scope
 
@@ -332,7 +332,6 @@ fixed.
 - `bio-batch-downloads` — `database-access/batch-downloads`
 - `bio-blast-searches` — `database-access/blast-searches`
 - `bio-ensembl-rest` — `database-access/ensembl-rest`
-- `bio-entrez-link` — `database-access/entrez-link`
 - `bio-geo-data` — `database-access/geo-data`
 - `bio-interaction-databases` — `database-access/interaction-databases`
 - `bio-ncbi-datasets-cli` — `database-access/ncbi-datasets-cli`

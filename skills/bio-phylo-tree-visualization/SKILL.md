@@ -132,9 +132,12 @@ import re
 
 tree.root_with_outgroup({'name': 'OutA'}, {'name': 'OutB'})   # root BEFORE any common_ancestor call -- see tree-manipulation
 
+intended_tips = {'Homo_sapiens', 'Pan_troglodytes', 'Gorilla_gorilla', 'Pongo_abelii'}   # the clade you actually mean
 mrca = tree.common_ancestor({'name': 'Homo_sapiens'}, {'name': 'Pongo_abelii'})
-mrca_tips = sorted(t.name for t in mrca.get_terminals())
-print('MRCA tips:', mrca_tips)                 # check this against the clade you meant BEFORE trusting the color
+mrca_tips = set(t.name for t in mrca.get_terminals())
+if mrca_tips != intended_tips:                 # FAIL LOUDLY -- do not silently color the wrong clade
+    raise ValueError(f'MRCA gave {sorted(mrca_tips)}, not the intended clade {sorted(intended_tips)} '
+                      f'-- check the outgroup/rooting and the tip names passed to common_ancestor')
 mrca.color = 'red'
 
 for clade in tree.get_nonterminals():          # clear raw support strings so they are not drawn as node labels
@@ -258,7 +261,7 @@ Lock the branch-length scale; do not let the figure engine non-uniformly stretch
 | BEAST HPD bars absent from a Python figure | drew an annotated tree with Bio.Phylo | route through treeio `read.beast` + ggtree `geom_range` |
 | Figure not saving / blank | `do_show=True` opens a window instead of writing | pass `do_show=False`, then `fig.savefig(...)` |
 | Branch colors not appearing | color set on a tip or the wrong clade | set `clade.color` on the MRCA clade (inherits to descendants); `as_phyloxml()` is only needed for phyloXML export |
-| Color covers far more of the tree than the intended clade | `common_ancestor` called before rooting, so the MRCA of two intended-clade tips is the basal node of an arbitrarily-rooted read | root on an outgroup (tree-manipulation) first, then print and check `mrca.get_terminals()` before coloring |
+| Color covers far more of the tree than the intended clade | `common_ancestor` called before rooting, so the MRCA of two intended-clade tips is the basal node of an arbitrarily-rooted read | root on an outgroup (tree-manipulation) first, then compare `mrca.get_terminals()` against the tip set you meant and raise if they don't match, before coloring |
 | Support labels missing on an IQ-TREE tree | `SH-aLRT/UFBoot` label kept in `clade.name`, `confidence` None | parse `clade.name` as in the support recipe; warn when no clade has support |
 | HPD bars shifted off the annotated interval | ggtree `geom_range` default `center = 'auto'` | `geom_range('height_0.95_HPD', center = 'height')` |
 | Labels overlap into a black band | too many tips for rectangular layout | increase panel height, rotate labels, or switch to circular/iTOL |

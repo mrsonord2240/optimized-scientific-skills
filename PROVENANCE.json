@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "03f50579746751de1c42969a9ae48b26d1faa80f"
+      "staging_commit": "7b1e6b9"
     }
   },
   "skills": [
@@ -1201,14 +1201,14 @@
     {
       "id": "bio-phylo-tree-visualization",
       "upstream_path": "phylogenetics/tree-visualization",
-      "score": 84,
-      "grade": "Limited Release",
+      "score": 88,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-15",
+      "audited_on": "2026-09-19",
       "fix_log": "fixes/bio-phylo-tree-visualization.md",
       "fix_pass": "done",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",

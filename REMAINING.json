@@ -5,9 +5,9 @@
   "reconciliation": {
     "skills_in_source_tree": 562,
     "refined": 98,
-    "audited_and_excluded": 0,
+    "audited_and_excluded": 1,
     "out_of_scope": 1,
-    "remaining": 463
+    "remaining": 462
   },
   "remaining": [
     {
@@ -569,10 +569,6 @@
     {
       "id": "bio-ensembl-rest",
       "upstream_path": "database-access/ensembl-rest"
-    },
-    {
-      "id": "bio-entrez-link",
-      "upstream_path": "database-access/entrez-link"
     },
     {
       "id": "bio-epidemiological-genomics-amr-surveillance",
@@ -1863,7 +1859,20 @@
       "upstream_path": "sequence-io/write-sequences"
     }
   ],
-  "excluded": [],
+  "excluded": [
+    {
+      "id": "bio-entrez-link",
+      "upstream_path": "database-access/entrez-link",
+      "score": 80,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 1,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    }
+  ],
   "out_of_scope": [
     {
       "id": "clawhub-installer",
