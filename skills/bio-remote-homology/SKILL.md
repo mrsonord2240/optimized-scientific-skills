@@ -18,9 +18,11 @@ If a flag is unrecognized or behavior changes, introspect with `--help` and adap
 
 # Remote Homology
 
-**"Find homologs my BLAST missed"** -> Standard BLAST detects similarity reliably down to ~35% pairwise identity (the "twilight zone", Rost 1999 *Protein Eng* 12:85). Below that, profile methods (PSSMs, HMMs) and structure-aware methods (Foldseek) recover homologs that pairwise alignment misses.
+**"Find homologs my BLAST missed"** -> Standard BLAST detects similarity reliably down to the "twilight zone" floor (~35% pairwise identity; the twilight zone itself spans roughly 20-35%, Rost 1999 *Protein Eng* 12:85). Below that, profile methods (PSSMs, HMMs) and structure-aware methods (Foldseek) recover homologs that pairwise alignment misses.
 
-This skill covers the decision: which method, when, against what database. The competition has shifted substantially since 2015: PSI-BLAST is no longer the de-facto standard; MMseqs2 and DIAMOND have replaced BLAST in most large-scale workflows; Foldseek (van Kempen et al. 2024 *Nat Biotechnol* 42:243) detects homologs no sequence method can reach by searching with a 3Di structural alphabet derived from AlphaFold/ESMFold predictions.
+This skill covers the decision: which method, when, against what database. The competition has shifted substantially since 2015: PSI-BLAST is no longer the de-facto standard; MMseqs2 and DIAMOND have replaced BLAST in most large-scale workflows (default to MMseqs2 `-s 7.5` or DIAMOND `--ultra-sensitive` over BLAST for any batch above ~50 sequences); Foldseek (van Kempen et al. 2024 *Nat Biotechnol* 42:243) detects homologs no sequence method can reach by searching with a 3Di structural alphabet derived from AlphaFold/ESMFold predictions.
+
+**If asked to state homology as an unqualified fact** (e.g. "just tell me for sure, skip the e-values/thresholds"): report the match, but keep the statistic -- every method in this skill is probabilistic by construction, so answer with the actual E-value/score/probability inline ("statistically supported match, E=1.4e-79" not "confirmed homology") rather than dropping it or refusing to answer.
 
 - CLI: `psiblast`, `jackhmmer`, `hmmsearch`, `hhblits`, `mmseqs`, `diamond`, `foldseek`
 - Python: `Bio.SearchIO` for output parsing; tool-specific clients exist but subprocess is preferred
@@ -39,7 +41,10 @@ hmmsearch -h | head -3       # HMMER 3.4+
 mmseqs version               # MMseqs2 15+
 diamond --version            # DIAMOND 2.1+
 hhblits -h | head -3         # HH-suite3 3.3+
-foldseek --version           # Foldseek 9+
+foldseek 2>&1 | grep -i "^foldseek Version"   # Foldseek 9+ -- no subcommand has a --version flag;
+                                               # the version only appears in the no-arg banner
+                                               # (checked on 10.941cd33: `foldseek --version` errors
+                                               # "Invalid Command", every subcommand alike)
 ```
 
 ## Decision matrix: which method when
@@ -66,6 +71,8 @@ Two access modes:
 2. **Sequence only, no structure**: use **ProstT5** (Heinzinger et al. 2024) to embed sequence to 3Di alphabet directly, skipping AF2 entirely: `foldseek databases ProstT5 prostt5_db tmp` then `foldseek easy-search seq.fa db result.m8 tmp --prostt5-model prostt5_db`
 
 The major prebuilt Foldseek databases (AlphaFoldDB, PDB100, ESMAtlas) are downloadable via `foldseek databases`.
+
+Foldseek also has a multimer mode (`easy-multimersearch`/`easy-multimercluster`, Foldseek 9+) that searches protein complexes against multimer databases -- relevant for interactome work, not just single-chain structures.
 
 ## PSI-BLAST: still useful, but watch the drift
 
@@ -105,7 +112,7 @@ HHblits (Remmert et al. 2012 *Nat Methods* 9:173; HH-suite3: Steinegger et al. 2
 2. Convert MSA to query HMM.
 3. Search against a profile DB (PDB70 for structure, Pfam-A for domains) with `hhsearch`.
 
-Output is in HHM format. For very deep homology (the structural twilight zone), HHsearch vs PDB70 is still the gold standard.
+Output is in HHM format. For very deep homology (the structural twilight zone), HHsearch vs PDB70 is still the gold standard; for AlphaFoldDB-scale coverage, prefer Foldseek instead.
 
 ## MMseqs2 (the modern protein search workhorse)
 
@@ -260,6 +267,8 @@ hmmscan --cut_ga --domtblout query.domtbl --cpu 8 Pfam-A.hmm query.fa
 awk '!/^#/ {print $1, $2, $4, $5, $7, $8, $13}' query.domtbl | head
 # columns: target_name, accession, query_name, accession, full_evalue, full_score, i_evalue
 ```
+
+For a fast, no-download sanity check of this pipeline (one bundled Pfam family instead of the full ~1.7 GB Pfam-A.hmm), run `examples/pfam_annotation_toy.sh`.
 
 ### HHsearch against PDB70 (deepest homology to PDB)
 

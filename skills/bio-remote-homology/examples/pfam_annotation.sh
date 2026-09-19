@@ -29,8 +29,9 @@ hmmscan --cut_ga \
 
 echo
 echo "=== Per-protein Pfam domain summary ==="
-# domtbl columns: target_name target_acc query_name query_acc full_evalue full_score
-#                 full_bias n_dom_total ali_from ali_to env_from env_to ...
-awk '!/^#/ {print $4"\t"$1"\t"$2"\t"$5"\t"$6}' query.domtbl | sort -k1,1 -k4,4g | head -20
+# domtbl columns (1-indexed): 1 target_name, 2 target_acc, 3 tlen, 4 query_name, 5 query_acc,
+#                 6 qlen, 7 full_evalue, 8 full_score, 9 full_bias, 10 dom#, 11 of, 12 c-Evalue,
+#                 13 i-Evalue, 14 dom_score, 15 dom_bias, 16-21 hmm/ali/env coords, 22 acc, 23+ desc
+awk '!/^#/ {print $4"\t"$1"\t"$2"\t"$7"\t"$8}' query.domtbl | sort -k1,1 -k4,4g | head -20
 echo
 echo "Columns: query_name | pfam_name | pfam_acc | full_evalue | full_score"

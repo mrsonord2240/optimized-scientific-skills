@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "9007224"
+      "staging_commit": "ff10062"
     }
   },
   "skills": [
@@ -741,6 +741,22 @@
       ]
     },
     {
+      "id": "bio-geo-data",
+      "upstream_path": "database-access/geo-data",
+      "score": 84,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": "fixes/bio-geo-data.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "id": "bio-local-blast",
       "upstream_path": "database-access/local-blast",
       "score": 93,
@@ -966,6 +982,22 @@
       "upstream_path": "microbiome/differential-abundance",
       "score": 87,
       "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": "fixes/bio-microbiome-differential-abundance.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-microbiome-diversity-analysis",
+      "upstream_path": "microbiome/diversity-analysis",
+      "score": 92,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
@@ -1470,17 +1502,22 @@
     {
       "id": "bio-remote-homology",
       "upstream_path": "database-access/remote-homology",
-      "score": 83,
-      "grade": "Limited Release",
+      "score": 92,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-remote-homology.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "P17612.fasta",
+        "PF00069.hmm",
+        "SKILL.md",
+        "pfam_annotation.sh",
+        "pfam_annotation_toy.sh",
+        "usage-guide.md"
       ]
     },
     {

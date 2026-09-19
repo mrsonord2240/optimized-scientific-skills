@@ -4,22 +4,7 @@
 
 Detect distant homologs using profile and structure-aware methods. Encodes the modern landscape: PSI-BLAST and jackhmmer for iterative profile search; HHblits/HHsearch for profile-profile (PDB70, Pfam); MMseqs2 and DIAMOND as the modern blastp replacements (100-10,000x faster); Foldseek (van Kempen 2024) for structure-aware homology via the 3Di alphabet, with ProstT5 for sequence-only access to structural search.
 
-## Prerequisites
-
-```bash
-conda install -c bioconda hmmer mmseqs2 diamond hhsuite foldseek blast
-hmmsearch -h | head -3       # HMMER 3.4+
-mmseqs version               # MMseqs2 15+
-diamond --version            # DIAMOND 2.1+
-hhblits -h | head -3         # HH-suite3 3.3+
-foldseek --version           # Foldseek 9+
-```
-
-For Foldseek databases:
-```bash
-mkdir -p foldseek_dbs tmp
-foldseek databases --help    # list available DBs
-```
+Setup, the decision matrix, tool-by-tool details, code patterns, failure modes and common errors all live in `SKILL.md` -- this guide only covers when to reach for this skill and what to ask for.
 
 ## Quick Start
 
@@ -54,28 +39,6 @@ foldseek databases --help    # list available DBs
 ### DIAMOND for metagenomic scale
 
 > "I have 1 million predicted ORFs from a metagenome. Use DIAMOND blastp --ultra-sensitive against UniRef90 with -p 32. blastp would take days; DIAMOND will finish in an hour."
-
-## What the Agent Will Do
-
-1. Identify whether the problem is single-query distant homology (PSI-BLAST, jackhmmer, Foldseek) or large-batch (MMseqs2, DIAMOND).
-2. Default to MMseqs2 (-s 7.5) or DIAMOND --ultra-sensitive over BLAST for any batch >50 sequences.
-3. For very deep homology to known structures, run Foldseek (with ProstT5 if no structure available) against AlphaFoldDB or PDB100.
-4. For domain annotation, use hmmscan vs Pfam-A with --cut_ga.
-5. For PSI-BLAST, cap iterations at 3 and use stricter inclusion threshold; save PSSM for reproducibility.
-6. For HHsearch profile-profile, build query MSA via HHblits first.
-7. Recommend mixing sequence + structure evidence for the toughest cases.
-8. Note when fold-level similarity alone (Foldseek to a TIM barrel) is not evidence of homology.
-
-## Tips
-
-- The twilight zone of sequence homology is 20-35% pairwise identity (Rost 1999). Below that, structure beats sequence -- reach for Foldseek.
-- ProstT5 (Heinzinger 2024) is the bridge: sequence -> 3Di alphabet directly, no AF2 step needed for Foldseek.
-- For metagenomic-scale work, MMseqs2 `easy-cluster` is the modern de-facto for clustering hundreds of millions of sequences.
-- PSI-BLAST is **non-deterministic** in detail (input order matters). For reproducibility, save the PSSM and re-use with `-in_pssm`.
-- HHsearch vs PDB70 is still the gold standard for deepest possible homology to PDB; for AlphaFoldDB coverage, prefer Foldseek.
-- DIAMOND v2 adds frameshift-aware mode (`--frameshift 15`) for nanopore / PacBio long-read protein search.
-- Common folds (TIM barrel, Rossmann, ABC) appear across many superfamilies. A high Foldseek score on a common fold is necessary but not sufficient for homology.
-- The Foldseek-multimer mode (Foldseek 9+) searches protein complexes against multimer databases -- relevant for interactome work.
 
 ## Related Skills
 

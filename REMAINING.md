@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**458 remaining** across 59 folders. 103 are already refined and live in `skills/`.
+**456 remaining** across 59 folders. 105 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 103 refined, 0 audited and excluded, 1 out of scope, 458 remaining.
+The source tree holds 562 Skills: 105 refined, 0 audited and excluded, 1 out of scope, 456 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -33,7 +33,6 @@ The source tree holds 562 Skills: 103 refined, 0 audited and excluded, 1 out of 
 | flow-cytometry | 8 | 0 |
 | genome-intervals | 8 | 0 |
 | metagenomics | 8 | 0 |
-| database-access | 7 | 8 |
 | genome-annotation | 7 | 0 |
 | imaging-mass-cytometry | 7 | 0 |
 | liquid-biopsy | 7 | 0 |
@@ -41,6 +40,7 @@ The source tree holds 562 Skills: 103 refined, 0 audited and excluded, 1 out of 
 | sequence-manipulation | 7 | 0 |
 | systems-biology | 7 | 0 |
 | variant-calling | 7 | 6 |
+| database-access | 6 | 9 |
 | ecological-genomics | 6 | 0 |
 | gene-regulatory-networks | 6 | 0 |
 | immunoinformatics | 6 | 0 |
@@ -60,13 +60,13 @@ The source tree holds 562 Skills: 103 refined, 0 audited and excluded, 1 out of 
 | restriction-analysis | 5 | 0 |
 | workflow-management | 5 | 0 |
 | machine-learning | 4 | 2 |
-| microbiome | 4 | 2 |
 | phasing-imputation | 4 | 0 |
 | primer-design | 4 | 0 |
 | read-alignment | 4 | 0 |
 | rna-quantification | 4 | 0 |
 | rna-structure | 4 | 0 |
 | crispr-screens | 3 | 12 |
+| microbiome | 3 | 3 |
 | causal-genomics | 1 | 10 |
 | proteomics | 1 | 8 |
 
@@ -83,12 +83,11 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-differential-expression-deseq2-basics` | 92 | Production Ready |
 | `bio-machine-learning-model-validation` | 93 | Limited Release |
 | `bio-machine-learning-prediction-explanation` | 89 | Limited Release |
-| `bio-microbiome-differential-abundance` | 87 | Limited Release |
+| `bio-microbiome-diversity-analysis` | 92 | Production Ready |
 | `bio-molecular-descriptors` | 86 | Limited Release |
 | `bio-molecular-io` | 91 | Limited Release |
 | `bio-molecular-standardization` | 90 | Limited Release |
 | `bio-qsar-modeling` | 88 | Limited Release |
-| `bio-remote-homology` | 83 | Limited Release |
 | `bio-scaffold-analysis` | 88 | Limited Release |
 | `bio-similarity-searching` | 90 | Limited Release |
 | `bio-single-cell-batch-integration` | 90 | Limited Release |
@@ -115,6 +114,7 @@ Changed in staging after their latest audit, so the score below describes earlie
 | `bio-clinical-databases-dbsnp-queries` | 86 | 2026-09-15 |
 | `bio-clinical-databases-gnomad-frequencies` | 86 | 2026-09-15 |
 | `bio-clinical-databases-myvariant-queries` | 84 | 2026-09-15 |
+| `bio-geo-data` | 84 | 2026-09-19 |
 | `bio-phylo-bayesian-inference` | 87 | 2026-09-15 |
 | `bio-phylo-distance-calculations` | 87 | 2026-09-15 |
 | `bio-phylo-divergence-dating` | 87 | 2026-09-15 |
@@ -332,7 +332,6 @@ fixed.
 
 - `bio-blast-searches` — `database-access/blast-searches`
 - `bio-ensembl-rest` — `database-access/ensembl-rest`
-- `bio-geo-data` — `database-access/geo-data`
 - `bio-interaction-databases` — `database-access/interaction-databases`
 - `bio-ncbi-datasets-cli` — `database-access/ncbi-datasets-cli`
 - `bio-ortholog-inference` — `database-access/ortholog-inference`
@@ -526,7 +525,6 @@ fixed.
 
 ### microbiome
 
-- `bio-microbiome-diversity-analysis` — `microbiome/diversity-analysis`
 - `bio-microbiome-functional-prediction` — `microbiome/functional-prediction`
 - `bio-microbiome-qiime2-workflow` — `microbiome/qiime2-workflow`
 - `bio-microbiome-taxonomy-assignment` — `microbiome/taxonomy-assignment`
