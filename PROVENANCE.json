@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "c4e0e78f853049284e9e075737a5b094f9ddb512"
+      "staging_commit": "0776dc98d8bb65533c81a9afa8fb594aae0c2466"
     }
   },
   "skills": [
@@ -984,7 +984,7 @@
     {
       "id": "bio-microbiome-differential-abundance",
       "upstream_path": "microbiome/differential-abundance",
-      "score": 87,
+      "score": 89.2,
       "grade": "Limited Release",
       "deployable": true,
       "open_p0": 0,
@@ -992,9 +992,10 @@
       "fix_log": "fixes/bio-microbiome-differential-abundance.md",
       "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "usage-guide.md"
       ]
     },
     {

@@ -8,7 +8,7 @@ license: MIT
 
 ## Version Compatibility
 
-Reference examples tested with: ALDEx2 1.34+, ANCOMBC 2.4+, Maaslin2 1.16+, MicrobiomeStat 1.2+ (LinDA), GUniFrac 1.8+ (ZicoSeq), phyloseq 1.46+.
+Reference examples tested with: ALDEx2 1.34+ (checked on 1.38.0), ANCOMBC 2.4+ (checked on 2.8.1), Maaslin2 1.16+ (checked on 1.20.0), maaslin3 1.5.7 (GitHub `biobakery/maaslin3`, not yet on Bioconductor), MicrobiomeStat 1.2+ (checked on 1.4, LinDA), GUniFrac 1.8+ (checked on 1.9, ZicoSeq), DESeq2 1.46.0, LEfSe 1.1.1, phyloseq 1.46+ (checked on 1.50.0).
 
 Before using code patterns, verify installed versions match. If versions differ:
 - R: `packageVersion('<pkg>')` then `?function_name` to verify parameters
@@ -17,6 +17,16 @@ If code throws ImportError, AttributeError, or TypeError, introspect the install
 package and adapt the example to match the actual API rather than retrying.
 
 ANCOM-BC2 changed argument names between `ancombc()` and `ancombc2()`, and its default `p_adj_method` is `holm`, not `BH` - confirm both against the installed version. The MaAsLin3 `maaslin3()` API differs from MaAsLin2's `Maaslin2()`.
+
+## Installation
+
+```r
+BiocManager::install(c('ALDEx2', 'ANCOMBC', 'Maaslin2', 'DESeq2'))
+install.packages(c('MicrobiomeStat', 'GUniFrac'))    # LinDA, ZicoSeq
+remotes::install_github('biobakery/maaslin3')          # not yet on Bioconductor
+```
+
+LEfSe is a separate Python CLI (`lefse-format_input.py`, `run_lefse.py`), not an R package - install via conda/bioconda (`lefse`), typically in its own environment (its `rpy2` dependency forces an old R/Python pin incompatible with a modern R library).
 
 # Differential Abundance Testing
 
@@ -99,6 +109,7 @@ counts <- as.matrix(otu_table(ps))            # integer counts, taxa in ROWS
 if (!taxa_are_rows(ps)) counts <- t(counts)
 groups <- as.character(sample_data(ps)$Group)
 
+set.seed(42)   # required for bit-reproducible results run-to-run, not just a larger mc.samples
 # mc.samples 128: standard Monte-Carlo draws; 256+ for publication (more stable expected p)
 res <- aldex(counts, groups, mc.samples = 128, test = 't', effect = TRUE, denom = 'all')
 # we.eBH = Welch expected BH-adjusted p (report this, NOT we.ep); wi.eBH = Wilcoxon equivalent
@@ -141,9 +152,11 @@ robust <- res[res[[dcol]] & res[[sub('^diff_', 'passed_ss_', dcol)]], ]
 ```r
 library(MicrobiomeStat)
 otu <- as.data.frame(otu_table(ps)); if (!taxa_are_rows(ps)) otu <- t(otu)
-meta <- as.data.frame(sample_data(ps))
+# as.data.frame(sample_data(ps)) alone keeps phyloseq's S4 "sample_data" class (it is an
+# identity op, not a real coercion) and linda() dies deep inside on that; force a true data.frame:
+meta <- data.frame(as(sample_data(ps), 'data.frame'))
 fit <- linda(feature.dat = otu, meta.dat = meta,
-             formula = '~ Group + Age + (1 | SubjectID)',   # random effect -> mixed model
+             formula = '~ Group + Age',   # add '+ (1 | SubjectID)' for repeated/paired samples -> mixed model
              feature.dat.type = 'count', prev.filter = 0.10, alpha = 0.05)
 fit$output[[1]]   # names(fit$output) are the model-matrix coefficient columns (e.g. 'Grouptreated' - the factor level keeps its case); per-feature: log2FoldChange, lfcSE, stat, pvalue, padj, reject
 ```
@@ -168,7 +181,43 @@ fit <- Maaslin2(input_data = as.data.frame(t(otu)), input_metadata = meta,
 # writes all_results.tsv / significant_results.tsv with columns feature, metadata, coef, pval, qval
 ```
 
-MaAsLin3 (`maaslin3()`) splits each feature into an abundance model (level when present) and a logistic prevalence model (present/absent) tested jointly, and can ingest total-load measurements for absolute-abundance inference. ZicoSeq (`GUniFrac::ZicoSeq()`) winsorizes, posterior-samples, normalizes against empirically selected reference taxa, and returns permutation FDR (`zc$p.adj.fdr`) - a non-parametric panel member that accepts covariates via `adj.name`.
+MaAsLin3 (`maaslin3()`) splits each feature into an abundance model (level when present) and a logistic prevalence model (present/absent) tested jointly, and can ingest total-load measurements for absolute-abundance inference. Its API differs from MaAsLin2's: `input_data`/`input_metadata` take data frames (features x samples or the transpose, auto-detected), and results land in `fit$fit_data_abundance$results` / `fit$fit_data_prevalence$results` keyed by `qval_individual` (per-model FDR) and `qval_joint` (combined).
+
+```r
+library(maaslin3)
+fit3 <- maaslin3(input_data = as.data.frame(t(otu)), input_metadata = meta,
+                 output = 'maaslin3_out', fixed_effects = c('Group'),
+                 normalization = 'TSS', transform = 'LOG',
+                 plot_summary_plot = FALSE, plot_associations = FALSE)
+res3 <- fit3$fit_data_abundance$results
+res3 <- res3[res3$metadata == 'Group', ]
+sig_maaslin3 <- res3$feature[res3$qval_individual < 0.05]   # abundance-model hits
+```
+
+ZicoSeq (`GUniFrac::ZicoSeq()`) winsorizes, posterior-samples, normalizes against empirically selected reference taxa, and returns permutation FDR (`zc$p.adj.fdr`) - a non-parametric panel member that accepts covariates via `adj.name`. Unlike ALDEx2/ANCOM-BC2/LinDA's `prv_cut`/`prev.filter` argument, ZicoSeq does NOT auto-drop zero-variance features - it errors outright ("Feature N have identical values") - so drop them explicitly first:
+
+```r
+library(GUniFrac)
+zerovar <- apply(otu_mat <- as.matrix(otu), 1, function(x) length(unique(x)) == 1)
+otu_zc <- otu_mat[!zerovar, ]   # ZicoSeq crashes on zero-variance features - see Common Errors
+zc <- ZicoSeq(meta.dat = meta, feature.dat = otu_zc, grp.name = 'Group', adj.name = 'Batch',
+              feature.dat.type = 'count', prev.filter = 0, perm.no = 99, return.feature.dat = TRUE)
+sig_zicoseq <- names(zc$p.adj.fdr)[zc$p.adj.fdr < 0.05]
+```
+
+## LEfSe: Exploratory Biomarker Discovery (CLI, Non-FDR)
+
+**Goal:** Rank candidate biomarker taxa by LDA effect size for hypothesis generation, not to produce an FDR-controlled hit list (Segata 2011).
+
+**Approach:** LEfSe is a standalone Python CLI, not an R package or a compositionally-aware CoDA tool: format the class-labelled feature table (features in rows, one row for the class label, samples in columns), run Kruskal-Wallis + LDA, and treat the ranked output as exploratory only.
+
+```bash
+# lefse_input.txt: row 1 = "class" + each sample's group label; remaining rows = feature + counts
+lefse-format_input.py lefse_input.txt lefse_input.in -c 1 -u -1 -o 1000000
+run_lefse.py lefse_input.in lefse_output.res   # per feature: LDA score, class it favors, p-value
+```
+
+LEfSe's Wilcoxon step is NOT BH-corrected across taxa (Segata 2011 relies on the LDA-score threshold, not FDR, to control false discoveries) - it is not compositionally-aware and does not count as one of the required consensus tools (see Decision Tree); use it only as an exploratory add-on, never alone.
 
 ## Consensus: Intersect the Tools
 
@@ -201,7 +250,15 @@ exploratory <- union(sig_aldex, sig_linda)       # report with the tool that fou
 **Trigger:** "taxon X doubled" from a closed table with no load data. **Mechanism:** one taxon blooming compresses every other proportion. **Symptom:** whole-community "depletion" that is really one taxon rising. **Fix:** anchor to load (spike-in/flow/qPCR) or MaAsLin3 absolute mode; otherwise state the claim is relative.
 
 ### DESeq2/edgeR on a sparse 16S table
-**Trigger:** RNA-seq median-of-ratios / TMM on a zero-heavy ASV table. **Mechanism:** the geometric-mean size-factor reference collapses on zeros and the "most features unchanged" assumption is violated. **Symptom:** degenerate size factors, errors, or inflated hit counts that disagree with CoDA tools (Nearing). **Fix:** use a compositional tool; if DESeq2 is unavoidable, the `poscounts` estimator is the minimum mitigation - present as a caveat, not a recipe.
+**Trigger:** RNA-seq median-of-ratios / TMM on a zero-heavy ASV table. **Mechanism:** the geometric-mean size-factor reference collapses on zeros and the "most features unchanged" assumption is violated. **Symptom:** degenerate size factors, errors, or inflated hit counts that disagree with CoDA tools (Nearing). **Fix:** use a compositional tool; if DESeq2 is unavoidable, the `poscounts` estimator is the minimum mitigation - present as a caveat, not a recipe:
+
+```r
+library(DESeq2)
+dds <- phyloseq_to_deseq2(ps, ~ Group)
+dds <- estimateSizeFactors(dds, type = 'poscounts')   # NOT the default median-of-ratios - that is what collapses on zeros
+dds <- DESeq(dds)
+sig_deseq2 <- rownames(results(dds, alpha = 0.05))[which(results(dds)$padj < 0.05)]   # caveat-only, not a panel member
+```
 
 ### ANCOM-BC2 hit held hostage by the pseudo-count
 **Trigger:** reporting `diff_* == TRUE` without checking `passed_ss_*`. **Mechanism:** significance depends on the arbitrary zero-replacement constant. **Symptom:** a hit that vanishes when the pseudo-count changes. **Fix:** require `diff_* & passed_ss_*` for a confident call.
@@ -222,6 +279,8 @@ exploratory <- union(sig_aldex, sig_linda)       # report with the tool that fou
 
 | Error / symptom | Cause | Solution |
 |-----------------|-------|----------|
+| `linda()` errors `invalid class "sample_data" object` | `as.data.frame(sample_data(ps))` keeps phyloseq's S4 class instead of converting | use `data.frame(as(sample_data(ps), 'data.frame'))` |
+| `ZicoSeq()` errors `Feature N have identical values...` | zero-variance features not auto-dropped, unlike `prv_cut`/`prev.filter` in the other tools | drop them explicitly first: `otu[apply(otu, 1, function(x) length(unique(x)) > 1), ]` |
 | ALDEx2 returns NA effects / errors | proportions or non-integer matrix passed | feed integer COUNTS with taxa in rows |
 | `passed_ss` column missing | `pseudo_sens = FALSE` | set `pseudo_sens = TRUE` (the default) |
 | Far fewer hits than expected | ANCOM-BC2 `p_adj_method` left at `holm` | set `p_adj_method = 'BH'` deliberately if FDR is wanted |

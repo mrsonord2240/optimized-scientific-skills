@@ -8,18 +8,7 @@ This skill owns per-taxon DA on an amplicon table. Whole-community alpha/beta di
 
 ## Prerequisites
 
-```r
-BiocManager::install(c('ALDEx2', 'ANCOMBC', 'Maaslin2'))
-install.packages(c('MicrobiomeStat', 'GUniFrac'))   # LinDA, ZicoSeq
-```
-
-Conceptual prerequisites:
-- A feature table of integer COUNTS (ASVs or taxa collapsed to genus/species), plus sample metadata - typically a phyloseq object. ALDEx2, ANCOM-BC2, LinDA, and ZicoSeq expect counts; MaAsLin2 TSS-normalizes internally and expects features in COLUMNS.
-- Answer the whole-community question first (diversity-analysis): knowing whether the communities differ at all frames the per-taxon hits.
-- Decide the DA-tool panel (>=2 tools) a priori, before seeing any result, to avoid cherry-picking.
-- Decide and declare a prevalence filter; it is a modeling knob that reshapes the FDR landscape.
-- Know whether the design has repeated/paired samples; if so, a random effect is required.
-- Remove host organelle (Mitochondria/Chloroplast) features and, for low-biomass samples, reagent contaminants upstream (taxonomy-assignment / amplicon-processing) before testing - they otherwise surface as spurious hits or skew the closure.
+A feature table of integer counts (typically a phyloseq object) plus sample metadata. See SKILL.md's Installation section for package installs and its Tool Taxonomy for per-tool input requirements (orientation, counts vs. proportions).
 
 ## Quick Start
 
@@ -47,29 +36,9 @@ Tell your AI agent what you want to do:
 ### Relative vs absolute
 > "Is this taxon's increase relative or absolute? I do not have load data - explain what I can and cannot claim, and what a spike-in or qPCR anchor would add."
 
-## What the Agent Will Do
-
-1. Confirm the input is integer counts with matching metadata and check feature orientation per tool.
-2. Apply and declare a prevalence/abundance filter (e.g. taxa present in >=10% of samples).
-3. Run the first compositionally-aware tool (default ALDEx2) and extract BH-adjusted q plus effect size.
-4. Run at least one more tool (ANCOM-BC2, LinDA, MaAsLin2/3, or ZicoSeq), adding covariates or a random effect as the design requires.
-5. For ANCOM-BC2, set p_adj_method to BH and require passed_ss for confident hits.
-6. Intersect the per-tool significant sets: report the intersection as high-confidence, the union as exploratory, and tabulate which tools agree per taxon.
-7. State whether claims are relative or absolute and whether a load anchor exists.
-8. Produce a results table and an effect-size plot; never pool p-values across tools.
-
 ## Tips
 
-- The deliverable is a consensus, not one tool's list. Decide the panel a priori and report all tools, including the ones that disagree.
-- Gate on effect size AND q-value, not p alone - large n makes trivially small differences "significant."
-- ANCOM-BC2 defaults to Holm, not BH; set p_adj_method to BH deliberately if FDR is wanted, and require passed_ss.
-- Repeated/paired samples need a random effect (ANCOM-BC2 rand_formula, MaAsLin2 random_effects, LinDA mixed formula); ignoring it inflates significance.
-- The prevalence filter is a modeling choice. Declare the threshold and confirm the headline result survives moving it from 10% to 25%.
-- A relative increase is not an absolute increase without a spike-in / flow / qPCR anchor or MaAsLin3's absolute-abundance mode.
-- DESeq2/edgeR are RNA-seq-native and misfire on sparse zero-heavy tables (the geometric-mean size factor collapses) - treat as a caveat, not a recipe.
-- An uncorrected Wilcoxon/t-test on relative abundances is wrong twice (closure and multiple testing). A BH-corrected simple test honestly labelled as relative is defensible, ideally alongside a compositional tool.
-- There is no settled best tool: Nearing favors conservative ALDEx2/ANCOM-II, Yang and Chen favor ZicoSeq/LinDA for power, Pelto finds elementary methods most replicable. Verify current best practice against the latest docs.
-- Filter host organelle features and decontaminate low-biomass samples before DA (taxonomy-assignment, amplicon-processing); contaminant ASVs otherwise appear among the hits.
+The workflow steps, gotchas and thresholds above (consensus panel, effect-size + q gating, ANCOM-BC2 Holm-vs-BH, prevalence-filter sensitivity, relative-vs-absolute, DESeq2/edgeR caveat, uncorrected-test pitfall, no-settled-best-tool, organelle/contaminant filtering) are documented once, in SKILL.md - see its Decision Tree, Per-Method Failure Modes, Common Errors and Quantitative Thresholds tables.
 
 ## Related Skills
 
