@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**442 remaining** across 58 folders. 119 are already refined and live in `skills/`.
+**441 remaining** across 58 folders. 120 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 119 refined, 0 audited and excluded, 1 out of scope, 442 remaining.
+The source tree holds 562 Skills: 120 refined, 0 audited and excluded, 1 out of scope, 441 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -45,7 +45,6 @@ The source tree holds 562 Skills: 119 refined, 0 audited and excluded, 1 out of 
 | population-genetics | 6 | 1 |
 | reporting | 6 | 0 |
 | ribo-seq | 6 | 0 |
-| single-cell | 6 | 11 |
 | small-rna-seq | 6 | 0 |
 | tcr-bcr-analysis | 6 | 0 |
 | temporal-genomics | 6 | 0 |
@@ -58,6 +57,7 @@ The source tree holds 562 Skills: 119 refined, 0 audited and excluded, 1 out of 
 | genome-engineering | 5 | 0 |
 | multi-omics-integration | 5 | 0 |
 | restriction-analysis | 5 | 0 |
+| single-cell | 5 | 12 |
 | workflow-management | 5 | 0 |
 | machine-learning | 4 | 2 |
 | phasing-imputation | 4 | 0 |
@@ -630,7 +630,6 @@ fixed.
 
 ### single-cell
 
-- `bio-single-cell-cnv-inference` — `single-cell/cnv-inference`
 - `bio-single-cell-hashing-demultiplexing` — `single-cell/hashing-demultiplexing`
 - `bio-single-cell-lineage-tracing` — `single-cell/lineage-tracing`
 - `bio-single-cell-metabolite-communication` — `single-cell/metabolite-communication`
