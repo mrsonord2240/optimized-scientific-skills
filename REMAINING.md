@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**442 remaining** across 58 folders. 119 are already refined and live in `skills/`.
+**441 remaining** across 58 folders. 120 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 119 refined, 0 audited and excluded, 1 out of scope, 442 remaining.
+The source tree holds 562 Skills: 120 refined, 0 audited and excluded, 1 out of scope, 441 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -31,7 +31,6 @@ The source tree holds 562 Skills: 119 refined, 0 audited and excluded, 1 out of 
 | flow-cytometry | 8 | 0 |
 | genome-intervals | 8 | 0 |
 | metagenomics | 8 | 0 |
-| chemoinformatics | 7 | 13 |
 | genome-annotation | 7 | 0 |
 | imaging-mass-cytometry | 7 | 0 |
 | liquid-biopsy | 7 | 0 |
@@ -39,6 +38,7 @@ The source tree holds 562 Skills: 119 refined, 0 audited and excluded, 1 out of 
 | sequence-manipulation | 7 | 0 |
 | systems-biology | 7 | 0 |
 | variant-calling | 7 | 6 |
+| chemoinformatics | 6 | 14 |
 | ecological-genomics | 6 | 0 |
 | gene-regulatory-networks | 6 | 0 |
 | immunoinformatics | 6 | 0 |
@@ -204,7 +204,6 @@ fixed.
 - `bio-ml-docking-rescoring` — `chemoinformatics/ml-docking-rescoring`
 - `bio-reaction-enumeration` — `chemoinformatics/reaction-enumeration`
 - `bio-retrosynthesis` — `chemoinformatics/retrosynthesis`
-- `bio-shape-similarity` — `chemoinformatics/shape-similarity`
 - `bio-virtual-screening` — `chemoinformatics/virtual-screening`
 
 ### chip-seq

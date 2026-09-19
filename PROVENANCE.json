@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "729d19213479bc6d189f47710213a2b394b37d8a"
+      "staging_commit": "a5c1e4f2d48a31064607b1c75d6972110674fa46"
     }
   },
   "skills": [
@@ -1703,6 +1703,23 @@
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-shape-similarity",
+      "upstream_path": "chemoinformatics/shape-similarity",
+      "score": 92,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": "fixes/bio-shape-similarity.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "shape_search.py"
       ]
     },
     {
