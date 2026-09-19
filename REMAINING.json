@@ -4,8 +4,8 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 122,
-    "audited_and_excluded": 1,
+    "refined": 123,
+    "audited_and_excluded": 0,
     "out_of_scope": 1,
     "remaining": 438
   },
@@ -1763,20 +1763,7 @@
       "upstream_path": "sequence-io/write-sequences"
     }
   ],
-  "excluded": [
-    {
-      "id": "bio-single-cell-hashing-demultiplexing",
-      "upstream_path": "single-cell/hashing-demultiplexing",
-      "score": 78,
-      "grade": "Limited Release",
-      "deployable": true,
-      "open_p0": 1,
-      "audited_on": "2026-09-19",
-      "fix_log": "fixes/bio-single-cell-hashing-demultiplexing.md",
-      "fix_pass": "done",
-      "reaudit": "not needed"
-    }
-  ],
+  "excluded": [],
   "out_of_scope": [
     {
       "id": "clawhub-installer",

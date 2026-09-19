@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "3f9ec6a8739ece56e6ea9f8a179bb4f245feb5a4"
+      "staging_commit": "eba37f4599e8fdb2d3ac29b21071c200cc6fe603"
     }
   },
   "skills": [
@@ -1868,6 +1868,24 @@
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-single-cell-hashing-demultiplexing",
+      "upstream_path": "single-cell/hashing-demultiplexing",
+      "score": 90,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": "fixes/bio-single-cell-hashing-demultiplexing.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "hashsolo_scanpy.py",
+        "usage-guide.md"
       ]
     },
     {
