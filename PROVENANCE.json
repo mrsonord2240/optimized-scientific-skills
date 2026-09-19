@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "adc52d385926a7e7e8be9308d2a6dcac1b7dce8d"
+      "staging_commit": "2810ac22b83cf97ca2d921c1085da24ed2f52056"
     }
   },
   "skills": [
@@ -1942,6 +1942,24 @@
         "SKILL.md",
         "cite_seq_analysis.R",
         "cite_seq_analysis.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-single-cell-perturb-seq",
+      "upstream_path": "single-cell/perturb-seq",
+      "score": 88,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": "fixes/bio-single-cell-perturb-seq.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "pertpy_analysis.py",
         "usage-guide.md"
       ]
     },

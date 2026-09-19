@@ -4,8 +4,8 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 123,
-    "audited_and_excluded": 1,
+    "refined": 124,
+    "audited_and_excluded": 0,
     "out_of_scope": 1,
     "remaining": 437
   },
@@ -1759,20 +1759,7 @@
       "upstream_path": "sequence-io/write-sequences"
     }
   ],
-  "excluded": [
-    {
-      "id": "bio-single-cell-perturb-seq",
-      "upstream_path": "single-cell/perturb-seq",
-      "score": 75,
-      "grade": "Beta Only",
-      "deployable": false,
-      "open_p0": 0,
-      "audited_on": "2026-09-19",
-      "fix_log": "fixes/bio-single-cell-perturb-seq.md",
-      "fix_pass": "done",
-      "reaudit": "not needed"
-    }
-  ],
+  "excluded": [],
   "out_of_scope": [
     {
       "id": "clawhub-installer",
