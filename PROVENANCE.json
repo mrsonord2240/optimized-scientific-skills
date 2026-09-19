@@ -962,6 +962,22 @@
       ]
     },
     {
+      "id": "bio-microbiome-differential-abundance",
+      "upstream_path": "microbiome/differential-abundance",
+      "score": 87,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "id": "bio-molecular-descriptors",
       "upstream_path": "chemoinformatics/molecular-descriptors",
       "score": 86,
@@ -1443,6 +1459,22 @@
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-16",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-remote-homology",
+      "upstream_path": "database-access/remote-homology",
+      "score": 83,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",

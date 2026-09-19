@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**460 remaining** across 59 folders. 101 are already refined and live in `skills/`.
+**458 remaining** across 59 folders. 103 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 101 refined, 0 audited and excluded, 1 out of scope, 460 remaining.
+The source tree holds 562 Skills: 103 refined, 0 audited and excluded, 1 out of scope, 458 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -30,10 +30,10 @@ The source tree holds 562 Skills: 101 refined, 0 audited and excluded, 1 out of 
 | long-read-sequencing | 9 | 0 |
 | sequence-io | 9 | 0 |
 | clinical-databases | 8 | 4 |
-| database-access | 8 | 7 |
 | flow-cytometry | 8 | 0 |
 | genome-intervals | 8 | 0 |
 | metagenomics | 8 | 0 |
+| database-access | 7 | 8 |
 | genome-annotation | 7 | 0 |
 | imaging-mass-cytometry | 7 | 0 |
 | liquid-biopsy | 7 | 0 |
@@ -56,11 +56,11 @@ The source tree holds 562 Skills: 101 refined, 0 audited and excluded, 1 out of 
 | epitranscriptomics | 5 | 0 |
 | expression-matrix | 5 | 0 |
 | genome-engineering | 5 | 0 |
-| microbiome | 5 | 1 |
 | multi-omics-integration | 5 | 0 |
 | restriction-analysis | 5 | 0 |
 | workflow-management | 5 | 0 |
 | machine-learning | 4 | 2 |
+| microbiome | 4 | 2 |
 | phasing-imputation | 4 | 0 |
 | primer-design | 4 | 0 |
 | read-alignment | 4 | 0 |
@@ -83,10 +83,12 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-differential-expression-deseq2-basics` | 92 | Production Ready |
 | `bio-machine-learning-model-validation` | 93 | Limited Release |
 | `bio-machine-learning-prediction-explanation` | 89 | Limited Release |
+| `bio-microbiome-differential-abundance` | 87 | Limited Release |
 | `bio-molecular-descriptors` | 86 | Limited Release |
 | `bio-molecular-io` | 91 | Limited Release |
 | `bio-molecular-standardization` | 90 | Limited Release |
 | `bio-qsar-modeling` | 88 | Limited Release |
+| `bio-remote-homology` | 83 | Limited Release |
 | `bio-scaffold-analysis` | 88 | Limited Release |
 | `bio-similarity-searching` | 90 | Limited Release |
 | `bio-single-cell-batch-integration` | 90 | Limited Release |
@@ -334,7 +336,6 @@ fixed.
 - `bio-interaction-databases` — `database-access/interaction-databases`
 - `bio-ncbi-datasets-cli` — `database-access/ncbi-datasets-cli`
 - `bio-ortholog-inference` — `database-access/ortholog-inference`
-- `bio-remote-homology` — `database-access/remote-homology`
 - `bio-uniprot-access` — `database-access/uniprot-access`
 
 ### differential-expression
@@ -525,7 +526,6 @@ fixed.
 
 ### microbiome
 
-- `bio-microbiome-differential-abundance` — `microbiome/differential-abundance`
 - `bio-microbiome-diversity-analysis` — `microbiome/diversity-analysis`
 - `bio-microbiome-functional-prediction` — `microbiome/functional-prediction`
 - `bio-microbiome-qiime2-workflow` — `microbiome/qiime2-workflow`

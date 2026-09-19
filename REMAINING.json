@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 101,
+    "refined": 103,
     "audited_and_excluded": 0,
     "out_of_scope": 1,
-    "remaining": 460
+    "remaining": 458
   },
   "remaining": [
     {
@@ -1063,10 +1063,6 @@
       "upstream_path": "methylation-analysis/methylkit-analysis"
     },
     {
-      "id": "bio-microbiome-differential-abundance",
-      "upstream_path": "microbiome/differential-abundance"
-    },
-    {
       "id": "bio-microbiome-diversity-analysis",
       "upstream_path": "microbiome/diversity-analysis"
     },
@@ -1257,10 +1253,6 @@
     {
       "id": "bio-reference-operations",
       "upstream_path": "alignment-files/reference-operations"
-    },
-    {
-      "id": "bio-remote-homology",
-      "upstream_path": "database-access/remote-homology"
     },
     {
       "id": "bio-reporting-automated-qc-reports",
