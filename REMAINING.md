@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**455 remaining** across 59 folders. 106 are already refined and live in `skills/`.
+**454 remaining** across 59 folders. 107 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 106 refined, 0 audited and excluded, 1 out of scope, 455 remaining.
+The source tree holds 562 Skills: 107 refined, 0 audited and excluded, 1 out of scope, 454 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -66,7 +66,7 @@ The source tree holds 562 Skills: 106 refined, 0 audited and excluded, 1 out of 
 | rna-quantification | 4 | 0 |
 | rna-structure | 4 | 0 |
 | crispr-screens | 3 | 12 |
-| microbiome | 3 | 3 |
+| microbiome | 2 | 4 |
 | causal-genomics | 1 | 10 |
 | proteomics | 1 | 8 |
 
@@ -83,6 +83,7 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-differential-expression-deseq2-basics` | 92 | Production Ready |
 | `bio-machine-learning-model-validation` | 93 | Limited Release |
 | `bio-machine-learning-prediction-explanation` | 89 | Limited Release |
+| `bio-microbiome-functional-prediction` | 80 | Limited Release |
 | `bio-molecular-descriptors` | 86 | Limited Release |
 | `bio-molecular-io` | 91 | Limited Release |
 | `bio-molecular-standardization` | 90 | Limited Release |
@@ -522,7 +523,6 @@ fixed.
 
 ### microbiome
 
-- `bio-microbiome-functional-prediction` — `microbiome/functional-prediction`
 - `bio-microbiome-qiime2-workflow` — `microbiome/qiime2-workflow`
 - `bio-microbiome-taxonomy-assignment` — `microbiome/taxonomy-assignment`
 

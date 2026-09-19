@@ -1016,6 +1016,22 @@
       ]
     },
     {
+      "id": "bio-microbiome-functional-prediction",
+      "upstream_path": "microbiome/functional-prediction",
+      "score": 80,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "id": "bio-molecular-descriptors",
       "upstream_path": "chemoinformatics/molecular-descriptors",
       "score": 86,
