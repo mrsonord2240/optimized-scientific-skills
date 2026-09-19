@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**457 remaining** across 59 folders. 104 are already refined and live in `skills/`.
+**456 remaining** across 59 folders. 105 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 104 refined, 0 audited and excluded, 1 out of scope, 457 remaining.
+The source tree holds 562 Skills: 105 refined, 0 audited and excluded, 1 out of scope, 456 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -60,13 +60,13 @@ The source tree holds 562 Skills: 104 refined, 0 audited and excluded, 1 out of 
 | restriction-analysis | 5 | 0 |
 | workflow-management | 5 | 0 |
 | machine-learning | 4 | 2 |
-| microbiome | 4 | 2 |
 | phasing-imputation | 4 | 0 |
 | primer-design | 4 | 0 |
 | read-alignment | 4 | 0 |
 | rna-quantification | 4 | 0 |
 | rna-structure | 4 | 0 |
 | crispr-screens | 3 | 12 |
+| microbiome | 3 | 3 |
 | causal-genomics | 1 | 10 |
 | proteomics | 1 | 8 |
 
@@ -523,7 +523,6 @@ fixed.
 
 ### microbiome
 
-- `bio-microbiome-diversity-analysis` — `microbiome/diversity-analysis`
 - `bio-microbiome-functional-prediction` — `microbiome/functional-prediction`
 - `bio-microbiome-qiime2-workflow` — `microbiome/qiime2-workflow`
 - `bio-microbiome-taxonomy-assignment` — `microbiome/taxonomy-assignment`

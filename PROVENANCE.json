@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "c905a60"
+      "staging_commit": "339f73efbc330ab7478bdf285fd5140c0b80f7a5"
     }
   },
   "skills": [
@@ -995,6 +995,24 @@
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-microbiome-diversity-analysis",
+      "upstream_path": "microbiome/diversity-analysis",
+      "score": 95,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": "fixes/bio-microbiome-diversity-analysis.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "diversity_analysis.R",
+        "usage-guide.md"
       ]
     },
     {
