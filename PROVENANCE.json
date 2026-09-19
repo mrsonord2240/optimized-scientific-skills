@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "ff10062"
+      "staging_commit": "c905a60"
     }
   },
   "skills": [
@@ -741,6 +741,26 @@
       ]
     },
     {
+      "id": "bio-geo-data",
+      "upstream_path": "database-access/geo-data",
+      "score": 89.0,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": "fixes/bio-geo-data.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "geo_from_pubmed.py",
+        "geo_to_sra.py",
+        "search_geo.py",
+        "usage-guide.md"
+      ]
+    },
+    {
       "id": "bio-local-blast",
       "upstream_path": "database-access/local-blast",
       "score": 93,
@@ -971,22 +991,6 @@
       "audited_on": "2026-09-19",
       "fix_log": "fixes/bio-microbiome-differential-abundance.md",
       "fix_pass": "done",
-      "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
-      "changed_files": [
-        "SKILL.md"
-      ]
-    },
-    {
-      "id": "bio-microbiome-diversity-analysis",
-      "upstream_path": "microbiome/diversity-analysis",
-      "score": 92,
-      "grade": "Production Ready",
-      "deployable": true,
-      "open_p0": 0,
-      "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
       "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [

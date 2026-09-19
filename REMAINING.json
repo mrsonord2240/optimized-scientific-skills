@@ -827,10 +827,6 @@
       "upstream_path": "genome-intervals/proximity-operations"
     },
     {
-      "id": "bio-geo-data",
-      "upstream_path": "database-access/geo-data"
-    },
-    {
       "id": "bio-hi-c-analysis-compartment-analysis",
       "upstream_path": "hi-c-analysis/compartment-analysis"
     },
@@ -1061,6 +1057,10 @@
     {
       "id": "bio-methylation-methylkit",
       "upstream_path": "methylation-analysis/methylkit-analysis"
+    },
+    {
+      "id": "bio-microbiome-diversity-analysis",
+      "upstream_path": "microbiome/diversity-analysis"
     },
     {
       "id": "bio-microbiome-functional-prediction",
