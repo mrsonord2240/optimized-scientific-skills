@@ -8,7 +8,27 @@ license: MIT
 
 ## Version Compatibility
 
-Reference examples tested with: koinapy 0.0.5+, ms2pip 4.0+, deeplc 3.0+, pandas 2.2+
+Reference examples tested with: koinapy 0.0.5+ (checked on 0.0.11), ms2pip 4.0+ (checked on 4.2.0),
+deeplc 4.1+ (checked on 4.5.0), pandas 2.2+
+
+deeplc dropped the `DeepLC()` class in 4.1 for a module-level API built on `psm_utils.PSM`/
+`PSMList` (verified running on deeplc 4.5.0):
+
+```python
+from psm_utils import PSM, PSMList
+import deeplc
+
+cal_psms = PSMList(psm_list=[PSM(peptidoform=seq, spectrum_id=str(i), retention_time=rt)
+                              for i, (seq, rt) in enumerate(calibration_pairs)])  # observed RT required
+pred_psms = PSMList(psm_list=[PSM(peptidoform=seq, spectrum_id=str(i))
+                               for i, seq in enumerate(peptides_to_predict)])
+calibrated_rt = deeplc.predict_and_calibrate(pred_psms, psm_list_reference=cal_psms)
+```
+
+`deeplc.predict()` alone returns RT on the model's internal training-gradient units, not the
+run's real RT -- always pair it with `deeplc.calibrate()`/`predict_and_calibrate()` against
+observed-RT anchors, same rule as Koina iRT below. Modifications use ProForma notation via
+`Peptidoform` (e.g. `'LGGNEQVTR[Phospho]'`), not the old MS2PIP `location|name` string.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - Python: `pip show <package>` then `help(module.function)` to check signatures
@@ -21,7 +41,7 @@ package and adapt the example to match the actual API rather than retrying.
 
 **"Build a spectral library for my DIA search"** -> Assemble a table of peptide query parameters (precursor m/z, top fragment m/z plus relative intensities, normalized RT, optional CCS), then calibrate the predicted RT/CCS to the actual gradient/instrument -- because a DIA library is not whole spectra and an uncalibrated prediction extracts every peak group at the wrong time.
 - Python: `koinapy.Koina(...).predict(df)` for Prosit/AlphaPeptDeep/MS2PIP/UniSpec fragment intensities and iRT served from Koina
-- Python: `deeplc.DeepLC().calibrate_preds(); .make_preds()` for RT prediction of any modification
+- Python: `deeplc.predict_and_calibrate(psms, psm_list_reference=cal_psms)` for RT prediction of any modification (module-level API, see Version Compatibility)
 - Python: `ms2pip.predict_batch(psms, model='HCD')` for local fragment-intensity prediction
 - CLI: EncyclopeDIA for empirical chromatogram libraries; EasyPQP/FragPipe for DDA-based libraries
 
@@ -136,6 +156,34 @@ def spectronaut_to_diann(lib):
     return out
 ```
 
+**OpenSwathDecoyGenerator's real input requirements (verified on OpenMS 3.5.0):**
+`TargetedFileConverter` converts and validates a TSV/TraML with placeholder `ProductMz` values
+without complaint, but `OpenSwathDecoyGenerator` then silently produces `Number of decoy
+peptides: 0` and fails ("... below the threshold of 80.0%") unless the transition list carries
+BOTH a literal `Annotation` column (e.g. `y3^1`) AND chemically real theoretical fragment m/z --
+not placeholders:
+
+```python
+from pyteomics import mass
+
+def y_ion_mz(seq, i, charge=1):
+    return mass.fast_mass(seq[-i:], ion_type='y', charge=charge)  # real theoretical m/z, required
+
+# each transition row needs: ProductMz=y_ion_mz(seq, i), Annotation=f'y{i}^1'
+```
+
+```bash
+TargetedFileConverter -in library.tsv -in_type tsv -out library.TraML -out_type TraML
+OpenSwathDecoyGenerator -in library.TraML -out library_decoy.TraML -method pseudo-reverse
+```
+
+The default `-method shuffle` has no seed flag and is NOT reproducible: two runs on identical
+input produce different decoy peptide sequences (confirmed by diffing output TraML from repeated
+runs). Use `-method reverse` or `-method pseudo-reverse` instead when decoys must be
+reproducible run-to-run -- both are deterministic (confirmed byte-identical across repeated
+runs). `-method shift` is listed by `--helphelp` but rejected every peptide as a duplicate in
+testing (OpenMS 3.5.0) because it leaves the amino-acid sequence unchanged; do not rely on it.
+
 ### QC and Merge Libraries
 
 **Goal:** Summarize a library and combine multiple libraries without dropping legitimate distinct transitions.
@@ -182,6 +230,12 @@ def library_stats(lib):
 **Symptom:** FDR cannot be estimated or is meaningless.
 **Fix:** Run OpenSwathDecoyGenerator to append decoys; do NOT also supply decoys to DIA-NN/Spectronaut, which generate their own.
 
+### OpenSwathDecoyGenerator silently generates 0 decoys
+**Trigger:** Transition list has placeholder/approximate `ProductMz` values or lacks a literal `Annotation` column, even though it converted cleanly via TargetedFileConverter.
+**Mechanism:** The decoy algorithm matches target and decoy fragments by annotation and real m/z; without both it cannot pair any fragment and drops every candidate peptide.
+**Symptom:** "Number of decoy peptides: 0" and a hard failure at the 80% threshold check, not a partial library.
+**Fix:** Add a literal `Annotation` column and compute real theoretical fragment m/z (e.g. `pyteomics.mass.fast_mass`) before conversion -- see "Convert Library Formats" above.
+
 ### Modification mismatch between library and data
 **Trigger:** Library lacks the sample's variable mods, or carries too many.
 **Mechanism:** A library without phospho/ox cannot find those peptidoforms; too many variable mods explode the search space and inflate FDR.
@@ -211,9 +265,12 @@ def library_stats(lib):
 | ConnectionError on proteomicsdb.org/prosit/api/predict | The old Prosit endpoint is dead | Use Koina: `from koinapy import Koina; Koina('Prosit_2019_intensity', 'koina.wilhelmlab.org:443')` |
 | ImportError: cannot import name Predictor from ms2pip | No Predictor class in ms2pip v4 | Call module-level `ms2pip.predict_batch(psms, model='HCD')` returning ProcessingResult objects |
 | koinapy TypeError on constructor/columns | Constructor signature and column names vary by version | Verify with `help(Koina)`; inputs are typically `peptide_sequences`, `precursor_charges`, `collision_energies` |
-| DeepLC RT all near constant | calibrate_preds not called | `dlc.calibrate_preds(seq_df=cal_df)` before `dlc.make_preds(seq_df=pep_df)`; mods as MS2PIP `location|name` |
+| DeepLC RT all near constant or on the wrong scale | `deeplc.predict()` called without calibration | Use `deeplc.calibrate()` + `deeplc.predict()`, or `deeplc.predict_and_calibrate(psms, psm_list_reference=cal_psms)`; mods as ProForma via `Peptidoform`, not MS2PIP `location\|name` |
 | Extraction at wrong time, ID collapse | Predicted RT not calibrated to the gradient | Fit iRT/CiRT anchors or run GPF-DIA empirical correction before searching |
 | OpenSWATH FDR meaningless | Target-only library, no decoys | Append decoys with OpenSwathDecoyGenerator |
+| OpenSwathDecoyGenerator: "Number of decoy peptides: 0" / below 80% threshold | Transition list lacks a literal `Annotation` column or has placeholder `ProductMz` | Add `Annotation` (e.g. `y3^1`) and real theoretical fragment m/z before conversion -- see "Convert Library Formats" |
+| Decoy peptide sequences differ between identical `-method shuffle` runs | Shuffle decoy generation has no seed flag; this is expected, not a bug | Use `-method reverse` or `-method pseudo-reverse` for reproducible decoys |
+| ms2pip.predict_batch appears to hang on first call ("Model hash not recognized." then nothing) | The default `model='HCD'` (= HCD2021) downloads two XGBoost files to `~/.ms2pip` on first use -- 66MB + 847MB, confirmed via `Content-Length` -- with no progress output, no timeout, and no resume (a killed download restarts from 0, not where it left off) | Let it finish once with network access (~10+ min on a slow link), pre-populate `model_dir` from a machine that already has it cached, or pass a smaller model (`model='HCD2019'`, ~17MB total, confirmed working end-to-end in ~45s) if HCD2021's extra accuracy isn't needed |
 | Fewer transitions than expected after merge | Dedup key missed charges | Key on the full five-field transition key |
 
 ## References

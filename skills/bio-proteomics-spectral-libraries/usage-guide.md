@@ -9,6 +9,9 @@ pip install koinapy ms2pip deeplc pandas numpy scipy
 # CLI: EncyclopeDIA (Java), EasyPQP/FragPipe for DDA libraries, OpenMS for OpenSwathDecoyGenerator
 # Predicted intensities/RT/CCS also served from Koina (koina.wilhelmlab.org)
 ```
+ms2pip's first `predict_batch()` call downloads its XGBoost model files to `~/.ms2pip` with no
+progress output and no timeout -- the default `HCD` model alone is ~915MB. See the Common
+Errors table in SKILL.md for what this looks like and how to work around it.
 
 ## Quick Start
 Tell your AI agent what you want to do:

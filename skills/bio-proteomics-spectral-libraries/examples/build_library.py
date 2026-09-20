@@ -14,7 +14,8 @@ from scipy import stats
 # inputs = pd.DataFrame({'peptide_sequences': ['LGGNEQVTR'], 'precursor_charges': [2], 'collision_energies': [30]})
 # fragments = Koina('Prosit_2019_intensity', 'koina.wilhelmlab.org:443').predict(inputs)
 # import ms2pip; result = ms2pip.predict_batch(psms, model='HCD')  # v4 module-level API, ProcessingResult objects
-# from deeplc import DeepLC; dlc = DeepLC(); dlc.calibrate_preds(seq_df=cal_df); rt = dlc.make_preds(seq_df=pep_df)
+# import deeplc; from psm_utils import PSM, PSMList  # 4.1+ module-level API, no DeepLC class; verified on 4.5.0
+# rt = deeplc.predict_and_calibrate(pred_psms, psm_list_reference=cal_psms)  # cal_psms carry observed retention_time
 
 R2_MIN = 0.95  # below this the iRT-to-RT fit is untrustworthy and extraction windows misplace
 FRAGMENTS_PER_PRECURSOR = 6  # confident peak-group scoring without inviting interference

@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "4b22889326905f518bc16073242a798ca46f4a60"
+      "staging_commit": "04e85dcb210a84960b482e6f566252f972b45540"
     }
   },
   "skills": [
@@ -303,8 +303,8 @@
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-causal-genomics-transcriptome-wide-association.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
@@ -1674,17 +1674,19 @@
     {
       "id": "bio-proteomics-spectral-libraries",
       "upstream_path": "proteomics/spectral-libraries",
-      "score": 87,
+      "score": 93,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-proteomics-spectral-libraries.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "build_library.py",
+        "usage-guide.md"
       ]
     },
     {
