@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 149,
+    "refined": 150,
     "audited_and_excluded": 4,
     "out_of_scope": 1,
-    "remaining": 408
+    "remaining": 407
   },
   "remaining": [
     {
@@ -839,6 +839,10 @@
       "upstream_path": "database-access/interaction-databases"
     },
     {
+      "id": "bio-isoform-switching",
+      "upstream_path": "alternative-splicing/isoform-switching"
+    },
+    {
       "id": "bio-long-read-sequencing-basecalling",
       "upstream_path": "long-read-sequencing/basecalling"
     },
@@ -873,10 +877,6 @@
     {
       "id": "bio-long-read-sequencing-structural-variants",
       "upstream_path": "long-read-sequencing/structural-variants"
-    },
-    {
-      "id": "bio-long-read-splicing",
-      "upstream_path": "alternative-splicing/long-read-splicing"
     },
     {
       "id": "bio-longitudinal-monitoring",
@@ -1315,10 +1315,6 @@
       "upstream_path": "spatial-transcriptomics/spatial-visualization"
     },
     {
-      "id": "bio-splicing-qc",
-      "upstream_path": "alternative-splicing/splicing-qc"
-    },
-    {
       "id": "bio-splicing-quantification",
       "upstream_path": "alternative-splicing/splicing-quantification"
     },
@@ -1645,18 +1641,6 @@
   ],
   "excluded": [
     {
-      "id": "bio-isoform-switching",
-      "upstream_path": "alternative-splicing/isoform-switching",
-      "score": 66,
-      "grade": "Beta Only",
-      "deployable": false,
-      "open_p0": 0,
-      "audited_on": "2026-09-20",
-      "fix_log": "fixes/bio-isoform-switching.md",
-      "fix_pass": "done",
-      "reaudit": "not needed"
-    },
-    {
       "id": "bio-outlier-splicing-detection",
       "upstream_path": "alternative-splicing/outlier-splicing-detection",
       "score": 67,
@@ -1676,8 +1660,8 @@
       "deployable": false,
       "open_p0": 2,
       "audited_on": "2026-09-20",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-single-cell-splicing.md",
+      "fix_pass": "done",
       "reaudit": "not needed"
     },
     {
@@ -1687,6 +1671,18 @@
       "grade": "Reject",
       "deployable": false,
       "open_p0": 2,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-splicing-qc",
+      "upstream_path": "alternative-splicing/splicing-qc",
+      "score": 67,
+      "grade": "Reject",
+      "deployable": false,
+      "open_p0": 1,
       "audited_on": "2026-09-20",
       "fix_log": null,
       "fix_pass": "needed",

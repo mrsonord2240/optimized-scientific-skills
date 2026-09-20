@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**408 remaining** across 52 folders. 149 are already refined and live in `skills/`.
+**407 remaining** across 52 folders. 150 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 149 refined, 4 audited and excluded, 1 out of scope, 408 remaining.
+The source tree holds 562 Skills: 150 refined, 4 audited and excluded, 1 out of scope, 407 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -61,7 +61,7 @@ The source tree holds 562 Skills: 149 refined, 4 audited and excluded, 1 out of 
 | read-alignment | 4 | 0 |
 | rna-quantification | 4 | 0 |
 | rna-structure | 4 | 0 |
-| alternative-splicing | 3 | 2 |
+| alternative-splicing | 2 | 3 |
 
 ## Promoted, fix pass still needed
 
@@ -130,10 +130,10 @@ fixed.
 
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
-| `bio-isoform-switching` | 66 | Beta Only | 0 |
 | `bio-outlier-splicing-detection` | 67 | Beta Only | 0 |
 | `bio-single-cell-splicing` | 69 | Reject | 2 |
 | `bio-splice-variant-prediction` | 66 | Reject | 2 |
+| `bio-splicing-qc` | 67 | Reject | 1 |
 
 ## Out of scope
 
@@ -145,8 +145,7 @@ fixed.
 
 ### alternative-splicing
 
-- `bio-long-read-splicing` — `alternative-splicing/long-read-splicing`
-- `bio-splicing-qc` — `alternative-splicing/splicing-qc`
+- `bio-isoform-switching` — `alternative-splicing/isoform-switching`
 - `bio-splicing-quantification` — `alternative-splicing/splicing-quantification`
 
 ### atac-seq

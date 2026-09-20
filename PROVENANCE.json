@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "70b5873e347f3f040e96b881afb7de6a622920f5"
+      "staging_commit": "1e4e4a49a0e61198b4cc17136feadbc4496651e5"
     }
   },
   "skills": [
@@ -1167,6 +1167,24 @@
       "changed_files": [
         "SKILL.md",
         "create_database.sh",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-long-read-splicing",
+      "upstream_path": "alternative-splicing/long-read-splicing",
+      "score": 83,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-long-read-splicing.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "longread_splicing_pipeline.sh",
         "usage-guide.md"
       ]
     },
