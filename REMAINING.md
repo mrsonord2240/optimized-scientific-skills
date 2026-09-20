@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**416 remaining** across 53 folders. 143 are already refined and live in `skills/`.
+**415 remaining** across 53 folders. 144 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 143 refined, 2 audited and excluded, 1 out of scope, 416 remaining.
+The source tree holds 562 Skills: 144 refined, 2 audited and excluded, 1 out of scope, 415 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -62,7 +62,7 @@ The source tree holds 562 Skills: 143 refined, 2 audited and excluded, 1 out of 
 | read-alignment | 4 | 0 |
 | rna-quantification | 4 | 0 |
 | rna-structure | 4 | 0 |
-| alignment-files | 2 | 6 |
+| alignment-files | 1 | 7 |
 
 ## Promoted, fix pass still needed
 
@@ -131,7 +131,7 @@ fixed.
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
 | `bio-bam-statistics` | 71 | Beta Only | 0 |
-| `bio-pileup-generation` | 71 | Beta Only | 0 |
+| `bio-sam-bam-basics` | 77 | Beta Only | 0 |
 
 ## Out of scope
 
@@ -143,8 +143,7 @@ fixed.
 
 ### alignment-files
 
-- `bio-reference-operations` — `alignment-files/reference-operations`
-- `bio-sam-bam-basics` — `alignment-files/sam-bam-basics`
+- `bio-pileup-generation` — `alignment-files/pileup-generation`
 
 ### alternative-splicing
 

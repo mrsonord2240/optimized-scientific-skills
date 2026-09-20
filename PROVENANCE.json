@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "1e96d8ea0dc23a1ccd8438a566582c6c8571b4e8"
+      "staging_commit": "e4711c538e6cca7f4d60b39cb51334f7192b9a04"
     }
   },
   "skills": [
@@ -2007,6 +2007,24 @@
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-reference-operations",
+      "upstream_path": "alignment-files/reference-operations",
+      "score": 85,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-reference-operations.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "prepare_reference.sh",
+        "usage-guide.md"
       ]
     },
     {

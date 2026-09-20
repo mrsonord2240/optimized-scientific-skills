@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 143,
+    "refined": 144,
     "audited_and_excluded": 2,
     "out_of_scope": 1,
-    "remaining": 416
+    "remaining": 415
   },
   "remaining": [
     {
@@ -1039,6 +1039,10 @@
       "upstream_path": "phasing-imputation/reference-panels"
     },
     {
+      "id": "bio-pileup-generation",
+      "upstream_path": "alignment-files/pileup-generation"
+    },
+    {
       "id": "bio-population-genetics-association-testing",
       "upstream_path": "population-genetics/association-testing"
     },
@@ -1129,10 +1133,6 @@
     {
       "id": "bio-read-sequences",
       "upstream_path": "sequence-io/read-sequences"
-    },
-    {
-      "id": "bio-reference-operations",
-      "upstream_path": "alignment-files/reference-operations"
     },
     {
       "id": "bio-reporting-automated-qc-reports",
@@ -1241,10 +1241,6 @@
     {
       "id": "bio-rna-structure-structure-probing",
       "upstream_path": "rna-structure/structure-probing"
-    },
-    {
-      "id": "bio-sam-bam-basics",
-      "upstream_path": "alignment-files/sam-bam-basics"
     },
     {
       "id": "bio-sashimi-plots",
@@ -1689,14 +1685,14 @@
       "reaudit": "not needed"
     },
     {
-      "id": "bio-pileup-generation",
-      "upstream_path": "alignment-files/pileup-generation",
-      "score": 71,
+      "id": "bio-sam-bam-basics",
+      "upstream_path": "alignment-files/sam-bam-basics",
+      "score": 77,
       "grade": "Beta Only",
       "deployable": false,
       "open_p0": 0,
       "audited_on": "2026-09-20",
-      "fix_log": "fixes/bio-pileup-generation.md",
+      "fix_log": "fixes/bio-sam-bam-basics.md",
       "fix_pass": "done",
       "reaudit": "not needed"
     }
