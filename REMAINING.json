@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 132,
-    "audited_and_excluded": 0,
+    "refined": 133,
+    "audited_and_excluded": 1,
     "out_of_scope": 1,
-    "remaining": 429
+    "remaining": 427
   },
   "remaining": [
     {
@@ -23,20 +23,12 @@
       "upstream_path": "alignment-files/alignment-indexing"
     },
     {
-      "id": "bio-alignment-io",
-      "upstream_path": "alignment/alignment-io"
-    },
-    {
       "id": "bio-alignment-msa-parsing",
       "upstream_path": "alignment/msa-parsing"
     },
     {
       "id": "bio-alignment-msa-statistics",
       "upstream_path": "alignment/msa-statistics"
-    },
-    {
-      "id": "bio-alignment-pairwise",
-      "upstream_path": "alignment/pairwise-alignment"
     },
     {
       "id": "bio-alignment-sorting",
@@ -1727,7 +1719,20 @@
       "upstream_path": "sequence-io/write-sequences"
     }
   ],
-  "excluded": [],
+  "excluded": [
+    {
+      "id": "bio-alignment-io",
+      "upstream_path": "alignment/alignment-io",
+      "score": 74,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    }
+  ],
   "out_of_scope": [
     {
       "id": "clawhub-installer",

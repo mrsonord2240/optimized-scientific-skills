@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**429 remaining** across 54 folders. 132 are already refined and live in `skills/`.
+**427 remaining** across 54 folders. 133 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 132 refined, 0 audited and excluded, 1 out of scope, 429 remaining.
+The source tree holds 562 Skills: 133 refined, 1 audited and excluded, 1 out of scope, 427 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -47,7 +47,6 @@ The source tree holds 562 Skills: 132 refined, 0 audited and excluded, 1 out of 
 | small-rna-seq | 6 | 0 |
 | tcr-bcr-analysis | 6 | 0 |
 | temporal-genomics | 6 | 0 |
-| alignment | 5 | 2 |
 | chemoinformatics | 5 | 15 |
 | differential-expression | 5 | 1 |
 | epidemiological-genomics | 5 | 0 |
@@ -64,6 +63,7 @@ The source tree holds 562 Skills: 132 refined, 0 audited and excluded, 1 out of 
 | read-alignment | 4 | 0 |
 | rna-quantification | 4 | 0 |
 | rna-structure | 4 | 0 |
+| alignment | 3 | 3 |
 
 ## Promoted, fix pass still needed
 
@@ -74,6 +74,7 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | skill | score | grade |
 | --- | ---: | --- |
 | `bio-admet-prediction` | 86 | Limited Release |
+| `bio-alignment-pairwise` | 80 | Limited Release |
 | `bio-causal-genomics-genetic-correlation` | 89 | Production Ready |
 | `bio-differential-expression-deseq2-basics` | 92 | Production Ready |
 | `bio-machine-learning-model-validation` | 93 | Limited Release |
@@ -131,6 +132,7 @@ fixed.
 
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
+| `bio-alignment-io` | 74 | Beta Only | 0 |
 
 ## Out of scope
 
@@ -142,10 +144,8 @@ fixed.
 
 ### alignment
 
-- `bio-alignment-io` — `alignment/alignment-io`
 - `bio-alignment-msa-parsing` — `alignment/msa-parsing`
 - `bio-alignment-msa-statistics` — `alignment/msa-statistics`
-- `bio-alignment-pairwise` — `alignment/pairwise-alignment`
 - `bio-alignment-structural` — `alignment/structural-alignment`
 
 ### alignment-files
