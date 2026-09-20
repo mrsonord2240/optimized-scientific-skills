@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "85a3e4de9a56ad5b24911ee7c21a039eb57ef216"
+      "staging_commit": "ed0ff44371bd7a2bea70cbf9aa0309acb01b28f6"
     }
   },
   "skills": [
@@ -199,6 +199,24 @@
         "alignment_from_file.py",
         "global_alignment.py",
         "sequences.fasta",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-alignment-sorting",
+      "upstream_path": "alignment-files/alignment-sorting",
+      "score": 86,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-alignment-sorting.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "sort_pipeline.sh",
         "usage-guide.md"
       ]
     },
@@ -902,8 +920,8 @@
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-20",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-duplicate-handling.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
