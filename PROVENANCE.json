@@ -472,6 +472,22 @@
       ]
     },
     {
+      "id": "bio-crispr-screens-combinatorial-screens",
+      "upstream_path": "crispr-screens/combinatorial-screens",
+      "score": 87,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "id": "bio-crispr-screens-copy-number-correction",
       "upstream_path": "crispr-screens/copy-number-correction",
       "score": 82,
@@ -540,6 +556,22 @@
         "SKILL.md",
         "consensus_hits.py",
         "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-crispr-screens-in-vivo-screens",
+      "upstream_path": "crispr-screens/in-vivo-screens",
+      "score": 88,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
       ]
     },
     {

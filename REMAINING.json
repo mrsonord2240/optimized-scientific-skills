@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 128,
+    "refined": 130,
     "audited_and_excluded": 0,
     "out_of_scope": 1,
-    "remaining": 433
+    "remaining": 431
   },
   "remaining": [
     {
@@ -401,14 +401,6 @@
     {
       "id": "bio-copy-number-subclonal-copy-number",
       "upstream_path": "copy-number/subclonal-copy-number"
-    },
-    {
-      "id": "bio-crispr-screens-combinatorial-screens",
-      "upstream_path": "crispr-screens/combinatorial-screens"
-    },
-    {
-      "id": "bio-crispr-screens-in-vivo-screens",
-      "upstream_path": "crispr-screens/in-vivo-screens"
     },
     {
       "id": "bio-crispr-screens-perturb-seq-analysis",
