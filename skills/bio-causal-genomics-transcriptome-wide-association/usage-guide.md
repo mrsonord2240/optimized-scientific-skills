@@ -17,7 +17,9 @@ TWAS is the natural cousin of Mendelian randomization and colocalization in the 
 Install Python tools:
 
 ```bash
-pip install pyfocus
+pip install pyfocus "pandas<2.2" "setuptools<81"   # see SKILL.md Tool Install Notes: a bare
+                                                    # `pip install pyfocus` is non-functional,
+                                                    # and a required post-install patch follows
 git clone https://github.com/hakyimlab/MetaXcan   # S-PrediXcan / S-MultiXcan (not on PyPI)
 ```
 

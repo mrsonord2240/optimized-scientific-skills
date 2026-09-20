@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "04e85dcb210a84960b482e6f566252f972b45540"
+      "staging_commit": "b9a9bd52806351317cfbae2cd1bbca479bb3ad54"
     }
   },
   "skills": [
@@ -298,17 +298,19 @@
     {
       "id": "bio-causal-genomics-transcriptome-wide-association",
       "upstream_path": "causal-genomics/transcriptome-wide-association",
-      "score": 80,
-      "grade": "Limited Release",
+      "score": 87,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
       "fix_log": "fixes/bio-causal-genomics-transcriptome-wide-association.md",
       "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "focus_finemap.sh",
+        "usage-guide.md"
       ]
     },
     {

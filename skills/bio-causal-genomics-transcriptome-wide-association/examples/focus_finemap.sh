@@ -1,8 +1,16 @@
 #!/usr/bin/env bash
-# Reference: MetaXcan 0.7+, FUSION 2.0+, FOCUS 0.8+, plink2 | Verify API if version differs
+# Reference: MetaXcan 0.7+, FUSION 2.0+, FOCUS (pyfocus) 0.802, plink2 | Verify API if version differs
 # FOCUS probabilistic gene-level fine-mapping of TWAS hits.
 # Resolves co-significant gene clusters at gene-dense loci into a credible causal-gene set
 # with per-gene posterior inclusion probabilities (PIPs).
+#
+# Install (checked 2026-09-19; a bare `pip install pyfocus` is non-functional -- see
+# SKILL.md Tool Install Notes for why and for the required post-install patch):
+#   pip install pyfocus "pandas<2.2" "setuptools<81"
+#
+# Windows: use paths relative to the working directory below, never an absolute `F:/...`
+# path -- pyfocus splits every positional argument on ':' to detect multi-ancestry input,
+# which also splits a drive-letter colon (confirmed: mis-detects "2 populations" from 1 file).
 
 set -euo pipefail
 
@@ -11,6 +19,8 @@ GWAS_FILE='gwas.sumstats'                                # GWAS sumstats (CHR SN
 LD_REF_PREFIX='1000G_EUR/chr'                            # PLINK bfile per chromosome (chr1.bim/bed/fam, ...)
 FOCUS_DB='focus_gtex_v8_whole_blood.db'                  # FOCUS DB matched to the TWAS weight panel
 TISSUE='Whole_Blood'                                     # Tissue label inside the FOCUS DB
+LOCATIONS='38:EUR'                                       # Required (not optional) in installed pyfocus 0.802;
+                                                          # use 37:EUR instead for GRCh37-aligned panels
 
 # Genome-wide significance threshold for SNPs that flag a locus for fine-mapping.
 # 5e-8 is standard GWAS genome-wide significance; loci below this threshold trigger FOCUS.
@@ -33,20 +43,28 @@ focus finemap \
     "${FOCUS_DB}" \
     --p-threshold "${P_THRESHOLD}" \
     --tissue "${TISSUE}" \
+    --locations "${LOCATIONS}" \
     --out "${OUT_PREFIX}"
-# Single-ancestry bogdanlab/focus (pip pyfocus) omits --locations (uses default LD blocks)
-# or takes a --locations FILE. The 38:EUR build:pop form and multi-ancestry 38:EUR-EAS-AFR
-# (with colon-separated per-ancestry sumstats/LD/weight DBs) are MA-FOCUS (mancusolab/ma-focus) syntax.
+# --locations is required here, not optional: omitting it crashes with "Please specify
+# independent regions location or default regions with '37:EUR', etc." (confirmed
+# 2026-09-19; there is no default-LD-block fallback in installed pyfocus 0.802). The same
+# build:pop syntax extends to multi-ancestry 38:EUR-EAS-AFR (with colon-separated
+# per-ancestry sumstats/LD/weight DBs) for MA-FOCUS (mancusolab/ma-focus) below.
 
 # ---- Step 3: filter credible-set genes ----
 # FOCUS reports per-gene PIP. PIP >= 0.8 = causal candidate; 0.5 <= PIP < 0.8 = suggestive;
 # PIP < 0.5 at a co-significant locus = LD-tagged co-regulated gene (NOT causal).
 # Mancuso 2019 Nat Genet 51:675 convention.
+#
+# Installed pyfocus 0.802 never writes a plain "pip" column: single-ancestry output names it
+# "pips_pop1" (population-indexed even for one population); multi-ancestry adds "pips_me" for
+# the cross-ancestry marginal PIP (confirmed from pyfocus/finemap.py's create_output(), 2026-09-19).
 PIP_THRESH='0.8'
+PIP_COL='pips_pop1'   # use 'pips_me' for the cross-ancestry PIP on MA-FOCUS output
 
-awk -v t="${PIP_THRESH}" -F'\t' '
+awk -v t="${PIP_THRESH}" -v pcol="${PIP_COL}" -F'\t' '
     NR==1 {print; for (i=1; i<=NF; i++) col[$i]=i; next}
-    $col["pip"] >= t {print}
+    $col[pcol] >= t {print}
 ' "${OUT_PREFIX}.focus.tsv" > "${OUT_PREFIX}.credible.tsv"
 
 echo 'FOCUS fine-mapping complete.'
