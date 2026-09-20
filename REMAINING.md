@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**427 remaining** across 54 folders. 133 are already refined and live in `skills/`.
+**427 remaining** across 54 folders. 134 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 133 refined, 1 audited and excluded, 1 out of scope, 427 remaining.
+The source tree holds 562 Skills: 134 refined, 0 audited and excluded, 1 out of scope, 427 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -63,7 +63,7 @@ The source tree holds 562 Skills: 133 refined, 1 audited and excluded, 1 out of 
 | read-alignment | 4 | 0 |
 | rna-quantification | 4 | 0 |
 | rna-structure | 4 | 0 |
-| alignment | 3 | 3 |
+| alignment | 3 | 4 |
 
 ## Promoted, fix pass still needed
 
@@ -131,7 +131,6 @@ fixed.
 
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
-| `bio-alignment-msa-parsing` | 78 | Beta Only | 0 |
 
 ## Out of scope
 
@@ -143,7 +142,7 @@ fixed.
 
 ### alignment
 
-- `bio-alignment-io` — `alignment/alignment-io`
+- `bio-alignment-msa-parsing` — `alignment/msa-parsing`
 - `bio-alignment-msa-statistics` — `alignment/msa-statistics`
 - `bio-alignment-structural` — `alignment/structural-alignment`
 

@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "7d3e7c2a3b96a5f57fa40abfa64bfcf1fb5e34b0"
+      "staging_commit": "818f049738e5194c9182844105d34c9a40afaffb"
     }
   },
   "skills": [
@@ -27,6 +27,26 @@
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-alignment-io",
+      "upstream_path": "alignment/alignment-io",
+      "score": 85,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": "fixes/bio-alignment-io.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "batch_convert.py",
+        "convert_formats.py",
+        "slice_alignment.py",
+        "usage-guide.md"
       ]
     },
     {
