@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b"
+      "staging_commit": "7e371d7b766f7014648bd119e2eabc155e7723ff"
     }
   },
   "skills": [
@@ -279,6 +279,24 @@
         "usage-guide.md",
         "validate_alignment.py",
         "validate_alignment.sh"
+      ]
+    },
+    {
+      "id": "bio-bam-statistics",
+      "upstream_path": "alignment-files/bam-statistics",
+      "score": 88,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-bam-statistics.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "qc_report.py",
+        "usage-guide.md"
       ]
     },
     {

@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 146,
-    "audited_and_excluded": 1,
+    "refined": 147,
+    "audited_and_excluded": 3,
     "out_of_scope": 1,
-    "remaining": 414
+    "remaining": 411
   },
   "remaining": [
     {
@@ -459,10 +459,6 @@
       "upstream_path": "differential-expression/timeseries-de"
     },
     {
-      "id": "bio-differential-splicing",
-      "upstream_path": "alternative-splicing/differential-splicing"
-    },
-    {
       "id": "bio-ecological-genomics-biodiversity-metrics",
       "upstream_path": "ecological-genomics/biodiversity-metrics"
     },
@@ -843,10 +839,6 @@
       "upstream_path": "database-access/interaction-databases"
     },
     {
-      "id": "bio-isoform-switching",
-      "upstream_path": "alternative-splicing/isoform-switching"
-    },
-    {
       "id": "bio-long-read-sequencing-basecalling",
       "upstream_path": "long-read-sequencing/basecalling"
     },
@@ -881,10 +873,6 @@
     {
       "id": "bio-long-read-sequencing-structural-variants",
       "upstream_path": "long-read-sequencing/structural-variants"
-    },
-    {
-      "id": "bio-long-read-splicing",
-      "upstream_path": "alternative-splicing/long-read-splicing"
     },
     {
       "id": "bio-longitudinal-monitoring",
@@ -1669,14 +1657,38 @@
   ],
   "excluded": [
     {
-      "id": "bio-bam-statistics",
-      "upstream_path": "alignment-files/bam-statistics",
-      "score": 71,
+      "id": "bio-differential-splicing",
+      "upstream_path": "alternative-splicing/differential-splicing",
+      "score": 73,
       "grade": "Beta Only",
       "deployable": false,
       "open_p0": 0,
       "audited_on": "2026-09-20",
-      "fix_log": "fixes/bio-bam-statistics.md",
+      "fix_log": "fixes/bio-differential-splicing.md",
+      "fix_pass": "done",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-isoform-switching",
+      "upstream_path": "alternative-splicing/isoform-switching",
+      "score": 66,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-long-read-splicing",
+      "upstream_path": "alternative-splicing/long-read-splicing",
+      "score": 68,
+      "grade": "Reject",
+      "deployable": false,
+      "open_p0": 2,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-long-read-splicing.md",
       "fix_pass": "done",
       "reaudit": "not needed"
     }
