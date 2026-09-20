@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 142,
+    "refined": 143,
     "audited_and_excluded": 2,
     "out_of_scope": 1,
-    "remaining": 417
+    "remaining": 416
   },
   "remaining": [
     {
@@ -1039,10 +1039,6 @@
       "upstream_path": "phasing-imputation/reference-panels"
     },
     {
-      "id": "bio-pileup-generation",
-      "upstream_path": "alignment-files/pileup-generation"
-    },
-    {
       "id": "bio-population-genetics-association-testing",
       "upstream_path": "population-genetics/association-testing"
     },
@@ -1681,18 +1677,6 @@
   ],
   "excluded": [
     {
-      "id": "bio-alignment-validation",
-      "upstream_path": "alignment-files/alignment-validation",
-      "score": 66,
-      "grade": "Beta Only",
-      "deployable": false,
-      "open_p0": 0,
-      "audited_on": "2026-09-20",
-      "fix_log": "fixes/bio-alignment-validation.md",
-      "fix_pass": "done",
-      "reaudit": "not needed"
-    },
-    {
       "id": "bio-bam-statistics",
       "upstream_path": "alignment-files/bam-statistics",
       "score": 71,
@@ -1702,6 +1686,18 @@
       "audited_on": "2026-09-20",
       "fix_log": "fixes/bio-bam-statistics.md",
       "fix_pass": "done",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-pileup-generation",
+      "upstream_path": "alignment-files/pileup-generation",
+      "score": 71,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
       "reaudit": "not needed"
     }
   ],

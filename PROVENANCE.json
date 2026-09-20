@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "ed0ff44371bd7a2bea70cbf9aa0309acb01b28f6"
+      "staging_commit": "7478de2954b34432dd1bf9c048fab97b3ad11ecd"
     }
   },
   "skills": [
@@ -260,6 +260,25 @@
         "selection-analysis-workflow.md",
         "specialist-trimmers.md",
         "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-alignment-validation",
+      "upstream_path": "alignment-files/alignment-validation",
+      "score": 85,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-alignment-validation.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "usage-guide.md",
+        "validate_alignment.py",
+        "validate_alignment.sh"
       ]
     },
     {
