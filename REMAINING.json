@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 134,
-    "audited_and_excluded": 0,
+    "refined": 135,
+    "audited_and_excluded": 2,
     "out_of_scope": 1,
-    "remaining": 427
+    "remaining": 424
   },
   "remaining": [
     {
@@ -23,20 +23,8 @@
       "upstream_path": "alignment-files/alignment-indexing"
     },
     {
-      "id": "bio-alignment-msa-parsing",
-      "upstream_path": "alignment/msa-parsing"
-    },
-    {
-      "id": "bio-alignment-msa-statistics",
-      "upstream_path": "alignment/msa-statistics"
-    },
-    {
       "id": "bio-alignment-sorting",
       "upstream_path": "alignment-files/alignment-sorting"
-    },
-    {
-      "id": "bio-alignment-structural",
-      "upstream_path": "alignment/structural-alignment"
     },
     {
       "id": "bio-alignment-validation",
@@ -1719,7 +1707,32 @@
       "upstream_path": "sequence-io/write-sequences"
     }
   ],
-  "excluded": [],
+  "excluded": [
+    {
+      "id": "bio-alignment-msa-statistics",
+      "upstream_path": "alignment/msa-statistics",
+      "score": 66,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-alignment-msa-statistics.md",
+      "fix_pass": "done",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-alignment-structural",
+      "upstream_path": "alignment/structural-alignment",
+      "score": 73,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    }
+  ],
   "out_of_scope": [
     {
       "id": "clawhub-installer",

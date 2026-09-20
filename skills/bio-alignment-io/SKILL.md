@@ -8,7 +8,7 @@ license: MIT
 
 ## Version Compatibility
 
-Checked on Biopython 1.88 and pyhmmer 0.12.3 (2026-09-19); patterns need Biopython 1.83+.
+Checked on Biopython 1.88 and pyhmmer 0.12.3 (2026-09-19), downstream tools on RAxML-NG 1.2.2 / 2.0.3, PhyML 3.3.20220408 / 3.3.20260528, MrBayes 3.2.7, IQ-TREE 3.1.3 (2026-09-20); patterns need Biopython 1.83+.
 
 ```bash
 pip install biopython
@@ -46,15 +46,16 @@ Three Python libraries cover the alignment-format space, with overlapping but no
 |--------|---------------|----------------------|-----------------|-------|
 | Aligned FASTA | R/W | R/W | R/W (`afa`) | Most portable; loses annotations |
 | Clustal | R/W | R/W | R/W | Clustal conservation marks NOT round-tripped |
-| PHYLIP (interleaved/sequential/relaxed) | R/W | R/W | R/W (`phylip`, `phylips`) | Strict 10-char names: see PHYLIP pitfalls |
+| PHYLIP (interleaved/sequential/relaxed) | R/W | R/W (strict 10-char names only: no relaxed variant; long ids raise on read and are silently truncated on write) | R/W (`phylip`, `phylips`) | See PHYLIP pitfalls |
 | Stockholm | R/W | R (plain files only; TypeError on real Pfam), W (AttributeError) | R/W | Only format preserving GS/GR/GC annotations (GF header lines are dropped by AlignIO) |
 | NEXUS | R/W | R/W | -- | MrBayes / PAUP* input; write needs a molecule type |
 | MAF (Multiple Alignment Format) | R/W | R/W | -- | UCSC whole-genome alignments |
-| A2M | -- (`'fasta'` parser works on padded A2M only) | R (padded A2M) | R/W | HMMER `hmmalign` writes ragged A2M |
+| A2M | -- (`'fasta'` parser works on padded A2M only) | R (padded A2M), W (needs `column_annotations['state']`, so only for alignments read from A2M) | R/W | HMMER `hmmalign` writes ragged A2M |
 | A3M | -- | -- | -- | HH-suite / ColabFold; convert to A2M first (below) |
 | MSF (GCG) | R | R | -- | GCG legacy |
 | EMBOSS / Mauve XMFA / FASTA-m10 | R (Mauve also W; FASTA-m10 AlignIO only) | R (Mauve also W; no FASTA-m10) | -- | Mostly one-way |
-| PSL / chain / BED / SAM | -- | R/W (pairwise alignments, not MSAs) | -- | Use Kent tools for manipulation |
+| PSL / chain / BED / SAM / exonerate / bigMaf / bigPsl / bigBed | -- | R/W (pairwise alignments, not MSAs) | -- | Use Kent tools for manipulation |
+| HHR / tabular (BLAST) | -- | R only (search hits, not MSAs) | -- | |
 
 **Formats NOT in BioPython** (use dedicated tools):
 
@@ -144,6 +145,16 @@ for record in alignment:
     record.annotations['molecule_type'] = 'DNA'
 AlignIO.write(alignment, 'output.nex', 'nexus')
 ```
+The value is copied into `datatype=` unchecked: label a protein alignment `'DNA'` and the file says `datatype=dna` with no error, so set it from the data (`examples/convert_formats.py` infers it and refuses a mismatch).
+
+**MrBayes needs quote-free ids.** Biopython single-quotes ids containing punctuation such as `-`, `+`, `:` or a space (Pfam/UniProt `GLB2_LUMTE/31-141`; `/` and `.` alone are not quoted), and MrBayes 3.2.7 stops with ``Instead found ''' in command 'Matrix'``. Replace every character outside `[A-Za-z0-9_]` before writing, and keep the ids unique (checked: MrBayes 3.2.7 loads the sanitized file and runs `mcmc`):
+```python
+import re
+for record in alignment:
+    record.id = re.sub(r'[^A-Za-z0-9_]', '_', record.id)
+    record.name, record.description = record.id, ''
+assert len({r.id for r in alignment}) == len(alignment), 'ids collide after sanitizing'
+```
 
 ### Manual Conversion (When Modification Needed)
 ```python
@@ -211,7 +222,7 @@ Choosing the output format depends on which downstream tool consumes the alignme
 | Downstream Tool | Required Format | BioPython Format String |
 |----------------|-----------------|------------------------|
 | RAxML-NG, IQ-TREE | PHYLIP (relaxed) | `'phylip-relaxed'` |
-| MrBayes | NEXUS | `'nexus'` |
+| MrBayes | NEXUS (quote-free ids) | `'nexus'` |
 | PAUP* | NEXUS or PHYLIP | `'nexus'` or `'phylip'` |
 | HMMER, Infernal | Stockholm | `'stockholm'` |
 | Pfam/Rfam databases | Stockholm | `'stockholm'` |
@@ -258,13 +269,14 @@ AlignIO.write(alignment, 'output.phy', 'phylip-relaxed')
 
 #### PHYLIP-Relaxed Dialect Mismatches Between Tree Tools
 
-Biopython's `'phylip-relaxed'` writes a single space between name and sequence. RAxML-NG and IQ-TREE accept this; PhyML rejects sequence names containing colons or parentheses; PAML's codeml expects sequential format with name-truncation behaviour distinct from interleaved. Common silent failures:
+Biopython's `'phylip-relaxed'` writes a single space between name and sequence. RAxML-NG and IQ-TREE accept this (checked with names of 138 characters); PhyML and RAxML-NG reject punctuation in names (table below); PAML's codeml expects sequential format with name-truncation behaviour distinct from interleaved. Common silent failures:
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| RAxML-NG: `terminating with uncaught exception ... bad alphabet` | Stop codons (`*`) in protein alignment | Replace `*` with `X` before writing |
+| RAxML-NG: `ERROR: Invalid character in sequence N at position P: *` | `*` in a nucleotide alignment (RAxML-NG 1.2.2 and 2.0.3 accept `*` in protein data as undetermined, so a stop codon is not scored) | Replace with `N` or `-` |
 | IQ-TREE 3.1.3: `WARNING: Some sequence names are changed` | Foreign file with `:` in a name (IQ-TREE renames it; Biopython's relaxed writer already turns `:` into `|` and drops `(` `,`) | Sanitize names yourself: `re.sub(r'[():,]', '_', record.id)` |
-| PhyML: silently truncated names | Names >100 chars | PhyML truncates without warning at 100 chars in current build |
+| PhyML: `Character ':' is not permitted in sequence name` (same for `,`) | Punctuation in a name (PhyML accepts `(` `)` but writes them into the Newick tree; 138-character names are kept intact, checked on 3.3.20220408 and 3.3.20260528) | Sanitize names as above |
+| RAxML-NG: `ERROR: Following taxon name contains invalid characters` | `:` `,` `(` in a name | Sanitize names as above |
 | codeml: `Error in sequence data file ... separate the sequence from its name by 2 or more spaces` | Used `phylip-relaxed` (single space, interleaved) instead of `phylip-sequential` | codeml requires sequential with short unique names |
 
 IQ-TREE has no validate-only flag (`--check` is invalid). Before a long run, check the input with a zero-iteration run (checked on IQ-TREE 3.1.3; a wrong sequence length gives `ERROR: Line N: Sequence X has wrong sequence length`), or re-read the file with `AlignIO.read`:
@@ -376,6 +388,7 @@ from pathlib import Path
 
 input_dir = Path('alignments/')
 output_dir = Path('converted/')
+output_dir.mkdir(exist_ok=True)
 
 for input_file in input_dir.glob('*.aln'):
     alignment = AlignIO.read(input_file, 'clustal')

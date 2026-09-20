@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "818f049738e5194c9182844105d34c9a40afaffb"
+      "staging_commit": "130efd18cf0d289e293da625deb172e889f80687"
     }
   },
   "skills": [
@@ -32,11 +32,11 @@
     {
       "id": "bio-alignment-io",
       "upstream_path": "alignment/alignment-io",
-      "score": 85,
+      "score": 87,
       "grade": "Limited Release",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-19",
+      "audited_on": "2026-09-20",
       "fix_log": "fixes/bio-alignment-io.md",
       "fix_pass": "done",
       "reaudit": "not needed",
@@ -45,7 +45,38 @@
         "SKILL.md",
         "batch_convert.py",
         "convert_formats.py",
+        "read_alignment.py",
         "slice_alignment.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-alignment-msa-parsing",
+      "upstream_path": "alignment/msa-parsing",
+      "score": 87,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-alignment-msa-parsing.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "a2m_a3m_io.py",
+        "analyze_alignment.py",
+        "clean_alignment.py",
+        "consensus_sequence.py",
+        "example.a2m",
+        "example_alignment.fasta",
+        "find_conserved.py",
+        "gap_analysis.py",
+        "henikoff_weights.py",
+        "mi_apc.py",
+        "msa_utils.py",
+        "muscle5_column_confidence.py",
+        "neff.py",
         "usage-guide.md"
       ]
     },

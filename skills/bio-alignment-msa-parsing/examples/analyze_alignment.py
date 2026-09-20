@@ -1,0 +1,18 @@
+'''Analyze alignment composition and conservation'''
+# Reference: biopython 1.83+ | Verify API if version differs
+
+from collections import Counter
+
+from msa_utils import example_path, load_alignment
+
+if __name__ == '__main__':
+    alignment = load_alignment(example_path('example_alignment.fasta'))
+    print(f'Alignment: {len(alignment)} sequences, {alignment.get_alignment_length()} columns\n')
+
+    print('Column composition (first 10 columns):')
+    for col_idx in range(min(10, alignment.get_alignment_length())):
+        column = alignment[:, col_idx]
+        counts = Counter(column)
+        most_common = counts.most_common(1)[0]
+        conservation = most_common[1] / len(alignment) * 100
+        print(f'  Col {col_idx}: {dict(counts)} - {conservation:.0f}% conserved')
