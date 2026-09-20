@@ -74,7 +74,7 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | skill | score | grade |
 | --- | ---: | --- |
 | `bio-admet-prediction` | 86 | Limited Release |
-| `bio-blast-searches` | 80 | Limited Release |
+| `bio-blast-searches` | 83 | Limited Release |
 | `bio-causal-genomics-genetic-correlation` | 89 | Production Ready |
 | `bio-crispr-screens-perturb-seq-analysis` | 83 | Limited Release |
 | `bio-differential-expression-deseq2-basics` | 92 | Production Ready |

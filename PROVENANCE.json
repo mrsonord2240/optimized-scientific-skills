@@ -110,7 +110,7 @@
     {
       "id": "bio-blast-searches",
       "upstream_path": "database-access/blast-searches",
-      "score": 80,
+      "score": 83,
       "grade": "Limited Release",
       "deployable": true,
       "open_p0": 0,
