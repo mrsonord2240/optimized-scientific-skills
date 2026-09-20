@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 148,
-    "audited_and_excluded": 3,
+    "refined": 149,
+    "audited_and_excluded": 4,
     "out_of_scope": 1,
-    "remaining": 410
+    "remaining": 408
   },
   "remaining": [
     {
@@ -875,6 +875,10 @@
       "upstream_path": "long-read-sequencing/structural-variants"
     },
     {
+      "id": "bio-long-read-splicing",
+      "upstream_path": "alternative-splicing/long-read-splicing"
+    },
+    {
       "id": "bio-longitudinal-monitoring",
       "upstream_path": "liquid-biopsy/longitudinal-monitoring"
     },
@@ -1001,10 +1005,6 @@
     {
       "id": "bio-ortholog-inference",
       "upstream_path": "database-access/ortholog-inference"
-    },
-    {
-      "id": "bio-outlier-splicing-detection",
-      "upstream_path": "alternative-splicing/outlier-splicing-detection"
     },
     {
       "id": "bio-paired-end-fastq",
@@ -1243,10 +1243,6 @@
       "upstream_path": "sequence-io/sequence-statistics"
     },
     {
-      "id": "bio-single-cell-splicing",
-      "upstream_path": "alternative-splicing/single-cell-splicing"
-    },
-    {
       "id": "bio-small-rna-seq-differential-mirna",
       "upstream_path": "small-rna-seq/differential-mirna"
     },
@@ -1317,10 +1313,6 @@
     {
       "id": "bio-spatial-transcriptomics-spatial-visualization",
       "upstream_path": "spatial-transcriptomics/spatial-visualization"
-    },
-    {
-      "id": "bio-splice-variant-prediction",
-      "upstream_path": "alternative-splicing/splice-variant-prediction"
     },
     {
       "id": "bio-splicing-qc",
@@ -1660,26 +1652,38 @@
       "deployable": false,
       "open_p0": 0,
       "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-isoform-switching.md",
+      "fix_pass": "done",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-outlier-splicing-detection",
+      "upstream_path": "alternative-splicing/outlier-splicing-detection",
+      "score": 67,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed"
     },
     {
-      "id": "bio-long-read-splicing",
-      "upstream_path": "alternative-splicing/long-read-splicing",
-      "score": 68,
+      "id": "bio-single-cell-splicing",
+      "upstream_path": "alternative-splicing/single-cell-splicing",
+      "score": 69,
       "grade": "Reject",
       "deployable": false,
       "open_p0": 2,
       "audited_on": "2026-09-20",
-      "fix_log": "fixes/bio-long-read-splicing.md",
-      "fix_pass": "done",
+      "fix_log": null,
+      "fix_pass": "needed",
       "reaudit": "not needed"
     },
     {
-      "id": "bio-sashimi-plots",
-      "upstream_path": "alternative-splicing/sashimi-plots",
-      "score": 67,
+      "id": "bio-splice-variant-prediction",
+      "upstream_path": "alternative-splicing/splice-variant-prediction",
+      "score": 66,
       "grade": "Reject",
       "deployable": false,
       "open_p0": 2,

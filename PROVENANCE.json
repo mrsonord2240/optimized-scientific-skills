@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "624c96b429600db6e00b568e97ab577b4e4d89ad"
+      "staging_commit": "70b5873e347f3f040e96b881afb7de6a622920f5"
     }
   },
   "skills": [
@@ -2120,6 +2120,24 @@
         "convert_formats.sh",
         "usage-guide.md",
         "view_bam.py"
+      ]
+    },
+    {
+      "id": "bio-sashimi-plots",
+      "upstream_path": "alternative-splicing/sashimi-plots",
+      "score": 88,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-sashimi-plots.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "plot_sashimi.py",
+        "usage-guide.md"
       ]
     },
     {
