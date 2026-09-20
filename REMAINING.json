@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 144,
+    "refined": 145,
     "audited_and_excluded": 2,
     "out_of_scope": 1,
-    "remaining": 415
+    "remaining": 414
   },
   "remaining": [
     {
@@ -1037,10 +1037,6 @@
     {
       "id": "bio-phasing-imputation-reference-panels",
       "upstream_path": "phasing-imputation/reference-panels"
-    },
-    {
-      "id": "bio-pileup-generation",
-      "upstream_path": "alignment-files/pileup-generation"
     },
     {
       "id": "bio-population-genetics-association-testing",

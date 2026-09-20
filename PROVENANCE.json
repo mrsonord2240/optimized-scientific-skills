@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "e4711c538e6cca7f4d60b39cb51334f7192b9a04"
+      "staging_commit": "3620ba2d352794e9fed5a9e3b6e8144d54032e99"
     }
   },
   "skills": [
@@ -1770,6 +1770,24 @@
       "changed_files": [
         "SKILL.md",
         "labeled_tree.py"
+      ]
+    },
+    {
+      "id": "bio-pileup-generation",
+      "upstream_path": "alignment-files/pileup-generation",
+      "score": 85,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-pileup-generation.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "allele_counts.py",
+        "usage-guide.md"
       ]
     },
     {
