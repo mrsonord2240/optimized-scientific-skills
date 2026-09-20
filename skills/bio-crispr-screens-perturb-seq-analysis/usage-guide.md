@@ -90,45 +90,12 @@ Tell the AI agent what to do:
 
 ## Tips
 
-- The single most common silent failure: sgRNA library prep doesn't match scRNA architecture. CROP-seq sgRNA is in 3'UTR captured by 3' chemistry. Direct-capture Perturb-seq needs amplicon-PCR pre-sequencing. Mixing them fails silently with low assignment rate.
-- For genome-wide screens, Replogle 2022 is the canonical protocol. Match: CRISPRi, 10X 3' chemistry, one dual-sgRNA element per gene, and a median >100 cells per perturbation (budget 500-1,000 per perturbation if per-perturbation DE power is the goal).
-- Mixscape escaper filtering is mandatory for clean perturbation signal. A guide- and gene-dependent fraction of cells fail to edit (Papalexi 2021: ~25% escapers for IFNGR2, but a predicted 0% perturbation rate for 15 genes); including them dilutes effects. Skip Mixscape only if validating that Cas9 expression is uniform via independent assay.
-- SCEPTRE is the only DE method with calibrated FDR on Perturb-seq scale (Barry 2024 benchmark). MAST and Wilcoxon over-call by 5-10x. Always use SCEPTRE.
-- Cells per perturbation: 500 minimum for moderate effects; 1,000+ for genome-scale comparisons. Below 500, per-pert DE is unstable.
-- MOI 0.3 is the standard for single-sgRNA-per-cell; at MOI 0.5, 9% of cells get multiple sgRNAs (not analyzable as single perturbation).
-- For combinatorial Perturb-seq (intentionally high MOI), pair guide-pairs cassettes and analyze as combinatorial.
-- Doublet rate from cell-loading (Scrublet / scDblFinder) is independent from sgRNA-multiplet rate; filter both.
-- For multimodal screens (Perturb-CITE, Perturb-ATAC, Multiome), use muon (Python) or Seurat (R) for joint analysis.
-
-## Architecture Cheat Sheet
-
-| Use case | Architecture |
-|----------|--------------|
-| Standard scRNA + sgRNA, low cost | CROP-seq |
-| Genome-wide CRISPRi (Replogle 2022) | Direct-capture + 10X 3' |
-| Surface protein + sgRNA | Perturb-CITE-seq |
-| Chromatin readout | Perturb-multiome (RNA+ATAC) |
-| Hashed cells + sgRNA | ECCITE-seq |
-| Cell barcoded + sgRNA | scAR-Trac (Tracr-RNA-barcoded) |
-
-## Cell-per-Pert Targets
-
-| Resolution | Cells per perturbation |
-|------------|------------------------|
-| Genome-scale | 500-1,000 |
-| Focused (specific module) | 1,000-2,000 |
-| Single-pert deep | 5,000+ |
-| Combinatorial (pair) | 2,000+ per pair |
+- For combinatorial Perturb-seq (intentionally high MOI), pair guide-pairs cassettes and analyze as combinatorial (see crispr-screens/combinatorial-screens).
+- For everything else -- architecture choice, MOI/assignment thresholds, Mixscape, SCEPTRE vs MAST, cells-per-perturbation targets -- see SKILL.md's Experimental Architecture Comparison, MOI and sgRNA Assignment, Escaper Cell Filtering, Failure Modes, and Quantitative Thresholds sections.
 
 ## Validation Checklist
 
-- [ ] sgRNA assignment rate >70% of cells
-- [ ] Multiplet rate <5% after doublet filtering
-- [ ] Mixscape KO retention >40% per guide (flag any guide below; investigate near-0% rates)
-- [ ] SCEPTRE permutation FDR calibrated (not MAST)
-- [ ] Per-pert cell count ≥500
-- [ ] Channel batch as SCEPTRE covariate
-- [ ] NTC controls included (~5% of library)
+Check the run against SKILL.md's Quantitative Thresholds table (sgRNA assignment, multiplet rate, Mixscape KO retention, cells per perturbation, NTC representation) and Common Errors table (SCEPTRE vs MAST, channel batch as a covariate).
 
 ## Related Skills
 

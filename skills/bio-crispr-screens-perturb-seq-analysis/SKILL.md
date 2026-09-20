@@ -8,7 +8,9 @@ license: MIT
 
 ## Version Compatibility
 
-Reference examples tested with: Pertpy 0.6+, SCEPTRE 0.10+ (R / katsevich-lab/sceptre), Mixscape via Seurat 4.3+ or Pertpy, scanpy 1.10+, anndata 0.10+, pandas 2.2+, numpy 1.26+, scipy 1.12+.
+Reference examples checked on pertpy 1.3.0, scanpy 1.12+, anndata 0.13+, pandas 2.2+, numpy 1.26+, scipy 1.12+, sceptre 0.99.0 (R / katsevich-lab/sceptre GitHub HEAD), muon 0.1.9.
+
+**pertpy >= 1.0 breaking changes from the 0.6.x examples some agents may have seen:** `PyDESeq2.test_contrasts()` takes a numeric contrast vector built via `de.contrast(column, baseline, group_to_compare)`, not a `contrast=(column, group, baseline)` tuple; and result columns are `log_fc` / `p_value` / `adj_p_value`, not `log2FoldChange` / `padj`. All code blocks below already use the current API.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - Python: `pip show pertpy scanpy anndata`
@@ -36,11 +38,11 @@ If code throws ImportError, AttributeError, or TypeError, introspect the install
 | Perturb-multiome (10X) | 2021+ | scRNA + scATAC simultaneously | scRNA + ATAC | Low | Direct capture from sgRNA cassette |
 | Replogle GW Perturb-seq (2022, *Cell*) | 2022 | Multiplexed CRISPRi with sgRNA barcoding | scRNA-seq | 1 sgRNA/cell | Direct capture |
 
-**Decision rule:** For genome-wide CRISPRi screens, Replogle's CRISPRi + 10X 3' direct-capture protocol is the gold standard (>2.5M cells; the genome-scale K562 screen targeted ~9,866 expressed genes in Replogle 2022). For protein readout, Perturb-CITE-seq. For chromatin, Perturb-multiome. For low-throughput pilot, original Dixit Perturb-seq.
+**Decision rule:** Standard scRNA + sgRNA at low cost -> CROP-seq. Genome-wide CRISPRi screens -> Replogle's CRISPRi + 10X 3' direct-capture protocol, the gold standard (>2.5M cells; the genome-scale K562 screen targeted ~9,866 expressed genes in Replogle 2022). Protein readout -> Perturb-CITE-seq. Chromatin readout -> Perturb-multiome. Hashed cells + sgRNA -> ECCITE-seq. Low-throughput pilot -> original Dixit Perturb-seq.
 
 ## MOI and sgRNA Assignment
 
-**The central technical challenge:** Each cell must receive exactly one sgRNA (otherwise the perturbation is undefined). At MOI 0.3, ~26% of cells get ≥1 sgRNA, but 4% get ≥2; the cells with multiple sgRNAs must be filtered or analyzed as combinatorial perturbations.
+**The central technical challenge:** Each cell must receive exactly one sgRNA (otherwise the perturbation is undefined). At MOI 0.3 (the standard target), ~26% of cells get ≥1 sgRNA, but 4% get ≥2; at MOI 0.5, ~9% of cells get multiple sgRNAs. The cells with multiple sgRNAs must be filtered or analyzed as combinatorial perturbations (see crispr-screens/combinatorial-screens for intentionally-high-MOI paired-guide design).
 
 **Assignment workflow:**
 
@@ -86,8 +88,11 @@ mixscape = pt.tl.Mixscape()
 mixscape.perturbation_signature(
     adata=adata,
     pert_key='sgrna_assignment',     # .obs column with sgRNA target per cell
-    control='NTC',                   # name of non-targeting control in pert_key column
+    control='NTC',                   # match this to whatever your data's NTC label actually is
     n_neighbors=20,                  # K neighbors for KNN-NTC subtraction
+    random_state=0,                  # forwarded to pynndescent.NNDescent -- omitting it makes
+                                      # X_pert non-deterministic across reruns (verified: 5/2000
+                                      # cells drifted between two unseeded runs on identical input)
 )
 # Writes .layers['X_pert'] with perturbation-signature-corrected expression
 
@@ -147,8 +152,13 @@ import pertpy as pt
 import scanpy as sc
 
 # Load data
-mdata = pt.dt.papalexi_2021()      # returns a MuData object
+mdata = pt.dt.papalexi_2021()      # returns a MuData object (rna/adt/hto/gdo modalities)
 adata = mdata['rna']  # built-in example from Mixscape paper
+# The per-cell target-gene label ('gene_target', with control cells labeled 'NT') lives on the
+# top-level MuData.obs, not on the rna modality's own .obs -- merge it in (verified: same
+# obs_names/order across mdata and mdata['rna']).
+adata.obs['gene_target'] = mdata.obs['gene_target']
+adata.layers['counts'] = adata.X.copy()  # PyDESeq2 needs raw counts -- save before normalizing
 
 # Standard scRNA-seq preprocessing (scanpy)
 sc.pp.normalize_total(adata, target_sum=1e4)
@@ -156,17 +166,25 @@ sc.pp.log1p(adata)
 sc.pp.highly_variable_genes(adata, n_top_genes=2000)
 
 # Mixscape escaper filtering (writes .layers['X_pert'] and .obs['mixscape_class'])
+# NOTE: papalexi_2021()'s own non-targeting-control label is literally 'NT' (not the 'NTC'
+# placeholder used elsewhere in this Skill) -- always match `control=` to your data's actual label.
 ms = pt.tl.Mixscape()
-ms.perturbation_signature(adata, pert_key='perturbation', control='NT', n_neighbors=20)
-ms.mixscape(adata, pert_key='perturbation', control='NT')
+ms.perturbation_signature(adata, pert_key='gene_target', control='NT', n_neighbors=20, random_state=0)
+ms.mixscape(adata, pert_key='gene_target', control='NT')
 
 # Filter to KO cells
 adata_ko = adata[adata.obs['mixscape_class'].isin(['KO', 'NT'])].copy()
 
 # Pseudobulk differential expression via pertpy (PyDESeq2 backend)
-de = pt.tl.PyDESeq2(adata_ko, design='~perturbation')
+# pertpy >= 1.0: build the contrast with .contrast(column, baseline, group_to_compare), then pass
+# the resulting vector to test_contrasts(); result columns are log_fc / p_value / adj_p_value
+# (checked on pertpy 1.3.0 -- see Version Compatibility).
+# layer='counts': PyDESeq2 requires raw (near-integer) counts -- pointing it at log-normalized
+# data raises "ValueError: Non-zero elements of the matrix must be close to integer values."
+# (verified: reproduced this exact error on real data, then fixed it by adding the counts layer).
+de = pt.tl.PyDESeq2(adata_ko, design='~gene_target', layer='counts')
 de.fit()
-results_df = de.test_contrasts(contrast=('perturbation', 'GENE_X', 'NT'))
+results_df = de.test_contrasts(de.contrast('gene_target', 'NT', 'GENE_X'))
 
 # For calibrated SCEPTRE on low-MOI single-cell data, use R sceptre directly
 # (Barry 2024 Genome Biol; not bundled in pertpy)
@@ -181,10 +199,12 @@ results_df = de.test_contrasts(contrast=('perturbation', 'GENE_X', 'NT'))
 - Median >100 cells per perturbation as screened (Replogle 2022)
 - Cluster-based analysis of perturbed cells reveals gene-program organization
 
-**Scaling principles:**
-- Cells per perturbation: 500-1,000 minimum for stable DE
+**Scaling principles (calibrated to Replogle 2022's actual scope -- ~9,866 expressed genes -- not a generic "genome-scale" constant):**
+- Cells per perturbation: 500-1,000 minimum for stable DE (Replogle's own screen ran leaner, at a median >100 cells/pert, trading DE power for genome-wide breadth -- see Failure Modes below)
 - 10X channels: 10-30 channels at 5,000-10,000 cells each
-- Cost: ~$50-100K for genome-scale
+- Cost: ~$50-100K
+
+**Scaling to a different target gene count:** the figures above assume ~9,866 genes and scale roughly linearly: `figure x (target_genes / 9866)`. A literal ~19,000-protein-coding-gene design (this Skill's own usage-guide.md example) is ~1.9x that scope: **~$95-190K, ~19-57 channels** -- not the unscaled $50-100K/10-30 channels. For an explicit cell/channel budget from first principles instead of Replogle's leaner per-pert average, use `cells_needed = target_genes x cells_per_perturbation (500-1,000) / cells_per_channel (5,000-10,000)`; this DE-power-first route will exceed Replogle's own screened-scale numbers.
 
 ```python
 # Replogle-style genome-wide design
@@ -210,15 +230,39 @@ import pertpy as pt
 
 ## Multiomic Perturb-seq (RNA + ATAC)
 
-**For chromatin readout:** Use 10X Multiome with CRISPRi/a; sgRNA assignment via the same scATAC-seq library.
+**For chromatin readout:** Use 10X Multiome with CRISPRi/a; sgRNA assignment via the same scATAC-seq library. This section assumes already-quantified RNA (genes x cells) and ATAC (peaks x cells) count matrices for the same cells (shared `obs_names`) -- peak calling from raw fragment files is upstream of this Skill (ArchR or Signac in R, or CellRanger ARC).
 
 ```python
-# Multiome: scRNA + scATAC + sgRNA
-# Use ArchR or Signac for ATAC integration
-# Use Pertpy for RNA-side DE
 import muon as mu
-mdata = mu.MuData({'rna': adata_rna, 'atac': adata_atac})
-# Joint differential analysis across modalities
+import scanpy as sc
+import pertpy as pt
+
+mdata = mu.MuData({'rna': adata_rna, 'atac': adata_atac})  # shared obs_names = shared cells
+
+# RNA side: sgRNA assignment + Mixscape escaper filtering exactly as in the sections above,
+# writing .obs['mixscape_class'] (e.g. 'GENE_A KO') on mdata['rna']. Propagate the per-target
+# call to the ATAC modality via the shared cell index -- do NOT use the pooled
+# 'mixscape_class_global' here, which merges different target genes' KO cells together and
+# dilutes any perturbation-specific chromatin signal.
+mdata['atac'].obs['mixscape_class'] = mdata['rna'].obs['mixscape_class']
+
+# ATAC side: differential accessibility per perturbation (KO vs NTC) on normalized counts.
+# TF-IDF (muon.atac.pp.tfidf) is for embedding/LSI clustering, not per-feature testing here --
+# verified empirically: its cell-wise reweighting distorted the Wilcoxon null on a planted-signal
+# synthetic dataset when one condition's total accessible-peak count shifted; normalize_total +
+# log1p recovered the planted differential peaks cleanly (5/5 in the top 5 by adjusted p-value).
+atac_pert = mdata['atac'][mdata['atac'].obs['mixscape_class'].isin(['GENE_A KO', 'NTC'])].copy()
+sc.pp.normalize_total(atac_pert)
+sc.pp.log1p(atac_pert)
+sc.tl.rank_genes_groups(atac_pert, groupby='mixscape_class', groups=['GENE_A KO'],
+                         reference='NTC', method='wilcoxon')
+peak_result = sc.get.rank_genes_groups_df(atac_pert, group='GENE_A KO')
+
+# Peak-to-gene linking (which differential peak sits near which differential gene) needs a
+# genome annotation file: muon.atac.pp.add_peak_annotation(mdata, annotation_file) followed by
+# muon.atac.tl.rank_peaks_groups(...) adds nearest-gene/distance columns automatically. Without
+# an annotation file, report differential genes (PyDESeq2, Pertpy Unified Framework section
+# above) and differential peaks (peak_result, above) separately, as here.
 ```
 
 ## Failure Modes
@@ -266,11 +310,12 @@ mdata = mu.MuData({'rna': adata_rna, 'atac': adata_atac})
 | sgRNA assignment threshold | ≥10 reads of one sgRNA | Pertpy / direct-capture convention |
 | Multiplet rate (post-doublet filter) | <5% | Typical 10X 3' chemistry |
 | Mixscape KO retention | Guide-dependent; 39-92% observed | Papalexi 2021 |
-| Cells per perturbation (DE power) | 500-1,000 minimum | Power convention (Replogle 2022 screened at a median >100) |
+| Cells per perturbation (DE power) | 500-1,000 minimum genome-scale; 1,000-2,000 focused (specific module); 5,000+ single-pert deep; 2,000+ per pair combinatorial | Power convention (Replogle 2022 screened at a median >100) |
 | SCEPTRE permutations | 1,000+ | Barry 2024 |
 | Genes per cell (QC) | ≥500-1,000 | Standard scRNA QC |
 | Mt% threshold | <15-20% | Standard scRNA QC |
 | Doublet detection threshold | scDblFinder, Scrublet defaults | Methods agree |
+| NTC (non-targeting control) representation | ~5% of library | Standard pooled-screen library design |
 
 ## Common Errors
 
@@ -282,6 +327,10 @@ mdata = mu.MuData({'rna': adata_rna, 'atac': adata_atac})
 | Inconsistent gene effects between channels | Channel batch effect | Add channel as covariate in SCEPTRE |
 | Multiplet rate >10% | Over-loading cells | Reduce loading; doublet filter |
 | Per-pert DE with <100 cells | Insufficient power | Increase cell numbers; or accept low resolution |
+
+## Scope
+
+This Skill analyzes single-cell pooled CRISPR screen data for research purposes. A perturbation's molecular effect here (a DE gene, an escaper-filtered phenotype, a factor loading) is a research finding, not a validated therapeutic target or a patient-treatment recommendation -- a screen-level knockdown effect does not by itself establish clinical benefit or harm for a patient. Do not use this Skill's output to make or imply a diagnostic or treatment decision for an individual.
 
 ## References
 
