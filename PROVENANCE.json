@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "7478de2954b34432dd1bf9c048fab97b3ad11ecd"
+      "staging_commit": "1e96d8ea0dc23a1ccd8438a566582c6c8571b4e8"
     }
   },
   "skills": [
@@ -934,17 +934,19 @@
     {
       "id": "bio-duplicate-handling",
       "upstream_path": "alignment-files/duplicate-handling",
-      "score": 77,
-      "grade": "Limited Release",
+      "score": 87,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-20",
       "fix_log": "fixes/bio-duplicate-handling.md",
       "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "markdup_pipeline.sh",
+        "usage-guide.md"
       ]
     },
     {
