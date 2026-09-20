@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 127,
+    "refined": 128,
     "audited_and_excluded": 0,
     "out_of_scope": 1,
-    "remaining": 434
+    "remaining": 433
   },
   "remaining": [
     {
@@ -1145,10 +1145,6 @@
     {
       "id": "bio-primer-design-qpcr-primers",
       "upstream_path": "primer-design/qpcr-primers"
-    },
-    {
-      "id": "bio-proteomics-spectral-libraries",
-      "upstream_path": "proteomics/spectral-libraries"
     },
     {
       "id": "bio-reaction-enumeration",

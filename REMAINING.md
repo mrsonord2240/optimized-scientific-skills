@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**434 remaining** across 56 folders. 127 are already refined and live in `skills/`.
+**433 remaining** across 55 folders. 128 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 127 refined, 0 audited and excluded, 1 out of scope, 434 remaining.
+The source tree holds 562 Skills: 128 refined, 0 audited and excluded, 1 out of scope, 433 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -65,7 +65,6 @@ The source tree holds 562 Skills: 127 refined, 0 audited and excluded, 1 out of 
 | rna-quantification | 4 | 0 |
 | rna-structure | 4 | 0 |
 | crispr-screens | 3 | 12 |
-| proteomics | 1 | 8 |
 
 ## Promoted, fix pass still needed
 
@@ -84,6 +83,7 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-molecular-descriptors` | 86 | Limited Release |
 | `bio-molecular-io` | 91 | Limited Release |
 | `bio-molecular-standardization` | 90 | Limited Release |
+| `bio-proteomics-spectral-libraries` | 87 | Production Ready |
 | `bio-qsar-modeling` | 88 | Limited Release |
 | `bio-scaffold-analysis` | 88 | Limited Release |
 | `bio-similarity-searching` | 90 | Limited Release |
@@ -538,10 +538,6 @@ fixed.
 - `bio-primer-design-primer-specificity` — `primer-design/primer-specificity`
 - `bio-primer-design-primer-validation` — `primer-design/primer-validation`
 - `bio-primer-design-qpcr-primers` — `primer-design/qpcr-primers`
-
-### proteomics
-
-- `bio-proteomics-spectral-libraries` — `proteomics/spectral-libraries`
 
 ### read-alignment
 
