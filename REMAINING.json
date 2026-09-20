@@ -23,8 +23,8 @@
       "upstream_path": "alignment-files/alignment-indexing"
     },
     {
-      "id": "bio-alignment-msa-parsing",
-      "upstream_path": "alignment/msa-parsing"
+      "id": "bio-alignment-io",
+      "upstream_path": "alignment/alignment-io"
     },
     {
       "id": "bio-alignment-msa-statistics",
@@ -1721,9 +1721,9 @@
   ],
   "excluded": [
     {
-      "id": "bio-alignment-io",
-      "upstream_path": "alignment/alignment-io",
-      "score": 74,
+      "id": "bio-alignment-msa-parsing",
+      "upstream_path": "alignment/msa-parsing",
+      "score": 78,
       "grade": "Beta Only",
       "deployable": false,
       "open_p0": 0,

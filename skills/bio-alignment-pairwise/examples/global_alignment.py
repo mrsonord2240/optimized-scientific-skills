@@ -40,13 +40,14 @@ if __name__ == '__main__':
     alignments = aligner.align(prot_seq1, prot_seq2)
     print(f'BLOSUM80 alignment score: {alignments[0].score}')
 
-    # Affine vs linear gap penalties comparison
+    # Affine vs linear gap penalties comparison (prot_seq3 has a 3-residue deletion, so gaps matter)
+    prot_seq3 = Seq('MKFLILLFNILCLFAADNH')
     aligner.substitution_matrix = substitution_matrices.load('BLOSUM62')
     aligner.open_gap_score = -11
     aligner.extend_gap_score = -1
-    affine_alignments = aligner.align(prot_seq1, prot_seq2)
+    affine_alignments = aligner.align(prot_seq1, prot_seq3)
 
     aligner.open_gap_score = -5
     aligner.extend_gap_score = -5
-    linear_alignments = aligner.align(prot_seq1, prot_seq2)
+    linear_alignments = aligner.align(prot_seq1, prot_seq3)
     print(f'Affine gap score: {affine_alignments[0].score}, Linear gap score: {linear_alignments[0].score}')

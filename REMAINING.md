@@ -74,7 +74,6 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | skill | score | grade |
 | --- | ---: | --- |
 | `bio-admet-prediction` | 86 | Limited Release |
-| `bio-alignment-pairwise` | 80 | Limited Release |
 | `bio-causal-genomics-genetic-correlation` | 89 | Production Ready |
 | `bio-differential-expression-deseq2-basics` | 92 | Production Ready |
 | `bio-machine-learning-model-validation` | 93 | Limited Release |
@@ -132,7 +131,7 @@ fixed.
 
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
-| `bio-alignment-io` | 74 | Beta Only | 0 |
+| `bio-alignment-msa-parsing` | 78 | Beta Only | 0 |
 
 ## Out of scope
 
@@ -144,7 +143,7 @@ fixed.
 
 ### alignment
 
-- `bio-alignment-msa-parsing` — `alignment/msa-parsing`
+- `bio-alignment-io` — `alignment/alignment-io`
 - `bio-alignment-msa-statistics` — `alignment/msa-statistics`
 - `bio-alignment-structural` — `alignment/structural-alignment`
 

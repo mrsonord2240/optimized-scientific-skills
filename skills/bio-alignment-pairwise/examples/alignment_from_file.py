@@ -1,11 +1,12 @@
 '''Align sequences from a FASTA file'''
 # Reference: biopython 1.83+ | Verify API if version differs
 
+import sys
 from Bio import SeqIO
 from Bio.Align import PairwiseAligner
 
 if __name__ == '__main__':
-    fasta_file = 'sequences.fasta'
+    fasta_file = sys.argv[1] if len(sys.argv) > 1 else 'sequences.fasta'  # a two-record sample ships beside this script
     records = list(SeqIO.parse(fasta_file, 'fasta'))
 
     if len(records) < 2:

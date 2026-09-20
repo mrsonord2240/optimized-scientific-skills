@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "354b4992cd8d2f1bee039510af618da0333821f1"
+      "staging_commit": "7d3e7c2a3b96a5f57fa40abfa64bfcf1fb5e34b0"
     }
   },
   "skills": [
@@ -50,17 +50,21 @@
     {
       "id": "bio-alignment-pairwise",
       "upstream_path": "alignment/pairwise-alignment",
-      "score": 80,
-      "grade": "Limited Release",
+      "score": 86,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-alignment-pairwise.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "alignment_from_file.py",
+        "global_alignment.py",
+        "sequences.fasta",
+        "usage-guide.md"
       ]
     },
     {

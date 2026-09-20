@@ -8,7 +8,7 @@ license: MIT
 
 ## Version Compatibility
 
-Reference examples tested with: BioPython 1.83+
+Checked on Biopython 1.88 (`pip install biopython`), with scores cross-checked against EMBOSS 6.6.0 `needle`/`water`, BLAST+ 2.17.0, parasail 1.3.4, edlib 1.3.9, pywfa 0.5.1, mappy 2.31 and R pwalign 1.2.0 (Bioconductor 3.20).
 
 Before using code patterns, verify installed versions match. If versions differ:
 - Python: `pip show <package>` then `help(module.function)` to check signatures
@@ -21,7 +21,7 @@ package and adapt the example to match the actual API rather than retrying.
 **"Align two sequences"** -> Compute an optimal alignment between a pair of sequences using dynamic programming.
 - Python: `PairwiseAligner()` (BioPython Bio.Align)
 - CLI: `needle` (global) or `water` (local) from EMBOSS
-- R: `pairwiseAlignment()` (Biostrings)
+- R: `pwalign::pairwiseAlignment()` (Bioconductor 3.20 moved it out of Biostrings; `Biostrings::pairwiseAlignment()` still works but warns). Gap parameters use the BLAST convention: see Gap Penalties
 
 Align two sequences using dynamic programming algorithms (Needleman-Wunsch for global, Smith-Waterman for local).
 
@@ -44,17 +44,43 @@ from Bio import SeqIO
 | Library | Speed vs Bio.Align | Alphabet | Scoring | Vectorization | When to use |
 |---------|-------------------|----------|---------|---------------|-------------|
 | `Bio.Align.PairwiseAligner` (BioPython) | 1x baseline | DNA / RNA / protein | Matrix + affine | C-backed Gotoh | Default, <10 kb pairs, interactive use |
-| `parasail` (Daily 2016 BMC Bioinf) | 10-100x | DNA / protein | Matrix + affine | SSE / AVX SIMD | High-throughput SW or NW; benchmark loops |
-| `edlib` (Sosic & Sikic 2017 Bioinf) | 100-1000x | DNA only | Edit distance only | Bit-parallel Myers | Read mapping, k-mer search, primer placement |
+| `parasail` (Daily 2016 BMC Bioinf) | 2-10x (300 nt), ~3-8x (20 kb); measured | DNA / protein | Matrix + affine | SSE / AVX SIMD | High-throughput SW or NW; benchmark loops |
+| `edlib` (Sosic & Sikic 2017 Bioinf) | 15-26x (300 nt), 400x+ (20 kb); measured | any alphabet | Edit distance only | Bit-parallel Myers | Read mapping, k-mer search, primer placement |
 | `pywfa` / WFA2 (Marco-Sola 2021 Bioinformatics 37:456; BiWFA: Marco-Sola 2023 Bioinformatics 39:btad074) | Best for low-divergence | DNA | Matrix + affine | Wavefront, O(s) memory | Long, near-identical sequences (>10 kb, <5% diverged) |
 | `mappy` / minimap2 (Li 2018 Bioinf) | Production reads-to-genome | DNA | Chain + base-level | k-mer chain | Long-read mapping, splice-aware DNA |
 | `Bio.pairwise2` | DEPRECATED | -- | -- | -- | Migrate to `PairwiseAligner` (deprecated in BioPython 1.80; not yet removed; migrate proactively) |
 | EMBOSS `needle` / `water` | ~Bio.Align | DNA / protein | Matrix + affine | None | Reproducibility, audit trails (fixed, documented default parameters) |
 
-Speed numbers in the table are rough; benchmark on representative inputs before committing. Critical caveats:
+Speed numbers for parasail and edlib were measured (Windows, score only, 5% divergence for 300 nt pairs, 3% for 20 kb; timings vary run to run); the rest are literature figures. Benchmark on representative inputs before committing. Critical caveats:
 - **WFA / BiWFA**: 10-100x faster than Gotoh below 5% divergence; above ~10% it converges to Gotoh complexity. Right tool for PacBio HiFi self-similarity or assembly-vs-reference; not for distant homologs.
-- **edlib**: 100-1000x faster than Gotoh at low divergence (<5% errors); above ~50% divergence the effective speedup drops to ~64x. For high-divergence DNA (<70% nucleotide identity), prefer parasail's SIMD score-only mode.
-- **parasail**: SIMD only realises its advantage on long sequences in amortised batch loops.
+- **edlib**: measured 15x vs Biopython Levenshtein and 26x vs affine scoring on 1000 pairs of 300 nt, 400x+ on a 20 kb pair; the speedup shrinks as divergence grows (literature: ~64x above ~50% divergence). It returns edit distance only, so for high-divergence DNA (<70% nucleotide identity) prefer parasail's SIMD score-only mode.
+- **parasail**: SIMD only realises its advantage on long sequences in amortised batch loops. **Fixed-width variants silently saturate**: `nw_striped_16` on a 20 kb pair returned score 0 with `.saturated == True` (true score 35565). Use the `*_sat` variants (they widen 8 -> 16 -> 32 bit) and check `.saturated`.
+
+Verified snippets (parasail's open/extend use the Biopython convention, so `10, 1` = `open_gap_score=-10, extend_gap_score=-1`):
+
+```python
+import parasail, edlib
+mat = parasail.matrix_create('ACGT', 2, -1)                  # protein: parasail.blosum62
+r = parasail.nw_striped_sat(query, target, 10, 1, mat)       # sw_striped_sat for local
+assert not r.saturated
+print(r.score)   # == PairwiseAligner(mode='global', match_score=2, mismatch_score=-1, open_gap_score=-10, extend_gap_score=-1).score(target, query)
+
+# edit distance == -score of PairwiseAligner(match 0, mismatch -1, all gaps -1); mode 'HW' = query anywhere in target
+d = edlib.align(query, target, mode='NW', task='distance')['editDistance']
+```
+
+`pywfa` and `mappy` (tested on Linux; their Windows builds failed):
+
+```python
+from pywfa import WavefrontAligner
+x, o, e = 4, 6, 2                      # WFA2 penalties: a gap of length L costs o + e*L
+r = WavefrontAligner(target, span='end-to-end', mismatch=x, gap_opening=o, gap_extension=e)(query)
+# r.score == PairwiseAligner(mode='global', match_score=0, mismatch_score=-x, open_gap_score=-(o+e), extend_gap_score=-e).score(target, query)
+
+import mappy
+for h in mappy.Aligner('ref.fa', preset='map-ont').map(read):   # presets: sr, map-hifi, asm5, ...
+    print(h.ctg, h.r_st, h.r_en, h.mapq, h.cigar_str)
+```
 
 When uncertain which algorithm Biopython's aligner selected internally, inspect `aligner.algorithm` after configuration -- it returns the resolved variant ("Needleman-Wunsch", "Smith-Waterman", "Gotoh global alignment algorithm", "Gotoh local alignment algorithm", "Waterman-Smith-Beyer global alignment algorithm", "Waterman-Smith-Beyer local alignment algorithm") for deterministic auditing.
 
@@ -114,10 +140,10 @@ aligner = PairwiseAligner(mode='global', substitution_matrix=substitution_matric
 ```python
 seq1 = Seq('ACCGGTAACGTAG')
 seq2 = Seq('ACCGTTAACGAAG')
+aligner = PairwiseAligner(mode='global', match_score=2, mismatch_score=-1, open_gap_score=-10, extend_gap_score=-0.5)
 
-# Get all optimal alignments
+# Optimal alignments (lazy iterable; see Iterating Over Multiple Alignments)
 alignments = aligner.align(seq1, seq2)
-print(f'Found {len(alignments)} optimal alignments')
 print(alignments[0])  # Print first alignment
 
 # Get score only (faster for large sequences)
@@ -128,7 +154,7 @@ score = aligner.score(seq1, seq2)
 
 ```
 target            0 ACCGGTAACGTAG 13
-                  0 |||||.||||.|| 13
+                  0 ||||.|||||.|| 13
 query             0 ACCGTTAACGAAG 13
 ```
 
@@ -177,9 +203,20 @@ print(f'Percent identity: {percent_identity:.1f}%')
 
 ## Common Scoring Configurations
 
-### PairwiseAligner Default Gap Penalties Are 0
+### Gap Penalties: Set Them Explicitly, and Mind the Convention
 
-`PairwiseAligner()` with no arguments uses match_score=1, mismatch_score=0, open_gap_score=0, extend_gap_score=0. Combined with a positive-scoring substitution matrix (BLOSUM62), this produces alignments with arbitrarily many short gaps -- gaps cost nothing while matches pay positive score. **Always specify gap penalties explicitly when using a substitution matrix.** BLASTP defaults: open=-11, extend=-1 with BLOSUM62; Smith-Waterman EMBOSS `water` defaults: open=-10, extend=-0.5. Inspect with `print(aligner)` after configuration to verify the resolved parameter set.
+`PairwiseAligner()` with no arguments (Biopython 1.88) uses match_score=1, mismatch_score=0 and open_gap_score=extend_gap_score=-1 (`print(aligner)` shows the resolved set). These defaults are tuned for nothing: combined with BLOSUM62, gaps are nearly free and alignments fragment (HBA vs HBB: 55 gap positions in 37 aligned blocks with the defaults, versus 9 gap positions in 5 blocks at open -11 / extend -1). **Always specify gap penalties explicitly.**
+
+Tools disagree on what "open" means, so the same numbers give different scores:
+
+| Convention | Cost of a gap of length k | Used by |
+|---|---|---|
+| open + (k-1) * extend | open covers the first gap position | Biopython `open_gap_score`, EMBOSS `needle`/`water`, parasail |
+| open + k * extend | open is charged on top of the extension | BLAST+ `-gapopen`, R pwalign `gapOpening` |
+
+Conversion: Biopython `open_gap_score = -(BLAST gapopen + gapextend)`, `extend_gap_score = -gapextend`. So **BLASTP defaults (BLOSUM62, 11/1) are `open_gap_score=-12, extend_gap_score=-1`**, and `-11/-1` is EMBOSS 11/1 (pwalign `gapOpening=10, gapExtension=1`). EMBOSS defaults 10/0.5 are `-10/-0.5`.
+
+Verified on HBA_HUMAN vs HBB_HUMAN, BLOSUM62, local: Biopython -12/-1 = 285 = `blastp -comp_based_stats 0` raw score (same HSP, query 3-141) = pwalign `gapOpening=11, gapExtension=1`; Biopython -11/-1 = 288 = EMBOSS `water -gapopen 11 -gapextend 1` = pwalign `gapOpening=10, gapExtension=1`. Global: -11/-1 = 286 = `needle` 11/1. BLASTP's own default composition-based statistics change the reported score (286 here); use `-comp_based_stats 0` to compare raw scores.
 
 ### DNA/RNA Alignment
 ```python
@@ -190,7 +227,7 @@ aligner = PairwiseAligner(mode='global', match_score=2, mismatch_score=-1, open_
 ```python
 from Bio.Align import substitution_matrices
 blosum62 = substitution_matrices.load('BLOSUM62')
-aligner = PairwiseAligner(mode='global', substitution_matrix=blosum62, open_gap_score=-11, extend_gap_score=-1)
+aligner = PairwiseAligner(mode='global', substitution_matrix=blosum62, open_gap_score=-11, extend_gap_score=-1)  # EMBOSS 11/1; BLASTP-equivalent is -12/-1
 ```
 
 ### Local Alignment (Find Best Region)
@@ -200,18 +237,20 @@ aligner = PairwiseAligner(mode='local', match_score=2, mismatch_score=-1, open_g
 
 ### Semiglobal (Overlap/Fragment Alignment)
 ```python
-# Free end gaps on query -- for aligning a fragment against a full-length reference
-# or detecting overlap between reads
-aligner = PairwiseAligner(mode='global')
-aligner.query_left_open_gap_score = 0
-aligner.query_left_extend_gap_score = 0
-aligner.query_right_open_gap_score = 0
-aligner.query_right_extend_gap_score = 0
-
-# Free end gaps on BOTH sequences -- for overlap detection between two reads
-aligner = PairwiseAligner(mode='global')
+# Free end gaps on BOTH sequences (order-independent) -- overlap detection between two reads,
+# or a fragment inside a reference
+aligner = PairwiseAligner(mode='global', match_score=2, mismatch_score=-1, open_gap_score=-10, extend_gap_score=-0.5)
 aligner.end_gap_score = 0.0
+alignment = aligner.align(reference, fragment)[0]   # 20-nt fragment in a 620-nt reference: score 40, target span [[300, 320]]
+
+# Free end gaps on the query (second argument) only. Argument ORDER matters: the fragment must be
+# the second argument (align(fragment, reference) scored -279 instead of 40).
+aligner = PairwiseAligner(mode='global', match_score=2, mismatch_score=-1, open_gap_score=-10, extend_gap_score=-0.5)
+aligner.open_left_deletion_score = aligner.extend_left_deletion_score = 0
+aligner.open_right_deletion_score = aligner.extend_right_deletion_score = 0
+alignment = aligner.align(reference, fragment)[0]
 ```
+Older Biopython named these `query_left_open_gap_score`, `query_left_extend_gap_score`, `query_right_open_gap_score`, `query_right_extend_gap_score` (still accepted on 1.88, with a DeprecationWarning).
 
 ## Substitution Matrix Selection
 
@@ -227,7 +266,7 @@ aligner.end_gap_score = 0.0
 
 **BLOSUM62 is the universal default** (used by BLAST, most alignment tools). When in doubt, use BLOSUM62. Switch to BLOSUM80 for very similar proteins or BLOSUM45 for distant homologs.
 
-**DNA matrices**: `NUC.4.4` (match=+5, mismatch=-4) handles IUPAC ambiguity codes. `HOXD70` is tuned for human-mouse whole-genome alignment from noncoding regions.
+**DNA matrices**: `NUC.4.4` (match=+5, mismatch=-4) accepts IUPAC ambiguity codes but scores partial matches weakly (`R` vs `A` = +1, not +5; check with `print(substitution_matrices.load('NUC.4.4'))` before relying on ambiguity-aware scoring). `HOXD70` is tuned for human-mouse whole-genome alignment from noncoding regions.
 
 ```python
 from Bio.Align import substitution_matrices
@@ -243,7 +282,7 @@ nuc44 = substitution_matrices.load('NUC.4.4')      # DNA with IUPAC support
 
 Gap penalties control how gaps (insertions/deletions) are scored. The **affine model** (`penalty = open + extend * (L-1)`) is almost always preferred over linear because it reflects indel biology: a DNA break introduces the first gap (costly), but extending an existing gap is mechanistically easier (less costly). This models the observation that indels in real sequences tend to occur as single contiguous events.
 
-Typical values with BLOSUM62: gap open = -11, gap extend = -1 (BLASTP defaults). Setting gap open equal to gap extend (linear model) over-penalizes long indels and under-penalizes scattered single-residue gaps, producing biologically unrealistic alignments.
+Typical values with BLOSUM62: `open_gap_score=-12, extend_gap_score=-1` (BLASTP defaults; see Gap Penalties for the convention) or `-11/-1` (EMBOSS). Setting gap open equal to gap extend (linear model) over-penalizes long indels and under-penalizes scattered single-residue gaps, producing biologically unrealistic alignments.
 
 ## Working with SeqRecord Objects
 
@@ -263,14 +302,13 @@ alignments = aligner.align(seq1, seq2)
 
 ## Iterating Over Multiple Alignments
 
-```python
-# Limit number of alignments returned (memory efficient)
-aligner.max_alignments = 100
+`aligner.align()` returns a lazy iterable. `PairwiseAligner` has no `max_alignments` attribute on Biopython 1.88 (assigning it raises AttributeError). `len(alignments)` counts every optimal alignment and raises `OverflowError` when there are too many (e.g. zero gap penalties on repetitive input), so cap with `itertools.islice` when the count is not needed:
 
-for i, alignment in enumerate(alignments):
+```python
+from itertools import islice
+
+for i, alignment in enumerate(islice(alignments, 5)):
     print(f'Alignment {i+1}: score={alignment.score}')
-    if i >= 4:
-        break
 ```
 
 ## Substitution Matrix from Alignment
@@ -316,13 +354,23 @@ print(format(alignment, 'sam'))       # SAM format
 | `extend_gap_score` | Cost per gap extension | -0.5 to -2 | -0.5 to -1 |
 | `substitution_matrix` | Scoring matrix | N/A | BLOSUM62 |
 
+## Input Checks
+
+Verified on Biopython 1.88 with BLOSUM62 / NUC.4.4 aligners:
+- **Case and whitespace**: lowercase, a trailing newline, or `J`/`U` residues raise `ValueError` with a substitution matrix (NUC.4.4 also rejects `U`). Use `str(seq).strip().upper()`. Match/mismatch aligners do not raise: `'acgt'` vs `'ACGT'` scores as four mismatches, and `U` vs `T` as a mismatch (convert RNA to DNA first).
+- **Empty sequences** raise `ValueError: sequence has zero length`. Check lengths before aligning.
+- **Accepted silently**: `*` (stop), `X`/`B`/`Z`, and a `SeqRecord` (scores identically to its `.seq`; pass `.seq` explicitly).
+- **Strand**: alignment is strand-specific. A reverse-complemented query scores near zero (a 30-nt exact match scored 60, reverse complement 0). For DNA of unknown orientation, score both `seq` and `seq.reverse_complement()` and keep the higher.
+- **Coding sequences**: check for internal stops (`'*' in str(seq.translate()).rstrip('*')`) before aligning or back-translating; a CDS with an internal stop (e.g. RefSeq NM_001314043.1, rabbit HBB2) breaks codon-aware tools such as PAL2NAL.
+
 ## Common Errors
 
 | Error | Cause | Solution |
 |-------|-------|----------|
-| `OverflowError` | Too many optimal alignments | Set `aligner.max_alignments` |
+| `OverflowError` | `len(alignments)` with too many optimal alignments | Iterate with `itertools.islice(alignments, n)` |
 | Low scores | Wrong scoring scheme | Use substitution matrix for proteins |
 | No alignments in local mode | Scores all negative | Ensure `match_score` > 0 |
+| `ValueError: sequence contains letters not in the alphabet` / `zero length` | See Input Checks | Clean the input first |
 
 ## Percent Identity: Definitions Matter
 
@@ -375,7 +423,6 @@ Length amplifies the signal: 30% identity over 200 residues is far more reliable
 Other failure modes:
 - **Non-homologous sequences**: All DP aligners return an alignment regardless of homology. E-value or bit score is the homology gate, not the existence of an alignment.
 - **Repetitive sequences**: Tandem repeats produce ambiguous, artifactually high-scoring alignments; mask first.
-- **NUC.4.4 IUPAC partial matches**: Biopython's NUC.4.4 matrix scores partial-match IUPAC codes (e.g. `R` vs `A`) as +1 rather than +5; verify behaviour with `print(substitution_matrices.load('NUC.4.4'))` before relying on ambiguity-aware scoring.
 
 ## Related Skills
 
