@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "ebc7f45f4a8c749f5aac1481e1ca896f2619a08c"
+      "staging_commit": "c206dff76d081a5126f8497fbabe10995c9b6026"
     }
   },
   "skills": [
@@ -144,6 +144,27 @@
         "alignment_from_file.py",
         "global_alignment.py",
         "sequences.fasta",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-alignment-structural",
+      "upstream_path": "alignment/structural-alignment",
+      "score": 85,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-alignment-structural.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "biopython_superimposer.py",
+        "foldmason_msa.py",
+        "foldseek_search.py",
+        "tm_align_pairwise.py",
         "usage-guide.md"
       ]
     },
