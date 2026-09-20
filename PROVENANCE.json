@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "7910c3a73542b9348004713ef9da14b325013e5c"
+      "staging_commit": "85a3e4de9a56ad5b24911ee7c21a039eb57ef216"
     }
   },
   "skills": [
@@ -45,6 +45,24 @@
         "SKILL.md",
         "ampliconclip_workflow.sh",
         "check_primer_residual.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-alignment-filtering",
+      "upstream_path": "alignment-files/alignment-filtering",
+      "score": 87,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-alignment-filtering.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "filter_bam.py",
         "usage-guide.md"
       ]
     },
