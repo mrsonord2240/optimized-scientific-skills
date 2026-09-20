@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**424 remaining** across 53 folders. 135 are already refined and live in `skills/`.
+**424 remaining** across 53 folders. 136 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 135 refined, 2 audited and excluded, 1 out of scope, 424 remaining.
+The source tree holds 562 Skills: 136 refined, 1 audited and excluded, 1 out of scope, 424 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -130,7 +130,6 @@ fixed.
 
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
-| `bio-alignment-msa-statistics` | 66 | Beta Only | 0 |
 | `bio-alignment-structural` | 73 | Beta Only | 0 |
 
 ## Out of scope

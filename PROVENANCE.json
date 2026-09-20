@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "130efd18cf0d289e293da625deb172e889f80687"
+      "staging_commit": "ebc7f45f4a8c749f5aac1481e1ca896f2619a08c"
     }
   },
   "skills": [
@@ -77,6 +77,35 @@
         "msa_utils.py",
         "muscle5_column_confidence.py",
         "neff.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-alignment-msa-statistics",
+      "upstream_path": "alignment/msa-statistics",
+      "score": 88,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-alignment-msa-statistics.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "capra_singh_jsd.py",
+        "conservation_profile.py",
+        "entropy_analysis.py",
+        "example_dna.fasta",
+        "example_protein.fasta",
+        "gap_statistics.py",
+        "identity_matrix.py",
+        "kimura_protein_distance.py",
+        "msa_utils.py",
+        "pssm.py",
+        "selftest.py",
+        "substitution_counts.py",
         "usage-guide.md"
       ]
     },
