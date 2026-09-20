@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**430 remaining** across 54 folders. 131 are already refined and live in `skills/`.
+**429 remaining** across 54 folders. 132 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 131 refined, 0 audited and excluded, 1 out of scope, 430 remaining.
+The source tree holds 562 Skills: 132 refined, 0 audited and excluded, 1 out of scope, 429 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -49,7 +49,6 @@ The source tree holds 562 Skills: 131 refined, 0 audited and excluded, 1 out of 
 | temporal-genomics | 6 | 0 |
 | alignment | 5 | 2 |
 | chemoinformatics | 5 | 15 |
-| database-access | 5 | 10 |
 | differential-expression | 5 | 1 |
 | epidemiological-genomics | 5 | 0 |
 | epitranscriptomics | 5 | 0 |
@@ -58,6 +57,7 @@ The source tree holds 562 Skills: 131 refined, 0 audited and excluded, 1 out of 
 | multi-omics-integration | 5 | 0 |
 | restriction-analysis | 5 | 0 |
 | workflow-management | 5 | 0 |
+| database-access | 4 | 11 |
 | machine-learning | 4 | 2 |
 | phasing-imputation | 4 | 0 |
 | primer-design | 4 | 0 |
@@ -74,6 +74,7 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | skill | score | grade |
 | --- | ---: | --- |
 | `bio-admet-prediction` | 86 | Limited Release |
+| `bio-blast-searches` | 80 | Limited Release |
 | `bio-causal-genomics-genetic-correlation` | 89 | Production Ready |
 | `bio-crispr-screens-perturb-seq-analysis` | 83 | Limited Release |
 | `bio-differential-expression-deseq2-basics` | 92 | Production Ready |
@@ -308,7 +309,6 @@ fixed.
 
 ### database-access
 
-- `bio-blast-searches` — `database-access/blast-searches`
 - `bio-ensembl-rest` — `database-access/ensembl-rest`
 - `bio-interaction-databases` — `database-access/interaction-databases`
 - `bio-ortholog-inference` — `database-access/ortholog-inference`

@@ -108,6 +108,22 @@
       ]
     },
     {
+      "id": "bio-blast-searches",
+      "upstream_path": "database-access/blast-searches",
+      "score": 80,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-19",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "id": "bio-causal-genomics-colocalization-analysis",
       "upstream_path": "causal-genomics/colocalization-analysis",
       "score": 96,
