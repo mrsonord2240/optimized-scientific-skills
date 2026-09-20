@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "7e371d7b766f7014648bd119e2eabc155e7723ff"
+      "staging_commit": "624c96b429600db6e00b568e97ab577b4e4d89ad"
     }
   },
   "skills": [
@@ -947,6 +947,25 @@
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-differential-splicing",
+      "upstream_path": "alternative-splicing/differential-splicing",
+      "score": 85,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-differential-splicing.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "diff_splicing_leafcutter.R",
+        "diff_splicing_rmats.sh",
+        "usage-guide.md"
       ]
     },
     {

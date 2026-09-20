@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**411 remaining** across 52 folders. 147 are already refined and live in `skills/`.
+**410 remaining** across 52 folders. 148 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 147 refined, 3 audited and excluded, 1 out of scope, 411 remaining.
+The source tree holds 562 Skills: 148 refined, 3 audited and excluded, 1 out of scope, 410 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -36,7 +36,6 @@ The source tree holds 562 Skills: 147 refined, 3 audited and excluded, 1 out of 
 | sequence-manipulation | 7 | 0 |
 | systems-biology | 7 | 0 |
 | variant-calling | 7 | 6 |
-| alternative-splicing | 6 | 0 |
 | ecological-genomics | 6 | 0 |
 | gene-regulatory-networks | 6 | 0 |
 | immunoinformatics | 6 | 0 |
@@ -46,6 +45,7 @@ The source tree holds 562 Skills: 147 refined, 3 audited and excluded, 1 out of 
 | small-rna-seq | 6 | 0 |
 | tcr-bcr-analysis | 6 | 0 |
 | temporal-genomics | 6 | 0 |
+| alternative-splicing | 5 | 1 |
 | chemoinformatics | 5 | 15 |
 | differential-expression | 5 | 1 |
 | epidemiological-genomics | 5 | 0 |
@@ -130,9 +130,9 @@ fixed.
 
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
-| `bio-differential-splicing` | 73 | Beta Only | 0 |
 | `bio-isoform-switching` | 66 | Beta Only | 0 |
 | `bio-long-read-splicing` | 68 | Reject | 2 |
+| `bio-sashimi-plots` | 67 | Reject | 2 |
 
 ## Out of scope
 
@@ -145,7 +145,6 @@ fixed.
 ### alternative-splicing
 
 - `bio-outlier-splicing-detection` — `alternative-splicing/outlier-splicing-detection`
-- `bio-sashimi-plots` — `alternative-splicing/sashimi-plots`
 - `bio-single-cell-splicing` — `alternative-splicing/single-cell-splicing`
 - `bio-splice-variant-prediction` — `alternative-splicing/splice-variant-prediction`
 - `bio-splicing-qc` — `alternative-splicing/splicing-qc`

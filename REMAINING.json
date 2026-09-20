@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 147,
+    "refined": 148,
     "audited_and_excluded": 3,
     "out_of_scope": 1,
-    "remaining": 411
+    "remaining": 410
   },
   "remaining": [
     {
@@ -1227,10 +1227,6 @@
       "upstream_path": "rna-structure/structure-probing"
     },
     {
-      "id": "bio-sashimi-plots",
-      "upstream_path": "alternative-splicing/sashimi-plots"
-    },
-    {
       "id": "bio-seq-objects",
       "upstream_path": "sequence-manipulation/seq-objects"
     },
@@ -1657,18 +1653,6 @@
   ],
   "excluded": [
     {
-      "id": "bio-differential-splicing",
-      "upstream_path": "alternative-splicing/differential-splicing",
-      "score": 73,
-      "grade": "Beta Only",
-      "deployable": false,
-      "open_p0": 0,
-      "audited_on": "2026-09-20",
-      "fix_log": "fixes/bio-differential-splicing.md",
-      "fix_pass": "done",
-      "reaudit": "not needed"
-    },
-    {
       "id": "bio-isoform-switching",
       "upstream_path": "alternative-splicing/isoform-switching",
       "score": 66,
@@ -1690,6 +1674,18 @@
       "audited_on": "2026-09-20",
       "fix_log": "fixes/bio-long-read-splicing.md",
       "fix_pass": "done",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-sashimi-plots",
+      "upstream_path": "alternative-splicing/sashimi-plots",
+      "score": 67,
+      "grade": "Reject",
+      "deployable": false,
+      "open_p0": 2,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
       "reaudit": "not needed"
     }
   ],
