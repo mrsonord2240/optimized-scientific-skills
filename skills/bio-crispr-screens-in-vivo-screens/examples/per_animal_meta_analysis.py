@@ -51,7 +51,10 @@ def stouffer_meta(group):
         'mean_neg_score': group['neg|score'].mean(),
         'median_neg_lfc': group['neg|lfc'].median(),
         'n_animals': len(group),
-        'animals_at_fdr_05': (group['neg|fdr'] < 0.05).sum(),
+        # nominal p, not per-animal FDR -- see SKILL.md "Compound hit-calling threshold":
+        # per-animal FDR<0.05 demands more power than typical in vivo cohorts provide and
+        # can call zero hits even when the meta-signal is strong.
+        'animals_at_nominal_p05': (group['neg|p-value'] < 0.05).sum(),
     })
 
 meta = all_results.groupby('id').apply(stouffer_meta).reset_index()
@@ -62,15 +65,23 @@ from statsmodels.stats.multitest import multipletests
 meta['meta_fdr'] = multipletests(meta['meta_p'], method='fdr_bh')[1]
 
 # === HIT CALLS ===
-# Standard threshold: meta FDR <0.05 AND consistent across most animals (>50%)
+# Threshold: meta FDR <0.05 AND consistent across most animals (>50% at nominal p<0.05)
 n_animals = len(animal_dfs)
 hits = meta[(meta['meta_fdr'] < 0.05) &
-            (meta['animals_at_fdr_05'] >= n_animals * 0.5)]
+            (meta['animals_at_nominal_p05'] >= n_animals * 0.5)]
+
+# Genes with a strong meta-signal that fail the consistency check are not noise by
+# default -- flag them for manual review rather than discarding silently.
+review = meta[(meta['meta_fdr'] < 0.05) &
+              (meta['animals_at_nominal_p05'] < n_animals * 0.5)]
 
 print(f'Total animals analyzed: {n_animals}')
-print(f'Meta-significant hits (FDR <0.05 + ≥50% animal consistency): {len(hits)}')
+print(f'Meta-significant hits (FDR <0.05 + >=50% animal consistency): {len(hits)}')
 print(hits[['id', 'meta_z', 'meta_fdr', 'mean_neg_score',
-             'animals_at_fdr_05', 'n_animals']].head(20).to_string(index=False))
+             'animals_at_nominal_p05', 'n_animals']].head(20).to_string(index=False))
+if len(review):
+    print(f'\nFlagged for manual review (meta-FDR<0.05 but <50% animal consistency): {len(review)}')
+    print(review[['id', 'meta_z', 'meta_fdr', 'animals_at_nominal_p05', 'n_animals']].head(20).to_string(index=False))
 
 # === EXPORT ===
 hits.to_csv('in_vivo_meta_hits.tsv', sep='\t', index=False)

@@ -80,39 +80,11 @@ Tell the AI agent what to do:
 
 ## Tips
 
-- For genome-scale paralog screens, Inzolia (Cas12a, 4-guide arrays) is preferred. It is ~30% smaller than a typical monogenic Cas9 library while additionally covering ~4,000 paralog pairs, which makes it more cost-effective at scale.
-- Always include singleton controls in your library. Without them, you cannot compute GI; you only have paired LFCs without baseline.
-- Per-gene per-pair, include 4+ cassettes for stable GI scoring. Single-cassette per pair gives noisy z-scores.
-- Cas12a editing efficiency is locus-specific. Pilot at representative loci before screening; flag low-efficiency loci.
-- For drug-target nomination, validate synthetic-lethal hits via:
-  - Orthogonal chemistry (Cas9 if originally Cas12a)
-  - Arrayed knock-out validation
-  - CRISPRi orthogonal (no DNA damage)
-  - Pharmacological inhibition with drugs
-- Linear-space GI saturation: for essential-pair tests where both genes are independently essential, the additive expectation overestimates the saturable double-effect. Use log-space (LFC) GI scoring.
+- Architecture choice (Big Papi vs Inzolia/in4mer vs Perturb-seq): see SKILL.md's Combinatorial Architecture Decision Tree.
+- Library/cassette/singleton counts, editing-efficiency and GI-score cutoffs: see SKILL.md's Quantitative Thresholds table.
+- Common failure modes (recombined dual-sgRNA constructs, low Cas12a editing efficiency, missing singletons, linear-space saturation, library skew): see SKILL.md's Failure Modes section.
+- Drug-target validation of synthetic-lethal hits: see SKILL.md's Cross-Modality Validation section (also covers the research-lead-vs-treatment scope boundary).
 - For combinatorial Perturb-seq (single-cell readout of multi-perturbation), see [[perturb-seq-analysis]].
-- Dual-sgRNA constructs with repeated U6/tracr elements recombine in lentivirus and collapse to a single perturbation. Use the pPapi architecture and verify by amplicon sequencing of clones. Verify by amplicon sequencing of clones before screening.
-
-## Decision Cheat Sheet
-
-| Goal | Architecture | Library |
-|------|--------------|---------|
-| Genome-scale paralog buffering | Cas12a multiplex | Inzolia (4-guide arrays) |
-| Specific pairwise GI | Paired-Cas9 | Big Papi |
-| 3-way / 4-way KO | Cas12a in4mer | Custom in4mer |
-| Combinatorial Perturb-seq | Cas9 multi-cassette + scRNA | Custom |
-| Drug + KO interaction | Standard library + drug | drugZ or MAGeCK MLE |
-
-## Thresholds
-
-| Threshold | Value | Rationale |
-|-----------|-------|-----------|
-| Synthetic lethal | GI z <-2 | Standard |
-| Synthetic rescue | GI z >2 | Standard |
-| Cassettes per pair | 4-6 | Stable GI |
-| Singletons per gene | 4-6 cassettes | For expected_additive |
-| Cas12a editing efficiency | >50% | Per-locus inclusion |
-| Library coverage at infection | 500x cassettes/cells | Standard pooled |
 
 ## Related Skills
 

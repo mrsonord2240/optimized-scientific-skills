@@ -6,6 +6,8 @@ Decision-grade design and analysis of in vivo CRISPR screens. Covers the bottlen
 
 ## Prerequisites
 
+**Requires prior IACUC (or equivalent institutional) approval before any animal work** — see SKILL.md's "Ethical & Regulatory Requirements" section; this Skill does not itself provide ethical review.
+
 ```bash
 conda install -c bioconda mageck   # not on PyPI
 pip install pandas numpy scipy

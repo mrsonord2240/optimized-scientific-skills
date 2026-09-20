@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "b9a9bd52806351317cfbae2cd1bbca479bb3ad54"
+      "staging_commit": "a93661e859a6db83209cafe734b68a6baebb1850"
     }
   },
   "skills": [
@@ -474,17 +474,18 @@
     {
       "id": "bio-crispr-screens-combinatorial-screens",
       "upstream_path": "crispr-screens/combinatorial-screens",
-      "score": 87,
-      "grade": "Limited Release",
+      "score": 92,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-crispr-screens-combinatorial-screens.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "usage-guide.md"
       ]
     },
     {
@@ -561,17 +562,19 @@
     {
       "id": "bio-crispr-screens-in-vivo-screens",
       "upstream_path": "crispr-screens/in-vivo-screens",
-      "score": 88,
+      "score": 92,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-crispr-screens-in-vivo-screens.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "per_animal_meta_analysis.py",
+        "usage-guide.md"
       ]
     },
     {

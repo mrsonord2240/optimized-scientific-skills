@@ -82,15 +82,16 @@ from scipy.stats import zscore
 def gi_score(paired_lfc_df, single_lfc_df):
     '''Score genetic interactions from paired vs single LFCs.
 
-    paired_lfc_df: rows = paired-KO; columns = ['gene_A', 'gene_B', 'paired_lfc']
-    single_lfc_df: rows = single-KO; columns = ['gene', 'single_lfc']
+    paired_lfc_df: rows = paired-KO; columns = ['gene_A', 'gene_B', 'lfc']
+    single_lfc_df: rows = single-KO; columns = ['gene', 'lfc']
+    (both files use the same 'lfc' column name -- see examples/gi_scoring.py)
     '''
-    single = dict(zip(single_lfc_df['gene'], single_lfc_df['single_lfc']))
+    single = dict(zip(single_lfc_df['gene'], single_lfc_df['lfc']))
     df = paired_lfc_df.copy()
     df['single_A_lfc'] = df['gene_A'].map(single)
     df['single_B_lfc'] = df['gene_B'].map(single)
     df['expected_additive'] = df['single_A_lfc'] + df['single_B_lfc']
-    df['gi_score'] = df['paired_lfc'] - df['expected_additive']
+    df['gi_score'] = df['lfc'] - df['expected_additive']
     df = df.dropna(subset=['gi_score'])          # a single missing singleton would NaN every z-score
     df['gi_z'] = zscore(df['gi_score'])
     df['gi_class'] = np.where(df['gi_z'] < -2, 'synthetic_lethal',
@@ -143,6 +144,8 @@ mageck mle \
 | `interaction|p-value`, `|fdr` | Significance vs zero |
 
 A significantly negative `interaction|beta` is synthetic lethal; positive is synthetic rescue. For formal GI hypothesis testing, prefer the explicit GI scoring approach (next section) over MAGeCK MLE interpretation, since MAGeCK MLE does not validate the additive null.
+
+**`interaction|fdr` is not reproducible across reruns.** MAGeCK MLE's FDR is permutation-based and exposes no `--seed` flag: two consecutive `mageck mle` runs on byte-identical count/design-matrix inputs produced different `interaction|fdr` for 39 of 40 genes, while `interaction|beta` point estimates stayed bit-identical (checked on MAGeCK 0.5.9.5). Treat `interaction|beta` sign/magnitude as the stable signal; do not report a specific `interaction|fdr` value as reproducible, and use the deterministic GI z-score method above for any significance claim that must hold across reruns.
 
 ## Inzolia / in4mer 4-Guide Array Analysis
 
@@ -211,6 +214,8 @@ def in4mer_pair_analysis(paired_counts_df, gene_pairs, value_cols):
 **Fix:** Standard library QC; for low-coverage pairs, aggregate fewer cassettes but with more sequencing depth; or drop low-coverage pairs from analysis.
 
 ## Cross-Modality Validation
+
+**Scope:** This Skill analyzes screen data for research purposes. A synthetic-lethal call here is a research lead, not a validated therapeutic target or a patient-treatment recommendation -- cell-line/screen-level synthetic lethality does not by itself establish patient-level clinical benefit. Any path from a screen hit to a therapy goes through the validation steps below and standard preclinical/clinical development; do not use screen output to make or imply a diagnostic or treatment decision for an individual patient.
 
 For high-stakes synthetic-lethal hits (drug-target nomination), validate by:
 

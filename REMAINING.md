@@ -76,8 +76,6 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | --- | ---: | --- |
 | `bio-admet-prediction` | 86 | Limited Release |
 | `bio-causal-genomics-genetic-correlation` | 89 | Production Ready |
-| `bio-crispr-screens-combinatorial-screens` | 87 | Limited Release |
-| `bio-crispr-screens-in-vivo-screens` | 88 | Production Ready |
 | `bio-differential-expression-deseq2-basics` | 92 | Production Ready |
 | `bio-machine-learning-model-validation` | 93 | Limited Release |
 | `bio-machine-learning-prediction-explanation` | 89 | Limited Release |

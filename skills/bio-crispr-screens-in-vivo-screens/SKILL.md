@@ -6,6 +6,14 @@ primary_tool: MAGeCK
 license: MIT
 ---
 
+## Ethical & Regulatory Requirements
+
+Every design pattern in this Skill involves live-animal tumor implantation, tamoxifen induction, and tumor harvest/sacrifice. This Skill assumes institutional approval is already in place; it does not itself provide ethical review, and library design or bottleneck math can be planned ahead of approval, but implantation cannot proceed without it.
+
+- **Obtain IACUC** (Institutional Animal Care and Use Committee) or equivalent institutional ethical-review approval *before* any animal procedure begins.
+- **Cite the approving protocol** (IACUC/ethics protocol number) in any resulting publication or report.
+- **Apply the 3Rs** (Replacement, Reduction, Refinement): use the smallest cohort that gives adequate power (see Quantitative Thresholds below), prefer in vitro/organoid work to rule out non-hits before committing to animal work, and use humane tumor-burden endpoints.
+
 ## Version Compatibility
 
 Reference examples tested with: MAGeCK 0.5.9+, MAGeCK-VISPR 0.5.6+, pandas 2.2+, numpy 1.26+.
@@ -74,6 +82,12 @@ If code throws ImportError, AttributeError, or TypeError, introspect the install
 
 **What it buys:** CRISPR-StAR enables genome-scale in vivo screens (vs focused libraries) by generating intrinsic per-clone controls; outperforms conventional in vivo screens in therapy-resistant mouse melanoma models (Uijttewaal 2025).
 
+**Worked numeric example** (parameters from Fenoglio et al. 2026, a CRISPR-StAR application study co-authored by Uijttewaal — the original 2025 paper does not itself publish a cell-number/MOI recipe, so do not invent one; use a pilot or these reported values as a starting point):
+- Primary genome-scale library: 30,000 sgRNAs (4 guides/gene), transduced at low MOI to a library representation of 1000x (i.e. >=30M cells transduced pre-implant)
+- Implant: 50,000 cells/uL in Matrigel, 200 uL/mouse = **10,000,000 cells/mouse** -> pre-bottleneck per-mouse coverage = 10,000,000 / 30,000 = **333x**
+- Tamoxifen induction: 75 mg/kg once daily x 2 days, started once tumors reached 150 mm3
+- Harvest: 28 days post-induction (in vivo arm); 118 tumors in the primary screen, with ~30 tumors shown sufficient to reproduce the full-cohort result (up to a 7-fold reduction in animal use — relevant to the 3Rs requirement above)
+
 ## Syngeneic vs Xenograft vs PDX
 
 | Model | Immune system | Use case |
@@ -131,6 +145,8 @@ mageck mle \
     --output-prefix in_vivo_mle
 ```
 
+**MLE determinism note (checked on MAGeCK 0.5.9.5):** `mageck mle`'s permutation-derived FDR-like p-values drift run-to-run on identical input — beta effect sizes and Wald p-values stay byte-identical, but the permutation-based FDR column does not, because `mageck mle` exposes no `--seed` option (confirmed via `mageck mle --help`). Report **Wald p-values** as the primary significance metric for MLE results; `--permutation-round` (default 2, suggested 10) improves the permutation FDR estimate's stability but does not make it deterministic.
+
 **Per-animal RRA + meta-analysis:**
 
 ```python
@@ -149,11 +165,16 @@ def meta_analyze_animals(per_animal_results):
         # clip to keep norm.ppf finite at p=0; negate so positive z = stronger depletion,
         # matching examples/per_animal_meta_analysis.py
         'stouffer_z': -norm.ppf(g['neg|p-value'].clip(1e-10, 1 - 1e-10)).sum() / (len(g) ** 0.5),
-        'animals_significant': (g['neg|fdr'] < 0.05).sum(),
+        # nominal p, not per-animal FDR -- see "Compound hit-calling threshold" below
+        'animals_at_nominal_p05': (g['neg|p-value'] < 0.05).sum(),
         'n_animals': len(g)
     }))
     return meta.sort_values('stouffer_z')
 ```
+
+**Compound hit-calling threshold:** call a gene a hit when **meta-FDR < 0.05 AND >=50% of animals individually reach nominal per-animal p < 0.05** (same direction). Use per-animal **nominal** p, not per-animal FDR, for the consistency arm: per-animal FDR-correction demands more power than typical in vivo cohorts provide (5-10 animals against a gene universe of hundreds-thousands), and requiring it can silently report zero hits on a screen with an obvious, strong meta-signal.
+
+Verified against a synthetic 6-animal / 60-gene in vivo dataset with 5 planted true hits (`meta_fdr` reaching 3e-6 via the Stouffer method above): the per-animal-**FDR**<0.05 consistency rule called **0/5** planted hits (no single animal's own MAGeCK RRA test crossed FDR<0.05 at this cohort size), while the per-animal-**nominal**-p<0.05 rule recovered **4/5** with **zero** false positives among the 55 noise genes. A gene that clears meta-FDR<0.05 but fails even the nominal-p consistency check (the 5th planted hit in that test: meta-FDR 0.0013, but nominal p<0.05 in only 1/6 animals) should be **flagged for manual review, not silently discarded** — it may reflect a real effect concentrated in a minority of animals (e.g. a tumor-specific clonal effect) or an outlier animal.
 
 ## Failure Modes
 
@@ -230,6 +251,7 @@ def meta_analyze_animals(per_animal_results):
 - Lee TW et al. 2023. *Cancer Gene Ther* 30:1610. Clonal dynamics limit detection of selection in tumour xenograft CRISPR/Cas9 screens.
 - Scheidmann MC et al. 2022. *Cancer Res* 82:681. In vivo CRISPR screen in a CTC-derived xenograft; late-tumor sgRNA-per-gene retention.
 - Uijttewaal ECH et al. 2025. *Nat Biotechnol* 43:1848 (online Dec 2024). CRISPR-StAR intrinsic-control screening for in vivo models.
+- Fenoglio S et al. 2026. *Cell Rep Methods* 6(7):101470. CRISPR-StAR applied at genome scale; source of the worked cell-density/MOI/library-size numbers above.
 
 ## Related Skills
 
