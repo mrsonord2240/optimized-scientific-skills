@@ -4,20 +4,12 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 140,
-    "audited_and_excluded": 0,
+    "refined": 141,
+    "audited_and_excluded": 3,
     "out_of_scope": 1,
-    "remaining": 421
+    "remaining": 417
   },
   "remaining": [
-    {
-      "id": "bio-alignment-sorting",
-      "upstream_path": "alignment-files/alignment-sorting"
-    },
-    {
-      "id": "bio-alignment-validation",
-      "upstream_path": "alignment-files/alignment-validation"
-    },
     {
       "id": "bio-analytical-validation",
       "upstream_path": "liquid-biopsy/analytical-validation"
@@ -69,10 +61,6 @@
     {
       "id": "bio-atac-seq-single-cell-atac",
       "upstream_path": "atac-seq/single-cell-atac"
-    },
-    {
-      "id": "bio-bam-statistics",
-      "upstream_path": "alignment-files/bam-statistics"
     },
     {
       "id": "bio-batch-processing",
@@ -473,10 +461,6 @@
     {
       "id": "bio-differential-splicing",
       "upstream_path": "alternative-splicing/differential-splicing"
-    },
-    {
-      "id": "bio-duplicate-handling",
-      "upstream_path": "alignment-files/duplicate-handling"
     },
     {
       "id": "bio-ecological-genomics-biodiversity-metrics",
@@ -1695,7 +1679,44 @@
       "upstream_path": "sequence-io/write-sequences"
     }
   ],
-  "excluded": [],
+  "excluded": [
+    {
+      "id": "bio-alignment-sorting",
+      "upstream_path": "alignment-files/alignment-sorting",
+      "score": 76,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-alignment-sorting.md",
+      "fix_pass": "done",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-alignment-validation",
+      "upstream_path": "alignment-files/alignment-validation",
+      "score": 66,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-bam-statistics",
+      "upstream_path": "alignment-files/bam-statistics",
+      "score": 71,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    }
+  ],
   "out_of_scope": [
     {
       "id": "clawhub-installer",

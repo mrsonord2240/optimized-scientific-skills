@@ -895,6 +895,22 @@
       ]
     },
     {
+      "id": "bio-duplicate-handling",
+      "upstream_path": "alignment-files/duplicate-handling",
+      "score": 77,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "id": "bio-entrez-fetch",
       "upstream_path": "database-access/entrez-fetch",
       "score": 89,

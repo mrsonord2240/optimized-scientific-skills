@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**421 remaining** across 53 folders. 140 are already refined and live in `skills/`.
+**417 remaining** across 53 folders. 141 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 140 refined, 0 audited and excluded, 1 out of scope, 421 remaining.
+The source tree holds 562 Skills: 141 refined, 3 audited and excluded, 1 out of scope, 417 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -30,7 +30,6 @@ The source tree holds 562 Skills: 140 refined, 0 audited and excluded, 1 out of 
 | flow-cytometry | 8 | 0 |
 | genome-intervals | 8 | 0 |
 | metagenomics | 8 | 0 |
-| alignment-files | 7 | 3 |
 | genome-annotation | 7 | 0 |
 | imaging-mass-cytometry | 7 | 0 |
 | liquid-biopsy | 7 | 0 |
@@ -63,6 +62,7 @@ The source tree holds 562 Skills: 140 refined, 0 audited and excluded, 1 out of 
 | read-alignment | 4 | 0 |
 | rna-quantification | 4 | 0 |
 | rna-structure | 4 | 0 |
+| alignment-files | 3 | 4 |
 
 ## Promoted, fix pass still needed
 
@@ -75,6 +75,7 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-admet-prediction` | 86 | Limited Release |
 | `bio-causal-genomics-genetic-correlation` | 89 | Production Ready |
 | `bio-differential-expression-deseq2-basics` | 92 | Production Ready |
+| `bio-duplicate-handling` | 77 | Limited Release |
 | `bio-machine-learning-model-validation` | 93 | Limited Release |
 | `bio-machine-learning-prediction-explanation` | 89 | Limited Release |
 | `bio-molecular-descriptors` | 86 | Limited Release |
@@ -130,6 +131,9 @@ fixed.
 
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
+| `bio-alignment-sorting` | 76 | Beta Only | 0 |
+| `bio-alignment-validation` | 66 | Beta Only | 0 |
+| `bio-bam-statistics` | 71 | Beta Only | 0 |
 
 ## Out of scope
 
@@ -141,10 +145,6 @@ fixed.
 
 ### alignment-files
 
-- `bio-alignment-sorting` — `alignment-files/alignment-sorting`
-- `bio-alignment-validation` — `alignment-files/alignment-validation`
-- `bio-bam-statistics` — `alignment-files/bam-statistics`
-- `bio-duplicate-handling` — `alignment-files/duplicate-handling`
 - `bio-pileup-generation` — `alignment-files/pileup-generation`
 - `bio-reference-operations` — `alignment-files/reference-operations`
 - `bio-sam-bam-basics` — `alignment-files/sam-bam-basics`
