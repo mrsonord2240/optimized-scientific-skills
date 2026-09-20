@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "3620ba2d352794e9fed5a9e3b6e8144d54032e99"
+      "staging_commit": "44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b"
     }
   },
   "skills": [
@@ -2064,6 +2064,25 @@
         "pfam_annotation.sh",
         "pfam_annotation_toy.sh",
         "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-sam-bam-basics",
+      "upstream_path": "alignment-files/sam-bam-basics",
+      "score": 85,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-sam-bam-basics.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "convert_formats.sh",
+        "usage-guide.md",
+        "view_bam.py"
       ]
     },
     {
