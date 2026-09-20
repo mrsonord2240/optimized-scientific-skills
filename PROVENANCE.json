@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "a93661e859a6db83209cafe734b68a6baebb1850"
+      "staging_commit": "049f0d09e5a8a3a2754ca4ab869c7c80e3566828"
     }
   },
   "skills": [
@@ -110,17 +110,19 @@
     {
       "id": "bio-blast-searches",
       "upstream_path": "database-access/blast-searches",
-      "score": 83,
-      "grade": "Limited Release",
+      "score": 93,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-19",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-blast-searches.md",
+      "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "statistics.md",
+        "usage-guide.md"
       ]
     },
     {

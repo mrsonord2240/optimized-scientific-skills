@@ -44,25 +44,10 @@ No API key required for remote BLAST; one search at a time is the polite cap.
 
 ## What the Agent Will Do
 
-1. Choose program from the (query molecule, target molecule) pair and the species-distance question.
-2. Choose database from the reproducibility-vs-coverage tradeoff (refseq_select for stability; nt/nr only with snapshot date).
-3. Set word_size, matrix, and composition-based-statistics appropriate for query length and protein composition.
-4. Set hitlist_size large (500+) to dodge the max_target_seqs trap; post-filter top N.
-5. Use entrez_query for pre-filtering by organism (faster and more meaningful E-values than post-filter).
-6. Parse XML with NCBIXML.read(); compute identity and coverage from HSP attributes.
-7. Sort by bit-score, not E-value, when comparing across databases.
-8. Recommend defection to local-blast / DIAMOND / MMseqs2 for >50 sequences.
-
-## Tips
-
-- Bit-score is database-size normalized and is the correct cross-database metric. E-value is not.
-- For cross-species DNA homology: use `dc-megablast` (discontiguous), never default megablast (word=28 misses divergent hits).
-- For protein remote homology (E in 10^-3 to 10^-1 range), switch to PSI-BLAST / jackhmmer / Foldseek -- see `remote-homology`.
-- `entrez_query='Mammalia[Organism]'` filters BLAST's search space before the search runs. Faster than post-filtering and gives correct (database-size-adjusted) E-values.
-- For publication: never use `nt`/`nr` without recording snapshot date or archiving the database. `refseq_select` is the safe default.
-- Remote BLAST submits to the NCBI queue. For >5 sequences/min, switch to local BLAST. For >1000 sequences, switch to DIAMOND or MMseqs2.
-- The "twilight zone" of homology (Rost 1999 *Protein Eng* 12:85) is 20-35% identity; below 20% sequence-only search is unreliable -- need structure (Foldseek) or HMM.
-- Compositional bias inflates E-values for low-complexity regions. CBS=2 (default) handles most; consider hard-masking with `filter='S'` for severe bias.
+Program choice, database choice, word-size/matrix/CBS selection, the `max_target_seqs`/
+`hitlist_size` pattern, `entrez_query` pre-filtering, XML parsing, and bit-score vs. E-value
+sorting are all in `SKILL.md`'s Program decision, Database decision, and Code patterns sections --
+followed as documented there, including the corrected `gapcosts`/megablast patterns.
 
 ## Related Skills
 

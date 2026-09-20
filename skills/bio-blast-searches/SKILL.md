@@ -19,7 +19,7 @@ package and adapt the example to match the actual API rather than retrying.
 
 # BLAST Searches (Remote)
 
-**"Find similar sequences in NCBI's database"** -> Submit a query to NCBI's remote BLAST servers; receive a Request ID (RID); poll for completion; parse the XML hit table. Best for one-off identification of a few sequences. For >50 sequences, switch to `local-blast` or DIAMOND/MMseqs2 in `remote-homology`.
+**"Find similar sequences in NCBI's database"** -> Submit a query to NCBI's remote BLAST servers; receive a Request ID (RID); poll for completion; parse the XML hit table. Best for one-off identification of a few sequences at a time (NCBI's queue tolerates roughly one search at a time, a few per minute). For >50 sequences, switch to `local-blast`; for >1000, switch to DIAMOND/MMseqs2 in `remote-homology`.
 
 The two most consequential decisions: **which program** (defines query+target molecule types and word-size defaults) and **which database** (defines the search space and therefore E-value baselines). The third most important: do NOT misuse `max_target_seqs` -- it is an early-termination heuristic, not a "give me the top N hits" filter (Shah et al. 2019).
 
@@ -36,6 +36,8 @@ from Bio import SeqIO
 
 No API key needed for remote BLAST itself, but NCBI's general rate-limit ethic still applies -- one search at a time, polite waiting, no parallelism.
 
+Always include a FASTA defline in `sequence` (`>id\n...`), even for a throwaway search -- see Failure Modes: "Empty FASTA defline submitted" for the real cost of skipping it.
+
 ## Program decision (query vs database molecule)
 
 | Program | Query | Target | Word size default | Use case |
@@ -50,6 +52,8 @@ No API key needed for remote BLAST itself, but NCBI's general rate-limit ethic s
 | `psiblast` | Protein | Protein | 3 | Iterative PSSM-based remote homology -- see `remote-homology` |
 
 **The misuse to avoid:** using default `blastn` (word=11) for cross-species DNA where `dc-megablast` is the right tool. Or using `megablast` (word=28) for cross-species homology where it will miss every divergent hit. The most-misused BLAST parameter according to literature.
+
+**`qblast()` API note:** `megablast` and `dc-megablast` in the table above are program *concepts*, not literal `program=` strings. `NCBIWWW.qblast(program='megablast', ...)` raises `ValueError: Program specified is megablast. Expected one of blastn, blastp, blastx, tblastn, tblastx` immediately -- confirmed live. Both are requested as `program='blastn'` plus a flag; see "Requesting megablast / dc-megablast" under Code patterns below.
 
 ## Database decision (search space)
 
@@ -69,32 +73,11 @@ No API key needed for remote BLAST itself, but NCBI's general rate-limit ethic s
 
 ## E-value interpretation (Karlin-Altschul)
 
-E-value = K * m * n * exp(-lambda * S), where m = effective query length, n = effective database size, lambda and K are scoring-matrix-dependent constants (Karlin & Altschul 1990 PNAS 87:2264).
-
-| E-value | Bit-score (BLOSUM62, protein) | Interpretation |
-|---|---|---|
-| < 1e-50 | > 200 | Strong; almost certainly homologous |
-| 1e-50 to 1e-10 | 100-200 | Significant; likely homolog |
-| 1e-10 to 1e-3 | 50-100 | Marginal; check identity + coverage |
-| 0.01 to 10 | 30-50 | Possible remote homolog; needs profile method |
-| > 10 | < 30 | Random; not meaningful |
-
-**Key implication of E = K * m * n * exp(-lambda * S):** the same alignment against a 100x larger database has a 100x larger E-value. Cross-database E-value comparison is meaningless. Bit-score is database-size normalized and is the right cross-database metric.
-
-For protein remote homology where E is marginal (10^-3 to 10^-1), reach for profile methods: PSI-BLAST, jackhmmer, HHblits, or Foldseek -- see `remote-homology` skill.
+E-values scale with database size (Karlin & Altschul 1990 PNAS 87:2264) -- the same alignment against a 100x larger database has a 100x larger E-value. **Cross-database E-value comparison is meaningless; bit-score is database-size normalized and is the right cross-database metric.** For protein remote homology where E is marginal (10^-3 to 10^-1), reach for profile methods: PSI-BLAST, jackhmmer, HHblits, or Foldseek -- see `remote-homology` skill. Full formula, the E-value/bit-score interpretation table, and the homology "twilight zone" threshold: `references/statistics.md`.
 
 ## Composition-Based Statistics (CBS)
 
-Compositional bias inflates significance for low-complexity proteins. The CBS modes (Yu et al. 2006 *Nucleic Acids Res* 34:5966):
-
-| `composition_based_statistics` | Mode | Use when |
-|---|---|---|
-| 0 | Off | Almost never |
-| 1 | F&S 2002 score adjustment | Legacy compatibility |
-| 2 | Yu&Altschul 2005 conditional score adjustment | **Default since BLAST+ 2.2.17** -- correct for most cases |
-| 3 | Universal statistics | Short queries (< 30 aa) where mode 2 over-corrects |
-
-For protein queries under 30 aa, switch to CBS=3. For protein with known compositional bias (e.g. coiled-coil regions, signal peptides), CBS=2 is appropriate but consider hard-masking with SEG.
+Compositional bias inflates significance for low-complexity proteins. Default `composition_based_statistics=2` (Yu&Altschul 2005) is correct for most cases; switch to `composition_based_statistics=3` for protein queries under 30 aa, where mode 2 over-corrects (used in the Short peptide search pattern below). For known compositional bias (coiled-coil regions, signal peptides), CBS=2 is appropriate but consider hard-masking with SEG. Full mode table and mechanism (Yu et al. 2006): `references/statistics.md`.
 
 ## The `max_target_seqs` trap
 
@@ -154,6 +137,36 @@ record = NCBIXML.read(handle); handle.close()
 top10 = sorted(record.alignments, key=lambda a: a.hsps[0].expect)[:10]
 ```
 
+### Requesting megablast / dc-megablast (qblast() flag, not a program value)
+
+**Goal:** Run high-identity DNA search (megablast) or sensitive discontiguous cross-species search (dc-megablast).
+
+**Approach:** `NCBIWWW.qblast()` has no `program='megablast'`. Both are requested as `program='blastn'` plus a keyword flag -- confirmed live, `program='megablast'` fails immediately with `ValueError`.
+
+**Reference (BioPython 1.83+):**
+```python
+# megablast (word=28, high-identity DNA, e.g. contamination screening)
+handle = NCBIWWW.qblast(
+    program='blastn',
+    megablast=True,
+    database='refseq_select_rna',
+    sequence=query_seq,
+    hitlist_size=500,
+)
+
+# dc-megablast (discontiguous, sensitive cross-species mRNA)
+handle = NCBIWWW.qblast(
+    program='blastn',
+    megablast=True,
+    template_type='coding',   # or 'optimal'
+    template_length=18,       # 16, 18, or 21
+    database='refseq_select_rna',
+    sequence=query_seq,
+    hitlist_size=500,
+)
+```
+Verified live: `program='blastn', megablast=True` on a human/mouse/rat cross-species mRNA query returned 5 alignments (human + mouse only) vs. 11 from plain `blastn`/word=11 on the identical query -- reduced but non-zero cross-species sensitivity, matching the mechanism in Failure Modes below.
+
 ### Protein search with organism restriction
 
 **Goal:** Find mammalian homologs of a query protein in Swiss-Prot.
@@ -183,11 +196,13 @@ handle = NCBIWWW.qblast(
     sequence=peptide_seq,  # < 30 aa
     matrix_name='PAM30',
     word_size=2,
+    gapcosts='9 1',  # required: PAM30 rejects BLOSUM62's default gap costs (11,1) -- see word-size/gap-cost table above
     expect=1000,  # short queries need permissive cutoff
     composition_based_statistics=3,
     hitlist_size=100,
 )
 ```
+Verified live: omitting `gapcosts` raises `ValueError: Error message from NCBI: ... Gap existence and extension values of 11 and 1 not supported for PAM30`; with `gapcosts='9 1'` the call succeeds.
 
 ### Save XML for re-parsing
 
@@ -255,7 +270,7 @@ handle = NCBIWWW.qblast('tblastn', 'nr', query, hitlist_size=500, format_type='X
 ### Megablast for cross-species
 - **Trigger:** Default `megablast` (word=28) on a cross-species DNA query.
 - **Mechanism:** Word size 28 requires 28-nt exact match to seed; cross-species mRNA has too much divergence.
-- **Symptom:** Zero hits or only hits to the same species.
+- **Symptom:** Reduced or missing cross-species hits, worse for more diverged sequences -- not necessarily zero. Confirmed live: on a real human/mouse/rat query, megablast still found the human and mouse hits (2 of 3 species) and only missed the most-diverged one (rat).
 - **Fix:** Use `dc-megablast` (discontiguous) or `blastn` with word=11.
 
 ### Reproducibility loss against `nt`/`nr`
@@ -278,20 +293,22 @@ handle = NCBIWWW.qblast('tblastn', 'nr', query, hitlist_size=500, format_type='X
 
 ### Empty FASTA defline submitted
 - **Trigger:** Sending `sequence` as a raw string without `>id\n`.
-- **Mechanism:** BLAST treats as anonymous query; some downstream parsers misbehave.
-- **Symptom:** Hits returned but `record.query` is None.
-- **Fix:** Always pass FASTA with a defline; or pass a `SeqRecord`.
+- **Mechanism:** BLAST accepts the anonymous query, but the search runs markedly slower server-side.
+- **Symptom:** Two confirmed, reproducible effects, not the one you'd expect from "just a label": (1) `record.query` comes back as the literal placeholder string `'No definition line'`, not `None`/empty; (2) the search itself takes **~12.7x longer** -- confirmed live, 781s vs. 62s for the identical query with vs. without a defline, with Biopython itself raising `BiopythonWarning: BLAST request ... is taking longer than 10 minutes`. Results (alignments, top hit) are otherwise correct.
+- **Fix:** Always pass FASTA with a defline (`>id\n...`), or a `SeqRecord`, even for a disposable one-off search -- this is a latency cost, not a cosmetic one, so it is not optional in practice.
 
 ## Common errors
 
 | Error / symptom | Cause | Solution |
 |---|---|---|
-| Stuck > 5 min | Large query or busy queue | Submit RID, poll separately; or use local |
+| Stuck > 5 min | Large query or busy queue, or a missing FASTA defline (see Failure Modes: Empty FASTA defline -- confirmed ~12.7x slower) | Submit RID, poll separately; add a defline; or use local |
 | URLError / timeout | Network or NCBI maintenance | Retry with backoff; status at status.ncbi.nlm.nih.gov |
 | No hits | Wrong program / database type | Verify query and DB molecule types match |
 | Empty XML | RID expired | Re-submit; RIDs purge after 24-36h |
 | 1000s of low-complexity hits | CBS disabled or extreme bias | CBS=2; consider SEG filter |
 | Cross-DB E mismatch | Comparing E across DBs | Use bit-score instead |
+| `ValueError: ... Gap existence and extension values of 11 and 1 not supported for PAM30` | Non-BLOSUM62 matrix (e.g. PAM30) without setting `gapcosts` | Set `gapcosts='9 1'` for PAM30 (see word-size/gap-cost table) |
+| `ValueError: Program specified is megablast. Expected one of blastn, blastp, blastx, tblastn, tblastx` | `program=` set to `'megablast'`/`'dc-megablast'` directly | Use `program='blastn', megablast=True` (+ `template_type`/`template_length` for dc-megablast) |
 
 ## References
 
@@ -301,6 +318,7 @@ handle = NCBIWWW.qblast('tblastn', 'nr', query, hitlist_size=500, format_type='X
 - Yu YK, Gertz EM, Agarwala R, Schaffer AA, Altschul SF. (2006) Retrieval accuracy, statistical significance and compositional similarity in protein sequence database searches. *Nucleic Acids Res* 34:5966-5973.
 - Shah N, Nute MG, Warnow T, Pop M. (2019) Misunderstood parameter of NCBI BLAST impacts the correctness of bioinformatics workflows. *Bioinformatics* 35:1613-1614.
 - Camacho C, Coulouris G, Avagyan V, Ma N, Papadopoulos J, Bealer K, Madden TL. (2009) BLAST+: architecture and applications. *BMC Bioinformatics* 10:421.
+- Rost B. (1999) Twilight zone of protein sequence alignments. *Protein Eng* 12:85-94.
 
 ## Related Skills
 
