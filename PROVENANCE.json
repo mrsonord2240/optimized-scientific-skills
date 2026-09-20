@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "c206dff76d081a5126f8497fbabe10995c9b6026"
+      "staging_commit": "9193f86f65daa816d3b39d553b36c00e2f1e8ea2"
     }
   },
   "skills": [
@@ -27,6 +27,25 @@
       "relative_to_upstream": "licence-declaration-only",
       "changed_files": [
         "SKILL.md"
+      ]
+    },
+    {
+      "id": "bio-alignment-amplicon-clipping",
+      "upstream_path": "alignment-files/alignment-amplicon-clipping",
+      "score": 85,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-alignment-amplicon-clipping.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "ampliconclip_workflow.sh",
+        "check_primer_residual.py",
+        "usage-guide.md"
       ]
     },
     {

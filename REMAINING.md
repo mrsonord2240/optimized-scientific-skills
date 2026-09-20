@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**424 remaining** across 53 folders. 137 are already refined and live in `skills/`.
+**423 remaining** across 53 folders. 138 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 137 refined, 0 audited and excluded, 1 out of scope, 424 remaining.
+The source tree holds 562 Skills: 138 refined, 0 audited and excluded, 1 out of scope, 423 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -19,9 +19,9 @@ The source tree holds 562 Skills: 137 refined, 0 audited and excluded, 1 out of 
 | clip-seq | 12 | 0 |
 | spatial-transcriptomics | 12 | 0 |
 | copy-number | 11 | 0 |
-| alignment-files | 10 | 0 |
 | methylation-analysis | 10 | 0 |
 | structural-biology | 10 | 0 |
+| alignment-files | 9 | 1 |
 | alternative-splicing | 9 | 0 |
 | genome-assembly | 9 | 0 |
 | hi-c-analysis | 9 | 0 |
@@ -141,7 +141,6 @@ fixed.
 
 ### alignment-files
 
-- `bio-alignment-amplicon-clipping` — `alignment-files/alignment-amplicon-clipping`
 - `bio-alignment-filtering` — `alignment-files/alignment-filtering`
 - `bio-alignment-indexing` — `alignment-files/alignment-indexing`
 - `bio-alignment-sorting` — `alignment-files/alignment-sorting`
