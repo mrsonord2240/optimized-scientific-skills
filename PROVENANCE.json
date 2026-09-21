@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "ce9b6247dfdebd9394b48bae3e7e15909824940d"
+      "staging_commit": "1d6bc476849b52a3c8d63b22086ef4dbed9960ff"
     }
   },
   "skills": [
@@ -2530,6 +2530,25 @@
       "changed_files": [
         "SKILL.md",
         "scvelo_velocity.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-splicing-qc",
+      "upstream_path": "alternative-splicing/splicing-qc",
+      "score": 85,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-splicing-qc.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "splicing_qc.py",
+        "test_splicing_qc.py",
         "usage-guide.md"
       ]
     },

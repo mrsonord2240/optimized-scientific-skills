@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 152,
-    "audited_and_excluded": 3,
+    "refined": 153,
+    "audited_and_excluded": 1,
     "out_of_scope": 1,
-    "remaining": 406
+    "remaining": 407
   },
   "remaining": [
     {
@@ -1311,6 +1311,10 @@
       "upstream_path": "spatial-transcriptomics/spatial-visualization"
     },
     {
+      "id": "bio-splice-variant-prediction",
+      "upstream_path": "alternative-splicing/splice-variant-prediction"
+    },
+    {
       "id": "bio-splicing-quantification",
       "upstream_path": "alternative-splicing/splicing-quantification"
     },
@@ -1646,30 +1650,6 @@
       "audited_on": "2026-09-20",
       "fix_log": "fixes/bio-outlier-splicing-detection.md",
       "fix_pass": "done",
-      "reaudit": "not needed"
-    },
-    {
-      "id": "bio-splice-variant-prediction",
-      "upstream_path": "alternative-splicing/splice-variant-prediction",
-      "score": 66,
-      "grade": "Reject",
-      "deployable": false,
-      "open_p0": 2,
-      "audited_on": "2026-09-20",
-      "fix_log": "fixes/bio-splice-variant-prediction.md",
-      "fix_pass": "done",
-      "reaudit": "not needed"
-    },
-    {
-      "id": "bio-splicing-qc",
-      "upstream_path": "alternative-splicing/splicing-qc",
-      "score": 67,
-      "grade": "Reject",
-      "deployable": false,
-      "open_p0": 1,
-      "audited_on": "2026-09-20",
-      "fix_log": null,
-      "fix_pass": "needed",
       "reaudit": "not needed"
     }
   ],
