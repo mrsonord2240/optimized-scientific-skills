@@ -4,14 +4,14 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**406 remaining** across 52 folders. 155 are already refined and live in `skills/`.
+**401 remaining** across 52 folders. 156 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 155 refined, 0 audited and excluded, 1 out of scope, 406 remaining.
+The source tree holds 562 Skills: 156 refined, 4 audited and excluded, 1 out of scope, 401 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
 | workflows | 37 | 4 |
-| data-visualization | 20 | 0 |
+| data-visualization | 15 | 1 |
 | comparative-genomics | 13 | 0 |
 | atac-seq | 12 | 0 |
 | chip-seq | 12 | 0 |
@@ -73,6 +73,7 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | --- | ---: | --- |
 | `bio-admet-prediction` | 86 | Limited Release |
 | `bio-causal-genomics-genetic-correlation` | 89 | Production Ready |
+| `bio-data-visualization-forest-funnel-plots` | 76 | Limited Release |
 | `bio-differential-expression-deseq2-basics` | 92 | Production Ready |
 | `bio-machine-learning-model-validation` | 93 | Limited Release |
 | `bio-machine-learning-prediction-explanation` | 89 | Limited Release |
@@ -132,6 +133,10 @@ fixed.
 
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
+| `bio-data-visualization-distribution-plots` | 69.5 | Beta Only | 0 |
+| `bio-data-visualization-heatmaps-clustering` | 78 | Reject | 1 |
+| `bio-data-visualization-matplotlib-fundamentals` | 75 | Beta Only | 0 |
+| `bio-data-visualization-volcano-and-ma-plots` | 76 | Beta Only | 0 |
 
 ## Out of scope
 
@@ -259,23 +264,18 @@ fixed.
 - `bio-data-visualization-circos-plots` — `data-visualization/circos-plots`
 - `bio-data-visualization-color-palettes` — `data-visualization/color-palettes`
 - `bio-data-visualization-dimensionality-reduction-plots` — `data-visualization/dimensionality-reduction-plots`
-- `bio-data-visualization-distribution-plots` — `data-visualization/distribution-plots`
 - `bio-data-visualization-flow-and-transition-plots` — `data-visualization/flow-and-transition-plots`
-- `bio-data-visualization-forest-funnel-plots` — `data-visualization/forest-funnel-plots`
 - `bio-data-visualization-genome-tracks` — `data-visualization/genome-tracks`
 - `bio-data-visualization-ggplot2-fundamentals` — `data-visualization/ggplot2-fundamentals`
-- `bio-data-visualization-heatmaps-clustering` — `data-visualization/heatmaps-clustering`
 - `bio-data-visualization-interactive-visualization` — `data-visualization/interactive-visualization`
 - `bio-data-visualization-lollipop-protein-maps` — `data-visualization/lollipop-protein-maps`
 - `bio-data-visualization-manhattan-qq-locuszoom` — `data-visualization/manhattan-qq-locuszoom`
-- `bio-data-visualization-matplotlib-fundamentals` — `data-visualization/matplotlib-fundamentals`
 - `bio-data-visualization-multipanel-figures` — `data-visualization/multipanel-figures`
 - `bio-data-visualization-network-visualization` — `data-visualization/network-visualization`
 - `bio-data-visualization-oncoprint-mutation-matrices` — `data-visualization/oncoprint-mutation-matrices`
 - `bio-data-visualization-sequence-logos` — `data-visualization/sequence-logos`
 - `bio-data-visualization-statistical-annotation` — `data-visualization/statistical-annotation`
 - `bio-data-visualization-upset-plots` — `data-visualization/upset-plots`
-- `bio-data-visualization-volcano-and-ma-plots` — `data-visualization/volcano-and-ma-plots`
 
 ### database-access
 

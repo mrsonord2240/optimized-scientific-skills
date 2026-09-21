@@ -934,6 +934,22 @@
       ]
     },
     {
+      "id": "bio-data-visualization-forest-funnel-plots",
+      "upstream_path": "data-visualization/forest-funnel-plots",
+      "score": 76,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed",
+      "relative_to_upstream": "licence-declaration-only",
+      "changed_files": [
+        "SKILL.md"
+      ]
+    },
+    {
       "id": "bio-differential-expression-deseq2-basics",
       "upstream_path": "differential-expression/deseq2-basics",
       "score": 92,

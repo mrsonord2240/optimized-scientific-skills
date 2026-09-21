@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 155,
-    "audited_and_excluded": 0,
+    "refined": 156,
+    "audited_and_excluded": 4,
     "out_of_scope": 1,
-    "remaining": 406
+    "remaining": 401
   },
   "remaining": [
     {
@@ -371,16 +371,8 @@
       "upstream_path": "data-visualization/dimensionality-reduction-plots"
     },
     {
-      "id": "bio-data-visualization-distribution-plots",
-      "upstream_path": "data-visualization/distribution-plots"
-    },
-    {
       "id": "bio-data-visualization-flow-and-transition-plots",
       "upstream_path": "data-visualization/flow-and-transition-plots"
-    },
-    {
-      "id": "bio-data-visualization-forest-funnel-plots",
-      "upstream_path": "data-visualization/forest-funnel-plots"
     },
     {
       "id": "bio-data-visualization-genome-tracks",
@@ -389,10 +381,6 @@
     {
       "id": "bio-data-visualization-ggplot2-fundamentals",
       "upstream_path": "data-visualization/ggplot2-fundamentals"
-    },
-    {
-      "id": "bio-data-visualization-heatmaps-clustering",
-      "upstream_path": "data-visualization/heatmaps-clustering"
     },
     {
       "id": "bio-data-visualization-interactive-visualization",
@@ -405,10 +393,6 @@
     {
       "id": "bio-data-visualization-manhattan-qq-locuszoom",
       "upstream_path": "data-visualization/manhattan-qq-locuszoom"
-    },
-    {
-      "id": "bio-data-visualization-matplotlib-fundamentals",
-      "upstream_path": "data-visualization/matplotlib-fundamentals"
     },
     {
       "id": "bio-data-visualization-multipanel-figures",
@@ -433,10 +417,6 @@
     {
       "id": "bio-data-visualization-upset-plots",
       "upstream_path": "data-visualization/upset-plots"
-    },
-    {
-      "id": "bio-data-visualization-volcano-and-ma-plots",
-      "upstream_path": "data-visualization/volcano-and-ma-plots"
     },
     {
       "id": "bio-differential-expression-batch-correction",
@@ -1635,7 +1615,56 @@
       "upstream_path": "sequence-io/write-sequences"
     }
   ],
-  "excluded": [],
+  "excluded": [
+    {
+      "id": "bio-data-visualization-distribution-plots",
+      "upstream_path": "data-visualization/distribution-plots",
+      "score": 69.5,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-data-visualization-heatmaps-clustering",
+      "upstream_path": "data-visualization/heatmaps-clustering",
+      "score": 78,
+      "grade": "Reject",
+      "deployable": false,
+      "open_p0": 1,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-data-visualization-matplotlib-fundamentals",
+      "upstream_path": "data-visualization/matplotlib-fundamentals",
+      "score": 75,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-data-visualization-volcano-and-ma-plots",
+      "upstream_path": "data-visualization/volcano-and-ma-plots",
+      "score": 76,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    }
+  ],
   "out_of_scope": [
     {
       "id": "clawhub-installer",
