@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "1e4e4a49a0e61198b4cc17136feadbc4496651e5"
+      "staging_commit": "6308a43161d01072e5bf67dc0f3cf0311936ff2b"
     }
   },
   "skills": [
@@ -1149,6 +1149,25 @@
         "geo_from_pubmed.py",
         "geo_to_sra.py",
         "search_geo.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-isoform-switching",
+      "upstream_path": "alternative-splicing/isoform-switching",
+      "score": 84,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-isoform-switching.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "hmmscan_to_pfamscan.py",
+        "isoform_switch_analysis.R",
         "usage-guide.md"
       ]
     },
