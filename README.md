@@ -25,11 +25,11 @@ justified.
 
 | | count |
 | --- | ---: |
-| Skills in this repository | **154** |
-| substantively modified by us, each with a fix log | 133 |
+| Skills in this repository | **155** |
+| substantively modified by us, each with a fix log | 134 |
 | unmodified apart from a declared `license: MIT` | 21 |
 | **fix pass still needed** (first audit only, whatever the score) | **21** |
-| **re-audit still needed** (changed after their latest audit) | **23** |
+| **re-audit still needed** (changed after their latest audit) | **24** |
 | audit coverage | **100%** |
 
 Each Skill carries a score and grade from a skill-auditor run that executed the Skill's own code against

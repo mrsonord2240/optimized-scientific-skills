@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be"
+      "staging_commit": "64b3b150c9b989c102f7ee69e0bb07c16842d894"
     }
   },
   "skills": [
@@ -1563,6 +1563,24 @@
         "bulk_dehydrated.sh",
         "download_genome.sh",
         "gene_metadata.sh",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-outlier-splicing-detection",
+      "upstream_path": "alternative-splicing/outlier-splicing-detection",
+      "score": 82,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-outlier-splicing-detection.md",
+      "fix_pass": "done",
+      "reaudit": "needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "fraser2_rare_disease.R",
         "usage-guide.md"
       ]
     },
