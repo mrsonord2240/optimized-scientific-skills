@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**406 remaining** across 52 folders. 151 are already refined and live in `skills/`.
+**406 remaining** across 52 folders. 152 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 151 refined, 4 audited and excluded, 1 out of scope, 406 remaining.
+The source tree holds 562 Skills: 152 refined, 3 audited and excluded, 1 out of scope, 406 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -61,7 +61,7 @@ The source tree holds 562 Skills: 151 refined, 4 audited and excluded, 1 out of 
 | read-alignment | 4 | 0 |
 | rna-quantification | 4 | 0 |
 | rna-structure | 4 | 0 |
-| alternative-splicing | 1 | 4 |
+| alternative-splicing | 1 | 5 |
 
 ## Promoted, fix pass still needed
 
@@ -131,7 +131,6 @@ fixed.
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
 | `bio-outlier-splicing-detection` | 67 | Beta Only | 0 |
-| `bio-single-cell-splicing` | 69 | Reject | 2 |
 | `bio-splice-variant-prediction` | 66 | Reject | 2 |
 | `bio-splicing-qc` | 67 | Reject | 1 |
 

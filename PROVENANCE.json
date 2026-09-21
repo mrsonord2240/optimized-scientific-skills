@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "6308a43161d01072e5bf67dc0f3cf0311936ff2b"
+      "staging_commit": "ce9b6247dfdebd9394b48bae3e7e15909824940d"
     }
   },
   "skills": [
@@ -2494,6 +2494,24 @@
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-single-cell-splicing",
+      "upstream_path": "alternative-splicing/single-cell-splicing",
+      "score": 84,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-single-cell-splicing.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "sc_splicing_brie2.py",
         "usage-guide.md"
       ]
     },

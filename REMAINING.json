@@ -4,8 +4,8 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 151,
-    "audited_and_excluded": 4,
+    "refined": 152,
+    "audited_and_excluded": 3,
     "out_of_scope": 1,
     "remaining": 406
   },
@@ -1644,19 +1644,7 @@
       "deployable": false,
       "open_p0": 0,
       "audited_on": "2026-09-20",
-      "fix_log": null,
-      "fix_pass": "needed",
-      "reaudit": "not needed"
-    },
-    {
-      "id": "bio-single-cell-splicing",
-      "upstream_path": "alternative-splicing/single-cell-splicing",
-      "score": 69,
-      "grade": "Reject",
-      "deployable": false,
-      "open_p0": 2,
-      "audited_on": "2026-09-20",
-      "fix_log": "fixes/bio-single-cell-splicing.md",
+      "fix_log": "fixes/bio-outlier-splicing-detection.md",
       "fix_pass": "done",
       "reaudit": "not needed"
     },
