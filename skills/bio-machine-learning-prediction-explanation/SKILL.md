@@ -4,6 +4,7 @@ description: Explains ML predictions on omics data with SHAP, LIME, and permutat
 tool_type: python
 primary_tool: shap
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

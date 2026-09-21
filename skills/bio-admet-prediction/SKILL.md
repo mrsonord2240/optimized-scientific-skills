@@ -4,6 +4,7 @@ description: Predicts ADMET properties using ADMETlab 3.0 (119 platform features
 tool_type: python
 primary_tool: ADMETlab
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

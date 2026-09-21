@@ -4,6 +4,7 @@ description: Designs covalent inhibitors and warheads targeting cysteine, lysine
 tool_type: python
 primary_tool: RDKit
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

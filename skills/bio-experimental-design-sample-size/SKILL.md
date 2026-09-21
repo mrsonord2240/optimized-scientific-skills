@@ -4,6 +4,7 @@ description: Estimates the minimum biological replicates (or cells/donors) for a
 tool_type: r
 primary_tool: ssizeRNA
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

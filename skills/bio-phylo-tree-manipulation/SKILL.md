@@ -4,6 +4,7 @@ description: Edit phylogenetic tree structure with Biopython Bio.Phylo, and trea
 tool_type: mixed
 primary_tool: Bio.Phylo
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

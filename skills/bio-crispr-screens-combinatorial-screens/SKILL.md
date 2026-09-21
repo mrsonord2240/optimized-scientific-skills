@@ -4,6 +4,7 @@ description: Designs and analyzes combinatorial CRISPR screens covering paired-C
 tool_type: mixed
 primary_tool: enCas12a
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

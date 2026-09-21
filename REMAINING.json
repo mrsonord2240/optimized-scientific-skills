@@ -5,9 +5,9 @@
   "reconciliation": {
     "skills_in_source_tree": 562,
     "refined": 156,
-    "audited_and_excluded": 4,
+    "audited_and_excluded": 14,
     "out_of_scope": 1,
-    "remaining": 401
+    "remaining": 391
   },
   "remaining": [
     {
@@ -363,14 +363,6 @@
       "upstream_path": "data-visualization/circos-plots"
     },
     {
-      "id": "bio-data-visualization-color-palettes",
-      "upstream_path": "data-visualization/color-palettes"
-    },
-    {
-      "id": "bio-data-visualization-dimensionality-reduction-plots",
-      "upstream_path": "data-visualization/dimensionality-reduction-plots"
-    },
-    {
       "id": "bio-data-visualization-flow-and-transition-plots",
       "upstream_path": "data-visualization/flow-and-transition-plots"
     },
@@ -379,44 +371,12 @@
       "upstream_path": "data-visualization/genome-tracks"
     },
     {
-      "id": "bio-data-visualization-ggplot2-fundamentals",
-      "upstream_path": "data-visualization/ggplot2-fundamentals"
-    },
-    {
       "id": "bio-data-visualization-interactive-visualization",
       "upstream_path": "data-visualization/interactive-visualization"
     },
     {
-      "id": "bio-data-visualization-lollipop-protein-maps",
-      "upstream_path": "data-visualization/lollipop-protein-maps"
-    },
-    {
       "id": "bio-data-visualization-manhattan-qq-locuszoom",
       "upstream_path": "data-visualization/manhattan-qq-locuszoom"
-    },
-    {
-      "id": "bio-data-visualization-multipanel-figures",
-      "upstream_path": "data-visualization/multipanel-figures"
-    },
-    {
-      "id": "bio-data-visualization-network-visualization",
-      "upstream_path": "data-visualization/network-visualization"
-    },
-    {
-      "id": "bio-data-visualization-oncoprint-mutation-matrices",
-      "upstream_path": "data-visualization/oncoprint-mutation-matrices"
-    },
-    {
-      "id": "bio-data-visualization-sequence-logos",
-      "upstream_path": "data-visualization/sequence-logos"
-    },
-    {
-      "id": "bio-data-visualization-statistical-annotation",
-      "upstream_path": "data-visualization/statistical-annotation"
-    },
-    {
-      "id": "bio-data-visualization-upset-plots",
-      "upstream_path": "data-visualization/upset-plots"
     },
     {
       "id": "bio-differential-expression-batch-correction",
@@ -1617,9 +1577,45 @@
   ],
   "excluded": [
     {
+      "id": "bio-data-visualization-color-palettes",
+      "upstream_path": "data-visualization/color-palettes",
+      "score": 71.8,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-data-visualization-dimensionality-reduction-plots",
+      "upstream_path": "data-visualization/dimensionality-reduction-plots",
+      "score": 75,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    },
+    {
       "id": "bio-data-visualization-distribution-plots",
       "upstream_path": "data-visualization/distribution-plots",
       "score": 69.5,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-data-visualization-ggplot2-fundamentals",
+      "upstream_path": "data-visualization/ggplot2-fundamentals",
+      "score": 75,
       "grade": "Beta Only",
       "deployable": false,
       "open_p0": 0,
@@ -1641,9 +1637,93 @@
       "reaudit": "not needed"
     },
     {
+      "id": "bio-data-visualization-lollipop-protein-maps",
+      "upstream_path": "data-visualization/lollipop-protein-maps",
+      "score": 65,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    },
+    {
       "id": "bio-data-visualization-matplotlib-fundamentals",
       "upstream_path": "data-visualization/matplotlib-fundamentals",
       "score": 75,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-data-visualization-multipanel-figures",
+      "upstream_path": "data-visualization/multipanel-figures",
+      "score": 71,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-data-visualization-network-visualization",
+      "upstream_path": "data-visualization/network-visualization",
+      "score": 74,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-data-visualization-oncoprint-mutation-matrices",
+      "upstream_path": "data-visualization/oncoprint-mutation-matrices",
+      "score": 73,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-data-visualization-sequence-logos",
+      "upstream_path": "data-visualization/sequence-logos",
+      "score": 69,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 1,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-data-visualization-statistical-annotation",
+      "upstream_path": "data-visualization/statistical-annotation",
+      "score": 71.2,
+      "grade": "Beta Only",
+      "deployable": false,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": null,
+      "fix_pass": "needed",
+      "reaudit": "not needed"
+    },
+    {
+      "id": "bio-data-visualization-upset-plots",
+      "upstream_path": "data-visualization/upset-plots",
+      "score": 70.4,
       "grade": "Beta Only",
       "deployable": false,
       "open_p0": 0,

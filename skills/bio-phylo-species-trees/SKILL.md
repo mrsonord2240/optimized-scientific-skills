@@ -4,6 +4,7 @@ description: Estimates species trees under the multispecies coalescent from per-
 tool_type: mixed
 primary_tool: ASTRAL-III
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

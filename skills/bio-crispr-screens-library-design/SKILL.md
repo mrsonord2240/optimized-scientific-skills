@@ -4,6 +4,7 @@ description: Designs pooled sgRNA libraries for CRISPR knockout, interference (C
 tool_type: mixed
 primary_tool: CRISPOR
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

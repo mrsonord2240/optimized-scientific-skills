@@ -4,6 +4,7 @@ description: Validates docked / generated protein-ligand poses using PoseBusters
 tool_type: python
 primary_tool: PoseBusters
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

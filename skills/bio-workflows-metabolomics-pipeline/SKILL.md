@@ -22,6 +22,7 @@ qc_checkpoints:
   - after_annotation: "MSI/Schymanski level assigned per compound; only Level 1-2 enter identified-ORA"
   - after_pathway: "Background = assay coverage (identified ORA) OR full feature table (mummichog); PREDICTED vs MEASURED stated"
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

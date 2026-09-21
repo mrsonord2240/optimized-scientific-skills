@@ -4,6 +4,7 @@ description: Detects aberrant splicing in single rare-disease patients vs a cont
 tool_type: r
 primary_tool: FRASER
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

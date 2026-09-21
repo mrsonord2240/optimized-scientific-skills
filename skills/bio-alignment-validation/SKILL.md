@@ -4,6 +4,7 @@ description: Validate alignment quality with insert size distribution, proper pa
 tool_type: mixed
 primary_tool: samtools
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

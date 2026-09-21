@@ -4,6 +4,7 @@ description: Predicts whether a DNA variant alters mRNA splicing using sequence-
 tool_type: python
 primary_tool: SpliceAI
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

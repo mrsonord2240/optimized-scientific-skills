@@ -4,6 +4,7 @@ description: Quantifies CRISPR editing outcomes with CRISPResso2 (Clement 2019 N
 tool_type: cli
 primary_tool: CRISPResso2
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

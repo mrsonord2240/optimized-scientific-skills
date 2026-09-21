@@ -4,6 +4,7 @@ description: Performs structure-based virtual screening using AutoDock Vina, SMI
 tool_type: python
 primary_tool: AutoDock Vina
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

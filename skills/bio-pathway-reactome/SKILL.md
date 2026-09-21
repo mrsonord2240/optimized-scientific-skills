@@ -4,6 +4,7 @@ description: Tests a gene list or ranked gene vector for over-representation or 
 tool_type: r
 primary_tool: ReactomePA
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

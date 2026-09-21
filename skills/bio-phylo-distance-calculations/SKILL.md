@@ -4,6 +4,7 @@ description: Build model-corrected evolutionary distance matrices and distance t
 tool_type: mixed
 primary_tool: Bio.Phylo.TreeConstruction
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

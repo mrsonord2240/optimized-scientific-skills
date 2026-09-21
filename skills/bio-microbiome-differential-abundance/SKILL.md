@@ -4,6 +4,7 @@ description: Tests which individual taxa differ between groups on an amplicon AS
 tool_type: r
 primary_tool: ALDEx2
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Runs JACKS (Joint Analysis of CRISPR/Cas9 Knockout Screens; Allen e
 tool_type: python
 primary_tool: JACKS
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

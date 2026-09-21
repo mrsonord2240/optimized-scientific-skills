@@ -4,6 +4,7 @@ description: Runs Gene Ontology over-representation analysis (ORA) on a gene LIS
 tool_type: r
 primary_tool: clusterProfiler
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

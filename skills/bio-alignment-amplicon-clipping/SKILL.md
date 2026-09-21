@@ -4,6 +4,7 @@ description: Trim PCR primers from aligned reads in amplicon-panel BAMs using sa
 tool_type: cli
 primary_tool: samtools
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

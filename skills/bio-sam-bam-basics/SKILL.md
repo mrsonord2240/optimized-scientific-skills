@@ -4,6 +4,7 @@ description: View, convert, and understand SAM/BAM/CRAM alignment files using sa
 tool_type: cli
 primary_tool: samtools
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

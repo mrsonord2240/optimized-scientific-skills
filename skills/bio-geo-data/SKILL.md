@@ -4,6 +4,7 @@ description: Query and download from NCBI Gene Expression Omnibus (GEO) and EMBL
 tool_type: mixed
 primary_tool: Bio.Entrez
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Estimates SNP heritability and partitions it across functional anno
 tool_type: mixed
 primary_tool: ldsc
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

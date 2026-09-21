@@ -4,6 +4,7 @@ description: Turns an enrichResult or gseaResult from clusterProfiler/enrichplot
 tool_type: r
 primary_tool: enrichplot
 license: MIT
+author: GPTomics
 ---
 
 ## Prerequisites

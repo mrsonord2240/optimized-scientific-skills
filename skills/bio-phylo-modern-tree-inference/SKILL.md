@@ -4,6 +4,7 @@ description: Infers maximum-likelihood phylogenetic trees with IQ-TREE2 and RAxM
 tool_type: cli
 primary_tool: IQ-TREE2
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

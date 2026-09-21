@@ -4,6 +4,7 @@ description: Read, write, and convert phylogenetic tree files with Biopython Bio
 tool_type: python
 primary_tool: Bio.Phylo
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

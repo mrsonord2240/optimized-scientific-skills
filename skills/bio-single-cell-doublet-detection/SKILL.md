@@ -4,6 +4,7 @@ description: Detect and remove doublets (two or more cells in one droplet) from 
 tool_type: mixed
 primary_tool: scDblFinder
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

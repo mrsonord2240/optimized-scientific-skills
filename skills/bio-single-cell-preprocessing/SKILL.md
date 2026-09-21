@@ -4,6 +4,7 @@ description: Quality control, ambient-RNA handling, normalization, and feature s
 tool_type: mixed
 primary_tool: Seurat
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

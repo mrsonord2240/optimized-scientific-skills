@@ -4,6 +4,7 @@ description: Bulk-query Ensembl BioMart (and other BioMart instances) for cross-
 tool_type: mixed
 primary_tool: pybiomart
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

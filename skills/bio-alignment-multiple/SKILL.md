@@ -4,6 +4,7 @@ description: Perform multiple sequence alignment using MAFFT, MUSCLE5, ClustalOm
 tool_type: mixed
 primary_tool: MAFFT
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Fits structural equation models to GWAS summary statistics using Ge
 tool_type: r
 primary_tool: GenomicSEM
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

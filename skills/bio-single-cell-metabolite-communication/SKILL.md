@@ -4,6 +4,7 @@ description: Infers metabolite-mediated cell-cell communication from scRNA-seq b
 tool_type: python
 primary_tool: MeboCost
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

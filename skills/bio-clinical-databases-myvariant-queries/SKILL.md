@@ -4,6 +4,7 @@ description: Queries myvariant.info BioThings aggregator for ClinVar, gnomAD, db
 tool_type: python
 primary_tool: myvariant
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

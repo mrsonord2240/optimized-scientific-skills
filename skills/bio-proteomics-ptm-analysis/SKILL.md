@@ -4,6 +4,7 @@ description: Frames PTM/phosphoproteomics analysis as three stacked inference la
 tool_type: mixed
 primary_tool: MSstatsPTM
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

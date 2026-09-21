@@ -4,6 +4,7 @@ description: Parse and analyze multiple sequence alignments using Biopython. Ext
 tool_type: python
 primary_tool: Bio.AlignIO
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

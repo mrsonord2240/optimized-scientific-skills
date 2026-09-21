@@ -4,6 +4,7 @@ description: Quantifies protein abundance from mass spectrometry using label-fre
 tool_type: mixed
 primary_tool: MSstats
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Download raw sequencing reads from NCBI SRA using sra-tools (prefet
 tool_type: cli
 primary_tool: sra-tools
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

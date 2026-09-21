@@ -4,6 +4,7 @@ description: Structures biological experiments so inference is valid by construc
 tool_type: r
 primary_tool: designit
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

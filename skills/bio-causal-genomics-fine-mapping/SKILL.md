@@ -4,6 +4,7 @@ description: Resolves GWAS associations to candidate causal variants and credibl
 tool_type: r
 primary_tool: susieR
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

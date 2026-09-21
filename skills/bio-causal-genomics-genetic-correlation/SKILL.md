@@ -4,6 +4,7 @@ description: Estimates bivariate genetic correlation (rg) between traits from GW
 tool_type: mixed
 primary_tool: ldsc
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

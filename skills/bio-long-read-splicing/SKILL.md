@@ -4,6 +4,7 @@ description: "Analyzes alternative splicing from PacBio Iso-Seq (HiFi, Kinnex/MA
 tool_type: mixed
 primary_tool: FLAIR
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

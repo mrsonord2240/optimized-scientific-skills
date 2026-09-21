@@ -4,6 +4,7 @@ description: Analyzes data-independent acquisition (DIA) proteomics by scoring r
 tool_type: cli
 primary_tool: diann
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

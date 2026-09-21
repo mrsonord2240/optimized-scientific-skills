@@ -4,6 +4,7 @@ description: Download large datasets from NCBI efficiently using EPost, history 
 tool_type: python
 primary_tool: Bio.Entrez
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

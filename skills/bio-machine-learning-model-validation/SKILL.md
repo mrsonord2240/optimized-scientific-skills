@@ -4,6 +4,7 @@ description: Validates predictive models on omics and biomedical data with neste
 tool_type: python
 primary_tool: sklearn
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

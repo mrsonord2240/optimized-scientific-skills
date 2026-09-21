@@ -4,6 +4,7 @@ description: Detects differential alternative splicing between conditions using 
 tool_type: mixed
 primary_tool: rMATS-turbo
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

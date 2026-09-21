@@ -4,6 +4,7 @@ description: Designs and analyzes stable-isotope-resolved metabolomics (SIRM / i
 tool_type: python
 primary_tool: isocor
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

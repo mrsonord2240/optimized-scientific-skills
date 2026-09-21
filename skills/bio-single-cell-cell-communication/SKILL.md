@@ -4,6 +4,7 @@ description: Infers ligand-receptor cell-cell communication from scRNA-seq with 
 tool_type: mixed
 primary_tool: LIANA
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

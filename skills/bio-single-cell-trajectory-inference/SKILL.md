@@ -4,6 +4,7 @@ description: Infers developmental trajectories, pseudotime, RNA velocity, and di
 tool_type: mixed
 primary_tool: PAGA
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

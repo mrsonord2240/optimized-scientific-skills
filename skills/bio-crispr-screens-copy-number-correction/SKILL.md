@@ -4,6 +4,7 @@ description: Corrects the gene-independent copy-number artifact in CRISPR-Cas9 s
 tool_type: mixed
 primary_tool: CRISPRcleanR
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

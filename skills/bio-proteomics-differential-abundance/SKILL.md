@@ -4,6 +4,7 @@ description: Tests for differentially abundant proteins between conditions with 
 tool_type: mixed
 primary_tool: limma
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

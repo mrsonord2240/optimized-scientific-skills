@@ -4,6 +4,7 @@ description: Estimate divergence times under molecular-clock models with BEAST2,
 tool_type: mixed
 primary_tool: BEAST2
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

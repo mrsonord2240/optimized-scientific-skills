@@ -4,6 +4,7 @@ description: Infer large-scale copy-number alterations from tumor single-cell or
 tool_type: r
 primary_tool: inferCNV
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

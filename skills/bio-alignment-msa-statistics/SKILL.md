@@ -4,6 +4,7 @@ description: Calculate alignment statistics including sequence identity, conserv
 tool_type: python
 primary_tool: Bio.AlignIO
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Standardizes molecular structures using the ChEMBL structure pipeli
 tool_type: python
 primary_tool: RDKit
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Test whether cell-type proportions or composition changed between c
 tool_type: mixed
 primary_tool: Milo
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Runs cis-pQTL Mendelian randomization for drug-target validation us
 tool_type: mixed
 primary_tool: TwoSampleMR
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

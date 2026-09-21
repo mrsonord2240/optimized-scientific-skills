@@ -4,6 +4,7 @@ description: Combine, split, sort, intersect, and subset VCF/BCF files with bcft
 tool_type: cli
 primary_tool: bcftools
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

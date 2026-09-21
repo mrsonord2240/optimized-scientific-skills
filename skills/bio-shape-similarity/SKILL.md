@@ -4,6 +4,7 @@ description: Performs 3D shape-based similarity searching using ROCS (OpenEye), 
 tool_type: python
 primary_tool: RDKit
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

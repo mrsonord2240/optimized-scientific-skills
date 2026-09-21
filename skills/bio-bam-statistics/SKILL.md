@@ -4,6 +4,7 @@ description: Generate alignment statistics using samtools flagstat, stats, depth
 tool_type: cli
 primary_tool: samtools
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

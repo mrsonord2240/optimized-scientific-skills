@@ -4,6 +4,7 @@ description: Creates sashimi-style plots showing RNA-seq read coverage and splic
 tool_type: python
 primary_tool: ggsashimi
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

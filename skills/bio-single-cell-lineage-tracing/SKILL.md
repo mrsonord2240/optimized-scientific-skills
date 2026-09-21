@@ -4,6 +4,7 @@ description: Reconstructs single-cell lineage trees and clonal relationships fro
 tool_type: python
 primary_tool: Cassiopeia
 license: MIT
+author: GPTomics
 ---
 
 ## Installation and Version Compatibility

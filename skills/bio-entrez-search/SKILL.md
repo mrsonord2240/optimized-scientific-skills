@@ -4,6 +4,7 @@ description: Search NCBI databases using Biopython Bio.Entrez (ESearch, EInfo, E
 tool_type: python
 primary_tool: Bio.Entrez
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

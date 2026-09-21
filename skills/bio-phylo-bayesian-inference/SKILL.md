@@ -4,6 +4,7 @@ description: Frames Bayesian phylogenetics as approximating a posterior distribu
 tool_type: mixed
 primary_tool: MrBayes
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

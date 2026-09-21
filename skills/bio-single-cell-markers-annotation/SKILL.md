@@ -4,6 +4,7 @@ description: Detect cluster marker genes and assign manual cell type labels in s
 tool_type: mixed
 primary_tool: Seurat
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

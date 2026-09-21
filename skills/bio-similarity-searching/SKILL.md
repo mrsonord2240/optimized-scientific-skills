@@ -4,6 +4,7 @@ description: Performs molecular similarity searching using Tanimoto, Tversky, Di
 tool_type: python
 primary_tool: RDKit
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

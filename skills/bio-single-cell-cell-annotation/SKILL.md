@@ -4,6 +4,7 @@ description: Automated reference-based cell type annotation for single-cell RNA-
 tool_type: mixed
 primary_tool: CellTypist
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Cross-method decision tree for calling hits in pooled CRISPR screen
 tool_type: mixed
 primary_tool: MAGeCK
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

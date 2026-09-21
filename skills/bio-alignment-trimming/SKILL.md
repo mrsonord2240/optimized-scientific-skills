@@ -4,6 +4,7 @@ description: Trim multiple sequence alignments using ClipKIT, trimAl, BMGE, Divv
 tool_type: mixed
 primary_tool: ClipKIT
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

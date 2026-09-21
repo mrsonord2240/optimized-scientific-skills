@@ -4,6 +4,7 @@ description: Decision-grade statistical analysis for metabolomics intensity tabl
 tool_type: mixed
 primary_tool: ropls
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

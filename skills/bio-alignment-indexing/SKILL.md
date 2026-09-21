@@ -4,6 +4,7 @@ description: Create and use BAI/CSI indices for BAM/CRAM files using samtools an
 tool_type: cli
 primary_tool: samtools
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

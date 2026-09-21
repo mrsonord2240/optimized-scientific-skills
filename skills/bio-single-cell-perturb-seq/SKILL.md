@@ -4,6 +4,7 @@ description: Analyze Perturb-seq / CROP-seq single-cell CRISPR screens. Use when
 tool_type: python
 primary_tool: Pertpy
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

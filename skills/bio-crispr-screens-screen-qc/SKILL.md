@@ -4,6 +4,7 @@ description: Quality control for pooled CRISPR screens covering library represen
 tool_type: python
 primary_tool: MAGeCK-VISPR
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

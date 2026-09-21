@@ -4,6 +4,7 @@ description: Alpha and beta diversity of an amplicon (16S/ITS) ASV/OTU community
 tool_type: mixed
 primary_tool: phyloseq
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

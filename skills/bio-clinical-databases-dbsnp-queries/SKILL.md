@@ -4,6 +4,7 @@ description: Resolves rsIDs, navigates RsMergeArch/SNPHistory merge chains, and 
 tool_type: python
 primary_tool: myvariant
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

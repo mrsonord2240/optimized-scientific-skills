@@ -4,6 +4,7 @@ description: Assigns taxonomy to amplicon ASVs/OTUs (16S, ITS, 18S) with a class
 tool_type: mixed
 primary_tool: DADA2
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Quality control for bottom-up proteomics across three levels -- ins
 tool_type: mixed
 primary_tool: pandas
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Predicts community functional POTENTIAL from 16S amplicon ASVs with
 tool_type: cli
 primary_tool: PICRUSt2
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

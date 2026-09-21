@@ -12,6 +12,7 @@ depends_on:
   - proteomics/differential-abundance
   - proteomics/dia-analysis
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

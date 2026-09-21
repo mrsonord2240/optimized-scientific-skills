@@ -4,6 +4,7 @@ description: Run remote BLAST searches against NCBI servers using Biopython Bio.
 tool_type: python
 primary_tool: Bio.Blast.NCBIWWW
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Generates 3D conformer ensembles using RDKit ETKDGv3 with knowledge
 tool_type: mixed
 primary_tool: RDKit
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

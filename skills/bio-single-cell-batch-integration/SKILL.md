@@ -4,6 +4,7 @@ description: Integrate multiple scRNA-seq samples or batches with Harmony, scVI/
 tool_type: mixed
 primary_tool: Harmony
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Maps GWAS-implicated loci to candidate effector (causal) genes by i
 tool_type: mixed
 primary_tool: MAGMA
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

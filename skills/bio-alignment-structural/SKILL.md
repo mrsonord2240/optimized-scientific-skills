@@ -4,6 +4,7 @@ description: Align protein structures using Foldseek 3Di, TM-align, US-align, DA
 tool_type: mixed
 primary_tool: Foldseek
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

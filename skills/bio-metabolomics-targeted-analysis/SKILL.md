@@ -4,6 +4,7 @@ description: Designs and validates quantitative targeted metabolomics assays (MR
 tool_type: mixed
 primary_tool: skyline
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

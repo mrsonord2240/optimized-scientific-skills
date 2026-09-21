@@ -4,6 +4,7 @@ description: Infers exact amplicon sequence variants (ASVs) from demultiplexed 1
 tool_type: mixed
 primary_tool: DADA2
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

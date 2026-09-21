@@ -4,6 +4,7 @@ description: Mark and remove PCR/optical duplicates using samtools fixmate and m
 tool_type: cli
 primary_tool: samtools
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

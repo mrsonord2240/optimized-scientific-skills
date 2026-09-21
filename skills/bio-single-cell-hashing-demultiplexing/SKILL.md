@@ -4,6 +4,7 @@ description: Assign cells to their sample of origin from cell or nucleus hashing
 tool_type: mixed
 primary_tool: Seurat
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

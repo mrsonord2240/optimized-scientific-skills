@@ -4,6 +4,7 @@ description: Gene and region-based rare-variant aggregation - burden/collapsing,
 tool_type: mixed
 primary_tool: regenie
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

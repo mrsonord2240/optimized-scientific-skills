@@ -4,6 +4,7 @@ description: Analyze single-cell ATAC-seq with Signac/ArchR (R) and SnapATAC2 (P
 tool_type: r
 primary_tool: Signac
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

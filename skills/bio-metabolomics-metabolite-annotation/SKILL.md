@@ -4,6 +4,7 @@ description: Turns untargeted LC-MS/MS features (m/z, RT, MS/MS) into confidence
 tool_type: mixed
 primary_tool: matchms
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

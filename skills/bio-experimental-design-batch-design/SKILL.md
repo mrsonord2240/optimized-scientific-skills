@@ -4,6 +4,7 @@ description: Designs genomics experiments so technical nuisance variation (batch
 tool_type: r
 primary_tool: designit
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

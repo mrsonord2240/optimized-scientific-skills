@@ -4,6 +4,7 @@ description: Detect and adjust for horizontal pleiotropy in two-sample Mendelian
 tool_type: r
 primary_tool: TwoSampleMR
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

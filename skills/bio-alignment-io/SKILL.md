@@ -4,6 +4,7 @@ description: Read, write, and convert multiple sequence alignment files using Bi
 tool_type: python
 primary_tool: Bio.AlignIO
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

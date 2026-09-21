@@ -17,6 +17,7 @@ qc_checkpoints:
   - after_normalization: "No batch effects, HVGs look sensible"
   - after_clustering: "Clusters are biologically meaningful"
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Reads, writes, and converts molecular file formats (SMILES, InChI, 
 tool_type: python
 primary_tool: RDKit
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

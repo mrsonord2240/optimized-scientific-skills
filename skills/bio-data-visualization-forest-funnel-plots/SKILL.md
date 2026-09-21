@@ -4,6 +4,7 @@ description: Build forest plots (HR, OR, RR, beta-coefficient summaries with CIs
 tool_type: r
 primary_tool: metafor
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

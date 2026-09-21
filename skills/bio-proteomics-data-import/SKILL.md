@@ -4,6 +4,7 @@ description: Loads mass-spectrometry data into Python/R and strips the search en
 tool_type: mixed
 primary_tool: pyOpenMS
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

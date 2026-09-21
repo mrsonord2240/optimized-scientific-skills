@@ -4,6 +4,7 @@ description: Analyzes base-editing screens for variant function. Covers library 
 tool_type: mixed
 primary_tool: CRISPResso2
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

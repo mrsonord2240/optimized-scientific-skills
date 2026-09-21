@@ -4,6 +4,7 @@ description: Find cross-database references between NCBI databases using Biopyth
 tool_type: python
 primary_tool: Bio.Entrez
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

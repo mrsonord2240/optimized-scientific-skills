@@ -4,6 +4,7 @@ description: Calculates statistical power for high-dimensional genomics experime
 tool_type: r
 primary_tool: RNASeqPower
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

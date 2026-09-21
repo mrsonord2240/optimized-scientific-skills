@@ -4,6 +4,7 @@ description: Identifies essential genes from CRISPR-Cas9 fitness screens using B
 tool_type: cli
 primary_tool: BAGEL2
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

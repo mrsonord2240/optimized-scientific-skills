@@ -4,6 +4,7 @@ description: Builds and manages DIA spectral libraries as peptide query paramete
 tool_type: mixed
 primary_tool: encyclopedia
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

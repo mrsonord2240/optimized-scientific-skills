@@ -4,6 +4,7 @@ description: Assigns honest lipid annotation levels, designs class-based interna
 tool_type: r
 primary_tool: lipidr
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

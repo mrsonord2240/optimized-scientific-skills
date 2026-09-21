@@ -4,6 +4,7 @@ description: Integrate multimodal single-cell data (CITE-seq RNA+protein, 10x Mu
 tool_type: mixed
 primary_tool: Seurat
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Programmatic untargeted LC-MS feature extraction in R with the mode
 tool_type: r
 primary_tool: xcms
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

@@ -4,14 +4,13 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**401 remaining** across 52 folders. 156 are already refined and live in `skills/`.
+**391 remaining** across 52 folders. 156 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 156 refined, 4 audited and excluded, 1 out of scope, 401 remaining.
+The source tree holds 562 Skills: 156 refined, 14 audited and excluded, 1 out of scope, 391 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
 | workflows | 37 | 4 |
-| data-visualization | 15 | 1 |
 | comparative-genomics | 13 | 0 |
 | atac-seq | 12 | 0 |
 | chip-seq | 12 | 0 |
@@ -46,6 +45,7 @@ The source tree holds 562 Skills: 156 refined, 4 audited and excluded, 1 out of 
 | tcr-bcr-analysis | 6 | 0 |
 | temporal-genomics | 6 | 0 |
 | chemoinformatics | 5 | 15 |
+| data-visualization | 5 | 1 |
 | differential-expression | 5 | 1 |
 | epidemiological-genomics | 5 | 0 |
 | epitranscriptomics | 5 | 0 |
@@ -133,9 +133,19 @@ fixed.
 
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
+| `bio-data-visualization-color-palettes` | 71.8 | Beta Only | 0 |
+| `bio-data-visualization-dimensionality-reduction-plots` | 75 | Beta Only | 0 |
 | `bio-data-visualization-distribution-plots` | 69.5 | Beta Only | 0 |
+| `bio-data-visualization-ggplot2-fundamentals` | 75 | Beta Only | 0 |
 | `bio-data-visualization-heatmaps-clustering` | 78 | Reject | 1 |
+| `bio-data-visualization-lollipop-protein-maps` | 65 | Beta Only | 0 |
 | `bio-data-visualization-matplotlib-fundamentals` | 75 | Beta Only | 0 |
+| `bio-data-visualization-multipanel-figures` | 71 | Beta Only | 0 |
+| `bio-data-visualization-network-visualization` | 74 | Beta Only | 0 |
+| `bio-data-visualization-oncoprint-mutation-matrices` | 73 | Beta Only | 0 |
+| `bio-data-visualization-sequence-logos` | 69 | Beta Only | 1 |
+| `bio-data-visualization-statistical-annotation` | 71.2 | Beta Only | 0 |
+| `bio-data-visualization-upset-plots` | 70.4 | Beta Only | 0 |
 | `bio-data-visualization-volcano-and-ma-plots` | 76 | Beta Only | 0 |
 
 ## Out of scope
@@ -262,20 +272,10 @@ fixed.
 ### data-visualization
 
 - `bio-data-visualization-circos-plots` — `data-visualization/circos-plots`
-- `bio-data-visualization-color-palettes` — `data-visualization/color-palettes`
-- `bio-data-visualization-dimensionality-reduction-plots` — `data-visualization/dimensionality-reduction-plots`
 - `bio-data-visualization-flow-and-transition-plots` — `data-visualization/flow-and-transition-plots`
 - `bio-data-visualization-genome-tracks` — `data-visualization/genome-tracks`
-- `bio-data-visualization-ggplot2-fundamentals` — `data-visualization/ggplot2-fundamentals`
 - `bio-data-visualization-interactive-visualization` — `data-visualization/interactive-visualization`
-- `bio-data-visualization-lollipop-protein-maps` — `data-visualization/lollipop-protein-maps`
 - `bio-data-visualization-manhattan-qq-locuszoom` — `data-visualization/manhattan-qq-locuszoom`
-- `bio-data-visualization-multipanel-figures` — `data-visualization/multipanel-figures`
-- `bio-data-visualization-network-visualization` — `data-visualization/network-visualization`
-- `bio-data-visualization-oncoprint-mutation-matrices` — `data-visualization/oncoprint-mutation-matrices`
-- `bio-data-visualization-sequence-logos` — `data-visualization/sequence-logos`
-- `bio-data-visualization-statistical-annotation` — `data-visualization/statistical-annotation`
-- `bio-data-visualization-upset-plots` — `data-visualization/upset-plots`
 
 ### database-access
 

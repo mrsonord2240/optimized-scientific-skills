@@ -4,6 +4,7 @@ description: Operates the QIIME2 framework as the glue for an amplicon analysis 
 tool_type: cli
 primary_tool: QIIME2
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

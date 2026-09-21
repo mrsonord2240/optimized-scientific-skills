@@ -4,6 +4,7 @@ description: Read, write, create, and convert single-cell objects across AnnData
 tool_type: mixed
 primary_tool: Seurat
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

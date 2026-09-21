@@ -4,6 +4,7 @@ description: Designs and analyzes pooled prime-editor (PE) screens for installin
 tool_type: mixed
 primary_tool: PRIDICT2
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

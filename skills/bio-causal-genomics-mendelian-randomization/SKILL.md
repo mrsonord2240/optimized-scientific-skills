@@ -4,6 +4,7 @@ description: Estimate causal effects of an exposure on an outcome from GWAS summ
 tool_type: mixed
 primary_tool: TwoSampleMR
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

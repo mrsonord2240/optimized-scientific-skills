@@ -4,6 +4,7 @@ description: Perform pairwise sequence alignment using Biopython Bio.Align.Pairw
 tool_type: python
 primary_tool: Bio.Align
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

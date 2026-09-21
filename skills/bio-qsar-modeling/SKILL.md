@@ -4,6 +4,7 @@ description: Builds QSAR / QSPR models using chemprop D-MPNN, MolFormer, Uni-Mol
 tool_type: python
 primary_tool: chemprop
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

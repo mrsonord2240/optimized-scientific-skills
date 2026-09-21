@@ -4,6 +4,7 @@ description: Groups proteins from peptide identifications and controls protein-l
 tool_type: mixed
 primary_tool: pyOpenMS
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

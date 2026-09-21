@@ -4,6 +4,7 @@ description: Performs gene-level association from GWAS summary statistics via ge
 tool_type: mixed
 primary_tool: FUSION
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

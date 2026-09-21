@@ -4,6 +4,7 @@ description: Designs and analyzes in vivo CRISPR screens in animal tumor models,
 tool_type: mixed
 primary_tool: MAGeCK
 license: MIT
+author: GPTomics
 ---
 
 ## Ethical & Regulatory Requirements

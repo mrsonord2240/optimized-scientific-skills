@@ -4,6 +4,7 @@ description: Searches molecular libraries for substructure matches using SMARTS 
 tool_type: python
 primary_tool: RDKit
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

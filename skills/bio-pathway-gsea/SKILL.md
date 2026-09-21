@@ -4,6 +4,7 @@ description: Tests a ranked gene vector for coordinated expression shifts in GO,
 tool_type: r
 primary_tool: clusterProfiler
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

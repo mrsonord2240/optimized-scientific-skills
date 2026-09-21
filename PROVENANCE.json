@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "64b3b150c9b989c102f7ee69e0bb07c16842d894"
+      "staging_commit": "431aa55d2dc56d3da947f1c820077a6578691e37"
     }
   },
   "skills": [
@@ -24,10 +24,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-alignment-amplicon-clipping",
@@ -46,7 +47,8 @@
         "ampliconclip_workflow.sh",
         "check_primer_residual.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-alignment-filtering",
@@ -64,7 +66,8 @@
         "SKILL.md",
         "filter_bam.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-alignment-indexing",
@@ -82,7 +85,8 @@
         "SKILL.md",
         "fetch_regions.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-alignment-io",
@@ -103,7 +107,8 @@
         "read_alignment.py",
         "slice_alignment.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-alignment-msa-parsing",
@@ -133,7 +138,8 @@
         "muscle5_column_confidence.py",
         "neff.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-alignment-msa-statistics",
@@ -162,7 +168,8 @@
         "selftest.py",
         "substitution_counts.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-alignment-multiple",
@@ -180,7 +187,8 @@
         "SKILL.md",
         "specialist-tools.md",
         "tcoffee.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-alignment-pairwise",
@@ -200,7 +208,8 @@
         "global_alignment.py",
         "sequences.fasta",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-alignment-sorting",
@@ -218,7 +227,8 @@
         "SKILL.md",
         "sort_pipeline.sh",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-alignment-structural",
@@ -239,7 +249,8 @@
         "foldseek_search.py",
         "tm_align_pairwise.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-alignment-trimming",
@@ -260,7 +271,8 @@
         "selection-analysis-workflow.md",
         "specialist-trimmers.md",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-alignment-validation",
@@ -279,7 +291,8 @@
         "usage-guide.md",
         "validate_alignment.py",
         "validate_alignment.sh"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-bam-statistics",
@@ -297,7 +310,8 @@
         "SKILL.md",
         "qc_report.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-batch-downloads",
@@ -316,7 +330,8 @@
         "batch_fasta.py",
         "robust_download.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-biomart-queries",
@@ -336,7 +351,8 @@
         "coordinate_table.sh",
         "ortholog_table.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-blast-searches",
@@ -354,7 +370,8 @@
         "SKILL.md",
         "statistics.md",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-causal-genomics-colocalization-analysis",
@@ -373,7 +390,8 @@
         "coloc_susie.R",
         "coloc_susie_multicausal.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-causal-genomics-effector-gene-prioritization",
@@ -400,7 +418,8 @@
         "toy_gwas_sumstats.tsv",
         "toy_snp_loc.txt",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-causal-genomics-fine-mapping",
@@ -417,7 +436,8 @@
       "changed_files": [
         "SKILL.md",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-causal-genomics-genetic-correlation",
@@ -434,7 +454,8 @@
       "changed_files": [
         "SKILL.md",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-causal-genomics-genomic-sem",
@@ -452,7 +473,8 @@
         "SKILL.md",
         "genomic_sem_commonfactor.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-causal-genomics-heritability-partitioning",
@@ -471,7 +493,8 @@
         "ldsc_partitioned_h2.sh",
         "smoke_test_ldsc.sh",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-causal-genomics-mediation-analysis",
@@ -489,7 +512,8 @@
         "SKILL.md",
         "cmaverse_4way.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-causal-genomics-mendelian-randomization",
@@ -508,7 +532,8 @@
         "cis_mr_drug_target.R",
         "two_sample_mr.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-causal-genomics-pleiotropy-detection",
@@ -526,7 +551,8 @@
         "SKILL.md",
         "simex_egger_correction.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-causal-genomics-proteome-mr-drug-target",
@@ -539,10 +565,11 @@
       "fix_log": "fixes/bio-causal-genomics-proteome-mr-drug-target.md",
       "fix_pass": "done",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-causal-genomics-transcriptome-wide-association",
@@ -560,7 +587,8 @@
         "SKILL.md",
         "focus_finemap.sh",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-clinical-databases-clinvar-lookup",
@@ -578,7 +606,8 @@
         "SKILL.md",
         "clinvar_query.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-clinical-databases-dbsnp-queries",
@@ -595,7 +624,8 @@
       "changed_files": [
         "SKILL.md",
         "dbsnp_lookup.py"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-clinical-databases-gnomad-frequencies",
@@ -613,7 +643,8 @@
         "SKILL.md",
         "gnomad_query.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-clinical-databases-myvariant-queries",
@@ -631,7 +662,8 @@
         "SKILL.md",
         "query_myvariant.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-conformer-generation",
@@ -648,7 +680,8 @@
       "changed_files": [
         "SKILL.md",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-covalent-design",
@@ -666,7 +699,8 @@
         "SKILL.md",
         "usage-guide.md",
         "warhead_classifier.py"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-crispr-screens-bagel-essentiality",
@@ -684,7 +718,8 @@
         "SKILL.md",
         "run_bagel2.sh",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-crispr-screens-base-editing-analysis",
@@ -701,7 +736,8 @@
       "changed_files": [
         "SKILL.md",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-crispr-screens-batch-correction",
@@ -718,7 +754,8 @@
       "changed_files": [
         "SKILL.md",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-crispr-screens-combinatorial-screens",
@@ -735,7 +772,8 @@
       "changed_files": [
         "SKILL.md",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-crispr-screens-copy-number-correction",
@@ -753,7 +791,8 @@
         "SKILL.md",
         "run_crispr_cleanr.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-crispr-screens-crispresso-editing",
@@ -771,7 +810,8 @@
         "SKILL.md",
         "crispresso_analysis.sh",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-crispr-screens-drugz-chemogenomic",
@@ -788,7 +828,8 @@
       "changed_files": [
         "SKILL.md",
         "run_drugz.py"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-crispr-screens-hit-calling",
@@ -806,7 +847,8 @@
         "SKILL.md",
         "consensus_hits.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-crispr-screens-in-vivo-screens",
@@ -824,7 +866,8 @@
         "SKILL.md",
         "per_animal_meta_analysis.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-crispr-screens-jacks-analysis",
@@ -842,7 +885,8 @@
         "SKILL.md",
         "run_jacks.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-crispr-screens-library-design",
@@ -860,7 +904,8 @@
         "SKILL.md",
         "design_library.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-crispr-screens-mageck-analysis",
@@ -877,7 +922,8 @@
       "changed_files": [
         "SKILL.md",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-crispr-screens-perturb-seq-analysis",
@@ -895,7 +941,8 @@
         "SKILL.md",
         "run_pertpy.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-crispr-screens-prime-editing-screens",
@@ -913,7 +960,8 @@
         "SKILL.md",
         "design_pegrna_pridict2.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-crispr-screens-screen-qc",
@@ -931,7 +979,8 @@
         "SKILL.md",
         "screen_qc.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-data-visualization-forest-funnel-plots",
@@ -944,10 +993,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-differential-expression-deseq2-basics",
@@ -960,10 +1010,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-differential-splicing",
@@ -982,7 +1033,8 @@
         "diff_splicing_leafcutter.R",
         "diff_splicing_rmats.sh",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-duplicate-handling",
@@ -1000,7 +1052,8 @@
         "SKILL.md",
         "markdup_pipeline.sh",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-entrez-fetch",
@@ -1019,7 +1072,8 @@
         "fetch_pubmed.py",
         "fetch_summaries.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-entrez-link",
@@ -1038,7 +1092,8 @@
         "basic_linking.py",
         "discover_links.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-entrez-search",
@@ -1057,7 +1112,8 @@
         "database_info.py",
         "global_query.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-experimental-design-batch-design",
@@ -1074,7 +1130,8 @@
       "changed_files": [
         "SKILL.md",
         "batch_design.R"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-experimental-design-multiple-testing",
@@ -1092,7 +1149,8 @@
         "SKILL.md",
         "multiple_testing_correction.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-experimental-design-power-analysis",
@@ -1110,7 +1168,8 @@
         "SKILL.md",
         "scrna_pseudobulk_power.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-experimental-design-randomization-blocking",
@@ -1128,7 +1187,8 @@
         "SKILL.md",
         "randomization_blocking.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-experimental-design-sample-size",
@@ -1146,7 +1206,8 @@
         "SKILL.md",
         "sample_size_estimation.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-geo-data",
@@ -1166,7 +1227,8 @@
         "geo_to_sra.py",
         "search_geo.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-isoform-switching",
@@ -1185,7 +1247,8 @@
         "hmmscan_to_pfamscan.py",
         "isoform_switch_analysis.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-local-blast",
@@ -1203,7 +1266,8 @@
         "SKILL.md",
         "create_database.sh",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-long-read-splicing",
@@ -1221,7 +1285,8 @@
         "SKILL.md",
         "longread_splicing_pipeline.sh",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-machine-learning-model-validation",
@@ -1234,10 +1299,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-machine-learning-prediction-explanation",
@@ -1250,10 +1316,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-metabolomics-isotope-tracing",
@@ -1270,7 +1337,8 @@
       "changed_files": [
         "SKILL.md",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-metabolomics-lipidomics",
@@ -1286,7 +1354,8 @@
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-metabolomics-metabolite-annotation",
@@ -1303,7 +1372,8 @@
       "changed_files": [
         "SKILL.md",
         "annotate_features.py"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-metabolomics-msdial-preprocessing",
@@ -1321,7 +1391,8 @@
         "SKILL.md",
         "process_msdial_output.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-metabolomics-normalization-qc",
@@ -1339,7 +1410,8 @@
         "SKILL.md",
         "normalize_data.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-metabolomics-pathway-mapping",
@@ -1356,7 +1428,8 @@
       "changed_files": [
         "SKILL.md",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-metabolomics-statistical-analysis",
@@ -1373,7 +1446,8 @@
       "changed_files": [
         "SKILL.md",
         "metabolomics_stats.R"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-metabolomics-targeted-analysis",
@@ -1390,7 +1464,8 @@
       "changed_files": [
         "SKILL.md",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-metabolomics-xcms-preprocessing",
@@ -1406,7 +1481,8 @@
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-microbiome-amplicon-processing",
@@ -1424,7 +1500,8 @@
         "SKILL.md",
         "dada2_workflow.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-microbiome-differential-abundance",
@@ -1441,7 +1518,8 @@
       "changed_files": [
         "SKILL.md",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-microbiome-diversity-analysis",
@@ -1459,7 +1537,8 @@
         "SKILL.md",
         "diversity_analysis.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-microbiome-functional-prediction",
@@ -1477,7 +1556,8 @@
         "SKILL.md",
         "run_picrust2.sh",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-microbiome-qiime2-workflow",
@@ -1493,7 +1573,8 @@
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-microbiome-taxonomy-assignment",
@@ -1512,7 +1593,8 @@
         "assign_qiime2_region.sh",
         "assign_silva.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-molecular-descriptors",
@@ -1525,10 +1607,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-molecular-io",
@@ -1541,10 +1624,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-molecular-standardization",
@@ -1557,10 +1641,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-ncbi-datasets-cli",
@@ -1580,7 +1665,8 @@
         "download_genome.sh",
         "gene_metadata.sh",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-outlier-splicing-detection",
@@ -1598,7 +1684,8 @@
         "SKILL.md",
         "fraser2_rare_disease.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-pathway-enrichment-visualization",
@@ -1616,7 +1703,8 @@
         "SKILL.md",
         "usage-guide.md",
         "visualization_ora.R"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-pathway-go-enrichment",
@@ -1634,7 +1722,8 @@
         "SKILL.md",
         "go_all_ontologies.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-pathway-gsea",
@@ -1653,7 +1742,8 @@
         "gsea_go.R",
         "gsea_msigdb.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-pathway-kegg-pathways",
@@ -1671,7 +1761,8 @@
         "SKILL.md",
         "kegg_spia_topology.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-pathway-reactome",
@@ -1690,7 +1781,8 @@
         "reactome_gsea.R",
         "reactome_ora.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-pathway-wikipathways",
@@ -1708,7 +1800,8 @@
         "SKILL.md",
         "usage-guide.md",
         "wikipathways_explore.R"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-pharmacophore-modeling",
@@ -1726,7 +1819,8 @@
         "SKILL.md",
         "pharmacophore.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-phylo-bayesian-inference",
@@ -1743,7 +1837,8 @@
       "changed_files": [
         "SKILL.md",
         "bayesian_convergence.py"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-phylo-distance-calculations",
@@ -1766,7 +1861,8 @@
         "sim8.fasta",
         "sim8_true.nwk",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-phylo-divergence-dating",
@@ -1787,7 +1883,8 @@
         "mcmctree_setup.py",
         "root_to_tip.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-phylo-modern-tree-inference",
@@ -1805,7 +1902,8 @@
         "SKILL.md",
         "iqtree_basic.sh",
         "partitioned_analysis.sh"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-phylo-species-trees",
@@ -1823,7 +1921,8 @@
         "SKILL.md",
         "astral_pipeline.sh",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-phylo-tree-io",
@@ -1840,7 +1939,8 @@
       "changed_files": [
         "SKILL.md",
         "convert_formats.py"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-phylo-tree-manipulation",
@@ -1861,7 +1961,8 @@
         "pairwise_tree_distances.py",
         "root_tree.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-phylo-tree-visualization",
@@ -1878,7 +1979,8 @@
       "changed_files": [
         "SKILL.md",
         "labeled_tree.py"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-pileup-generation",
@@ -1896,7 +1998,8 @@
         "SKILL.md",
         "allele_counts.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-population-genetics-rare-variant-association",
@@ -1913,7 +2016,8 @@
       "changed_files": [
         "SKILL.md",
         "rare_variant_test.sh"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-pose-validation",
@@ -1933,7 +2037,8 @@
         "receptor.pdb",
         "usage-guide.md",
         "validate_poses.py"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-protac-degraders",
@@ -1952,7 +2057,8 @@
         "cooperativity_dc50.py",
         "ternary_geometry_screen.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-proteomics-data-import",
@@ -1970,7 +2076,8 @@
         "SKILL.md",
         "load_maxquant.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-proteomics-dia-analysis",
@@ -1988,7 +2095,8 @@
         "SKILL.md",
         "diann_analysis.sh",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-proteomics-differential-abundance",
@@ -2008,7 +2116,8 @@
         "limma_analysis.R",
         "msqrob2_peptide_level.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-proteomics-peptide-identification",
@@ -2028,7 +2137,8 @@
         "fdr_filtering.py",
         "separate_search_fdr.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-proteomics-protein-inference",
@@ -2046,7 +2156,8 @@
         "SKILL.md",
         "protein_groups.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-proteomics-proteomics-qc",
@@ -2064,7 +2175,8 @@
         "SKILL.md",
         "qc_analysis.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-proteomics-ptm-analysis",
@@ -2082,7 +2194,8 @@
         "SKILL.md",
         "phospho_analysis.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-proteomics-quantification",
@@ -2099,7 +2212,8 @@
       "changed_files": [
         "SKILL.md",
         "lfq_normalization.py"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-proteomics-spectral-libraries",
@@ -2117,7 +2231,8 @@
         "SKILL.md",
         "build_library.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-qsar-modeling",
@@ -2130,10 +2245,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-reference-operations",
@@ -2151,7 +2267,8 @@
         "SKILL.md",
         "prepare_reference.sh",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-remote-homology",
@@ -2172,7 +2289,8 @@
         "pfam_annotation.sh",
         "pfam_annotation_toy.sh",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-sam-bam-basics",
@@ -2191,7 +2309,8 @@
         "convert_formats.sh",
         "usage-guide.md",
         "view_bam.py"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-sashimi-plots",
@@ -2209,7 +2328,8 @@
         "SKILL.md",
         "plot_sashimi.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-scaffold-analysis",
@@ -2222,10 +2342,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-shape-similarity",
@@ -2242,7 +2363,8 @@
       "changed_files": [
         "SKILL.md",
         "shape_search.py"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-similarity-searching",
@@ -2255,10 +2377,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-single-cell-batch-integration",
@@ -2271,10 +2394,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-single-cell-cell-annotation",
@@ -2287,10 +2411,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-single-cell-cell-communication",
@@ -2307,7 +2432,8 @@
       "changed_files": [
         "SKILL.md",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-single-cell-clustering",
@@ -2320,10 +2446,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-single-cell-cnv-inference",
@@ -2341,7 +2468,8 @@
         "SKILL.md",
         "infercnv_malignant_calling.R",
         "scevan_calling.R"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-single-cell-data-io",
@@ -2358,7 +2486,8 @@
       "changed_files": [
         "SKILL.md",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-single-cell-differential-abundance",
@@ -2371,10 +2500,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-single-cell-doublet-detection",
@@ -2387,10 +2517,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-single-cell-hashing-demultiplexing",
@@ -2408,7 +2539,8 @@
         "SKILL.md",
         "hashsolo_scanpy.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-single-cell-lineage-tracing",
@@ -2427,7 +2559,8 @@
         "cassiopeia_reconstruction.py",
         "cospar_dynamics.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-single-cell-markers-annotation",
@@ -2440,10 +2573,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-single-cell-metabolite-communication",
@@ -2456,10 +2590,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-single-cell-multimodal-integration",
@@ -2478,7 +2613,8 @@
         "cite_seq_analysis.R",
         "cite_seq_analysis.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-single-cell-perturb-seq",
@@ -2496,7 +2632,8 @@
         "SKILL.md",
         "pertpy_analysis.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-single-cell-preprocessing",
@@ -2509,10 +2646,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-single-cell-scatac-analysis",
@@ -2529,7 +2667,8 @@
       "changed_files": [
         "SKILL.md",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-single-cell-splicing",
@@ -2547,7 +2686,8 @@
         "SKILL.md",
         "sc_splicing_brie2.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-single-cell-trajectory-inference",
@@ -2565,7 +2705,8 @@
         "SKILL.md",
         "scvelo_velocity.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-splice-variant-prediction",
@@ -2594,7 +2735,8 @@
         "splicevault_lookup.py",
         "test_splice_parsers.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-splicing-qc",
@@ -2613,7 +2755,8 @@
         "splicing_qc.py",
         "test_splicing_qc.py",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-sra-data",
@@ -2633,7 +2776,8 @@
         "download_single.sh",
         "prefetch_large.sh",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-substructure-search",
@@ -2646,10 +2790,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-variant-annotation",
@@ -2667,7 +2812,8 @@
         "SKILL.md",
         "annotate_vcf.sh",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-variant-calling-filtering-best-practices",
@@ -2685,7 +2831,8 @@
         "SKILL.md",
         "filter_variants.sh",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-variant-normalization",
@@ -2702,7 +2849,8 @@
       "changed_files": [
         "SKILL.md",
         "normalize_vcf.sh"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-vcf-basics",
@@ -2719,7 +2867,8 @@
       "changed_files": [
         "SKILL.md",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-vcf-manipulation",
@@ -2736,7 +2885,8 @@
       "changed_files": [
         "SKILL.md",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-vcf-statistics",
@@ -2753,7 +2903,8 @@
       "changed_files": [
         "SKILL.md",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-virtual-screening",
@@ -2771,7 +2922,8 @@
         "SKILL.md",
         "usage-guide.md",
         "virtual_screen.py"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-workflows-crispr-screen-pipeline",
@@ -2788,7 +2940,8 @@
       "changed_files": [
         "SKILL.md",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-workflows-metabolomics-pipeline",
@@ -2806,7 +2959,8 @@
         "SKILL.md",
         "pipeline_handoff_check.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-workflows-proteomics-pipeline",
@@ -2824,7 +2978,8 @@
         "SKILL.md",
         "proteomics_workflow.R",
         "usage-guide.md"
-      ]
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-workflows-scrnaseq-pipeline",
@@ -2837,10 +2992,11 @@
       "fix_log": null,
       "fix_pass": "needed",
       "reaudit": "not needed",
-      "relative_to_upstream": "licence-declaration-only",
+      "relative_to_upstream": "declarations-only",
       "changed_files": [
         "SKILL.md"
-      ]
+      ],
+      "marketplace_ready": false
     }
   ]
 }

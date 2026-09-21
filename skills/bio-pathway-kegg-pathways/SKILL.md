@@ -4,6 +4,7 @@ description: Tests gene lists, ranked vectors, and fold-change vectors against K
 tool_type: r
 primary_tool: clusterProfiler
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

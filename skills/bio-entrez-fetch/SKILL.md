@@ -4,6 +4,7 @@ description: Retrieve records from NCBI databases using Biopython Bio.Entrez (EF
 tool_type: python
 primary_tool: Bio.Entrez
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

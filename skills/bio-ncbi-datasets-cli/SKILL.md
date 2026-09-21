@@ -4,6 +4,7 @@ description: Download genome assemblies, gene records, and ortholog data from NC
 tool_type: cli
 primary_tool: NCBI Datasets CLI
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

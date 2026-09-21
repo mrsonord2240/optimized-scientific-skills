@@ -4,6 +4,7 @@ description: Left-align and trim indels to parsimonious canonical form, decompos
 tool_type: cli
 primary_tool: bcftools
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

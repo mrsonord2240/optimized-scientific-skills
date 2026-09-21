@@ -4,6 +4,7 @@ description: Performs differential expression on bulk RNA-seq count data with DE
 tool_type: r
 primary_tool: DESeq2
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Test whether a GWAS signal and a molecular QTL (eQTL/sQTL/pQTL/mQTL
 tool_type: r
 primary_tool: coloc
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

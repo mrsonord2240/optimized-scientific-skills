@@ -4,6 +4,7 @@ description: Sort alignment files by coordinate or read name using samtools and 
 tool_type: cli
 primary_tool: samtools
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

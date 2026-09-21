@@ -4,6 +4,7 @@ description: Decompose total effects into direct and indirect paths through medi
 tool_type: mixed
 primary_tool: mediation
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Analyzes CRISPR drug-modifier (chemogenomic) screens with drugZ (Co
 tool_type: cli
 primary_tool: drugZ
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Assesses RNA-seq data quality for alternative splicing analysis. QC
 tool_type: python
 primary_tool: RSeQC
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

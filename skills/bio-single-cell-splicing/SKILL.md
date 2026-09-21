@@ -4,6 +4,7 @@ description: Analyzes alternative splicing at single-cell resolution. The first 
 tool_type: mixed
 primary_tool: MARVEL
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

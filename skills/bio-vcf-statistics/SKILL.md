@@ -4,6 +4,7 @@ description: Compute and interpret VCF quality-control metrics (Ti/Tv, het/hom, 
 tool_type: cli
 primary_tool: bcftools
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

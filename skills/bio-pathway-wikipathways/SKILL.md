@@ -4,6 +4,7 @@ description: Tests a gene list (ORA, enrichWP) or a ranked gene vector (GSEA, gs
 tool_type: r
 primary_tool: rWikiPathways
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

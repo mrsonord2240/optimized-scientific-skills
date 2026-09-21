@@ -4,6 +4,7 @@ description: Build local BLAST databases and run searches using NCBI BLAST+ comm
 tool_type: cli
 primary_tool: BLAST+
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

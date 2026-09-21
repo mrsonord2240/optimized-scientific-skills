@@ -4,6 +4,7 @@ description: Builds and applies 3D pharmacophore models using RDKit Pharm3D, the
 tool_type: python
 primary_tool: RDKit
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

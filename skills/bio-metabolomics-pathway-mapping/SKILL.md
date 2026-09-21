@@ -4,6 +4,7 @@ description: Maps metabolomics results to biological pathways via over-represent
 tool_type: r
 primary_tool: MetaboAnalystR
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

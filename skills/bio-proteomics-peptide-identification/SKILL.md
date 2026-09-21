@@ -4,6 +4,7 @@ description: Peptide-spectrum matching from MS/MS with target-decoy FDR control,
 tool_type: mixed
 primary_tool: pyOpenMS
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

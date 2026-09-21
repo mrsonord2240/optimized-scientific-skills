@@ -4,6 +4,7 @@ description: Generate pileup data for variant calling using samtools mpileup and
 tool_type: cli
 primary_tool: samtools
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

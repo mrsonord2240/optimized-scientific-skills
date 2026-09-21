@@ -4,6 +4,7 @@ description: View, query, and interpret VCF/BCF variant files with bcftools and 
 tool_type: cli
 primary_tool: bcftools
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

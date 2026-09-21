@@ -26,6 +26,7 @@ qc_checkpoints:
   - after_cn_correction: "Spearman ρ between CN and gene LFC abs <0.10 post-correction (literature 'significant bias' band; <0.05 is a stricter target). Requires a matched CN profile, which the unsupervised CRISPRcleanR path never loads -- compute in crispr-screens/copy-number-correction, or use Chronos, which takes CN as input"
   - after_hit_calling: "Tier-1 hits = 3-method consensus; Tier-2 = 2 of 3; Tier-3 = single-method exploratory"
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Analyzes differential transcript usage (DTU) and isoform switches w
 tool_type: r
 primary_tool: IsoformSwitchAnalyzeR
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

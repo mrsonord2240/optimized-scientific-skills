@@ -4,6 +4,7 @@ description: Queries ClinVar for variant pathogenicity classifications, ClinGen 
 tool_type: python
 primary_tool: requests
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

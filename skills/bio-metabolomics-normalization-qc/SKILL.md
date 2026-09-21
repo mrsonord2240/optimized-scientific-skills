@@ -4,6 +4,7 @@ description: Designs QC, corrects signal drift, removes batch effects, filters f
 tool_type: r
 primary_tool: pmp
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

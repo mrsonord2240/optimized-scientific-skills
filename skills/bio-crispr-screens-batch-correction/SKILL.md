@@ -4,6 +4,7 @@ description: Batch effect correction for CRISPR screens covering ComBat empirica
 tool_type: mixed
 primary_tool: pyComBat
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

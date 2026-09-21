@@ -4,6 +4,7 @@ description: Generate consensus sequences and manage reference files using samto
 tool_type: cli
 primary_tool: samtools
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

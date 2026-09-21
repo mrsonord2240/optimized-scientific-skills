@@ -4,6 +4,7 @@ description: Detect distant homologs using profile and structure-aware methods t
 tool_type: mixed
 primary_tool: HMMER
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Annotates VCF variants with functional consequences, population fre
 tool_type: mixed
 primary_tool: VEP
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

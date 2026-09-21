@@ -4,6 +4,7 @@ description: Filter alignments by flags, mapping quality, and regions using samt
 tool_type: cli
 primary_tool: samtools
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

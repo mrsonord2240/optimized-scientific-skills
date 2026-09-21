@@ -4,6 +4,7 @@ description: Analyzes pooled CRISPR screens with MAGeCK (Li et al 2014), coverin
 tool_type: cli
 primary_tool: MAGeCK
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

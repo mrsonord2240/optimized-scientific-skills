@@ -4,6 +4,7 @@ description: Runs the MS-DIAL preprocessing workflow (peak picking, MS2Dec spect
 tool_type: mixed
 primary_tool: msdial
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

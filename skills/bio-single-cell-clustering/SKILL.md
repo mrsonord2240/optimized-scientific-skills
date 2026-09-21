@@ -4,6 +4,7 @@ description: Dimensionality reduction and graph-based clustering for single-cell
 tool_type: mixed
 primary_tool: Seurat
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility

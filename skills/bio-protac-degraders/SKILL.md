@@ -4,6 +4,7 @@ description: Designs PROTACs, molecular glues, and bivalent degraders with expli
 tool_type: python
 primary_tool: PRosettaC
 license: MIT
+author: GPTomics
 ---
 
 ## Version Compatibility
