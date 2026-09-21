@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "1d6bc476849b52a3c8d63b22086ef4dbed9960ff"
+      "staging_commit": "019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be"
     }
   },
   "skills": [
@@ -2530,6 +2530,35 @@
       "changed_files": [
         "SKILL.md",
         "scvelo_velocity.py",
+        "usage-guide.md"
+      ]
+    },
+    {
+      "id": "bio-splice-variant-prediction",
+      "upstream_path": "alternative-splicing/splice-variant-prediction",
+      "score": 84,
+      "grade": "Limited Release",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-20",
+      "fix_log": "fixes/bio-splice-variant-prediction.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "edge_grch38.vcf",
+        "mmsplice_panel.csv",
+        "panel_grch38.vcf",
+        "pangolin_edge_m0.vcf",
+        "pangolin_panel_m0.vcf",
+        "pangolin_tissue.py",
+        "splice_parsers.py",
+        "spliceai_clingen_classify.py",
+        "spliceai_edge_D50_M0.vcf",
+        "spliceai_panel_D50_M0.vcf",
+        "splicevault_lookup.py",
+        "test_splice_parsers.py",
         "usage-guide.md"
       ]
     },

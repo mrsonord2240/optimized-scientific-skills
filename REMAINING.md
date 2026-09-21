@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**407 remaining** across 52 folders. 153 are already refined and live in `skills/`.
+**406 remaining** across 52 folders. 154 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 153 refined, 1 audited and excluded, 1 out of scope, 407 remaining.
+The source tree holds 562 Skills: 154 refined, 1 audited and excluded, 1 out of scope, 406 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -61,7 +61,7 @@ The source tree holds 562 Skills: 153 refined, 1 audited and excluded, 1 out of 
 | read-alignment | 4 | 0 |
 | rna-quantification | 4 | 0 |
 | rna-structure | 4 | 0 |
-| alternative-splicing | 2 | 6 |
+| alternative-splicing | 1 | 7 |
 
 ## Promoted, fix pass still needed
 
@@ -143,7 +143,6 @@ fixed.
 
 ### alternative-splicing
 
-- `bio-splice-variant-prediction` — `alternative-splicing/splice-variant-prediction`
 - `bio-splicing-quantification` — `alternative-splicing/splicing-quantification`
 
 ### atac-seq

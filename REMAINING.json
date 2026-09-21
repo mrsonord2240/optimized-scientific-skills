@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 153,
+    "refined": 154,
     "audited_and_excluded": 1,
     "out_of_scope": 1,
-    "remaining": 407
+    "remaining": 406
   },
   "remaining": [
     {
@@ -1309,10 +1309,6 @@
     {
       "id": "bio-spatial-transcriptomics-spatial-visualization",
       "upstream_path": "spatial-transcriptomics/spatial-visualization"
-    },
-    {
-      "id": "bio-splice-variant-prediction",
-      "upstream_path": "alternative-splicing/splice-variant-prediction"
     },
     {
       "id": "bio-splicing-quantification",

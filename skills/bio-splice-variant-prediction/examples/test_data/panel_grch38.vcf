@@ -1,0 +1,14 @@
+##fileformat=VCFv4.2
+##reference=GRCh38
+##contig=<ID=chr17,length=83257441>
+##contig=<ID=chrX,length=156040895>
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+chr17	7674292	TP53_c.673-2A>G	T	C	.	.	.
+chrX	31209497	DMD_c.9563+1G>A	C	T	.	.	.
+chrX	33211281	DMD_c.31+1G>A	C	T	.	.	.
+chrX	38381434	OTC_c.386+5G>A	G	A	.	.	.
+chrX	101397776	GLA_rs782094147_benign	C	T	.	.	.
+chrX	101398121	GLA_rs2071228_benign	G	A	.	.	.
+chrX	101398391	GLA_rs151195362_benign	C	T	.	.	.
+chrX	101399747	GLA_c.639+919G>A	C	T	.	.	.
+chrX	101401810	GLA_c.370-1G>A	C	T	.	.	.

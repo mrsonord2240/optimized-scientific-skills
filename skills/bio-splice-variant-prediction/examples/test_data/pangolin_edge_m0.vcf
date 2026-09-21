@@ -1,0 +1,7 @@
+##fileformat=VCFv4.2
+##INFO=<ID=Pangolin,Number=.,Type=String,Description="Pangolin splice scores. Format: gene|pos:score_change|pos:score_change|warnings,...">
+##contig=<ID=chr17,length=83257441>
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+chr17	7676154	usage_guide_wrong_ref	A	G	.	.	.
+chr17	7674283	N22_masked_window	GAGCCAACCTAGGAGATAACAC	NNNNNNNNNNNNNNNNNNNNNN	.	.	.
+chr17	7674292	multiallelic_T_C_A	T	C,A	.	.	Pangolin=ENSG00000141510.18|47:0.7200000286102295|-2:-0.8999999761581421|Warnings:
