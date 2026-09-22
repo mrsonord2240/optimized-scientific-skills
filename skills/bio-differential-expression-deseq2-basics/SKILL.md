@@ -1,6 +1,6 @@
 ---
 name: bio-differential-expression-deseq2-basics
-description: Performs differential expression on bulk RNA-seq count data with DESeq2's negative-binomial GLM, Wald and LRT testing, apeglm/ashr/normal LFC shrinkage, independent filtering, Cook's outlier handling, VST/rlog transforms, and design formulas including paired, batch, and interaction terms. Use when running bulk DE, choosing DESeq2 over edgeR or limma-voom, building a paired or interaction design, applying LFC shrinkage for ranking or GSEA, choosing Wald vs LRT, troubleshooting padj=NA, picking VST vs rlog, importing salmon/kallisto via tximport, or analyzing prokaryotic RNA-seq.
+description: Performs differential expression on bulk RNA-seq count data and single-cell pseudobulk with DESeq2's negative-binomial GLM, Wald and LRT testing, apeglm/ashr/normal LFC shrinkage, independent filtering, Cook's outlier handling, VST/rlog transforms, and design formulas including paired, batch, and interaction terms. Use when running bulk DE, pseudobulk DE (aggregated per sample × cell type), choosing DESeq2 over edgeR or limma-voom, building a paired or interaction design, applying LFC shrinkage for ranking or GSEA, choosing Wald vs LRT, troubleshooting padj=NA, picking VST vs rlog, importing salmon/kallisto via tximport, or analyzing prokaryotic RNA-seq.
 tool_type: r
 primary_tool: DESeq2
 license: MIT
@@ -81,6 +81,19 @@ sig <- subset(res, padj < 0.05)
 ```
 
 The reference level fix is non-cosmetic: DESeq2 picks alphabetically if not told otherwise, so `c('Treated','Untreated')` makes 'Treated' the reference and the LFC reads inverted. Set it BEFORE `DESeq()`.
+
+The reference level fix is non-cosmetic: DESeq2 picks alphabetically if not told otherwise, so `c('Treated','Untreated')` makes 'Treated' the reference and the LFC reads inverted. Set it BEFORE `DESeq()`.
+
+## What to Report
+
+When reporting DESeq2 results, include:
+
+- **Exact contrast tested**: `condition_treated_vs_control` (not just "treated vs control")
+- **Alpha level**: `alpha = 0.05` (not the `summary()` default of 0.1)
+- **Filtering threshold**: `metadata(res)$filterThreshold` (the baseMean cutoff from independent filtering)
+- **Sample counts**: n per group (e.g., "8 donors per condition")
+- **NA counts by cause**: independent filtering vs Cook's outlier vs all-zero rows
+- **LFC source**: shrunken (apeglm/ashr) or unshrunken Wald - never conflate them
 
 ## Tximport (Salmon / kallisto / RSEM)
 
@@ -166,11 +179,11 @@ res_ashr   <- lfcShrink(dds, contrast = c('condition','treated','control'), type
 
 The apeglm-cannot-use-contrast footgun: if the question is "drug effect in KO" from `~ genotype * treatment`, apeglm cannot directly shrink that contrast. Workarounds: (a) rebuild as combined factor `~ 0 + group` and relevel so the desired comparison is a coefficient; (b) use ashr; (c) accept the unshrunken LFC for that one comparison.
 
-p-values do NOT change when shrinking. `lfcShrink()` preserves the Wald p-value from `results()`. See the Single Most Important Insight at the top.
+p-values do NOT change when shrinking. `lfcShrink()` preserves the **raw Wald p-value** (`pvalue` column) from `results()` exactly. The **adjusted p-values** (`padj`) ARE re-run by independent filtering on the shrinkage object, so `padj` differs between `results()` and `lfcShrink()` even though the raw p-values match. For combined tables, pull LFC from `lfcShrink()` and padj from `results()`.
 
 ## Independent Filtering, Cook's Outliers, padj=NA
 
-`padj = NA` has three distinct causes (independent filtering, Cook's outlier, all-zero in a group), each with a different remediation -- see `de-results` for the full diagnostic table, IHW alternative, and recovery code.
+`padj = NA` has three distinct causes (independent filtering, Cook's outlier, all-zero across EVERY sample), each with a different remediation -- see `de-results` for the full diagnostic table, IHW alternative, and recovery code.
 
 Two DESeq2-specific points worth knowing at this layer:
 
