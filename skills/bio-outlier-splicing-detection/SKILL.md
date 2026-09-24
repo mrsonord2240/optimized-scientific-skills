@@ -91,13 +91,21 @@ fds <- filterExpressionAndVariability(fds, minExpressionInOneSample = 20, minDel
 fitMetrics(fds) <- 'jaccard'
 currentType(fds) <- 'jaccard'
 
-# q: see Choosing q. FRASER 2.6.1: estimateBestQ(); FRASER 2.2.0 has only optimHyperParams()
-fds <- estimateBestQ(fds, type = 'jaccard', plot = FALSE)
+# FRASER 2.6.1 supplies estimateBestQ(); FRASER 2.2.0 supplies optimHyperParams().
+estimate_q <- if (exists('estimateBestQ', envir = asNamespace('FRASER'), inherits = FALSE)) {
+    FRASER::estimateBestQ
+} else {
+    FRASER::optimHyperParams
+}
+fds <- estimate_q(fds, type = 'jaccard', plot = FALSE)
 fds <- FRASER(fds, q = c(jaccard = bestQ(fds, 'jaccard')), implementation = 'PCA', BPPARAM = bp)
 
 all_results <- as.data.frame(results(fds, psiType = 'jaccard', padjCutoff = 0.05, deltaPsiCutoff = 0.1))
-patient_results <- all_results[all_results$sampleID == 'PATIENT_001', ]
-patient_results <- patient_results[order(patient_results$padjust), ]
+patient_results <- all_results
+if (nrow(patient_results) > 0L) {
+    patient_results <- patient_results[patient_results$sampleID == 'PATIENT_001', ]
+    patient_results <- patient_results[order(patient_results$padjust), ]
+}
 ```
 
 `filterExpressionAndVariability` is left at FRASER's variability defaults (`quantile = 0.75`, `quantileMinExpression = 10`).
@@ -144,9 +152,9 @@ for bam in *.bam; do
 done
 
 ls *.junc > juncfiles.txt
-python leafcutter_cluster_regtools.py -j juncfiles.txt -o leafcutter -m 50 -l 500000
+python /path/to/leafcutter/clustering/leafcutter_cluster_regtools.py -j juncfiles.txt -o leafcutter -m 50 -l 500000
 
-leafcutterMD.R \
+/path/to/leafcutter/scripts/leafcutterMD.R \
     --num_threads 4 \
     --output_prefix patient_outlier \
     leafcutter_perind_numers.counts.gz
@@ -187,7 +195,7 @@ drop init          # takes no project-name argument; run it in the empty directo
 snakemake aberrantSplicing --cores 16    # or aberrantExpression / mae; no --use-conda: DROP's rules have no conda: directives
 ```
 
-`drop demo` downloads a public 10-sample demo project; its `snakemake aberrantSplicing` took about 85 minutes on 10 cores and reported no significant outlier (min padjust 1), as expected for 10 samples. The **MAE module** tests allelic imbalance on heterozygous SNPs called from RNA-seq with a negative-binomial test (not a z-score); useful for monoallelic LoF that splicing/expression outliers miss.
+`drop demo` downloads a public 10-sample demo project; its `snakemake aberrantSplicing` took about 90 minutes to first `results.tsv` on 10 cores and reported no significant outlier (min padjust 1), as expected for 10 samples. Allow longer for all targets and a cold cache. The **MAE module** tests allelic imbalance on heterozygous SNPs called from RNA-seq with a negative-binomial test (not a z-score); useful for monoallelic LoF that splicing/expression outliers miss.
 
 ## Variant + Outlier Integration
 
@@ -260,19 +268,30 @@ GTEx-derived tissue-matched controls can supplement small in-house cohorts but i
 
 ## Tissue Choice for Mendelian RNA-seq
 
-| Tissue | Pros | Cons | Genes captured |
-|--------|------|------|----------------|
-| Whole blood (PAXgene) | Easy, standard | Globin contamination; many disease genes silent | ~70-80% of clinical genes |
-| Fibroblast (skin biopsy) | Reasonable expression | Requires culture; senescence variability | ~75-85% |
-| Muscle biopsy | Best for muscular dystrophy | Invasive | ~85-90% for muscle disorders |
-| iPSC-derived neuron / cardiomyocyte | Disease-relevant tissue | Cost, variability | ~95% if differentiation works |
-| Urine sediment | Non-invasive | Low yield | ~50-60% |
+| Tissue | Pros | Cons |
+|--------|------|------|
+| Whole blood (PAXgene) | Easy, standard | Globin contamination; many disease genes silent |
+| Fibroblast (skin biopsy) | Reasonable expression | Requires culture; senescence variability |
+| Muscle biopsy | Best for muscular dystrophy | Invasive |
+| iPSC-derived neuron / cardiomyocyte | Disease-relevant tissue | Cost, variability |
+| Urine sediment | Non-invasive | Low yield |
 
 For UDN-style cases: blood first, then fibroblast if blood lacks expression of the candidate gene. **A negative blood RNA-seq does not rule out a candidate gene that is silent in blood** - verify gene expression with the GTEx tissue panel before committing to the tissue.
 
-**Detecting a tissue/batch mismatch before interpreting.** Strict tissue matching is required, and a mismatched patient does not always look like "hundreds of outliers": on a synthetic sample with globally shifted splicing, FRASER PCA reported 0 calls (the fit absorbed it), FRASER AE q=10 reported 15, LeafcutterMD 9. So do not read a zero-call patient as tissue-matched. Compare calls per sample; a sample far above the cohort median is suspect:
+**Detecting a tissue/batch mismatch before interpreting.** Strict tissue matching is required, and a mismatched patient does not always look like "hundreds of outliers": on a synthetic sample with globally shifted splicing, FRASER PCA reported 0 calls (the fit absorbed it), FRASER AE q=10 reported 15, LeafcutterMD 9. So do not read a zero-call patient as tissue-matched. Before fitting FRASER, inspect sample-level count correlations and PCA using a matched gene-count matrix (rows = genes, columns = the same samples); a patient isolated from the control cluster is a stop-and-investigate signal:
 
 ```r
+# Replace gene_counts.tsv with your pre-FRASER, unnormalised gene x sample matrix.
+counts <- as.matrix(read.delim('gene_counts.tsv', row.names = 1, check.names = FALSE))
+log_cpm <- log2(sweep(counts + 0.5, 2, colSums(counts + 0.5), '/') * 1e6 + 1)
+sample_correlation <- cor(log_cpm, method = 'spearman')
+sort(sample_correlation['PATIENT_001', setdiff(colnames(sample_correlation), 'PATIENT_001')])
+
+sample_pca <- prcomp(t(log_cpm), scale. = TRUE)
+plot(sample_pca$x[, 1], sample_pca$x[, 2], xlab = 'PC1', ylab = 'PC2')
+text(sample_pca$x[, 1], sample_pca$x[, 2], labels = rownames(sample_pca$x), pos = 3)
+
+# Calls are a secondary check only; PCA may absorb a global mismatch.
 sort(table(factor(all_results$sampleID, levels = colnames(fds))), decreasing = TRUE)[1:5]
 ```
 
@@ -281,14 +300,16 @@ sort(table(factor(all_results$sampleID, levels = colnames(fds))), decreasing = T
 `q` is the latent-space (bottleneck) dimension of the fit; too low leaves confounders in the outlier signal, too high absorbs real signal, and it must stay far below the sample count. Estimate it per cohort instead of hard-coding it:
 
 ```r
-fds <- estimateBestQ(fds, type = 'jaccard', plot = FALSE)    # FRASER 2.6.1: optimal hard threshold, fast
+# FRASER 2.6.1: estimateBestQ() (OHT); FRASER 2.2.0: optimHyperParams().
+estimate_q <- if (exists('estimateBestQ', envir = asNamespace('FRASER'), inherits = FALSE)) FRASER::estimateBestQ else FRASER::optimHyperParams
+fds <- estimate_q(fds, type = 'jaccard', plot = FALSE)
 bestQ(fds, 'jaccard')
-# exhaustive injected-outlier grid (FRASER 2.2.0: optimHyperParams(fds, type = 'jaccard', q_param = ...)):
-fds <- estimateBestQ(fds, type = 'jaccard', useOHT = FALSE, q_param = c(2, 5, 10, 15), plot = FALSE)
+# Exhaustive injected-outlier grid is available with FRASER 2.6.1:
+fds <- FRASER::estimateBestQ(fds, type = 'jaccard', useOHT = FALSE, q_param = c(2, 5, 10, 15), plot = FALSE)
 plotEncDimSearch(fds, type = 'jaccard', plotType = 'auc')    # plotType = 'loss' also works
 ```
 
-`plotEncDimSearch` without `plotType` shows the OHT singular-value plot and returns NULL (with a warning) after `useOHT = FALSE`. Measured on the 30-sample synthetic cohort (PCA): q=1-3 flagged 4/4 planted events, q=5-10 3/4 (the 60%-usage cryptic donor was missed), q=15 1/4; `estimateBestQ` chose q=1 (FRASER 2.6.1, OHT) and q=2 (2.2.0 grid), both 4/4. A fixed q=10 (the old default) is wrong for cohorts this small. OHT prints "Optimal latent space dimension is smaller than 2 ... set to 2" when the cohort is too small or degenerate (seen at n=8-12). For OUTRIDER, `estimateBestQ(ods)` (see its block) is the fast single-q estimate; `findEncodingDim` / `estimateBestQ(ods, useOHT = FALSE)` grids many q values and is slow.
+`plotEncDimSearch` without `plotType` shows the OHT singular-value plot and returns NULL (with a warning) after `useOHT = FALSE`. Measured on the 30-sample synthetic cohort (PCA): q=1-3 flagged 4/4 planted events, q=5-10 3/4 (the 60%-usage cryptic donor was missed), q=15 1/4; `estimateBestQ` chose q=1 (FRASER 2.6.1, OHT) and q=2 (2.2.0 grid), both 4/4. A fixed q=10 (the old default) is wrong for cohorts this small. OHT prints "Optimal latent space dimension is smaller than 2 ... set to 2" when the cohort is too small or degenerate (observed at n=4 in the synthetic check). For OUTRIDER, `estimateBestQ(ods)` (see its block) is the fast single-q estimate; `findEncodingDim` / `estimateBestQ(ods, useOHT = FALSE)` grids many q values and is slow.
 
 ## Per-Tool Failure Modes
 
@@ -318,19 +339,9 @@ plotEncDimSearch(fds, type = 'jaccard', plotType = 'auc')    # plotType = 'loss'
 | LeafcutterMD sig, FRASER2 not | Novel cryptic event not in annotation | High-priority novel finding; investigate |
 | All tools null but biology suggests change | Underpowered cohort or wrong tissue | Verify gene expression in tissue; recruit larger cohort |
 
-## Disease-Specific Expectations
+## Disease Context
 
-| Condition | Expected outlier signature | Tissue |
-|-----------|----------------------------|--------|
-| ALS / FTD (TDP-43 loss) | Cryptic exons in UNC13A, STMN2, ATG4B | Post-mortem brain ONLY |
-| SF3B1-mutant MDS / CLL / uveal melanoma | Aberrant 3'ss ~10-30nt upstream of canonical | Bone marrow / tumor tissue |
-| Spinal muscular atrophy (untreated SMN2) | SMN exon 7 skipping | Fibroblast / iPSC-MN |
-| Familial dysautonomia (ELP1 c.2204+6T>C) | ELP1 exon 20 skipping (>=99% in CNS, partial elsewhere) | iPSC-neuron > fibroblast > blood |
-| Deep-intronic CFTR / USH2A / CEP290 | Pseudoexon inclusion | Cognate disease tissue (lung / retina) |
-| Duchenne muscular dystrophy (DMD) | Out-of-frame exon skipping pattern | Muscle biopsy |
-| Stargardt (ABCA4) deep-intronic | Pseudoexon in retina | Retinal organoid / iPSC-RPE |
-
-For each, the gene must be expressed in the queried tissue. Verify with GTEx before assuming a negative result rules out the gene.
+Use disease biology to choose the tissue and candidate follow-up, but do not treat a familiar signature as an expected result or a diagnostic conclusion. Published examples include TDP-43-associated cryptic exons in ALS/FTD and SF3B1-associated alternative 3' splice-site use (references below). For every case, first verify that the candidate gene is expressed in the queried tissue (for example with GTEx) and interpret a negative RNA result as inconclusive when it is not.
 
 ## Common Errors
 
@@ -340,7 +351,7 @@ Messages observed on FRASER 2.2.0/2.6.1, OUTRIDER 1.24.0/1.28.1, DROP 1.6.1, lea
 |-----------------|-------|----------|
 | `FraserDataSet`: `assignment of an object of class "data.frame" is not valid for slot 'colData'` | Plain data.frame passed as `colData` | `S4Vectors::DataFrame(sample_table)` |
 | `failed to open BamFile: failed to load BAM index` (FRASER); `Unable to open BAM/SAM index` (regtools) | BAM not indexed / index missing | `samtools index`; check `samtools idxstats` |
-| `Optimal latent space dimension is smaller than 2 ... set to 2` (`estimateBestQ`) | Cohort too small or degenerate (seen at n=8-12) | Add matched controls; do not interpret a null |
+| `Optimal latent space dimension is smaller than 2 ... set to 2` (`estimateBestQ`) | Cohort too small or degenerate (observed at n=4 synthetic samples) | Add matched controls; do not interpret a null |
 | `OUTRIDER(ods, q = <OutriderDataSet>)`: `operations are possible only for numeric, logical or complex types` | OUTRIDER 1.28.1 `estimateBestQ` returns the object | Use the `is(q_best, 'OutriderDataSet')` step in the OUTRIDER block |
 | `Please provide for q an integer greater than 1 ...` (`OUTRIDER()`) | OHT estimate of 1 on OUTRIDER 1.28.1 | `max(q_best, 2)` step in the OUTRIDER block |
 | `Warning: No significant events` (OUTRIDER) | Cohort <50 (expected), or no outliers | See Cohort Size and Power |

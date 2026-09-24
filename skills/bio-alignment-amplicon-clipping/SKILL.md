@@ -40,7 +40,7 @@ Standard amplicon BAMs should NEVER be processed by `samtools markdup` -- by des
 | Tool | When | Notes |
 |------|------|-------|
 | `samtools ampliconclip` | Default for amplicon panels (since 1.11) | Soft- or hard-clip from BED; modifies CIGAR; removes MD/NM from clipped reads |
-| `iVar trim` | Illumina SARS-CoV-2 / PrimalSeq route (Andersen lab) | Soft-clips by primer position + quality sliding window (`-q 20` default); needs sorted, indexed input |
+| `iVar trim` | Illumina SARS-CoV-2 / PrimalSeq route (Andersen lab) | Soft-clips by primer position + quality sliding window (`-q 20` default); expects sorted input (the index is optional in iVar 1.4.4) |
 | `cutadapt` (pre-alignment) | Legacy / when alignment is downstream | Trims at FASTQ stage; less precise for amplicon |
 
 `fgbio ClipBam` is not a primer trimmer: it clips a fixed number of bases or overlapping mate ends and takes no primer file.
@@ -115,7 +115,7 @@ Default `ampliconclip` clips only the 5' end, against any primer. Measured on th
 
 Other options:
 - Reads whose end matches no primer pass through unclipped and are counted as `NOT CLIPPED` in the stats (ARTIC: 92 with `--strand`, 7 with `--both-ends --strand`). `--clipped` drops them (4909 written instead of 4916), `--fail` marks them QCFAIL.
-- `--tolerance N` (default 5) is how many bases a read end may sit from a primer edge and still match; `--primer-counts FILE` writes reads per primer (bedgraph); `--original` adds an `OA` tag holding the pre-clip alignment; `--keep-tag` keeps the old, now wrong, NM/MD.
+- `--tolerance N` (default 5) extends matching upstream: a read start up to N bases before the primer start still matches, while starts inside the primer already match. `--primer-counts FILE` writes reads per primer (bedgraph); `--original` adds an `OA` tag holding the pre-clip alignment; `--keep-tag` keeps the old, now wrong, NM/MD.
 
 ## Primer BED Format
 
@@ -127,7 +127,7 @@ chr1   600   625   primer_2_F    60   +
 chr1   1000  1025  primer_2_R    60   -
 ```
 
-Columns 1-3 give the region and column 6 the strand, which `--strand` requires: a 5-column BED fails with `Parsed 5 columns, but need at least 6`. ARTIC primer schemes ship pre-built BEDs (`primer.bed` from artic-network/primer-schemes) with 7 columns (chrom, start, end, name, pool, strand, sequence); ampliconclip accepts them as they are.
+Columns 1-3 give the region and column 6 the strand, which `--strand` requires: a 5-column BED fails with `Parsed 5 columns, but need at least 6`. The shipped workflow accepts tabs or spaces and ignores UCSC `track`/`browser` header lines before validating the normalized BED. ARTIC primer schemes ship pre-built BEDs (`primer.bed` from artic-network/primer-schemes) with 7 columns (chrom, start, end, name, pool, strand, sequence); ampliconclip accepts them as they are.
 
 ## SARS-CoV-2 ARTIC Comparison
 
@@ -137,7 +137,7 @@ Columns 1-3 give the region and column 6 the strand, which `--strand` requires: 
 | `iVar trim` | Soft-clip with primer-position parsing + quality trim | nf-core/viralrecon; Illumina PrimalSeq route (Andersen lab) |
 
 ```bash
-# iVar needs a coordinate-sorted, indexed BAM. -q 0 -m 1 turns the quality/length filters off so only
+# iVar needs a coordinate-sorted BAM (the index is optional in iVar 1.4.4). -q 0 -m 1 turns the quality/length filters off so only
 # primer logic acts; reads with no primer are dropped unless -e is given.
 samtools index input.bam
 ivar trim -i input.bam -b primers.bed -p ivar_trimmed -q 0 -m 1   # writes ivar_trimmed.bam
@@ -176,7 +176,8 @@ Amplicon reads at primer locations are by design coordinate-degenerate -- every 
 | `[bam_fillmd] fail to find sequence ... in the reference` and no MD tags, exit 0 | Wrong reference FASTA for calmd | Pass the FASTA the BAM was aligned to |
 | `Parsed 5 columns, but need at least 6` | BED lacks the strand column | Use the 6-column format above |
 | `[E::hts_idx_push] Unsorted positions` | Indexed the raw ampliconclip output | Sort first (workflow step 2) |
-| Primer bases remain at read ends (`check_primer_residual.py` exit 1, or a variant at a primer end confirms reference) | ampliconclip not run; `--strand` without `--both-ends` on reads that span the amplicon (3' primer left); BED from another primer-scheme version | Re-run with `--both-ends --strand`; check BED build |
+| High `NOT CLIPPED` share in `clip.stats` | Wrong primer-scheme version/build, or a sparse/negative-control sample | Verify scheme/build; review coverage; only raise `MAX_NOT_CLIPPED_PCT` for a documented sparse control |
+| Primer bases remain at read ends (`check_primer_residual.py` exit 1, or a variant at a primer end confirms reference) | ampliconclip not run; `--strand` without `--both-ends` on reads that span the amplicon (3' primer left) | Re-run with `--both-ends --strand`; verify the clipping step ran |
 | Valid sequence next to a primer is soft-clipped | `--strand` omitted, so opposite-orientation primers clip the read | Add `--strand` |
 | MD/NM missing after clipping | calmd not run (ampliconclip removes them) | `samtools calmd -b clipped.bam ref.fa` |
 | Markdup output shows ~100% duplicates | Amplicon BAM was processed with markdup | Restart from raw alignment; use ampliconclip; skip markdup |

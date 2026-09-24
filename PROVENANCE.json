@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "aa465d0494ed00d2fab44bc7007374715d23ef6d"
+      "staging_commit": "2812e2229740a034a414ff6f3d7209dce80487f9"
     }
   },
   "skills": [
@@ -34,11 +34,11 @@
     {
       "id": "bio-alignment-amplicon-clipping",
       "upstream_path": "alignment-files/alignment-amplicon-clipping",
-      "score": 85,
-      "grade": "Limited Release",
+      "score": 95,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-20",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-alignment-amplicon-clipping.md",
       "fix_pass": "done",
       "reaudit": "not needed",
@@ -49,7 +49,7 @@
         "check_primer_residual.py",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-alignment-filtering",
@@ -292,14 +292,14 @@
     {
       "id": "bio-alignment-trimming",
       "upstream_path": "alignment/alignment-trimming",
-      "score": 83,
-      "grade": "Limited Release",
+      "score": 96,
+      "grade": "Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-15",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-alignment-trimming.md",
       "fix_pass": "done",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -788,39 +788,40 @@
     {
       "id": "bio-clinical-databases-dbsnp-queries",
       "upstream_path": "clinical-databases/dbsnp-queries",
-      "score": 86,
+      "score": 93,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-15",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-clinical-databases-dbsnp-queries.md",
       "fix_pass": "done",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
-        "dbsnp_lookup.py"
+        "dbsnp_lookup.py",
+        "test_dbsnp_lookup_contracts.py"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-clinical-databases-gnomad-frequencies",
       "upstream_path": "clinical-databases/gnomad-frequencies",
-      "score": 86,
+      "score": 95,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-15",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-clinical-databases-gnomad-frequencies.md",
       "fix_pass": "done",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
         "gnomad_query.py",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-clinical-databases-myvariant-queries",
@@ -1151,14 +1152,14 @@
     {
       "id": "bio-crispr-screens-perturb-seq-analysis",
       "upstream_path": "crispr-screens/perturb-seq-analysis",
-      "score": 89,
+      "score": 93,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-23",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-crispr-screens-perturb-seq-analysis.md",
       "fix_pass": "done",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -1168,12 +1169,14 @@
         "mixscape_filter.py",
         "multiome_differential.py",
         "multiomic-perturb-seq.md",
+        "optional-methods.md",
         "run_pertpy.py",
         "run_sceptre.R",
+        "run_sceptre_safe.py",
         "sceptre-low-moi.md",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-crispr-screens-prime-editing-screens",
@@ -2028,21 +2031,23 @@
     {
       "id": "bio-outlier-splicing-detection",
       "upstream_path": "alternative-splicing/outlier-splicing-detection",
-      "score": 82,
-      "grade": "Limited Release",
+      "score": 95,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-20",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-outlier-splicing-detection.md",
       "fix_pass": "done",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
+        "01_make_synth_cohort.py",
+        "README_SYNTHETIC.md",
         "SKILL.md",
         "fraser2_rare_disease.R",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-pathway-enrichment-visualization",
@@ -2187,32 +2192,32 @@
     {
       "id": "bio-phylo-bayesian-inference",
       "upstream_path": "phylogenetics/bayesian-inference",
-      "score": 87,
+      "score": 91,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-15",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-phylo-bayesian-inference.md",
       "fix_pass": "done",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
         "bayesian_convergence.py"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-phylo-distance-calculations",
       "upstream_path": "phylogenetics/distance-calculations",
-      "score": 87,
-      "grade": "Production Ready",
+      "score": 97,
+      "grade": "Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-15",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-phylo-distance-calculations.md",
       "fix_pass": "done",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "README.txt",
@@ -2251,21 +2256,21 @@
     {
       "id": "bio-phylo-modern-tree-inference",
       "upstream_path": "phylogenetics/modern-tree-inference",
-      "score": 88,
+      "score": 94,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-15",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-phylo-modern-tree-inference.md",
       "fix_pass": "done",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
         "iqtree_basic.sh",
         "partitioned_analysis.sh"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-phylo-species-trees",

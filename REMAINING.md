@@ -79,14 +79,6 @@ Changed in staging after their latest audit, so the score below describes earlie
 
 | skill | score at last audit | audited on |
 | --- | ---: | --- |
-| `bio-alignment-trimming` | 83 | 2026-09-15 |
-| `bio-clinical-databases-dbsnp-queries` | 86 | 2026-09-15 |
-| `bio-clinical-databases-gnomad-frequencies` | 86 | 2026-09-15 |
-| `bio-crispr-screens-perturb-seq-analysis` | 89 | 2026-09-23 |
-| `bio-outlier-splicing-detection` | 82 | 2026-09-20 |
-| `bio-phylo-bayesian-inference` | 87 | 2026-09-15 |
-| `bio-phylo-distance-calculations` | 87 | 2026-09-15 |
-| `bio-phylo-modern-tree-inference` | 88 | 2026-09-15 |
 | `bio-phylo-tree-manipulation` | 86 | 2026-09-15 |
 | `bio-pileup-generation` | 85 | 2026-09-20 |
 | `bio-population-genetics-rare-variant-association` | 89 | 2026-09-15 |

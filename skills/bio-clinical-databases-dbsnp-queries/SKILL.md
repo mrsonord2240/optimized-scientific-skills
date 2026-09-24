@@ -154,7 +154,13 @@ def summarize_refsnp(payload):
 
 ```python
 def resolve_merge_chain(rsid, max_hops=10):
-    '''Follow multi-hop merge chain. Cycle-safe with max_hops cap. rs630496 -> rs429358.'''
+    '''Follow a multi-hop merge chain. Cycle-safe with max_hops cap.
+
+    Every terminal lookup result uses ``status`` with one of ``resolved``,
+    ``not_found``, ``withdrawn``, or ``orphan``; it also includes
+    ``final_rsid`` and ``chain``. Error-only results use ``error``.
+    rs630496 -> rs429358.
+    '''
     chain = []
     current = str(rsid).lstrip('rs')
     for _ in range(max_hops):

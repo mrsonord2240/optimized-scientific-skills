@@ -23,6 +23,8 @@ Required inputs:
 - Sample / channel metadata (batch covariate)
 - Non-targeting control sgRNA identifier
 
+Optional FR-Perturb and Seurat environments, plus the executable Python fallbacks when they are unavailable, are in `references/optional-methods.md`.
+
 ## Quick Start
 
 Tell the AI agent what to do:
@@ -31,6 +33,8 @@ Tell the AI agent what to do:
 - "Scale up: design genome-wide Perturb-seq following the Replogle 2022 protocol (2.5M cells, ~9,866 expressed genes in K562, CRISPRi)"
 - "Diagnose: why does my Mixscape filter out 80% of perturbed cells as escapers?"
 - "Run SCEPTRE on my low-MOI Perturb-seq data and compare FDR calibration vs MAST"
+
+For SCEPTRE execution, use `python scripts/run_sceptre_safe.py --example results.tsv` (or pass `input.rds results.tsv`). It validates the result table and records native-worker status in `results.tsv.run.json`; see `references/sceptre-low-moi.md`.
 
 ## Example Prompts
 

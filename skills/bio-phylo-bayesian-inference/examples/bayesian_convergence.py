@@ -12,18 +12,31 @@ import pandas as pd
 
 def parse_mrbayes_pfile(filepath):
     rows = []
+    header = None
     with open(filepath) as f:
-        for line in f:
+        for line_number, line in enumerate(f, start=1):
             line = line.strip()
             if not line or line.startswith('['):
                 continue
-            if line.startswith('Gen'):
+            if header is None:
                 header = line.split('\t')
+                if not header or header[0] != 'Gen':
+                    raise ValueError(f'{filepath}: line {line_number} is not a MrBayes .p header (expected first column Gen)')
                 continue
-            rows.append(line.split('\t'))
+            values = line.split('\t')
+            if len(values) != len(header):
+                raise ValueError(f'{filepath}: line {line_number} has {len(values)} columns; expected {len(header)} from header')
+            rows.append(values)
+    if header is None:
+        raise ValueError(f'{filepath}: no MrBayes .p header found')
+    if not rows:
+        raise ValueError(f'{filepath}: no sampled rows found after header')
     df = pd.DataFrame(rows, columns=header)
-    for col in df.columns:
-        df[col] = pd.to_numeric(df[col])
+    try:
+        for col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors='raise')
+    except ValueError as exc:
+        raise ValueError(f'{filepath}: non-numeric value in a sampled row') from exc
     return df
 
 
@@ -67,6 +80,10 @@ def assess_convergence(pfile_run1, pfile_run2, burnin_fraction=0.25):
     print(f'Parsing {pfile_run1} and {pfile_run2}...\n')
     df1_raw = parse_mrbayes_pfile(pfile_run1)
     df2_raw = parse_mrbayes_pfile(pfile_run2)
+    if list(df1_raw.columns) != list(df2_raw.columns):
+        raise ValueError('Run .p headers differ; do not compare chains from different models or parameterizations.')
+    if not 0 <= burnin_fraction < 1:
+        raise ValueError('burnin_fraction must be >= 0 and < 1')
 
     burnin1 = int(len(df1_raw) * burnin_fraction)
     burnin2 = int(len(df2_raw) * burnin_fraction)
@@ -75,7 +92,7 @@ def assess_convergence(pfile_run1, pfile_run2, burnin_fraction=0.25):
     print(f'Samples after {burnin_fraction:.0%} burn-in: run1={len(df1)}, run2={len(df2)}\n')
 
     skip_cols = {'Gen'}
-    param_cols = [c for c in df1.columns if c not in skip_cols and c in df2.columns]
+    param_cols = [c for c in df1.columns if c not in skip_cols]
 
     results = []
     for col in param_cols:
@@ -146,10 +163,14 @@ if __name__ == '__main__':
         with tempfile.TemporaryDirectory() as tmp:
             p1, p2 = write_synthetic_pfiles(tmp)
             assess_convergence(p1, p2)
-    elif len(sys.argv) >= 3:
+    elif len(sys.argv) in (3, 4):
         pfile1, pfile2 = sys.argv[1], sys.argv[2]
         burnin = float(sys.argv[3]) if len(sys.argv) > 3 else 0.25
-        assess_convergence(pfile1, pfile2, burnin)
+        try:
+            assess_convergence(pfile1, pfile2, burnin)
+        except (OSError, ValueError) as exc:
+            print(f'Error: {exc}', file=sys.stderr)
+            sys.exit(2)
     elif len(sys.argv) == 2:
         print(f'Error: one file given ({sys.argv[1]!r}); ESS/PSRF need two .p files from independent runs.')
         _usage()

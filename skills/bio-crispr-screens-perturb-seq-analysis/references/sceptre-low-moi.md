@@ -12,9 +12,13 @@ Pipeline (current sceptre API, composable steps): `import_data` -> `set_analysis
 gRNA matrix, `grna_target_data_frame`, technical covariates (batch, n_genes, etc.), `discovery_pairs`.
 
 ```bash
-Rscript scripts/run_sceptre.R input.rds results.tsv     # input.rds: list(response_matrix, grna_matrix, grna_target_data_frame, extra_covariates, discovery_pairs)
-Rscript scripts/run_sceptre.R --example results.tsv     # sceptre's bundled lowmoi_example_data
+# Recommended: runs R in a child process, validates the TSV, and writes results.tsv.run.json.
+# Pass --rscript with a pinned project R wrapper when your environment needs one.
+python scripts/run_sceptre_safe.py input.rds results.tsv
+python scripts/run_sceptre_safe.py --example results.tsv
 ```
 Output: per-gene-per-perturbation table (`p_value`, `log_2_fold_change`, `significant`, ...).
+
+`run_sceptre_safe.py` returns nonzero if the table is absent, empty, malformed, or has invalid p-values. Some Windows R/sceptre combinations can fault during native teardown *after* producing a valid TSV; the wrapper records the child exit code and validation outcome in `results.tsv.run.json` and returns zero only when the table validates. Treat a nonzero `worker_returncode` in that manifest as an environment warning: pin and retest the R/sceptre stack before production analysis. `run_sceptre.R` is the worker, not the recommended public entrypoint.
 
 **Advantage over MAST:** SCEPTRE's permutation NB GLM is the only method that maintains calibrated FDR in pooled-screen scRNA-seq (Barry 2024 benchmark). MAST and Wilcoxon are over-confident due to data sparsity.

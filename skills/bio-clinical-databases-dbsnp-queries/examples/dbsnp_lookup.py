@@ -44,6 +44,9 @@ def resolve_merge_chain(rsid, max_hops=10):
 
     A merged record has no primary_snapshot_data; merged_snapshot_data is an object
     {"merged_into": ["429358"], ...} (rs630496 -> rs429358). Each hop is one request.
+    Every terminal lookup result uses ``status`` (``resolved``, ``not_found``,
+    ``withdrawn``, or ``orphan``) plus ``final_rsid`` and ``chain``. Error-only
+    results use ``error``.
     '''
     chain = []
     current = str(rsid).lstrip('rs')
@@ -146,7 +149,9 @@ def batch_normalize_rsids(rsids):
     '''Normalize a list of rsIDs: resolve merges, flag multi-allelic, one row per input rsID.
 
     myvariant returns one hit per allele for a multi-allelic rsID (gnomAD values there are gnomAD 2.1.1);
-    hits are collapsed per rsID with per-allele values joined by ';'.
+    hits are collapsed per rsID with per-allele values joined by ';'. Repeated
+    inputs are emitted once, and merged inputs use their resolved canonical rsID
+    for both the annotation query and allele lookup.
     '''
     mv = myvariant.MyVariantInfo()
     fields = ['dbsnp.rsid', 'gnomad_exome.af.af', 'gnomad_genome.af.af', 'clinvar.rcv.clinical_significance']

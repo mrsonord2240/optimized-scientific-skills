@@ -86,7 +86,9 @@ SCEPTRE (NB GLM + conditional resampling, calibrated FDR) is the low-MOI DE meth
 **Pertpy** (https://pertpy.readthedocs.io) integrates Mixscape, distance-based perturbation comparison, EdgeR/PyDESeq2/WilcoxonTest DE, and factor models in a single AnnData-based interface. For SCEPTRE specifically, invoke the R sceptre package separately (Pertpy does not wrap it).
 
 The end-to-end recipe (load papalexi_2021, merge `gene_target` from the MuData, keep raw counts in `layers['counts']`,
-Mixscape with `control='NT'`, per-perturbation PyDESeq2 contrasts) is `examples/run_pertpy.py`. The DE call it makes:
+Mixscape with `control='NT'`, per-perturbation PyDESeq2 contrasts) is `examples/run_pertpy.py`. It defaults to a bounded
+600-cell / 2,000-gene smoke run across two perturbations; provide `--full` only with a separately planned tens-of-GiB memory
+budget. The DE call it makes:
 
 ```python
 de = pt.tl.PyDESeq2(adata_ko, design='~gene_target', layer='counts')   # raw counts, not log-normalized
@@ -114,6 +116,7 @@ RNA + ATAC Perturb-seq (10X Multiome): propagate the Mixscape call to the ATAC m
 | `references/genome-wide-perturb-seq.md` | Designing or budgeting a genome-scale CRISPRi Perturb-seq (Replogle 2022) |
 | `references/factor-decomposition.md` | Decomposing perturbation effects into shared factors (FR-Perturb) |
 | `references/multiomic-perturb-seq.md` | RNA + ATAC (10X Multiome) Perturb-seq: differential accessibility per perturbation |
+| `references/optional-methods.md` | Installing or falling back from optional FR-Perturb and Seurat methods |
 
 ## Failure Modes
 

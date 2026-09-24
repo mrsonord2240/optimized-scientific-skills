@@ -1,10 +1,11 @@
 ---
 name: bio-phylo-distance-calculations
 description: Build model-corrected evolutionary distance matrices and distance trees (NJ, BIONJ, FastME, UPGMA) with Biopython Bio.Phylo plus R ape/phangorn/FastME. Covers why a distance is a model-corrected estimate of substitutions per site that undercounts raw because of multiple/back/parallel hits (saturation); why the matrix discards the per-site information ML keeps; the LogDet/paralinear fix for compositional heterogeneity; the UPGMA molecular-clock trap; and the Bio.Phylo landmine that DistanceCalculator offers only identity/matrix distances, not JC/K80/TN93. Use when computing a distance matrix, building a fast NJ/FastME tree, seeding an ML search, barcoding, or testing substitution saturation before a deep tree. Routes ML and starting-tree work to modern-tree-inference, alignment quality to alignment/alignment-io, and tree I/O to tree-io.
-tool_type: mixed
-primary_tool: Bio.Phylo.TreeConstruction
 license: MIT
-author: GPTomics
+metadata:
+  tool_type: mixed
+  primary_tool: Bio.Phylo.TreeConstruction
+  author: GPTomics
 ---
 
 ## Version Compatibility

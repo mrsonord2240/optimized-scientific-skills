@@ -9,7 +9,7 @@ author: GPTomics
 
 ## Version Compatibility
 
-Reference examples tested with: requests 2.31+, hail 0.2.130+, pandas 2.2+, myvariant 1.0+. Current gnomAD release is **v4.1 (May 2024)**; v4.1 fixed the v4.0 AN under-counting issue that inflated rare-variant AF estimates by 5-10%.
+Reference examples tested with: requests 2.31+, hail 0.2.130+, pandas 2.2+, myvariant 1.0+. Current gnomAD release is **v4.1.1 (March 2026)**; v4.1 fixed the v4.0 AN under-counting issue that inflated rare-variant AF estimates by 5-10%, and v4.1.1 updated constraint metrics and annotation downloads.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - Python: `pip show <package>` then `help(module.function)` to check signatures
@@ -35,7 +35,7 @@ This is the most consequential decision in any gnomAD query. The releases are **
 |---------|-------|---------|----------|-----------|
 | **v2.1.1** | GRCh37 | 125,748 exomes + 15,708 genomes | Constraint metrics needed (LOEUF v2 most-validated); GRCh37 native non-negotiable | GRCh38 native cohort; modern rare-variant FAF95 (use v4) |
 | **v3.1.2** | GRCh38 | 76,156 genomes (NO exomes) | Non-coding region rare variants on GRCh38; mtDNA frequencies | Exome variants needed (no exomes); 76k cohort smaller than v4 |
-| **v4.0/v4.1** | GRCh38 | 730,947 exomes + 76,215 genomes = **807,162 total** | Default for everything; rare-variant filtering, FAF95, gene queries | GRCh37 coordinates (lift over or use v2.1.1); cancer-cohort analysis (no TCGA in v4) |
+| **v4.0/v4.1.1** | GRCh38 | 730,947 exomes + 76,215 genomes = **807,162 total** | Default for rare-variant filtering, FAF95, and current gene constraint | GRCh37 coordinates (lift over or use v2.1.1); cancer-cohort analysis (no TCGA in v4) |
 
 **Critical caveats:**
 - v4 genomes are the SAME 76,215 v3 samples reprocessed against GRCh38 with updated pipelines; not independent.
@@ -78,9 +78,9 @@ Karczewski 2020 *Nature* 581:434 defined LOEUF as the upper bound of the 90% CI 
 | **Missense O/E** | Observed/expected missense ratio | Continuous form of missense Z |
 
 **Critical version mismatch:**
-- v2.1.1 constraint metrics published 2020; v4 constraint published **March 2024** (4 months after v4 data release).
-- The browser API returns constraint for chrX genes on GRCh38 (DMD LOEUF 0.235, checked 2026-09-15). If `gnomad_constraint` comes back null for a gene, fall back to v2.1.1 (`reference_genome: GRCh37`) and say so.
-- **LOEUF first decile shifted v2 to v4**: v2 < 0.35; v4 < 0.6 (larger sample shifted the distribution). Gene rank in deciles is stable across versions but absolute thresholds are NOT interchangeable.
+- v2.1.1 constraint metrics published 2020; v4.1.1 constraint metrics were updated **March 2026** (including all coding loci and chromosomes X/Y).
+- The browser API returns constraint for chrX genes on GRCh38 (DMD LOEUF 0.235, checked 2026-09-24). If `gnomad_constraint` comes back null for a gene, fall back to v2.1.1 (`reference_genome: GRCh37`) and say so.
+- **LOEUF thresholds are version-specific:** v2 < 0.35 was the prior constrained-gene cutoff. For v4.1.1, gnomAD recommends **LOEUF < 0.45** (about the most constrained 15% of MANE Select transcripts); <0.36 is the v4.1.1 first decile and <0.60 is its first quartile. Compare ranks or percentiles across releases, never raw values alone.
 
 ## Subsets: non_cancer, non_neuro, controls
 
@@ -102,7 +102,7 @@ mtDNA catalog details (Laricchia 2022 *Genome Res* 32:569 frequencies and hetero
 ## VEP Version Pinning
 
 Each gnomAD release pins to a VEP version:
-- **v4 uses VEP 105** with GENCODE 39 / Ensembl 105 transcripts
+- **v4.1.1 Hail Table downloads use VEP 115**; browser VEP display can remain on an older version for GTEx/pext compatibility
 - v2.1.1 uses VEP 85
 
 A variant's consequence prediction can flip between v2 and v4 due to MANE Select adoption and transcript-set updates. Always pin VEP version when reproducing gnomAD annotations.
@@ -386,7 +386,8 @@ def filter_rare_variants_hail(input_vcf, max_grpmax_faf95=0.0001, output_path='f
 | BS1 | grpmax_faf95 > gene-specific max-credible-AF | Whiffin 2017 |
 | PM2_Supporting | Absent or ultra-rare in gnomAD | SVI 2020 downgrade |
 | LOEUF first decile v2 | < 0.35 | Karczewski 2020 |
-| LOEUF first decile v4 | < 0.6 | gnomAD constraint release March 2024 |
+| LOEUF first decile v4.1.1 | < 0.36 | gnomAD v4.1.1 release March 2026 |
+| Recommended constrained-gene cutoff v4.1.1 | < 0.45 | gnomAD v4.1.1 release March 2026 |
 | Missense Z constrained | Z > 3.09 (~p < 0.001) | Samocha 2014 |
 | mtDNA heteroplasmy carrier threshold | >=10% heteroplasmy | Laricchia 2022 |
 | v4 sample size | 730,947 exomes + 76,215 genomes = 807,162 | gnomAD v4.0 release Nov 2023 |
@@ -418,7 +419,7 @@ Anticipated reviewer pushback and standard responses are in the usage guide.
 - Whiffin N et al. 2017. Using high-resolution variant frequencies to empower clinical genome interpretation. *Genet Med* 19:1151.
 - ClinGen guidance on gnomAD v4 (March 2024): `https://clinicalgenome.org/site/assets/files/9445/clingen_guidance_to_vceps_regarding_the_use_of_gnomad_v4_march_2024.pdf`
 - gnomAD v4 release notes: `https://gnomad.broadinstitute.org/news/2023-11-gnomad-v4-0/`
-- gnomAD v4.1 updates: `https://gnomad.broadinstitute.org/news/2024-05-gnomad-v4-1-updates/`
+- gnomAD v4.1.1 constraint update: `https://gnomad.broadinstitute.org/news/2026-03-gnomad-v4-1-1/`
 
 ## Related Skills
 

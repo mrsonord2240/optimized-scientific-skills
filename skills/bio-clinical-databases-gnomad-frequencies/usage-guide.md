@@ -82,14 +82,14 @@ Tell the agent what to do:
 - Use `grpmax_faf95`, not raw AF, for ACMG BS1/BA1; this is the ClinGen SVI recommendation.
 - v4 genomes are the same 76,215 v3 samples reprocessed; not independent; for true non-overlap use `non_v2` subset.
 - v4 includes 416,555 UK Biobank exomes; for ancestry-balanced analysis use `non_ukb` subset.
-- LOEUF first decile = strongly LoF-intolerant; threshold shifted v2 < 0.35 -> v4 < 0.6 due to larger sample. Compare deciles, not absolute values.
-- The v4 API returns constraint for chrX genes (DMD LOEUF 0.235, checked 2026-09-15); fall back to v2.1.1 only when v4 returns none.
+- LOEUF thresholds changed again in v4.1.1: < 0.36 is its first decile and gnomAD recommends < 0.45 for a constrained-gene cutoff; v2's < 0.35 is not interchangeable. Compare percentiles, not raw values.
+- The v4 API returns constraint for chrX genes (DMD LOEUF 0.235, checked 2026-09-24); fall back to v2.1.1 only when v4 returns none.
 - gnomAD-SV v4 = GRCh38, 63,046 samples; gnomAD-CNV v4 = 464,297 exome-derived CNVs. Choose by data type.
 - mtDNA frequencies exist only in v3.1.2 (Laricchia 2022); apply non-Mendelian inheritance carefully.
 - Filtering allele frequency formula: `(prevalence x heterogeneity x allelic_contribution) / (penetrance x 2)`. Gene-specific BS1.
 - Bottleneck groups (AMI, ASJ, FIN, REMAINING) are excluded from grpmax to avoid founder-variant false BS1/BA1.
-- v4.1 (May 2024) fixed AN under-counting in v4.0; rare-variant AFs inflated 5-10% in v4.0; always use v4.1 or later.
-- VEP version pinning matters: a variant's consequence prediction can flip between v2 and v4 due to transcript-set updates.
+- v4.1 fixed AN under-counting in v4.0; v4.1.1 (March 2026) updated constraint metrics and VEP 115 Hail Table annotations. Use v4.1 or later for frequencies and v4.1.1 for current constraint interpretation.
+- VEP version pinning matters: a variant's consequence prediction can flip between v2 and v4 due to transcript-set updates; v4.1.1 Hail Table downloads use VEP 115 while browser display may remain older for GTEx/pext compatibility.
 
 ## SV Catalog and CNV
 

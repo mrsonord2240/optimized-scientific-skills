@@ -20,11 +20,17 @@ def load_primers(path):
     plus, minus = [], []
     with open(path, encoding="utf-8") as fh:
         for line in fh:
-            if not line.strip() or line.startswith(("#", "track", "browser")):
+            stripped = line.strip()
+            if not stripped:
                 continue
-            f = line.rstrip("\n").split("\t")
+            first = stripped.split(maxsplit=1)[0]
+            if first.startswith("#") or first in ("track", "browser"):
+                continue
+            f = stripped.split()
             if len(f) < 6 or f[5] not in ("+", "-"):
-                sys.exit(f"BED needs >= 6 tab-separated columns with strand in column 6; got: {line.strip()[:80]}")
+                raise ValueError(
+                    f"BED needs >= 6 whitespace-delimited columns with strand in column 6; got: {stripped[:80]}"
+                )
             (plus if f[5] == "+" else minus).append((f[0], int(f[1]), int(f[2])))
     return plus, minus
 
@@ -40,20 +46,26 @@ def main(argv):
         print(__doc__, file=sys.stderr)
         return 2
     bam, bed = args
-    plus, minus = load_primers(bed)
-    n = five = three_n = 0
-    with pysam.AlignmentFile(bam) as fh:
-        for r in fh.fetch(until_eof=True):
-            if r.is_unmapped or r.reference_end is None:
-                continue
-            n += 1
-            c, first, last = r.reference_name, r.reference_start, r.reference_end - 1
-            if r.is_reverse:
-                five += inside(minus, c, last)
-                three_n += inside(plus, c, first)
-            else:
-                five += inside(plus, c, first)
-                three_n += inside(minus, c, last)
+    try:
+        plus, minus = load_primers(bed)
+        if not plus and not minus:
+            raise ValueError("BED has no primer rows")
+        n = five = three_n = 0
+        with pysam.AlignmentFile(bam) as fh:
+            for r in fh.fetch(until_eof=True):
+                if r.is_unmapped or r.reference_end is None:
+                    continue
+                n += 1
+                c, first, last = r.reference_name, r.reference_start, r.reference_end - 1
+                if r.is_reverse:
+                    five += inside(minus, c, last)
+                    three_n += inside(plus, c, first)
+                else:
+                    five += inside(plus, c, first)
+                    three_n += inside(minus, c, last)
+    except (OSError, ValueError, pysam.utils.SamtoolsError) as exc:
+        print(f"bad input: {exc}", file=sys.stderr)
+        return 2
     if n == 0:
         print("no mapped reads", file=sys.stderr)
         return 2

@@ -67,10 +67,10 @@ ModelFinder (Kalyaanamoorthy 2017) scores the substitution matrix and the rate-h
 - **Site-heterogeneous mixtures for deep data.** Empirical matrices (LG, WAG) assume one residue-frequency vector for the whole alignment; real proteins do not, and that across-site compositional heterogeneity is the chief driver of deep LBA. The ML answer is the C10..C60 profile-mixture series (`LG+C60+F+G`), made tractable by PMSF (Wang 2018): a guide-tree pass computes one posterior-mean profile per site, and the real search uses those frozen profiles. PMSF is the standard recommendation for deep / LBA-prone protein phylogenomics.
 
 ```bash
-# PMSF (Wang 2018): a fast guide tree, then the C-mixture frozen to that topology
-iqtree3 -s aln.fasta -m LG+F+G --prefix guide                                 # step 1: simple-model guide tree
-iqtree3 -s aln.fasta -m LG+C60+F+G -ft guide.treefile -B 1000 -bnni --prefix pmsf   # step 2: PMSF + UFBoot
-#  -ft guide.treefile   freeze the topology to the guide tree while the C60 profiles are fit and searched
+# PMSF (Wang 2018): a reproducible guide tree, then C-mixture profiles fit on that fixed topology
+iqtree3 -s aln.fasta -m LG+F+G --seed 12345 --prefix guide
+iqtree3 -s aln.fasta -m LG+C60+F+G -ft guide.treefile -B 1000 -bnni --seed 12345 --prefix pmsf
+#  -ft guide.treefile   fixes the topology for the PMSF profile fit; it does not run a second topology search
 ```
 The `.iqtree` report from step 2 shows `Model of substitution: LG+SSF+F+G4` with "site specific frequencies" --
 that SSF (site-specific frequency) model, cited to Wang 2018, IS the fitted PMSF profile derived from `LG+C60+F+G`;

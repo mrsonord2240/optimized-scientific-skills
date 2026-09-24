@@ -5,6 +5,27 @@
 # 2. Escaper filtering via Mixscape
 # 3. SCEPTRE differential expression (low-MOI calibrated)
 
+import argparse
+
+parser = argparse.ArgumentParser(
+    description="Run a bounded Pertpy/Mixscape/PyDESeq2 demonstration on Papalexi 2021."
+)
+parser.add_argument(
+    "--full",
+    action="store_true",
+    help="Run all cells, targets, and genes. This is not a smoke test and may need tens of GiB RAM.",
+)
+parser.add_argument("--max-cells", type=int, default=600, help="Bounded-mode cell cap (default: 600).")
+parser.add_argument("--max-genes", type=int, default=2000, help="Bounded-mode gene cap (default: 2000).")
+parser.add_argument(
+    "--max-perturbations", type=int, default=2, help="Bounded-mode number of non-targeting contrasts (default: 2)."
+)
+parser.add_argument("--out", default="pertpy_de_results.tsv", help="Output DE TSV path.")
+args = parser.parse_args()
+if not args.full and (args.max_cells < 60 or args.max_genes < 100 or args.max_perturbations < 1):
+    parser.error("bounded mode needs at least 60 cells, 100 genes, and one perturbation")
+
+# Parse first so --help and invalid-argument feedback do not import the full single-cell stack.
 import pertpy as pt
 import scanpy as sc
 import anndata as ad
@@ -16,11 +37,27 @@ import pandas as pd
 # papalexi_2021() returns a MuData object (RNA + ADT modalities), not a bare AnnData --
 # extract the RNA modality before running scRNA-seq preprocessing/Mixscape/DE on it.
 mdata = pt.dt.papalexi_2021()
-adata = mdata['rna']
+labels = mdata.obs['gene_target'].astype(str)
+if args.full:
+    adata = mdata['rna'].copy()
+    selected_labels = sorted(labels.unique())
+    print("Full mode selected: expect the Mixscape signature matrix to require tens of GiB RAM.")
+else:
+    non_controls = sorted(label for label in labels.unique() if label != 'NT')
+    selected_labels = ['NT', *non_controls[:args.max_perturbations]]
+    per_label = max(1, args.max_cells // len(selected_labels))
+    selected_positions = np.concatenate(
+        [np.flatnonzero(labels.to_numpy() == label)[:per_label] for label in selected_labels]
+    )
+    adata = mdata['rna'][selected_positions, :args.max_genes].copy()
+    print(
+        f"Bounded smoke mode: {adata.n_obs} cells, {adata.n_vars} genes, "
+        f"targets {selected_labels}; use --full only with a separately planned memory budget."
+    )
 # The per-cell target-gene label ('gene_target', with control cells labeled 'NT') lives on the
 # top-level MuData.obs, not on the rna modality's own .obs -- merge it in (verified: same
 # obs_names/order across mdata and mdata['rna']).
-adata.obs['gene_target'] = mdata.obs['gene_target']
+adata.obs['gene_target'] = labels.loc[adata.obs_names].to_numpy()
 adata.layers['counts'] = adata.X.copy()  # PyDESeq2 needs raw counts -- save before normalizing
 
 # Verify metadata
@@ -90,7 +127,7 @@ for pert in adata_filtered.obs['gene_target'].unique():
 de_result = pd.concat(all_de)
 
 # === OUTPUT ===
-de_result.to_csv('pertpy_de_results.tsv', sep='\t')
+de_result.to_csv(args.out, sep='\t')
 print(f'DE results: {de_result.shape}')
 
 # Top hits per perturbation
