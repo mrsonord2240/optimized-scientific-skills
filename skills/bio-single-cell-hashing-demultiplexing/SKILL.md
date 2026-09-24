@@ -1,5 +1,6 @@
 ---
 name: bio-single-cell-hashing-demultiplexing
+category: Data Analysis
 description: Assign cells to their sample of origin from cell or nucleus hashing (CITE-seq HTOs, MULTI-seq lipid/cholesterol tags, CellPlex CMOs) and call cross-sample doublets using Seurat HTODemux/MULTIseqDemux, hashsolo, demuxEM, GMM-Demux, and demuxmix. Use when assigning pooled hashed cells back to their sample, calling cross-sample doublets from HTO counts, choosing a demultiplexing method, deciding between hashtag and genetic demultiplexing, or rescuing an oversized Negative pile from weak HTO staining or ambient spillover.
 tool_type: mixed
 primary_tool: Seurat

@@ -1,5 +1,6 @@
 ---
 name: bio-phylo-tree-visualization
+category: Data Analysis
 description: Draw and export phylogenetic trees with Bio.Phylo plus matplotlib, and route rich figures to ggtree, ETE4, or iTOL. Covers why a tree figure is an argument not a neutral picture, the cladogram-vs-phylogram-vs-chronogram choice that hides or reveals rate and time, how ladderization manufactures a false arrow of progress, why an unlabeled support number always flatters the result (bootstrap vs posterior vs SH-aLRT vs UFBoot are different scales), why Bio.Phylo silently drops BEAST HPD bars so annotated Bayesian trees must go through treeio plus ggtree, and the tip-count and raster-vs-vector thresholds for legible publication figures. Use when drawing a tree, choosing a layout, coloring branches, showing or labeling support, exporting vector figures, or deciding a drawing tool. Routes annotation-preserving reads to tree-io, and rooting and ladderizing to tree-manipulation.
 tool_type: python
 primary_tool: Bio.Phylo

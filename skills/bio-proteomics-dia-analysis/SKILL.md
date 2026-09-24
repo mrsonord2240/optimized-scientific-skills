@@ -1,5 +1,6 @@
 ---
 name: bio-proteomics-dia-analysis
+category: Data Analysis
 description: Analyzes data-independent acquisition (DIA) proteomics by scoring reconstructed fragment-chromatogram peak groups against a decoy null with DIA-NN (library-free search against a deep-learning predicted library, or library-based search), Spectronaut, OpenSWATH, and EncyclopeDIA. Frames the deliverable around q-value LEVEL (precursor/peptide/protein-group) and CONTEXT (run vs experiment-wide/global) rather than a bare "1% FDR", and around the duty-cycle-vs-selectivity acquisition tradeoff (window design, staggered demultiplexing, diaPASEF, narrow-window Astral). Use when identifying and quantifying proteins from DIA mass spectrometry runs and filtering DIA-NN report.parquet/matrix output. Building the spectral library itself is spectral-libraries; normalization and protein roll-up is quantification; statistical testing of the matrix is differential-abundance.
 tool_type: cli
 primary_tool: diann

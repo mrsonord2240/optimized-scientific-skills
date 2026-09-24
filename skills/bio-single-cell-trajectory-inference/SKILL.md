@@ -1,5 +1,6 @@
 ---
 name: bio-single-cell-trajectory-inference
+category: Data Analysis
 description: Infers developmental trajectories, pseudotime, RNA velocity, and directed fate probabilities from single-cell data using PAGA, Slingshot, Monocle3, DPT, Palantir, scVelo, and CellRank 2. Use when ordering cells along a differentiation continuum, choosing a trajectory method by topology, rooting pseudotime, estimating RNA velocity direction, computing fate probabilities near a bifurcation, or judging whether an inferred trajectory is real.
 tool_type: mixed
 primary_tool: PAGA

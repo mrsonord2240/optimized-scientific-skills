@@ -1,5 +1,6 @@
 ---
 name: bio-alignment-indexing
+category: Data Analysis
 description: Create and use BAI/CSI indices for BAM/CRAM files using samtools and pysam. Use when enabling random access to alignment files or fetching specific genomic regions.
 tool_type: cli
 primary_tool: samtools

@@ -1,5 +1,6 @@
 ---
 name: bio-single-cell-data-io
+category: Data Analysis
 description: Read, write, create, and convert single-cell objects across AnnData (Python), Seurat (R), and SingleCellExperiment (R). Use when loading 10X Cell Ranger output (raw vs filtered), importing or exporting h5ad/RDS/h5mu/zarr, building AnnData or Seurat objects from matrices, moving objects between Python and R, or debugging lost layers, transposed matrices, or mangled gene names during conversion.
 tool_type: mixed
 primary_tool: Seurat

@@ -1,5 +1,6 @@
 ---
 name: bio-pharmacophore-modeling
+category: Data Analysis
 description: Builds and applies 3D pharmacophore models using RDKit Pharm3D, the apo2ph4 receptor-based workflow (Heider et al. 2023), Pharmer / Pharmit for search, and PharmacoForge for protein-pocket-conditioned pharmacophore generation (Flynn et al. 2025), covering ligand-based pharmacophores from active-set alignment and receptor-based pharmacophores from binding-pocket geometry. Explicitly handles feature types, geometric tolerances, partial matching, and pharmacophore-based virtual screening. Use when identifying scaffold-hopping candidates, building shape-and-feature search queries, or transferring SAR across chemotypes.
 tool_type: python
 primary_tool: RDKit

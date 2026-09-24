@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "9d9d66773e8d25145c2580c58423acc6cb238be4"
+      "staging_commit": "7963580251c856f48511aa64c438dd798decb0ae"
     }
   },
   "skills": [
@@ -23,6 +23,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-admet-prediction.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -41,6 +42,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-alignment-amplicon-clipping.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -61,6 +63,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-alignment-filtering.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -86,6 +89,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-alignment-indexing.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -105,6 +109,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-alignment-io.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -130,6 +135,7 @@
       "audited_on": "2026-09-22",
       "fix_log": "fixes/bio-alignment-msa-parsing.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -169,6 +175,7 @@
       "audited_on": "2026-09-22",
       "fix_log": "fixes/bio-alignment-msa-statistics.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -207,6 +214,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-alignment-multiple.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -226,6 +234,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-alignment-pairwise.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -254,6 +263,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-alignment-sorting.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -274,6 +284,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-alignment-structural.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -299,6 +310,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-alignment-trimming.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -321,6 +333,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-alignment-validation.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -342,6 +355,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-bam-statistics.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -364,6 +378,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-batch-downloads.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -386,6 +401,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-biomart-queries.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -408,6 +424,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-blast-searches.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -433,6 +450,7 @@
       "audited_on": "2026-09-22",
       "fix_log": "fixes/bio-causal-genomics-colocalization-analysis.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -468,6 +486,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-causal-genomics-effector-gene-prioritization.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -503,6 +522,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-causal-genomics-fine-mapping.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -535,6 +555,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-causal-genomics-genetic-correlation.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -556,6 +577,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-causal-genomics-genomic-sem.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -581,6 +603,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-causal-genomics-heritability-partitioning.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -614,6 +637,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-causal-genomics-mediation-analysis.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -649,6 +673,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-causal-genomics-mendelian-randomization.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -682,6 +707,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-causal-genomics-pleiotropy-detection.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -719,6 +745,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-causal-genomics-proteome-mr-drug-target.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -745,6 +772,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-causal-genomics-transcriptome-wide-association.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -776,6 +804,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-clinical-databases-clinvar-lookup.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -795,6 +824,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-clinical-databases-dbsnp-queries.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -814,6 +844,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-clinical-databases-gnomad-frequencies.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -833,6 +864,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-clinical-databases-myvariant-queries.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -852,6 +884,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-conformer-generation.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -872,6 +905,7 @@
       "audited_on": "2026-09-22",
       "fix_log": "fixes/bio-covalent-design.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -892,6 +926,7 @@
       "audited_on": "2026-09-22",
       "fix_log": "fixes/bio-crispr-screens-bagel-essentiality.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -916,6 +951,7 @@
       "audited_on": "2026-09-22",
       "fix_log": "fixes/bio-crispr-screens-base-editing-analysis.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -944,6 +980,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-crispr-screens-batch-correction.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -968,6 +1005,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-crispr-screens-combinatorial-screens.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -987,6 +1025,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-crispr-screens-copy-number-correction.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1006,6 +1045,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-crispr-screens-crispresso-editing.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1029,6 +1069,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-crispr-screens-drugz-chemogenomic.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1051,6 +1092,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-crispr-screens-hit-calling.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1075,6 +1117,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-crispr-screens-in-vivo-screens.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1094,6 +1137,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-crispr-screens-jacks-analysis.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1118,6 +1162,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-crispr-screens-library-design.md",
       "fix_pass": "done",
+      "category": "Protocol Design",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1143,6 +1188,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-crispr-screens-mageck-analysis.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1161,6 +1207,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-crispr-screens-perturb-seq-analysis.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1190,6 +1237,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-crispr-screens-prime-editing-screens.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1214,6 +1262,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-crispr-screens-screen-qc.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1241,6 +1290,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-data-visualization-forest-funnel-plots.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1260,6 +1310,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-data-visualization-sequence-logos.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1286,6 +1337,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-differential-expression-deseq2-basics.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1316,6 +1368,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-differential-splicing.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1336,6 +1389,7 @@
       "audited_on": "2026-09-22",
       "fix_log": "fixes/bio-duplicate-handling.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1362,6 +1416,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-entrez-fetch.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1389,6 +1444,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-entrez-link.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1413,6 +1469,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-entrez-search.md",
       "fix_pass": "done",
+      "category": "Evidence Insight",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1436,6 +1493,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-experimental-design-batch-design.md",
       "fix_pass": "done",
+      "category": "Protocol Design",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1458,6 +1516,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-experimental-design-multiple-testing.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1479,6 +1538,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-experimental-design-power-analysis.md",
       "fix_pass": "done",
+      "category": "Protocol Design",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1499,6 +1559,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-experimental-design-randomization-blocking.md",
       "fix_pass": "done",
+      "category": "Protocol Design",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1518,6 +1579,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-experimental-design-sample-size.md",
       "fix_pass": "done",
+      "category": "Protocol Design",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1539,6 +1601,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-geo-data.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1564,6 +1627,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-isoform-switching.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1584,6 +1648,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-local-blast.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1604,6 +1669,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-long-read-splicing.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1624,6 +1690,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-machine-learning-model-validation.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1642,6 +1709,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-machine-learning-prediction-explanation.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1661,6 +1729,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-metabolomics-isotope-tracing.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1679,6 +1748,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-metabolomics-lipidomics.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1700,6 +1770,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-metabolomics-metabolite-annotation.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1723,6 +1794,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-metabolomics-msdial-preprocessing.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1742,6 +1814,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-metabolomics-normalization-qc.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1762,6 +1835,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-metabolomics-pathway-mapping.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1788,6 +1862,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-metabolomics-statistical-analysis.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1808,6 +1883,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-metabolomics-targeted-analysis.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1828,6 +1904,7 @@
       "audited_on": "2026-09-22",
       "fix_log": "fixes/bio-metabolomics-xcms-preprocessing.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1846,6 +1923,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-microbiome-amplicon-processing.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1865,6 +1943,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-microbiome-differential-abundance.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1883,6 +1962,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-microbiome-diversity-analysis.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1903,6 +1983,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-microbiome-functional-prediction.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1923,6 +2004,7 @@
       "audited_on": "2026-09-19",
       "fix_log": "fixes/bio-microbiome-qiime2-workflow.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1940,6 +2022,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-microbiome-taxonomy-assignment.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1963,6 +2046,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-molecular-descriptors.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -1982,6 +2066,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-molecular-io.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2001,6 +2086,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-molecular-standardization.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2020,6 +2106,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-ncbi-datasets-cli.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2045,6 +2132,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-outlier-splicing-detection.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2066,6 +2154,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-pathway-enrichment-visualization.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2085,6 +2174,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-pathway-go-enrichment.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2104,6 +2194,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-pathway-gsea.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2124,6 +2215,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-pathway-kegg-pathways.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2146,6 +2238,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-pathway-reactome.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2166,6 +2259,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-pathway-wikipathways.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2187,6 +2281,7 @@
       "audited_on": "2026-09-22",
       "fix_log": "fixes/bio-pharmacophore-modeling.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2206,6 +2301,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-phylo-bayesian-inference.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2224,6 +2320,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-phylo-distance-calculations.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2248,6 +2345,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-phylo-divergence-dating.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2270,6 +2368,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-phylo-modern-tree-inference.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2289,6 +2388,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-phylo-species-trees.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2308,6 +2408,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-phylo-tree-io.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2326,6 +2427,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-phylo-tree-manipulation.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2348,6 +2450,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-phylo-tree-visualization.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2369,6 +2472,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-pileup-generation.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2390,6 +2494,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-population-genetics-rare-variant-association.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2409,6 +2514,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-pose-validation.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2432,6 +2538,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-protac-degraders.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2453,6 +2560,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-proteomics-data-import.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2475,6 +2583,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-proteomics-dia-analysis.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2495,6 +2604,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-proteomics-differential-abundance.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2520,6 +2630,7 @@
       "audited_on": "2026-09-22",
       "fix_log": "fixes/bio-proteomics-peptide-identification.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2548,6 +2659,7 @@
       "audited_on": "2026-09-22",
       "fix_log": "fixes/bio-proteomics-protein-inference.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2574,6 +2686,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-proteomics-proteomics-qc.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2601,6 +2714,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-proteomics-ptm-analysis.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2638,6 +2752,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-proteomics-quantification.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2664,6 +2779,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-proteomics-spectral-libraries.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2688,6 +2804,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-qsar-modeling.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2707,6 +2824,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-reference-operations.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2733,6 +2851,7 @@
       "audited_on": "2026-09-22",
       "fix_log": "fixes/bio-remote-homology.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2757,6 +2876,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-sam-bam-basics.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2782,6 +2902,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-sashimi-plots.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2810,6 +2931,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-scaffold-analysis.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2829,6 +2951,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-shape-similarity.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2852,6 +2975,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-similarity-searching.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2871,6 +2995,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-single-cell-batch-integration.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2895,6 +3020,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-single-cell-cell-annotation.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2912,6 +3038,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-single-cell-cell-communication.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2935,6 +3062,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-single-cell-clustering.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2954,6 +3082,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-single-cell-cnv-inference.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2974,6 +3103,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-single-cell-data-io.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -2992,6 +3122,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-single-cell-differential-abundance.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3012,6 +3143,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-single-cell-doublet-detection.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3031,6 +3163,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-single-cell-hashing-demultiplexing.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3050,6 +3183,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-single-cell-lineage-tracing.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3070,6 +3204,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-single-cell-markers-annotation.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3088,6 +3223,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-single-cell-metabolite-communication.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3108,6 +3244,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-single-cell-multimodal-integration.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3135,6 +3272,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-single-cell-perturb-seq.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3155,6 +3293,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-single-cell-preprocessing.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3175,6 +3314,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-single-cell-scatac-analysis.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3195,6 +3335,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-single-cell-splicing.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3221,6 +3362,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-single-cell-trajectory-inference.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3242,6 +3384,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-splice-variant-prediction.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3272,6 +3415,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-splicing-qc.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3292,6 +3436,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-sra-data.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3319,6 +3464,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-substructure-search.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3338,6 +3484,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-variant-annotation.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3357,6 +3504,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-variant-calling-filtering-best-practices.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3376,6 +3524,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-variant-normalization.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3395,6 +3544,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-vcf-basics.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3414,6 +3564,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-vcf-manipulation.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3432,6 +3583,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-vcf-statistics.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3450,6 +3602,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-virtual-screening.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3474,6 +3627,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-workflows-crispr-screen-pipeline.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3492,6 +3646,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-workflows-metabolomics-pipeline.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3517,6 +3672,7 @@
       "audited_on": "2026-09-23",
       "fix_log": "fixes/bio-workflows-proteomics-pipeline.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
@@ -3546,6 +3702,7 @@
       "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-workflows-scrnaseq-pipeline.md",
       "fix_pass": "done",
+      "category": "Data Analysis",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [

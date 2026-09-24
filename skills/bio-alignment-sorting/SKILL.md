@@ -1,5 +1,6 @@
 ---
 name: bio-alignment-sorting
+category: Data Analysis
 description: Sort, merge, collate, and verify alignment-file order with samtools and pysam. Use when preparing BAM files for indexing, variant calling, or paired-end analysis.
 tool_type: cli
 primary_tool: samtools

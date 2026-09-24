@@ -1,5 +1,6 @@
 ---
 name: bio-proteomics-proteomics-qc
+category: Data Analysis
 description: Quality control for bottom-up proteomics across three levels -- instrument/raw-signal (mass accuracy, RT/iRT fit, FWHM, TIC vs injection time, % MS2 identified), identification/run (missed cleavages, charge states, PTM handling artifacts, contaminants), and experiment/quantitative (replicate correlation on log2, CV on the linear scale, completeness, MNAR-vs-MCAR missingness, PCA/batch, TMT channel balance, DIA q-values). Frames QC as a control chart against a per-instrument rolling baseline, not fixed cutoffs, and mandates inspecting raw boxplots, per-sample ID counts, total signal, and contaminant removal BEFORE normalizing -- because median normalization erases loading failures. Use when assessing proteomics data quality, diagnosing outlier samples, or deciding which samples to exclude before differential testing. The statistical test itself is differential-abundance; normalization mechanics are quantification; DIA q-value internals are dia-analysis.
 tool_type: mixed
 primary_tool: pandas

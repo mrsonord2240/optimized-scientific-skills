@@ -1,5 +1,6 @@
 ---
 name: bio-substructure-search
+category: Data Analysis
 description: Searches molecular libraries for substructure matches using SMARTS patterns with explicit handling of recursive SMARTS, ring membership, aromaticity dialect, vector binding, atom map indices, and reactive/PAINS/Brenk filter catalogs. Use when filtering compounds by pharmacophore features, functional groups, scaffold matches, or screening for assay-interference / structural alerts.
 tool_type: python
 primary_tool: RDKit

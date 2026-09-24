@@ -1,5 +1,6 @@
 ---
 name: bio-isoform-switching
+category: Data Analysis
 description: Analyzes differential transcript usage (DTU) and isoform switches with functional consequence prediction (NMD via 50nt rule, ORF disruption, protein domain loss/gain, coding-potential shifts; signal peptide and IDR changes when licensed annotators are available). Tools include IsoformSwitchAnalyzeR (DEXSeq up to 5 replicates per condition, satuRn above), the manual DRIMSeq -> DEXSeq/satuRn -> stageR DTU pipeline, and fishpond/swish for inferential-uncertainty-aware DTE. Distinguishes DTU from DGE and DTE; integrates external annotators (CPC2 and Pfam run locally; SignalP, IUPred2A and DeepTMHMM are licence-gated). Use when investigating how splicing differences alter protein function or trigger NMD-mediated degradation.
 tool_type: r
 primary_tool: IsoformSwitchAnalyzeR

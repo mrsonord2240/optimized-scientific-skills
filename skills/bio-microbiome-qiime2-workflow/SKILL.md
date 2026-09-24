@@ -1,5 +1,6 @@
 ---
 name: bio-microbiome-qiime2-workflow
+category: Data Analysis
 description: Operates the QIIME2 framework as the glue for an amplicon analysis - the .qza/.qzv artifact model, semantic types (FeatureTable[Frequency], SampleData[PairedEndSequencesWithQuality], Phylogeny[Rooted], FeatureData[Taxonomy]), embedded provenance plus provenance replay, import (Casava/manifest/EMP/BIOM), export, the Metadata object, and the q2cli vs Artifact API interfaces. Covers why a .qza is data-plus-executable-history not a file, why export drops provenance, why a .qzv is terminal, why classifier .qza are version-pinned, and the 2026 distribution/rachis rename. Use when importing reads, choosing a manifest/Casava/EMP/BIOM path, reading or replaying provenance, exporting to BIOM/phyloseq, fixing semantic-type or Phred or sklearn-version errors, or orchestrating the pipeline. Denoising -> amplicon-processing; classifier/DB -> taxonomy-assignment; diversity metric/depth -> diversity-analysis; DA tool -> differential-abundance; PICRUSt2 -> functional-prediction; shotgun moshpit -> metagenomics.
 tool_type: cli
 primary_tool: QIIME2

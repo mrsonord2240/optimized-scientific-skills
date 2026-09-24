@@ -1,5 +1,6 @@
 ---
 name: bio-single-cell-differential-abundance
+category: Data Analysis
 description: Test whether cell-type proportions or composition changed between conditions in single-cell data using Milo (miloR), scCODA, sccomp, and propeller. Use when comparing cell-type proportions / composition between conditions, asking which populations expanded or contracted with treatment or disease, running neighborhood-level (cluster-free) abundance testing, or guarding against compositional shifts that masquerade as differential expression.
 tool_type: mixed
 primary_tool: Milo

@@ -1,5 +1,6 @@
 ---
 name: bio-splicing-qc
+category: Data Analysis
 description: Assesses RNA-seq data quality for alternative splicing analysis. QC layers include experimental design audit (library prep, read length, depth, replicates), STAR cohort-style 2-pass alignment, junction saturation and plateau detection, known-vs-novel junction ratio, junction overhang and read support, splice-site strength (MaxEntScan, SpliceAI), strandedness verification, GENCODE basic vs comprehensive choice, and rRNA contamination screening. Failures in these layers silently bias PSI estimates and inflate novel-junction false positives. Use when evaluating data suitability for splicing analysis, troubleshooting low event detection, or designing sequencing experiments where AS is a primary endpoint.
 tool_type: python
 primary_tool: RSeQC

@@ -1,5 +1,6 @@
 ---
 name: bio-phylo-tree-io
+category: Data Analysis
 description: Read, write, and convert phylogenetic tree files with Biopython Bio.Phylo, and choose an annotation-preserving parser (treeio, DendroPy) when metadata matters. Covers why a tree file is a lossy serialization, why format conversion silently drops BEAST/MrBayes node annotations (posteriors, HPD intervals, rates), the Newick support-vs-label ambiguity that mislabels bootstrap values, and the Nexus TRANSLATE and rooted/unrooted traps. Use when parsing Newick, Nexus, NHX, phyloXML, or NeXML, converting between formats, handling posterior tree sets, or moving annotated BEAST trees without losing the credible intervals. Routes annotation-critical reads to DendroPy or treeio and orthology/alignment context to sibling skills.
 tool_type: python
 primary_tool: Bio.Phylo

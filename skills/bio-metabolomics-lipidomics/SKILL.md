@@ -1,5 +1,6 @@
 ---
 name: bio-metabolomics-lipidomics
+category: Data Analysis
 description: Assigns honest lipid annotation levels, designs class-based internal-standard quantification, and runs lipid-aware differential and enrichment analysis with lipidr, guarding against in-source-fragment phantoms, sn-position over-claims, and invalid cross-class quantification. Use when naming or canonicalizing lipid species (shorthand separators, Goslin), deciding shotgun vs RP vs HILIC LC-MS, picking internal standards (SPLASH/EquiSPLASH), interpreting MS-DIAL/LipidSearch output, or comparing lipid classes. For general feature detection see metabolomics/xcms-preprocessing and metabolomics/msdial-preprocessing; for non-lipid annotation confidence see metabolomics/metabolite-annotation; for normalization/QC see metabolomics/normalization-qc; for multivariate stats see metabolomics/statistical-analysis.
 tool_type: r
 primary_tool: lipidr

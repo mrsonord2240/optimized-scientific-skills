@@ -1,5 +1,6 @@
 ---
 name: bio-local-blast
+category: Data Analysis
 description: Build local BLAST databases and run searches using NCBI BLAST+ command-line tools. Use when running >50 queries, building custom databases with -parse_seqids and -taxid, downloading prebuilt NCBI databases via update_blastdb.pl, choosing -task variants (megablast/dc-megablast/blastn/blastn-short), tuning soft/hard masking, scaling threads, or extracting hits with blastdbcmd. Encodes BLAST v5 vs v4 database format, taxonomy filtering, makeblastdb pitfalls.
 tool_type: cli
 primary_tool: BLAST+

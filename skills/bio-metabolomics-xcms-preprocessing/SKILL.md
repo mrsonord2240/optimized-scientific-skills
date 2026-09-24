@@ -1,5 +1,6 @@
 ---
 name: bio-metabolomics-xcms-preprocessing
+category: Data Analysis
 description: Programmatic untargeted LC-MS feature extraction in R with the modern xcms 4.x MsExperiment/XcmsExperiment API, taking raw mzML to a feature table via CentWave peak detection, retention-time alignment, peak-density correspondence, gap-filling, CAMERA redundancy collapse, and built-in QC feature filtering. Use when converting centroided LC-MS runs into a features-by-samples matrix and deciding centWave/grouping/alignment parameters. For drift correction and QC/CV filtering execution see metabolomics/normalization-qc; for metabolite identification see metabolomics/metabolite-annotation; for the MS-DIAL GUI alternative with MS2Dec deconvolution see metabolomics/msdial-preprocessing; for downstream statistics see metabolomics/statistical-analysis.
 tool_type: r
 primary_tool: xcms

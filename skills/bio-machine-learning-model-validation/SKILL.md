@@ -1,5 +1,6 @@
 ---
 name: bio-machine-learning-model-validation
+category: Data Analysis
 description: Validates predictive models on omics and biomedical data with nested cross-validation, group/batch/temporal-aware splits, the full data-leakage taxonomy, probability calibration, decision-curve net benefit, optimism correction, sample-size planning, and TRIPOD+AI reporting. Use when estimating model performance honestly, choosing a CV scheme, detecting leakage, or judging whether reported discrimination means the model is actually useful. For feature selection itself see machine-learning/biomarker-discovery; for confirmatory-trial inference see clinical-biostatistics/trial-reporting.
 tool_type: python
 primary_tool: sklearn

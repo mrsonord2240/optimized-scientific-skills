@@ -1,5 +1,6 @@
 ---
 name: bio-single-cell-batch-integration
+category: Data Analysis
 description: Integrate multiple scRNA-seq samples or batches with Harmony, scVI/scANVI, Seurat (CCA/RPCA), fastMNN, Scanorama, or BBKNN. Resolves which method to use for the dataset size and design, how strongly to correct, when integration is the wrong move (confounded batch/biology), how to score integration with scIB metrics without gaming them, and why corrected expression must not be used for differential expression. Use when integrating batches or datasets, choosing an integration method, diagnosing over-correction, or judging integration quality.
 tool_type: mixed
 primary_tool: Harmony

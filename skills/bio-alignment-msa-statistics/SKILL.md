@@ -1,5 +1,6 @@
 ---
 name: bio-alignment-msa-statistics
+category: Data Analysis
 description: Calculate alignment statistics including sequence identity, conservation scores, substitution matrices, and similarity metrics. Use when comparing alignment quality, measuring sequence divergence, and analyzing evolutionary patterns.
 tool_type: python
 primary_tool: Bio.AlignIO

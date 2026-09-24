@@ -1,5 +1,6 @@
 ---
 name: bio-pathway-reactome
+category: Data Analysis
 description: Tests a gene list or ranked gene vector for over-representation or coordinated shifts in Reactome's curated, peer-reviewed, reaction-level pathways using ReactomePA's enrichPathway (ORA) and gsePathway (GSEA), reading the local reactome.db so a run is reproducible given the Bioconductor release. Covers why Reactome's atomic unit is the REACTION and pathways are nested containers so a parent and child enrich on the same genes and double-count one signal, why only human is curated and every other species is orthology-inferred, why enrichPathway has NO keyType argument and returns nothing unless genes are ENTREZ (bitr first), and why viewPathway draws a LOCAL reaction network from a pathway NAME. Use when reaction-level granularity, peer-reviewed curation, or an offline-reproducible database is wanted; for comparative multi-sample or multi-omics analysis use ReactomeGSA. The DE list comes from differential-expression; plots from enrichment-visualization.
 tool_type: r
 primary_tool: ReactomePA

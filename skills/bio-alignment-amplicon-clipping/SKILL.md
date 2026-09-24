@@ -1,5 +1,6 @@
 ---
 name: bio-alignment-amplicon-clipping
+category: Data Analysis
 description: Trim PCR primers from aligned reads in amplicon-panel BAMs using samtools ampliconclip. Use when processing SARS-CoV-2 ARTIC, hereditary cancer panels, ctDNA hot-spot panels, or any amplicon assay where primer-derived bases would falsely confirm reference at primer footprints.
 tool_type: cli
 primary_tool: samtools

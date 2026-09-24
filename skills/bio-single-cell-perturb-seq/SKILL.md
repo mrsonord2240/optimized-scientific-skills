@@ -1,5 +1,6 @@
 ---
 name: bio-single-cell-perturb-seq
+category: Data Analysis
 description: Analyze Perturb-seq / CROP-seq single-cell CRISPR screens. Use when assigning guides as a mixture problem, removing non-perturbed escaper cells with Mixscape, choosing a calibrated test (SCEPTRE conditional resampling) over naive DE, quantifying effect size with E-distance, separating compositional shifts from within-state expression change, or judging whether a perturbation-prediction foundation model actually beats a baseline.
 tool_type: python
 primary_tool: Pertpy

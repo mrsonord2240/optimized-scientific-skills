@@ -1,5 +1,6 @@
 ---
 name: bio-microbiome-taxonomy-assignment
+category: Data Analysis
 description: Assigns taxonomy to amplicon ASVs/OTUs (16S, ITS, 18S) with a classifier conditioned on a reference database and primer region - DADA2 assignTaxonomy + addSpecies (RDP naive Bayes), DECIPHER IDTAXA, and QIIME2 q2-feature-classifier (classify-sklearn naive Bayes, classify-consensus-vsearch alignment-consensus). Covers region-specific training (extract-reads, fit-classifier-naive-bayes), why a full-length classifier fabricates calls on a V4 read, the scikit-learn version-pinning trap on pre-trained .qza classifiers, confidence thresholds (classify-sklearn 0.7, assignTaxonomy minBoot 50), and choosing SILVA/GTDB/Greengenes2/UNITE/PR2/RDP. Use when classifying ASVs after DADA2, picking a reference database, training a region-matched classifier, setting a confidence threshold, or deciding whether a 16S species call is defensible (usually not - genus at best). For shotgun read classification see metagenomics/kraken-classification and metagenomics/metaphlan-profiling.
 tool_type: mixed
 primary_tool: DADA2

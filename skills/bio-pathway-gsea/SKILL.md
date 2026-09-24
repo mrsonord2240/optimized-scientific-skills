@@ -1,5 +1,6 @@
 ---
 name: bio-pathway-gsea
+category: Data Analysis
 description: Tests a ranked gene vector for coordinated expression shifts in GO, KEGG, Reactome, or MSigDB gene sets with clusterProfiler's gseGO, gseKEGG, gsePathway, and GSEA (fgseaMultilevel engine), and scores per-sample pathway activity with ssGSEA and GSVA. Covers why a GSEA result is a deterministic function of three implicit choices (the ranking STATISTIC, the weight exponent p, and which LABELS are permuted), why the input must be a NAMED vector sorted DECREASING by a signed variance-calibrated metric (DESeq2 stat, limma t) not a raw p-value that erases direction, why preranked gene-permutation is anti-conservative for correlated sets (CAMERA with inter.gene.cor=NA is the fix), why nPerm silently downgrades the engine instead of erroring (eps governs tiny p), and why set.seed is required. Use when every gene carries a DE statistic, when a hard cutoff is arbitrary, or when ORA finds nothing. For gene-list ORA see go-enrichment; the ranking statistic comes from differential-expression/de-results.
 tool_type: r
 primary_tool: clusterProfiler

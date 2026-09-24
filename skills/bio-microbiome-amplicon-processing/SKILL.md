@@ -1,5 +1,6 @@
 ---
 name: bio-microbiome-amplicon-processing
+category: Data Analysis
 description: Infers exact amplicon sequence variants (ASVs) from demultiplexed 16S rRNA or ITS amplicon FASTQ with DADA2 - removing primers with cutadapt (--discard-untrimmed), learning a per-run error model (filterAndTrim -> learnErrors -> dada -> mergePairs), merging run-level tables with mergeSequenceTables, then one removeBimeraDenovo. Covers why primers come OFF before truncation, why the error model is per-run, truncLen as a merge-overlap detection budget (V4 vs V3-V4), DADA2 vs Deblur and q2-dada2 (denoise-paired/single/pyro/ccs), ASV vs OTU, NovaSeq binned-quality error-fit breakage, ITSxpress for variable-length ITS, and decontam removal of reagent/kit contaminants. Use when turning demultiplexed amplicon reads into an ASV/feature table, choosing truncation lengths, handling multi-run studies, or ITS. For shotgun reads see metagenomics/kraken-classification; for QIIME2 CLI mechanics see qiime2-workflow; for primer trimming theory see read-qc/adapter-trimming.
 tool_type: mixed
 primary_tool: DADA2

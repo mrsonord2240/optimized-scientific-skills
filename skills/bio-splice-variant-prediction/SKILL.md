@@ -1,5 +1,6 @@
 ---
 name: bio-splice-variant-prediction
+category: Data Analysis
 description: Predicts whether a DNA variant alters mRNA splicing using sequence-based deep-learning tools — SpliceAI (10kb context dilated CNN, clinical default), Pangolin (multi-tissue), MMSplice (modular per-region CNN with calibrated ΔPSI), SpliceTransformer (tissue-aware transformer), CI-SpliceAI (SpliceAI retrained on all isoforms), SpliceVault (empirical 300K-RNA lookup of likely mis-splicing outcomes), CADD-Splice (composite score). Applies the ClinGen SVI 2023 framework as research-use computational evidence for ACMG/AMP interpretation (PVS1, PP3, BP4 codes), HGVS splicing nomenclature (c.123+1G>A, c.123-3T>G, r.spl?), extended-window scoring for deep-intronic pseudoexons, tissue-specific predictions, branchpoint-variant caveats, and a splice-switching ASO design checklist. Use when interpreting splice impact of variants, prioritizing VUS, identifying deep-intronic candidates, or planning ASOs.
 tool_type: python
 primary_tool: SpliceAI

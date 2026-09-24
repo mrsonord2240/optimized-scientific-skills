@@ -1,5 +1,6 @@
 ---
 name: bio-metabolomics-isotope-tracing
+category: Data Analysis
 description: Designs and analyzes stable-isotope-resolved metabolomics (SIRM / isotope tracing / fluxomics) experiments that measure metabolic ACTIVITY via 13C/15N/2H tracers, distinct from steady-state pool profiling. Covers tracer choice, isotopologue vs isotopomer, mass-isotopomer distributions (MID), fractional enrichment, the mandatory natural-abundance + tracer-purity correction (IsoCor, AccuCor), and the metabolic/isotopic steady-state vs non-stationary (INST-MFA) distinction. Use when feeding a labeled tracer and interpreting labeling patterns, correcting raw isotopologue intensities, computing or plotting an MID, or deciding tracing vs abundance profiling. For absolute pool concentration and MRM mechanics see metabolomics/targeted-analysis; for constraint-based genome-scale flux (FBA, not empirical tracing) see systems-biology/flux-balance-analysis; for feature detection see metabolomics/xcms-preprocessing; for pathway enrichment that ignores the pool-vs-flux caveat see metabolomics/pathway-mapping.
 tool_type: python
 primary_tool: isocor

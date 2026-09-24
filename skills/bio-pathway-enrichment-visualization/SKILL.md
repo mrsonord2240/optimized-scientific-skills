@@ -1,5 +1,6 @@
 ---
 name: bio-pathway-enrichment-visualization
+category: Data Analysis
 description: Turns an enrichResult or gseaResult from clusterProfiler/enrichplot into a figure that collapses or shows gene-set redundancy, using dotplot, barplot, cnetplot, emapplot, treeplot, ridgeplot, gseaplot2, and upsetplot. Covers why a default top-20 GO dotplot is one biological theme drawn twenty times (the DAG/nesting guarantees redundant overlapping terms), so the figure is a modeling choice between SHOWING redundancy (pairwise_termsim -> emapplot/treeplot) and DELETING it (simplify/REVIGO); why cnetplot/emapplot/treeplot need pairwise_termsim first; why enrichplot ships no barplot for gseaResult (a bar cannot carry a signed NES); why GeneRatio is not fold enrichment; and why showCategory silently truncates. Use when plotting ORA or GSEA results, collapsing redundant GO terms visually, encoding a dotplot, or building a publication enrichment figure. Statistics come from go-enrichment and gsea; generic ggplot -> data-visualization/ggplot2-fundamentals.
 tool_type: r
 primary_tool: enrichplot

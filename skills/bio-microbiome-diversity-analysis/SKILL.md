@@ -1,5 +1,6 @@
 ---
 name: bio-microbiome-diversity-analysis
+category: Data Analysis
 description: Alpha and beta diversity of an amplicon (16S/ITS) ASV/OTU community table - observed features, Shannon, Pielou evenness, Faith PD, Bray-Curtis, Jaccard, weighted/unweighted/generalized UniFrac, Aitchison/RPCA - via QIIME2 core-metrics-phylogenetic, phyloseq/vegan, and scikit-bio. Covers the three knobs that set the answer before it is seen (rarefaction sampling depth, the tree, the metric), why core-metrics silently deletes samples below the sampling depth, why de novo trees lose to SEPP fragment-insertion and Greengenes2, why unweighted and weighted UniFrac can flip the story, why observed features is an ASV count not a species count, the QIIME2-log2 vs R-ln Shannon mismatch, and pairing PERMANOVA (adonis2) with betadisper. Use when summarizing whole-community richness/evenness or testing group differences in community structure. Per-taxon testing -> differential-abundance. Shotgun tables -> metagenomics/metagenome-visualization. Shared CoDA/rarefaction theory -> metagenomics/abundance-estimation.
 tool_type: mixed
 primary_tool: phyloseq

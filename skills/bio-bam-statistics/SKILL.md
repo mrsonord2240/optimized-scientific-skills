@@ -1,5 +1,6 @@
 ---
 name: bio-bam-statistics
+category: Data Analysis
 description: Generate alignment statistics using samtools flagstat, stats, depth, coverage, and mosdepth. Use when assessing alignment quality, calculating coverage, or generating QC reports.
 tool_type: cli
 primary_tool: samtools

@@ -1,5 +1,6 @@
 ---
 name: bio-metabolomics-statistical-analysis
+category: Data Analysis
 description: Decision-grade statistical analysis for metabolomics intensity tables. Covers transformation and scaling (Pareto vs unit-variance as a hidden hypothesis), unsupervised structure (PCA/HCA for QC), permutation-validated PLS-DA/OPLS-DA (R2 vs Q2, double CV, VIP as heuristic), univariate testing (Welch/Mann-Whitney/ANOVA/LMM with covariate adjustment), and dependence-aware multiple testing. Use when testing which metabolites differ, building or validating a discriminant model, choosing a scaling, or correcting many correlated tests. For sample-wise normalization/drift correction see metabolomics/normalization-qc; for ML classifiers and selection-inside-CV leakage see machine-learning/biomarker-discovery and machine-learning/model-validation; for pathway interpretation see metabolomics/pathway-mapping; for design/power/multiplicity regime see experimental-design/multiple-testing.
 tool_type: mixed
 primary_tool: ropls

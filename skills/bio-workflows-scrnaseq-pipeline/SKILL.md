@@ -1,5 +1,6 @@
 ---
 name: bio-workflows-scrnaseq-pipeline
+category: Data Analysis
 description: Orchestrates the end-to-end single-cell RNA-seq pipeline from 10x Cell Ranger output to annotated cell types, chaining ambient-RNA removal, doublet detection, MAD-adaptive QC, normalization, integration, clustering, marker annotation, and (separately) pseudobulk DE + differential abundance. Use when honoring the made-once counting commitments (reference build/Ensembl vintage, --include-introns, cell-calling, feature namespace), ordering correct-then-detect-then-normalize (ambient before doublet before normalize), running per-sample QC before merge, integrating-then-clustering (never testing on integrated values), aggregating to pseudobulk for condition DE instead of cells-as-replicates, or pairing DE with differential abundance. Hands mechanism to the single-cell component skills; not a re-teach of any single step.
 tool_type: mixed
 primary_tool: Seurat

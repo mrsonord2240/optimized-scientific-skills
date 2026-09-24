@@ -1,5 +1,6 @@
 ---
 name: bio-alignment-pairwise
+category: Data Analysis
 description: Perform pairwise sequence alignment using Biopython Bio.Align.PairwiseAligner (Needleman-Wunsch global, Smith-Waterman local, semiglobal). Use when comparing two sequences, finding optimal alignments, scoring similarity, computing percent identity, checking the reverse-complement strand, reproducing EMBOSS needle/water or BLAST scores, and identifying local or global matches between DNA, RNA, or protein sequences.
 tool_type: python
 primary_tool: Bio.Align

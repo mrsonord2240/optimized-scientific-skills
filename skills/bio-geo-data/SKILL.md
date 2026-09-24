@@ -1,5 +1,6 @@
 ---
 name: bio-geo-data
+category: Data Analysis
 description: Query and download from NCBI Gene Expression Omnibus (GEO) and EMBL-EBI's BioStudies/ArrayExpress mirror. Use when finding expression datasets, navigating SuperSeries vs SubSeries, choosing between series-matrix (submitter-normalized) and raw supplementary files, downloading via GEOparse (Python) or GEOquery (R/Bioconductor), linking GEO to SRA for raw reads, or distinguishing GSE/GSM/GPL/GDS record types. Encodes the SuperSeries trap, the series-matrix normalization-trust caveat, GEOmetadb deprecation, ArrayExpress migration to BioStudies, and processed-vs-raw decision matrix.
 tool_type: mixed
 primary_tool: Bio.Entrez

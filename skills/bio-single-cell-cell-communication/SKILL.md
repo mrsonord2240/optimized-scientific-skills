@@ -1,5 +1,6 @@
 ---
 name: bio-single-cell-cell-communication
+category: Data Analysis
 description: Infers ligand-receptor cell-cell communication from scRNA-seq with a consensus-first workflow (LIANA), plus CellPhoneDB specificity tests, CellChat pathway probabilities, and NicheNet downstream ligand-activity. Use when ranking ligand-receptor interactions between cell types, comparing communication across conditions, asking which ligand drives a receiver response, or deciding which CCC method and resource to trust.
 tool_type: mixed
 primary_tool: LIANA

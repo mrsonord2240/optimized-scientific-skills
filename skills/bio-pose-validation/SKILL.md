@@ -1,5 +1,6 @@
 ---
 name: bio-pose-validation
+category: Data Analysis
 description: Validates docked / generated protein-ligand poses using PoseBusters physical-validity tests, strain energy quantification, geometric checks (planarity, vdW overlap, bond/angle distortion), and pose-energy reasonableness. Use when QC-ing docking results, comparing classical vs ML docking outputs, or filtering pose lists before SAR analysis.
 tool_type: python
 primary_tool: PoseBusters

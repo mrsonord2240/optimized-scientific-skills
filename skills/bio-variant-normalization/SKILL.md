@@ -1,5 +1,6 @@
 ---
 name: bio-variant-normalization
+category: Data Analysis
 description: Left-align and trim indels to parsimonious canonical form, decompose MNPs (atomize), and split multiallelic variants with bcftools norm. Use when comparing variants across callers or cohorts, preparing a VCF for database annotation or ClinVar/dbSNP matching, merging VCFs, reconciling vt-vs-bcftools representation discordance, or resolving the VCF-left-align vs HGVS-3'-rule clash.
 tool_type: cli
 primary_tool: bcftools

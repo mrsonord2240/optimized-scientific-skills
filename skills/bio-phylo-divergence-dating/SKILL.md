@@ -1,5 +1,6 @@
 ---
 name: bio-phylo-divergence-dating
+category: Data Analysis
 description: Estimate divergence times under molecular-clock models with BEAST2, MCMCTree/PAML, TreePL, and LSD2, framing a date as a product of the calibration prior and the clock model far more than of the sequence data. Covers why branch length = rate x time is nonidentifiable so only calibrations convert relative rate-time into absolute age; why the effective (marginal) prior on a calibrated node differs from the density specified, mandating a sample-from-prior run; the fossil-as-minimum rule, soft bounds, tip-dating, and the fossilized birth-death process; the temporal-signal check (TempEst root-to-tip regression + date-randomization) required before dating viruses or ancient DNA; and clock-model choice via the coefficient of variation. Use when dating nodes, calibrating with fossils or sampling dates, choosing a clock or dating engine, or routing topology to modern-tree-inference, posteriors to bayesian-inference, and rooting to tree-manipulation.
 tool_type: mixed
 primary_tool: BEAST2

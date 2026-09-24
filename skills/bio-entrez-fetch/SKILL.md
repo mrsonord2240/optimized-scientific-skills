@@ -1,5 +1,6 @@
 ---
 name: bio-entrez-fetch
+category: Data Analysis
 description: Retrieve records from NCBI databases using Biopython Bio.Entrez (EFetch, ESummary). Use when downloading sequences, fetching GenBank/GenPept records, getting document summaries, parsing nested XML, navigating GI deprecation, choosing between rettype+retmode combinations, and parsing into Biopython SeqRecord/SwissProt objects. Covers nucleotide, protein, gene, pubmed, sra, gds, taxonomy, snp, clinvar.
 tool_type: python
 primary_tool: Bio.Entrez

@@ -1,5 +1,6 @@
 ---
 name: bio-vcf-manipulation
+category: Data Analysis
 description: Combine, split, sort, intersect, and subset VCF/BCF files with bcftools merge, concat, isec, sort, view, and reheader. Use when merging different samples into a cohort VCF, concatenating per-chromosome or per-region call sets for the same samples, intersecting or complementing call sets from different callers, subsetting samples/regions, harmonizing sample names and ##contig headers, or recomputing AC/AN/AF after subsetting. Covers the normalize-before-combine rule, the single-sample-merge 0/0-fabrication trap (merge is not joint genotyping), merge vs concat vs isec selection, and the --naive concat and -R-vs-T region caveats. Not for structural-variant merging by breakpoint fuzz (see variant-calling/structural-variant-calling) or joint genotyping of gVCFs (see variant-calling/joint-calling).
 tool_type: cli
 primary_tool: bcftools

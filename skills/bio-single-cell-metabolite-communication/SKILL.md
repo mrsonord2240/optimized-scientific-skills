@@ -1,5 +1,6 @@
 ---
 name: bio-single-cell-metabolite-communication
+category: Data Analysis
 description: Infers metabolite-mediated cell-cell communication from scRNA-seq by scoring enzyme-to-sensor pairs (MEBOCOST), with metabolic flux (scFEA), FBA state (Compass), and neurotransmitter (NeuronChat) alternatives. Use when studying metabolic crosstalk between cell types, predicting metabolite secretion and sensing, or deciding which metabolic-communication method fits and how speculative the result is.
 tool_type: python
 primary_tool: MeboCost

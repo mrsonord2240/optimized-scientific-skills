@@ -1,5 +1,6 @@
 ---
 name: bio-proteomics-spectral-libraries
+category: Data Analysis
 description: Builds and manages DIA spectral libraries as peptide query parameters (precursor m/z, a few fragment m/z plus relative intensities, normalized RT, optional CCS), covering experimental DDA, chromatogram, and in-silico predicted libraries via Koina-served Prosit, AlphaPeptDeep, MS2PIP, and DeepLC, with iRT/CiRT RT calibration, NCE tuning, format conversion (DIA-NN tsv/speclib/parquet, OpenSWATH pqp/TraML, Spectronaut, blib/dlib/elib), and library QC/merge. Use when generating, calibrating, converting, or merging a spectral library to drive a DIA search. Running the actual DIA search is dia-analysis; building from DDA identifications depends on peptide-identification; modified-peptide libraries route to ptm-analysis; quantifying the result is quantification.
 tool_type: mixed
 primary_tool: encyclopedia

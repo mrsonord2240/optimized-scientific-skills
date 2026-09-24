@@ -1,5 +1,6 @@
 ---
 name: bio-pathway-wikipathways
+category: Data Analysis
 description: Tests a gene list (ORA, enrichWP) or a ranked gene vector (GSEA, gseWP) against the WikiPathways community-curated pathway collection with clusterProfiler and rWikiPathways. Covers why a WikiPathways result is a snapshot of a live, monthly-updated database (enrichWP/gseWP/gson_WP silently pull data.wikipathways.org/current/), why reproducibility requires pinning a dated GMT via downloadPathwayArchive(date=, format='gmt'), why the WP GMT is Entrez-keyed so symbols and Ensembl silently overlap nothing, why universe=NULL gives a biased all-WP-genes background, how to split the name%version%wpid%org term, and why WikiPathways (CC0, no peer review) complements KEGG/Reactome. Use when running open community-pathway enrichment, covering a non-model WP species, catching disease/drug pathways missing from KEGG/Reactome, or needing a reproducible dated analysis. The gene list comes from differential-expression/de-results; visualize with enrichment-visualization.
 tool_type: r
 primary_tool: rWikiPathways

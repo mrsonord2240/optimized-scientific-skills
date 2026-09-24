@@ -1,5 +1,6 @@
 ---
 name: bio-data-visualization-forest-funnel-plots
+category: Data Analysis
 description: Build and audit forest plots for study-level effects and funnel plots for meta-analysis asymmetry, including random-effects pooling, small-study safeguards, Cox covariate versus subgroup displays, and Mendelian-randomization method comparisons. Use for meta-analysis, subgroup interaction, funnel, Egger, trim-and-fill, or MR forest-plot requests.
 tool_type: r
 primary_tool: metafor

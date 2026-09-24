@@ -1,5 +1,6 @@
 ---
 name: bio-alignment-msa-parsing
+category: Data Analysis
 description: Parse and analyze multiple sequence alignments using Biopython. Extract sequences, identify conserved regions, analyze gaps, work with annotations, and manipulate alignment data for downstream analysis, including sequence weights, Neff, MI-APC coevolution and MUSCLE5 column confidence. Use when parsing or manipulating multiple sequence alignments.
 tool_type: python
 primary_tool: Bio.AlignIO

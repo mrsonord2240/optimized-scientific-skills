@@ -1,5 +1,6 @@
 ---
 name: bio-single-cell-cell-annotation
+category: Data Analysis
 description: Automated reference-based cell type annotation for single-cell RNA-seq using CellTypist, SingleR, Azimuth, scANVI, and scmap to transfer labels from a reference. Use when annotating cell types from a reference atlas or pretrained model, transferring labels onto a query, assessing prediction confidence and rejection, or triaging whether an unexpected cluster is a novel type versus a doublet, low-quality, or batch artifact.
 tool_type: mixed
 primary_tool: CellTypist

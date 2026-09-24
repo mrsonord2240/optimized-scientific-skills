@@ -1,5 +1,6 @@
 ---
 name: bio-pathway-go-enrichment
+category: Data Analysis
 description: Runs Gene Ontology over-representation analysis (ORA) on a gene LIST with clusterProfiler enrichGO, the one-sided hypergeometric/Fisher 2x2 test phyper(k-1, M, N-M, n, lower.tail=FALSE). Covers why the BACKGROUND universe (not the gene list) is the null and decides significance, why omitting universe= is a bug, why enrichGO defaults to ont='MF' not 'BP', why pvalueCutoff filters p.adjust not raw p, why ORA discards effect magnitude and inherits GO-DAG true-path redundancy (simplify, topGO), why RNA-seq gene-length bias inflates long-gene terms (GOseq Wallenius), plus GeneRatio/BgRatio, bitr ID mapping, minGSSize/maxGSSize, groupGO. Use when a pre-selected gene list (DE hits, co-expression module, screen, GWAS-mapped) needs GO annotation. For a ranked no-cutoff analysis see gsea; for other databases see kegg-pathways, reactome-pathways, wikipathways; DE source is differential-expression/de-results; plots in enrichment-visualization.
 tool_type: r
 primary_tool: clusterProfiler

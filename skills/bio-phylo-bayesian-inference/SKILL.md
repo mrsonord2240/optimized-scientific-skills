@@ -1,5 +1,6 @@
 ---
 name: bio-phylo-bayesian-inference
+category: Data Analysis
 description: Frames Bayesian phylogenetics as approximating a posterior distribution over trees conditioned on data AND priors via an MCMC that must be proven to have converged, using MrBayes, BEAST2, RevBayes, and PhyloBayes-MPI. Covers why convergence (ESS, PSRF, ASDSF, topology vs scalar) is the load-bearing claim, why posterior probabilities are systematically higher than bootstrap and overconfident under model misspecification, why the default branch-length prior inflates tree length, why the harmonic-mean estimator must never select models (use stepping-stone), and when site-heterogeneous CAT-GTR is required at depth. Use when needing posterior clade support, model averaging, marginal-likelihood model comparison, or CAT models for deep phylogeny. Routes topology-only ML to modern-tree-inference, divergence times to divergence-dating, and tree summarization to tree-io.
 tool_type: mixed
 primary_tool: MrBayes

@@ -1,5 +1,6 @@
 ---
 name: bio-metabolomics-targeted-analysis
+category: Data Analysis
 description: Designs and validates quantitative targeted metabolomics assays (MRM/SRM on triple-quadrupole, PRM on high-resolution instruments) to report absolute concentrations. Covers the internal-standard strategy (external cal -> global IS -> standard addition -> stable-isotope-labeled IS), weighted calibration judged by back-calculated %RE not R-squared, ion-ratio quantifier/qualifier confirmation, matrix-effect/recovery characterization, and ICH M10 method validation. Use when quantifying a closed panel of known metabolites with units, building or validating an LC-MS/MS assay, choosing an IS or calibration weighting, or judging whether a reported concentration is trustworthy. For untargeted feature detection see metabolomics/xcms-preprocessing; for group statistics see metabolomics/statistical-analysis; for flux/MID/tracing see metabolomics/isotope-tracing.
 tool_type: mixed
 primary_tool: skyline

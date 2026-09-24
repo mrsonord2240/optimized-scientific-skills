@@ -1,5 +1,6 @@
 ---
 name: bio-phylo-modern-tree-inference
+category: Data Analysis
 description: Infers maximum-likelihood phylogenetic trees with IQ-TREE2 and RAxML-NG -- model selection (ModelFinder), branch support (UFBoot2, SH-aLRT), concordance factors (gCF/sCF), partitioning, topology tests, and long-branch-attraction control. Covers why an ML tree inherits every flaw of the assumed model and the fixed alignment, why reported support measures repeatability under resampling and not correctness, why UFBoot uses a >=95 cutoff and not the bootstrap-70 rule, and why a node with UFBoot 100 but gCF ~35 is essentially unresolved ILS rather than a clade. Use when inferring an ML tree, selecting a substitution or partition model, choosing or interpreting support measures, testing an a-priori topology, or diagnosing LBA. Routes model-free distance trees to distance-calculations, posteriors to bayesian-inference, and species trees under ILS to species-trees.
 tool_type: cli
 primary_tool: IQ-TREE2

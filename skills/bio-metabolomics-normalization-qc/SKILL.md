@@ -1,5 +1,6 @@
 ---
 name: bio-metabolomics-normalization-qc
+category: Data Analysis
 description: Designs QC, corrects signal drift, removes batch effects, filters features, normalizes samples, and imputes missing values for untargeted LC-MS/GC-MS metabolomics, framing each step as a measurement model that can create or erase biological signal. Use when processing a peak/feature table before statistical analysis, choosing a drift-correction or sample-normalization method, deciding QC RSD vs D-ratio filtering, or handling left-censored missing values. The feature table is produced by metabolomics/xcms-preprocessing or metabolomics/msdial-preprocessing; transformation/scaling for modeling defers to metabolomics/statistical-analysis; cross-study design issues link to experimental-design/batch-design.
 tool_type: r
 primary_tool: pmp

@@ -1,5 +1,6 @@
 ---
 name: bio-single-cell-multimodal-integration
+category: Data Analysis
 
 description: Integrate multimodal single-cell data (CITE-seq RNA+protein, 10x Multiome RNA+ATAC, unpaired/diagonal RNA+ATAC) and choose the right joint method. Use when classifying an integration task by anchor structure (paired vs unpaired), denoising CITE-seq ADT background before joint embedding, picking between WNN, totalVI, MultiVI, MOFA+, GLUE, or Seurat v5 bridge integration, or diagnosing why a modality dominates a joint clustering.
 

@@ -1,5 +1,6 @@
 ---
 name: bio-metabolomics-msdial-preprocessing
+category: Data Analysis
 description: Runs the MS-DIAL preprocessing workflow (peak picking, MS2Dec spectral deconvolution, alignment, gap-filling) and imports the alignment-result table into R or Python with honest filtering. Use when preprocessing LC-MS DDA/DIA (SWATH) or GC-MS raw data with MS-DIAL, deciding MS-DIAL vs XCMS, configuring the MSDIALCUI console run, or parsing an MS-DIAL export into a clean feature matrix. For programmatic R peak detection and the feature-table-as-artifact framing see metabolomics/xcms-preprocessing; for lipid annotation mode see metabolomics/lipidomics; for MSI-level confidence honesty see metabolomics/metabolite-annotation; for drift correction and QC see metabolomics/normalization-qc.
 tool_type: mixed
 primary_tool: msdial

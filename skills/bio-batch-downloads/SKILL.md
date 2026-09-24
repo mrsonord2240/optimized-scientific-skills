@@ -1,5 +1,6 @@
 ---
 name: bio-batch-downloads
+category: Data Analysis
 description: Download large datasets from NCBI efficiently using EPost, history server, batching, rate limiting, and retry logic. Use when bulk-fetching tens of thousands of sequences, pulling all results of a large ESearch, designing reproducible pipelines, comparing E-utilities to NCBI Datasets v2 CLI, or implementing checksum-validated downloads. Encodes WebEnv TTL (~8h), EPost 200-ID limit, retmax caps, parallelization design, and integrity verification.
 tool_type: python
 primary_tool: Bio.Entrez

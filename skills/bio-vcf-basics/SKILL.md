@@ -1,5 +1,6 @@
 ---
 name: bio-vcf-basics
+category: Data Analysis
 description: View, query, and interpret VCF/BCF variant files with bcftools and cyvcf2. Use when inspecting variants, extracting fields with query format strings, converting VCF/BCF, or correctly reading a field -- QUAL (site) vs GQ (genotype) vs PL/GL likelihoods, AD vs DP and allele balance, GT phasing/ploidy/PS and missing-vs-hom-ref, INFO/FORMAT Number A/R/G semantics, symbolic alleles (<DEL>, <NON_REF>, spanning *) and END, or telling a raw gVCF apart from a filtered callset.
 tool_type: cli
 primary_tool: bcftools

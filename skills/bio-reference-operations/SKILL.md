@@ -1,5 +1,6 @@
 ---
 name: bio-reference-operations
+category: Data Analysis
 description: Generate consensus sequences and manage reference files using samtools. Use when creating consensus from alignments, indexing references, creating sequence dictionaries, extracting regions, renaming or matching contig names (chr22 vs 22, GRCh38 flavours), or resolving CRAM references.
 tool_type: cli
 primary_tool: samtools

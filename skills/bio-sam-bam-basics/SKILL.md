@@ -1,5 +1,6 @@
 ---
 name: bio-sam-bam-basics
+category: Data Analysis
 description: View, convert, and understand SAM/BAM/CRAM alignment files using samtools and pysam. Use when inspecting alignments, converting between formats, or understanding alignment file structure.
 tool_type: cli
 primary_tool: samtools

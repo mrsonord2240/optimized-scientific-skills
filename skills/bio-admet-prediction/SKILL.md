@@ -1,5 +1,6 @@
 ---
 name: bio-admet-prediction
+category: Data Analysis
 description: Predicts common small-molecule ADMET properties with an executable offline ADMET-AI route, optional current ADMETlab 3.0 service results, chemprop D-MPNN, and rule-based drug-likeness filters. Includes applicability-domain, calibration, hERG/CYP/AMES, and structural-alert safeguards. Use for lead triage or in-house ADMET QSAR work; not for clinical or regulatory conclusions from a single prediction.
 tool_type: python
 primary_tool: admet-ai

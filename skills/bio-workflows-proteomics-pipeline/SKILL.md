@@ -1,5 +1,6 @@
 ---
 name: bio-workflows-proteomics-pipeline
+category: Data Analysis
 description: Orchestrates bottom-up proteomics from a search engine's output (MaxQuant/DIA-NN) to differential protein abundance with limma/DEqMS/MSstats. Use when committing the search database + acquisition mode (DDA vs DIA) up front, re-controlling FDR at PSM AND peptide AND protein-group level (not just PSM), removing contaminant/reverse rows and inspecting RAW distributions before normalizing, bridging cross-plex TMT with an IRS reference channel, modeling MNAR missingness rather than downshift-imputing on/off proteins, batching as a covariate (not pre-subtracted), and testing with treat()/DEqMS. Hands mechanism to the proteomics component skills; not a re-teach of any single step.
 tool_type: mixed
 primary_tool: limma

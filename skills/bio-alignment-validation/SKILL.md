@@ -1,5 +1,6 @@
 ---
 name: bio-alignment-validation
+category: Data Analysis
 description: Validate BAM integrity, reference-dictionary identity, alignment quality, contamination, and sample swaps with insert size, pairing, GC bias, strand balance, and post-alignment metrics. Use before variant calling or quantification.
 tool_type: mixed
 primary_tool: samtools

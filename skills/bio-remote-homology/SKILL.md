@@ -1,5 +1,6 @@
 ---
 name: bio-remote-homology
+category: Data Analysis
 description: Detect distant homologs using profile and structure-aware methods that go beyond standard BLAST. Use when sequence identity falls into the twilight zone (<35% pairwise), when BLAST fails to find homologs that should exist, when working at metagenomic scale (DIAMOND, MMseqs2), or when structure beats sequence (Foldseek). Covers PSI-BLAST (iterative PSSM), jackhmmer (iterative HMM), HHblits/HHsearch (profile-profile), DIAMOND, MMseqs2, and Foldseek (3Di structural alphabet, van Kempen 2024).
 tool_type: mixed
 primary_tool: HMMER

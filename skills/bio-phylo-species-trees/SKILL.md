@@ -1,5 +1,6 @@
 ---
 name: bio-phylo-species-trees
+category: Data Analysis
 description: Estimates species trees under the multispecies coalescent from per-locus gene trees with the modern ASTER astral binary (ASTRAL-III/wASTRAL/ASTRAL-Pro), plus SVDQuartets, BPP, and StarBEAST2. Covers why a species tree is not a gene tree, why each locus has its own genealogy that disagrees by incomplete lineage sorting (ILS) even with zero error, why concatenation is statistically inconsistent and positively misleading in the anomaly zone where more loci converge on the wrong tree with full support, why gene-tree estimation error biases summary methods, that localPP is not bootstrap and ASTRAL branch-length units depend on the binary and the `--length` flag (not always coalescent units), and how minority-quartet symmetry separates ILS from introgression. Use when multi-locus discordance, rapid radiations, anomaly-zone risk, concordance-factor interpretation, or concatenation-vs-coalescent choice arise. Routes per-locus gene-tree inference and gCF/sCF to modern-tree-inference, dating to divergence-dating, orthology to comparative-genomics/ortholog-inference.
 tool_type: mixed
 primary_tool: ASTRAL-III

@@ -1,5 +1,6 @@
 ---
 name: bio-pathway-kegg-pathways
+category: Data Analysis
 description: Tests gene lists, ranked vectors, and fold-change vectors against KEGG pathways and modules with clusterProfiler enrichKEGG/enrichMKEGG (ORA), gseKEGG (GSEA), and SPIA/graphite (signed-topology perturbation) in R. Owns the third pathway-analysis generation because KEGG ships signed directed signaling topology (KGML). Covers why a KEGG result is a timestamped join against a live REST API (irreproducible unless pinned with a gson snapshot, not the stale 2012 KEGG.db), why enrichKEGG keyType is kegg/ncbi-geneid not OrgDb ENSEMBL/SYMBOL (zero hits), why organism is a KEGG code (hsa, pae) with prokaryotic locus tags, and why SPIA works only on signaling maps. Use when finding enriched KEGG pathways or modules, scoring signed pathway perturbation, analyzing prokaryotes or non-model organisms via locus tags or KO, comparing conditions with compareCluster, or overlaying data with pathview. The hypergeometric universe lives in go-enrichment; the GSEA engine in gsea.
 tool_type: r
 primary_tool: clusterProfiler

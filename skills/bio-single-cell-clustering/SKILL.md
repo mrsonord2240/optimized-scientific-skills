@@ -1,5 +1,6 @@
 ---
 name: bio-single-cell-clustering
+category: Data Analysis
 description: Dimensionality reduction and graph-based clustering for single-cell RNA-seq with Scanpy (Python) and Seurat (R). Resolves which algorithm to use (Leiden vs Louvain), how many PCs and neighbors to set, how to sweep and validate resolution, when a split is over-clustering, and why post-clustering marker p-values are not valid inference. Use when clustering cells, choosing a clustering resolution, deciding whether two clusters are one population, building a UMAP/tSNE, or judging whether clusters are real.
 tool_type: mixed
 primary_tool: Seurat

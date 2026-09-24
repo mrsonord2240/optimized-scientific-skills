@@ -1,5 +1,6 @@
 ---
 name: bio-microbiome-differential-abundance
+category: Data Analysis
 description: Tests which individual taxa differ between groups on an amplicon ASV/feature table (phyloseq) using compositionally-aware methods - ALDEx2 (Dirichlet-MC CLR, conservative), ANCOM-BC2/ANCOMBC (sampling-fraction bias correction, structural zeros, passed_ss, default p_adj_method=holm), MaAsLin2/MaAsLin3 (multivariable GLM, random effects, prevalence/abundance split), LinDA (CLR mixed-model regression), ZicoSeq (permutation FDR), LEfSe, and q2-composition ancombc. Covers why the hit list depends more on the DA tool than the biology (Nearing benchmark) so the deliverable is a CONSENSUS of >=2 tools, why a relative change is not absolute without a load anchor, the prevalence-filter knob, BH/FDR plus an effect-size floor, and why DESeq2/edgeR misfire here. Use when finding differentially abundant taxa, handling covariates or longitudinal designs, or choosing a method. Whole-community diversity -> diversity-analysis; shotgun DA -> metagenomics/metagenome-visualization; CoDA theory -> metagenomics/abundance-estimation
 tool_type: r
 primary_tool: ALDEx2

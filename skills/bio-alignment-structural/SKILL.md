@@ -1,5 +1,6 @@
 ---
 name: bio-alignment-structural
+category: Data Analysis
 description: Align protein structures using Foldseek 3Di, TM-align, US-align, DALI, or Foldmason for structural MSA. Score and superpose backbone coordinates when sequence identity is below the twilight zone or remote-homology detection is required. Use when sequence MSA fails (<25% identity), when the dark proteome is the target, when AlphaFoldDB / ESM Atlas search is needed, or when structural superposition is the goal.
 tool_type: mixed
 primary_tool: Foldseek

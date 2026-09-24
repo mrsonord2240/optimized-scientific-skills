@@ -1,5 +1,6 @@
 ---
 name: bio-microbiome-functional-prediction
+category: Data Analysis
 description: Predicts community functional POTENTIAL from 16S amplicon ASVs with PICRUSt2 (or q2-picrust2) by phylogenetic interpolation of reference-genome gene content - EPA-ng placement, gappa, castor hidden-state prediction of KO/EC/Pfam copy number, 16S copy-number normalization, and MinPath MetaCyc/KEGG pathways - gated by the NSTI quality index. Covers why predicted function is taxonomy re-encoded (never measured gene content and never activity), the mandatory NSTI report (--max_nsti 2 silently drops novel ASVs), why accuracy IS reference coverage (gut Spearman ~0.8, soil/marine collapse), the circularity trap, and Tax4Fun2/FAPROTAX/BugBase alternatives. Use when inferring KO/EC/MetaCyc potential from an ASV table, gating on NSTI, or choosing a prediction method. For MEASURED shotgun function see metagenomics/functional-profiling; for enrichment of KO lists see pathway-analysis/go-enrichment; for DA of predicted tables see differential-abundance.
 tool_type: cli
 primary_tool: PICRUSt2

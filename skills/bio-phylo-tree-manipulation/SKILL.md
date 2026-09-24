@@ -1,5 +1,6 @@
 ---
 name: bio-phylo-tree-manipulation
+category: Data Analysis
 description: Edit phylogenetic tree structure with Biopython Bio.Phylo, and treat rooting as a separate statistical inference rather than a display choice. Covers why most inference returns an unrooted tree so placing the root creates every ancestor/descendant and basal claim; why a distant or lonely outgroup misroots inside the ingroup via long-branch attraction; the outgroup/midpoint/MAD/MinVar/non-reversible-likelihood rooting tradeoffs; why pruning must suppress degree-2 nodes and sum their branch lengths or all patristic distances silently corrupt; and why collapsing by support makes SOFT (uncertainty) polytomies, not HARD (radiation) ones. Use when rooting, re-rooting, pruning or subsetting taxa, extracting a clade or induced subtree, collapsing low-support branches, resolving polytomies, or ladderizing. Routes clock-based rooting to divergence-dating, inference to modern-tree-inference, and reading/plotting to tree-io and tree-visualization.
 tool_type: mixed
 primary_tool: Bio.Phylo

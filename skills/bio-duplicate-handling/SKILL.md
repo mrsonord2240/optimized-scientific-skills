@@ -1,5 +1,6 @@
 ---
 name: bio-duplicate-handling
+category: Data Analysis
 description: Mark and remove PCR/optical duplicates using samtools fixmate and markdup. Use when preparing alignments for variant calling or when duplicate reads would bias analysis. Not for RNA-seq, amplicon or UMI libraries (see the decision table).
 tool_type: cli
 primary_tool: samtools

@@ -1,5 +1,6 @@
 ---
 name: bio-molecular-standardization
+category: Data Analysis
 description: Standardizes molecular structures using the ChEMBL structure pipeline for normalization and parent selection plus RDKit rdMolStandardize for explicit custom steps such as tautomer canonicalization, salt/solvent stripping, charge handling, stereochemistry handling, mixture selection, and isotope normalization. Explicitly compares ChEMBL, canSARchem, RDKit, and PubChem standardization choices. Use when preparing libraries for QSAR training, joining datasets across sources, deduplicating compound collections, or building canonical compound registries.
 tool_type: python
 primary_tool: RDKit

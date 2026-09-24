@@ -1,5 +1,6 @@
 ---
 name: bio-machine-learning-prediction-explanation
+category: Data Analysis
 description: Explains ML predictions on omics data with SHAP, LIME, and permutation importance, handling the correlated-feature trap, the conditional-vs-interventional Shapley choice, and the attribution-is-not-causation boundary. Use when interpreting an omics classifier, debugging shortcut/batch learning, or deciding whether an attribution ranking can be trusted as biology. For validated feature selection see machine-learning/biomarker-discovery; explanations are not a selection method.
 tool_type: python
 primary_tool: shap

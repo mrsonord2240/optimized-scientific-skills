@@ -1,5 +1,6 @@
 ---
 name: bio-metabolomics-metabolite-annotation
+category: Data Analysis
 description: Turns untargeted LC-MS/MS features (m/z, RT, MS/MS) into confidence-stratified metabolite annotations using spectral-library matching (matchms), in-silico tools (SIRIUS/CSI:FingerID, MetFrag) and molecular networking, and assigns a defensible MSI/Schymanski confidence level to each. Use when naming detected features, scoring MS/MS against a reference library, running SIRIUS, or deciding what confidence level an evidence set actually supports. For upstream feature extraction see metabolomics/xcms-preprocessing and metabolomics/msdial-preprocessing; for downstream enrichment that must respect these levels see metabolomics/pathway-mapping; for lipid-specific structural annotation see metabolomics/lipidomics.
 tool_type: mixed
 primary_tool: matchms

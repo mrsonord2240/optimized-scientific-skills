@@ -1,5 +1,6 @@
 ---
 name: bio-clinical-databases-myvariant-queries
+category: Data Analysis
 description: Queries myvariant.info BioThings aggregator for ClinVar, gnomAD, dbSNP, dbNSFP, COSMIC, CADD, and CIViC annotations in batched, version-tracked requests. Use when annotating variant lists from multiple databases simultaneously without managing per-source APIs, and when reproducibility-grade analyses require recording source data versions from /v1/metadata.
 tool_type: python
 primary_tool: myvariant

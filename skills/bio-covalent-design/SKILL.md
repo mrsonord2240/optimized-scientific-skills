@@ -1,5 +1,6 @@
 ---
 name: bio-covalent-design
+category: Data Analysis
 description: Designs covalent inhibitors and warheads targeting cysteine, lysine, serine, threonine, tyrosine, and aspartate residues, with explicit handling of warhead reactivity (acrylamide, chloroacetamide, vinyl sulfone, sulfonyl fluoride, fluorosulfate, aldehyde, boronate, nitrile), reversibility (kinact/Ki, t_residence), glutathione (GSH) stability, intrinsic reactivity assays, and covalent docking (DOCKovalent, GOLD, HCovDock). Use when designing covalent inhibitors for targeted covalent inhibition (TCI), KRAS G12C-style approaches, or rationalizing covalent SAR.
 tool_type: python
 primary_tool: RDKit

@@ -1,5 +1,6 @@
 ---
 name: bio-single-cell-preprocessing
+category: Data Analysis
 description: Quality control, ambient-RNA handling, normalization, and feature selection for single-cell RNA-seq using Scanpy (Python) and Seurat (R). Use when filtering low-quality cells with MAD-adaptive thresholds, setting tissue-aware mito cutoffs, removing ambient RNA (SoupX/CellBender/DecontX), choosing a normalization (shifted-log vs scran vs sctransform vs Pearson residuals), selecting highly variable genes, or deciding whether to scale and regress out covariates.
 tool_type: mixed
 primary_tool: Seurat

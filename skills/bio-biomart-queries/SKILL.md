@@ -1,5 +1,6 @@
 ---
 name: bio-biomart-queries
+category: Data Analysis
 description: Bulk-query Ensembl BioMart (and other BioMart instances) for cross-database ID mapping, gene/transcript/exon coordinates, and ortholog tables. Use when batch-converting Ensembl IDs to other namespaces (HGNC, RefSeq, UniProt, Entrez), pulling gene coordinate tables for thousands of genes, building ortholog wide-tables across species, or replacing slow Ensembl REST loops with one-shot bulk export. Encodes BioMart's XML query format, R biomaRt vs Python pybiomart trade-off, mart-vs-dataset hierarchy, and the URL endpoint that's BioMart-specific (separate from rest.ensembl.org).
 tool_type: mixed
 primary_tool: pybiomart

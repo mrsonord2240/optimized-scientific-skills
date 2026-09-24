@@ -1,5 +1,6 @@
 ---
 name: bio-entrez-link
+category: Data Analysis
 description: Find cross-database references between NCBI databases using Biopython Bio.Entrez (ELink). Use when navigating gene to protein/structure, sequence to publication, PubMed to GEO, BioProject to SRA runs, or discovering all link relationships for a record. Covers linkname semantics, cmd= variants, asymmetric link warnings, neighbor_history for >200 input IDs, and per-database link tables.
 tool_type: python
 primary_tool: Bio.Entrez

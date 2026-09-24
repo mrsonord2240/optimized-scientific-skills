@@ -1,5 +1,6 @@
 ---
 name: bio-data-visualization-sequence-logos
+category: Data Analysis
 description: Build sequence logos from aligned DNA, RNA, or protein motifs using ggseqlogo (R), Logomaker (Python), or WebLogo with explicit bits vs probability encoding, correctly computed non-uniform-background relative entropy, custom alphabets, and multi-logo stacking. Use when visualizing motif PWMs (TF binding, splice sites, CRISPR spacers), aligned-position composition, or comparing two motif sets.
 tool_type: mixed
 primary_tool: ggseqlogo

@@ -1,5 +1,6 @@
 ---
 name: bio-crispr-screens-prime-editing-screens
+category: Data Analysis
 description: Designs and analyzes pooled prime-editor (PE) screens for installing precise genetic variants without bystander confounding. Covers pegRNA design with PRIDICT and PRIDICT2 for predicting per-pegRNA editing efficiency, pegRNA architecture (spacer + scaffold + PBS + RTT), PE2/PE3/PE3b/PEmax variants, MOSAIC in situ saturation mutagenesis, the PRIME pooled-screen methodology (Ren 2023; ~3,699 ClinVar variant screens), chromatin context as a major locus-level determinant of PE efficiency, scaffold-incorporation and indel byproduct quantification with CRISPResso2, and the cross-modal validation strategy of PE + base-editor screens for variant function. Use when designing a pegRNA library for variant installation, choosing between BE and PE for a specific edit, predicting pegRNA efficiency before library synthesis, analyzing PE screen output, distinguishing intended-edit from scaffold-incorporation, or scaling PE screens to thousands of variants.
 tool_type: mixed
 primary_tool: PRIDICT2

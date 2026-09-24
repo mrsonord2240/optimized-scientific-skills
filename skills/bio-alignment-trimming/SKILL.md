@@ -1,5 +1,6 @@
 ---
 name: bio-alignment-trimming
+category: Data Analysis
 description: Trim multiple sequence alignments using ClipKIT, trimAl, BMGE, Divvier, or HMMcleaner with mode selection guidance per downstream goal. Use when removing unreliable columns or contaminating residues before phylogenetic inference, HMM building, or selection analysis.
 license: MIT
 metadata:

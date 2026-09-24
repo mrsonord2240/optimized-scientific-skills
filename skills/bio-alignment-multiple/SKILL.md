@@ -1,5 +1,6 @@
 ---
 name: bio-alignment-multiple
+category: Data Analysis
 description: Perform multiple sequence alignment using MAFFT, MUSCLE5, ClustalOmega, or T-Coffee. Guides tool and algorithm selection based on dataset size, sequence divergence, and downstream application. Use when aligning three or more homologous sequences for phylogenetics, conservation analysis, or evolutionary studies.
 tool_type: mixed
 primary_tool: MAFFT

@@ -1,5 +1,6 @@
 ---
 name: bio-proteomics-differential-abundance
+category: Data Analysis
 description: Tests for differentially abundant proteins between conditions with limma/DEqMS empirical-Bayes moderation, proDA/msqrob2/MSstats missingness modeling, and Python Welch+BH alternatives. Frames missing values as left-censored MNAR (model, do not impute), makes variance moderation the load-bearing step at n=3-5, and prefers feature/peptide-level testing. Use when identifying proteins with significant abundance changes between experimental groups. Summarization and normalization mechanics are proteomics/quantification; volcano and MA plots are data-visualization/volcano-and-ma-plots; pathway enrichment of the hit list is pathway-analysis/go-enrichment.
 tool_type: mixed
 primary_tool: limma

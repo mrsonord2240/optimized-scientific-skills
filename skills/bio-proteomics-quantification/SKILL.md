@@ -1,5 +1,6 @@
 ---
 name: bio-proteomics-quantification
+category: Data Analysis
 description: Quantifies protein abundance from mass spectrometry using label-free (LFQ/MaxLFQ, DIA fragment-level), isobaric (TMT/iTRAQ reporter ions, MS2 vs SPS-MS3), and metabolic (SILAC) approaches, including peptide-to-protein summarization (Tukey median polish, MaxLFQ, msqrob), sample-loading and IRS cross-plex normalization, and isotopic impurity correction. Use when turning peptide/PSM/reporter signal into a protein-by-sample abundance matrix for downstream analysis. Statistical testing of that matrix is differential-abundance; DIA quant mechanics and DIA-NN runs are dia-analysis; reading search-engine outputs is data-import; razor/shared-peptide group assignment is protein-inference.
 tool_type: mixed
 primary_tool: MSstats

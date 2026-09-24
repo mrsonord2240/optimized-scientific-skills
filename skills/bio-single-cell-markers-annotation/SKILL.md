@@ -1,5 +1,6 @@
 ---
 name: bio-single-cell-markers-annotation
+category: Data Analysis
 description: Detect cluster marker genes and assign manual cell type labels in single-cell RNA-seq using Scanpy (Python) and Seurat (R). Use when finding genes that distinguish clusters, ranking markers for annotation, scoring gene signatures, hand-labeling clusters, or deciding between Wilcoxon marker ranking and pseudobulk condition DE.
 tool_type: mixed
 primary_tool: Seurat

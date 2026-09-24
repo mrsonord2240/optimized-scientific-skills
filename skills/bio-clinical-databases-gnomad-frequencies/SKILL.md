@@ -1,5 +1,6 @@
 ---
 name: bio-clinical-databases-gnomad-frequencies
+category: Data Analysis
 description: Queries gnomAD v4 (807k samples), v3, v2.1.1, and constraint metrics with grpmax FAF95, bottleneck-group exclusion, LOEUF interpretation, SV/CNV/mtDNA catalogs, and Whiffin max-credible-AF framework. Use when filtering rare variants, applying ACMG BS1/BA1, ranking genes by LoF intolerance, or selecting between v2 (GRCh37) and v4 (GRCh38 + 807k samples).
 tool_type: python
 primary_tool: requests

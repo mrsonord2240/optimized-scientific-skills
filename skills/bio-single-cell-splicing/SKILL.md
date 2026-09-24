@@ -1,5 +1,6 @@
 ---
 name: bio-single-cell-splicing
+category: Data Analysis
 description: >-
   Analyzes alternative splicing at single-cell resolution. Start by determining
   whether library chemistry supports the requested inference: 10X 3' is

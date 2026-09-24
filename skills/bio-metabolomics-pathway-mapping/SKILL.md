@@ -1,5 +1,6 @@
 ---
 name: bio-metabolomics-pathway-mapping
+category: Data Analysis
 description: Maps metabolomics results to biological pathways via over-representation (ORA), metabolite-set enrichment (MSEA/QEA), mummichog/PSEA on raw m/z peaks, and network-diffusion enrichment (FELLA), with correct background-set construction and honest interpretive ceilings. Use when interpreting differential metabolites or an untargeted LC-MS feature table in pathway context, choosing ORA vs MSEA vs mummichog vs topology, or setting the reference/background set. For annotation confidence levels feeding ORA see metabolomics/metabolite-annotation; for gene-set concepts see pathway-analysis/go-enrichment and pathway-analysis/gsea; for joint gene+metabolite pathways see multi-omics-integration/mofa-integration.
 tool_type: r
 primary_tool: MetaboAnalystR

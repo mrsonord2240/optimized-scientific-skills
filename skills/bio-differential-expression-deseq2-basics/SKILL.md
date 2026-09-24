@@ -1,5 +1,6 @@
 ---
 name: bio-differential-expression-deseq2-basics
+category: Data Analysis
 description: Performs differential expression on bulk RNA-seq or single-cell pseudobulk counts (aggregated per sample x cell type) with DESeq2's negative-binomial GLM, Wald and LRT testing, apeglm/ashr/normal LFC shrinkage, independent filtering, Cook's outlier handling, VST/rlog transforms, and design formulas including paired, batch, and interaction terms. Use when running bulk or pseudobulk DE, choosing DESeq2 over edgeR or limma-voom, building a paired or interaction design, applying LFC shrinkage for ranking or GSEA, choosing Wald vs LRT, troubleshooting padj=NA, picking VST vs rlog, importing salmon/kallisto via tximport, or analyzing prokaryotic RNA-seq.
 tool_type: r
 primary_tool: DESeq2
