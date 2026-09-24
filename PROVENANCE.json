@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "2812e2229740a034a414ff6f3d7209dce80487f9"
+      "staging_commit": "18179c6c6722f540cea46387490fb359f0c40df6"
     }
   },
   "skills": [
@@ -845,20 +845,22 @@
     {
       "id": "bio-conformer-generation",
       "upstream_path": "chemoinformatics/conformer-generation",
-      "score": 90,
-      "grade": "Limited Release",
+      "score": 95,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-19",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-conformer-generation.md",
       "fix_pass": "done",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
+        "compare_macrocycle_embedding.py",
+        "gen_conformers.py",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-covalent-design",
@@ -1134,11 +1136,11 @@
     {
       "id": "bio-crispr-screens-mageck-analysis",
       "upstream_path": "crispr-screens/mageck-analysis",
-      "score": 88,
-      "grade": "Limited Release",
+      "score": 94,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-16",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-crispr-screens-mageck-analysis.md",
       "fix_pass": "done",
       "reaudit": "not needed",
@@ -1147,7 +1149,7 @@
         "SKILL.md",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-crispr-screens-perturb-seq-analysis",
@@ -1404,22 +1406,25 @@
     {
       "id": "bio-entrez-search",
       "upstream_path": "database-access/entrez-search",
-      "score": 88,
-      "grade": "Limited Release",
+      "score": 95,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-17",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-entrez-search.md",
       "fix_pass": "done",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
+        "basic_search.py",
         "database_info.py",
         "global_query.py",
-        "usage-guide.md"
+        "query-design-and-failures.md",
+        "usage-guide.md",
+        "validate_term.py"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-experimental-design-batch-design",
@@ -1552,11 +1557,11 @@
     {
       "id": "bio-isoform-switching",
       "upstream_path": "alternative-splicing/isoform-switching",
-      "score": 84,
-      "grade": "Limited Release",
+      "score": 94,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-20",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-isoform-switching.md",
       "fix_pass": "done",
       "reaudit": "not needed",
@@ -1567,16 +1572,16 @@
         "isoform_switch_analysis.R",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-local-blast",
       "upstream_path": "database-access/local-blast",
-      "score": 93,
-      "grade": "Limited Release",
+      "score": 95,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-17",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-local-blast.md",
       "fix_pass": "done",
       "reaudit": "not needed",
@@ -1584,9 +1589,10 @@
       "changed_files": [
         "SKILL.md",
         "create_database.sh",
+        "run_blast.sh",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-long-read-splicing",
@@ -1709,11 +1715,11 @@
     {
       "id": "bio-metabolomics-msdial-preprocessing",
       "upstream_path": "metabolomics/msdial-preprocessing",
-      "score": 91,
-      "grade": "Limited Release",
+      "score": 95.5,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-16",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-metabolomics-msdial-preprocessing.md",
       "fix_pass": "done",
       "reaudit": "not needed",
@@ -1723,7 +1729,7 @@
         "process_msdial_output.R",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-metabolomics-normalization-qc",

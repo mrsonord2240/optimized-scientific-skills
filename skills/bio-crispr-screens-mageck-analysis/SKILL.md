@@ -17,6 +17,12 @@ Before using code patterns, verify installed versions match. If versions differ:
 
 If code throws ImportError, AttributeError, or TypeError, introspect the installed package and adapt the example to match the actual API rather than retrying.
 
+For MAGeCKFlute, prefer a released 2.0+ installation. The historical GitHub-head 1.99.2001 build
+has reproduced `undefined columns selected` after `FluteRRA` creates its output directory; that is a
+package compatibility failure, not a reason to change the MAGeCK hit call. Record the package version,
+keep the `gene_summary`/`sgrna_summary` files, and retry visualization with a released compatible
+build rather than treating the failed enrichment plot as evidence about a gene.
+
 ## MAGeCK CRISPR Screen Analysis
 
 **"Run MAGeCK on my pooled CRISPR screen"** -> Count sgRNAs from FASTQ, normalize across samples, and rank genes by enrichment or depletion using either the robust rank aggregation (RRA) test for two-condition designs or the maximum-likelihood (MLE) model with explicit design matrix for multi-condition / time-course / drug screens.
@@ -35,7 +41,8 @@ If code throws ImportError, AttributeError, or TypeError, introspect the install
 | Two conditions (e.g. drug vs vehicle, treated vs untreated), single cell line, no covariates | `mageck test` (RRA) | RRA is more robust to outlier sgRNAs; faster; default for most published screens |
 | Time series (Day 0 -> Day 7 -> Day 14 -> Day 21) | `mageck mle` | RRA cannot model multiple timepoints jointly; MLE estimates per-condition beta scores |
 | Multi-cell-line panel (e.g. DepMap-style 5-50 lines) | `mageck mle` with cell-line covariate, or Chronos | MLE handles >2 conditions; Chronos preferred at DepMap scale |
-| Paired samples (each replicate matched donor/cell prep) | `mageck mle` with paired design | RRA does not support pairing |
+| Paired, two-condition samples (each replicate matched donor/cell prep) | `mageck test --paired` | Use the matching treatment/control order; this is the simpler paired comparison when no additional covariates are needed |
+| Paired samples with additional conditions or covariates | `mageck mle` with donor and condition columns | MLE accommodates pairing together with time, dose, cell-line, or batch terms; do not collapse the donor structure |
 | Combinatorial (treatment x cell line x time) | `mageck mle` with full factorial design | RRA only handles 1 factor |
 | Drug screen (vehicle vs drug, multiple doses) | `mageck mle` with dose covariate OR drugZ (preferred for chemogenomic) | drugZ optimized for chemogenomic; see [[drugz-chemogenomic]] |
 | Essentiality (Day 0 -> endpoint, single condition) | `mageck test` for simple dropout; `mageck mle` if multi-cell-line | RRA suffices; or BAGEL2 for Bayesian essentiality; see [[bagel-essentiality]] |
@@ -196,17 +203,20 @@ mageck mle \
 
 **Permutation-Round Sensitivity of the primary `fdr` column:** `mageck mle`'s permutation-based `fdr`
 column is coarser than it looks -- `--permutation-round` defaults to 2 (`mageck mle --help`: "Suggested
-value: 10 (may take longer time). Default 2") and the SKILL's own worked examples never set it.
-Measured directly on real data (HAP1 TKOv3 T0-vs-T18 counts, a 1500-gene/5880-sgRNA random subset,
-two-condition `baseline`+`treatment` design, `--norm-method median`): raising `--permutation-round`
-from the default 2 to 5 moved the FDR<0.05 hit count from 48 to 67 genes -- 19 genes (40% of the
-default run's hit count) flipped FDR<0.05 status, purely from the permutation-count change, while
-`wald-fdr` stayed at exactly 108 significant genes across `--permutation-round` 1, 2, and 5 (it does
-not depend on permutation count). **Rule of thumb:** don't trust a permutation `fdr` call near the
-0.05 boundary at the default round count; either raise `--permutation-round` to 10+ (per `--help`'s
-own suggestion) and re-check stability, or cross-check against `wald-fdr`, which is stable but a
-looser approximation (asymptotic, not permutation-calibrated). If the two disagree, treat the gene as
-borderline and validate orthogonally rather than trusting either column alone.
+value: 10 (may take longer time). Default 2"). At that default, rerunning the *identical* command can
+move near-threshold genes across FDR<0.05: MAGeCK 0.5.9.5 offers no `mle --seed` option to make this
+Monte-Carlo component repeatable. Always use an explicitly stated higher round count for a result you
+will report, and rerun borderline calls before interpreting them.
+
+One real HAP1 TKOv3 T0-vs-T18 exercise (a 1500-gene/5880-sgRNA random subset, two-condition
+`baseline`+`treatment` design, `--norm-method median`) moved from 48 to 67 FDR<0.05 genes between
+rounds 2 and 5, with 19 genes changing status, while `wald-fdr` remained 108 across rounds 1, 2, and
+5. This is an *illustrative run*, not an expected effect size: a second independently sampled subset
+changed by only 3 genes over the same comparison. **Rule of thumb:** don't trust a permutation `fdr`
+call near 0.05 at the default round count; use `--permutation-round 10+` (per `--help`'s suggestion),
+then check whether the conclusion is stable and cross-check `wald-fdr`. `wald-fdr` is an asymptotic
+alternative, not a replacement for validation. If the columns disagree, treat the gene as borderline
+and validate orthogonally rather than trusting either one alone.
 
 ## Sample MAGeCK Test for Drug Screen with sgRNA Efficiency
 
@@ -305,11 +315,15 @@ FluteRRA(gene_summary = "drug_vs_veh.gene_summary.txt",
 # After mageck mle
 dir.create("flute_mle_output/MAGeCKFlute_test1", recursive = TRUE, showWarnings = FALSE)
 FluteMLE(gene_summary = "timecourse_mle.gene_summary.txt",
-         treatname = "day21", ctrlname = "baseline",
+         treatname = "day21", ctrlname = "day7",
          proj = "test1",
          organism = "hsa",
          outdir = "flute_mle_output/")
 ```
+
+For `FluteMLE`, both `treatname` and `ctrlname` must be condition names emitted in the MLE
+`gene_summary` (for example `day7` and `day21`). The all-ones `baseline` design-matrix column is the
+model intercept; it is not an emitted condition and cannot be used as `ctrlname`.
 
 ## MAGeCK-VISPR Interactive Dashboard
 
@@ -383,7 +397,7 @@ vispr server results/*.vispr.yaml   # serve the interactive dashboard
 | Time-course conditions for MLE | ≥3 (otherwise use test) | MLE statistical power |
 | PR-AUC of ranked hits against CEGv2 | >0.7 for "passing" essentiality screen | Community convention (CEGv2 from Hart 2017); see [[screen-qc]] |
 | RRA permutation passes per gene | 100 default; raise via `--additional-rra-parameters "--permutation N"` | Not exposed directly on `mageck test`; trades runtime |
-| MLE `--permutation-round` | Default 2; use >=10 for any FDR call near 0.05 | `mageck mle --help`'s own suggestion; measured 40% of a real screen's FDR<0.05 hits flip between round 2 and round 5 (see MLE section) |
+| MLE `--permutation-round` | Default 2; use >=10 for any reported or near-0.05 FDR call | `mageck mle --help`'s own suggestion; identical default-round reruns can flip boundary calls, and the size of a round-count effect is screen-dependent (see MLE section) |
 
 ## Common Errors
 
@@ -392,6 +406,7 @@ vispr server results/*.vispr.yaml   # serve the interactive dashboard
 | `mageck count` outputs mostly zero counts | Library column order swapped, or wrong `--trim-5` length | Library must be sgRNA id, sequence, gene; try `--trim-5 AUTO` |
 | All genes significant, or recall collapses in one selection direction | Median normalization break (heavy selection, >40% guides changing) | `--norm-method control` |
 | `FluteRRA`/`FluteMLE` errors on missing output dir, or `undefined columns selected` | `proj=` not passed (subfolder `MAGeCKFlute_<proj>/` not pre-created), or a MAGeCKFlute build ahead of/behind the Version Compatibility note | Pass `proj=` and `dir.create()` the subfolder first; if the column error persists, it is a known MAGeCKFlute-build compatibility gap -- check `packageVersion('MAGeCKFlute')` against this Skill's tested version |
+| `FluteMLE`: `Sample name doesn't match` | `ctrlname` or `treatname` was the implicit `baseline` intercept, or is absent from the MLE output | Use two actual emitted condition names (for example `day7` and `day21`); inspect `colnames()` of the MLE result rather than using `baseline` |
 | NaN beta in MLE | Gene with insufficient non-zero counts | Exclude from interpretation |
 | Two-condition MLE works but ranks differ from RRA | Different test statistic | Both correct; check direction and use the appropriate one |
 | Hits include amplified genes | No CN correction | See [[copy-number-correction]] |

@@ -1,6 +1,6 @@
 ---
 name: bio-entrez-search
-description: Search NCBI databases using Biopython Bio.Entrez (ESearch, EInfo, ESpell), including cross-database counts via an ESearch loop (EGQuery is broken on current Biopython/NCBI — see below). Use when finding records by keyword, building reproducible field-qualified queries, navigating the Entrez Query Translator, exploiting the history server for large result sets, handling retmax caps, or interpreting weekly index lag. Covers PubMed, Nucleotide, Protein, Gene, SRA, GEO, Assembly, Taxonomy, ClinVar, dbSNP.
+description: Search NCBI databases using Biopython Bio.Entrez (ESearch, EInfo, ESpell), including cross-database counts via an ESearch loop (EGQuery is broken on current Biopython/NCBI — see below). Use when finding records by keyword, building reproducible field-qualified queries, navigating the Entrez Query Translator, exploiting the history server for large result sets, handling retmax caps, or interpreting indexing lag. Covers PubMed, Nucleotide, Protein, Gene, SRA, GEO, Assembly, Taxonomy, ClinVar, dbSNP.
 tool_type: python
 primary_tool: Bio.Entrez
 license: MIT
@@ -38,16 +38,25 @@ import time
 Entrez.email = 'researcher@institution.edu'       # NCBI requires; sets User-Agent
 Entrez.api_key = os.environ.get('NCBI_API_KEY')   # 3 -> 10 req/sec; get at ncbi.nlm.nih.gov/account/settings/
 Entrez.tool = 'project-name'                      # appears in NCBI usage logs; helps if rate-throttled
+
+def validate_term(term, max_chars=2000, max_or_clauses=100):
+    """Reject malformed or impractically large query strings before an API call."""
+    if not isinstance(term, str) or not term.strip():
+        raise ValueError('term must be a non-empty string')
+    if len(term) > max_chars or term.upper().count(' OR ') > max_or_clauses:
+        raise ValueError('term is too large; EPost IDs in batches instead')
+    return term
 ```
 
 Never hardcode a real key in source. `Entrez.api_key` is `None` if the env var is unset, which Biopython
 treats the same as not passing a key (falls back to the 3 req/sec ceiling).
 
-**`term` strings are URL query parameters, not code** — Biopython URL-encodes them automatically (do
-not pre-encode); there is no shell/eval injection risk. Do sanity-check length and count before a
-large batch loop: an extremely long term (hundreds of IDs `OR`-joined into one string) is a common,
-silent way to trip `HTTPError 400` — see "Common errors" below. Chunk large ID sets through EPost
-(200 IDs/call, see "retmax silent caps") instead of building one giant `term`.
+**`term` strings are URL query parameters, not code** — Biopython URL-encodes them automatically; do
+not pre-encode or treat `validate_term` as a security sanitizer. The helper above is an operational
+guard against malformed, empty, or impractically large queries. An extremely long term (hundreds of
+IDs `OR`-joined into one string) commonly trips `HTTPError 400`; EPost large ID sets in batches
+(200 IDs/call, see "retmax silent caps") instead of building one giant `term`. For a runnable local
+check, use `examples/validate_term.py`.
 
 ## What ESearch actually does
 
@@ -67,7 +76,7 @@ The translator may expand `human` to the full taxonomy subtree, or coerce a gene
 
 | Question | Utility | Returns | Cost |
 |---|---|---|---|
-| "How many records match X in PubMed?" | ESearch with `retmax=0` | Count + WebEnv | 1 call |
+| "How many records match X in PubMed?" | ESearch with `retmax=0` | Count + QueryTranslation | 1 call |
 | "Give me 20 matching UIDs" | ESearch | UIDs | 1 call |
 | "Give me ALL matching UIDs (>10K)" | ESearch + `usehistory='y'` | WebEnv/QueryKey | 1 call (then EFetch chunks server-side) |
 | "Does record X exist in db Y?" | ESearch with `term='X[Accn]'` | UIDs | 1 call |
@@ -117,7 +126,7 @@ def cross_db_counts(term, dbs=CURATED_DBS):
 | Default `retmax` | 20 | Set explicitly |
 | Legacy esearch.fcgi (no `usehistory`) | **9,999** silent cap | Use history server |
 | `usehistory='y'` + ESearch | 100,000 per page | Page with `retstart` against the WebEnv |
-| EPost (to push IDs server-side) | 200 IDs per call | Chunk to multiple EPost calls; union with QueryKey |
+| EPost (to push IDs server-side) | No small universal cap | Batch a few hundred IDs per call and union with QueryKey |
 
 The 9,999 cap is the bug that has shipped in countless lab pipelines: query returns "Count: 78,432" but `IdList` has 9,999 entries and there is no error. Always set `retmax` explicitly and either page or move to `usehistory='y'` whenever `Count > retmax`.
 
@@ -149,37 +158,18 @@ print(f'CRISPR & 2024: {r3["Count"]}')
 
 ## Index lag
 
-NCBI's Entrez indexer runs nightly (US Eastern). Records submitted Monday morning typically appear in ESearch results Wednesday at earliest. PubMed has additional MEDLINE indexing lag (1-3 weeks for full MeSH terms). For freshly-deposited data the more reliable check is EFetch on the known accession or NCBI Datasets API for genomes.
+Entrez and PubMed indexes update on provider-controlled schedules, so a fresh deposit or newly assigned
+MeSH term can be absent temporarily. Do not infer that a known accession is invalid from an empty
+search result: use EFetch for the known accession, or NCBI Datasets for genome metadata, and record
+the EInfo `LastUpdate` value when timing matters.
 
-## Field-qualified query patterns (per database)
+## Query design and error reference
 
-| Database | Common fields | Notes |
-|---|---|---|
-| pubmed | `[Title]`, `[TIAB]` (title+abstract), `[MeSH]`, `[Author]`, `[Journal]`, `[PDAT]`, `[DCOM]`, `[PMC]` | `[TIAB]` is more permissive than `[Title]`; `[MeSH]` requires the term to be indexed (lags); PMC full-text subset is `pubmed pmc[sb]`, not a separate db — the underlying UIDs are still PubMed's |
-| nucleotide | `[Organism]`, `[Gene Name]`, `[Accn]`, `[SLEN]`, `[Filter]`, `[PROP]` | `srcdb_refseq[PROP]` restricts to RefSeq; `biomol_genomic[PROP]` filters molecule type |
-| protein | `[Organism]`, `[Gene Name]`, `[Accn]`, `[MOLWT]`, `[PROP]` | `swissprot[Filter]` restricts to reviewed |
-| gene | `[Gene/Locus]`, `[Organism]`, `[Chromosome]`, `[Gene Type]` | `[Gene Type]` includes `protein-coding`, `pseudo`, `ncRNA` |
-| sra | `[Organism]`, `[Platform]`, `[Strategy]`, `[Library Source]`, `[BioProject]` | `[Strategy]` accepts `RNA-Seq`, `WGS`, `ChIP-Seq`, etc. |
-| gds (GEO) | `[Organism]`, `[Entry Type]`, `[GDS Type]`, `[Platform]` | `gse[Entry Type]` for Series, `gds[Entry Type]` for curated DataSets |
-| taxonomy | `[Scientific Name]`, `[Common Name]`, `[Rank]`, `[TXID]` | TXID is the numeric taxonomy ID |
-| clinvar | `[Gene Name]`, `[Clinical Significance]`, `[Variation Type]` | `pathogenic[CLIN]` for pathogenic only |
-
-### Filter properties that newcomers miss
-
-```python
-# Curated RefSeq mRNA only, human, between 500 and 5000 nt
-term = 'Homo sapiens[ORGN] AND srcdb_refseq[PROP] AND biomol_mrna[PROP] AND 500:5000[SLEN]'
-
-# Reviewed SwissProt human kinases
-term = 'Homo sapiens[ORGN] AND swissprot[Filter] AND kinase[Protein Name]'
-
-# PubMed: human studies in last 30 days, full-text in PMC
-term = 'CRISPR[Title] AND humans[MeSH Terms] AND last 30 days[EDAT] AND pubmed pmc[sb]'
-```
-
-### Organism field gotcha
-
-`[Organism]` (and the alias `[ORGN]`) is **taxonomy-walked**: searching `mammalia[ORGN]` returns records from every species in Mammalia. To get records tagged at exactly that node use `[Organism:exp]` (no taxonomic expansion). Most workflows want the default walk, but multi-species queries that "blow up" by 100x are almost always a missing `:exp`.
+Start with a field-qualified query, then inspect `QueryTranslation` before using it in a
+reproducible analysis. The per-database field table, common filter patterns, taxonomy-expansion
+behavior, detailed failure modes, and error-to-recovery table are in
+[`references/query-design-and-failures.md`](references/query-design-and-failures.md). Read it when
+choosing database-specific fields, a count looks implausible, or recovering from a failed request.
 
 ## Code patterns
 
@@ -271,36 +261,6 @@ r = Entrez.read(h); h.close()
 print(r['CorrectedQuery'])  # 'breast cancer'
 ```
 
-## Failure modes
-
-### Silent retmax cap
-Trigger and mechanism: see "retmax silent caps" above (9,999-record non-history cap).
-- **Fix:** Always check `int(record['Count']) <= len(record['IdList'])`; switch to history server above ~5000.
-
-### Query translation mismatch
-- **Trigger:** Unqualified ambiguous term (e.g. `MARCH1` — Excel-renamed gene vs month abbreviation).
-- **Mechanism:** EQT falls back to `[All Fields]` when no unambiguous mapping is found.
-- **Symptom:** Either zero hits (gene symbol not in `[All Fields]`) or huge non-specific hits.
-- **Fix:** Use field-qualified terms; for gene symbols, use HGNC ID via `gene` db lookup first.
-
-### WebEnv expiration mid-pipeline
-Trigger and mechanism: see "History server (WebEnv/QueryKey) semantics" above (TTL, idle eviction, error body).
-- **Fix:** Parse error bodies (not just status codes); re-run ESearch and resume from `retstart`.
-
-### Index lag for fresh deposits
-Trigger and mechanism: see "Index lag" above.
-- **Fix:** If the accession is known, use EFetch directly; only use ESearch for content-based discovery.
-
-### Organism over-expansion
-Trigger and mechanism: see "Organism field gotcha" above.
-- **Fix:** Use `[Organism:exp]` to disable the walk, or constrain to a specific species/genus.
-
-### Empty IdList with no error
-- **Trigger:** Misspelled field name (`[gene]` works; `[gene_name]` returns nothing).
-- **Mechanism:** Unknown field is silently coerced to `[All Fields]` — but combined with `AND` of a real field, the AND prunes everything.
-- **Symptom:** Query that "should" match gets 0 results.
-- **Fix:** Run EInfo on the db first to confirm field names; check `QueryTranslation`.
-
 ## Rate-limit math
 
 | Auth | req/sec allowed | Sleep between calls | Bulk-friendly? |
@@ -310,17 +270,6 @@ Trigger and mechanism: see "Organism field gotcha" above.
 | Institutional bulk | Email `eutilities@ncbi.nlm.nih.gov` | Negotiated | For >100K queries; courtesy expected |
 
 NCBI's terms of use ask that heavy automated queries run outside US weekday business hours (9 AM-5 PM ET). For genuinely bulk work, prefer the history server over parallel API calls — chunking against one session is faster and friendlier than scaling out.
-
-## Common errors
-
-| Error / symptom | Cause | Solution |
-|---|---|---|
-| `HTTPError 429` | Rate limit exceeded | Add `time.sleep(0.34)` or use API key |
-| `HTTPError 400` | Field name or bracket malformed | Inspect EInfo field list; check brackets |
-| `RuntimeError: ... email` | Missing `Entrez.email` | Set globally before any call |
-| Empty `IdList`, large `Count` | Hit retmax cap | Set `retmax` explicitly or use history |
-| `<ERROR>WebEnv not found</ERROR>` (HTTP 200) | Session expired | Re-run ESearch; parse XML body for errors |
-| Query gives wildly wrong count | EQT misinterpretation | Print `QueryTranslation`; use field-qualified terms |
 
 ## References
 

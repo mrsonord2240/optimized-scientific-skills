@@ -49,19 +49,19 @@ update_blastdb.pl --showall pretty | head
 
 ## Database format: v5 vs v4
 
-NCBI introduced BLAST database v5 in BLAST+ 2.10 (2020). v5 embeds per-sequence taxid assignment (via `-taxid`/`-taxid_map` at build time) directly in the database files; v4 has no per-sequence taxid support at all. **Neither format is self-sufficient for `-taxids`/`-taxidlist` filtering** -- both still need NCBI's `taxdb.tar.gz` (scientific-name lookup: `taxdb.bti`/`taxdb.btd`) present in `$BLASTDB` or the working directory, and `blastp`/`blastn` auto-fetch a further ~98 MB `taxonomy4blast.sqlite3` over the network on the first `-taxids`/`-taxidlist` call. Checked on NCBI BLAST+ 2.17.0+.
+NCBI introduced BLAST database v5 in BLAST+ 2.10 (2020). Both v4 and v5 can store per-sequence taxid assignments supplied through `-taxid`/`-taxid_map` at build time. **Only v5 supports `-taxids`/`-taxidlist` filtering.** A v5 filter also needs NCBI's `taxdb.tar.gz` (scientific-name lookup: `taxdb.bti`/`taxdb.btd`) present in `$BLASTDB` or the working directory, and `blastp`/`blastn` auto-fetch a further ~98 MB `taxonomy4blast.sqlite3` over the network on the first `-taxids`/`-taxidlist` call. Checked on NCBI BLAST+ 2.17.0+.
 
 | Feature | v4 | v5 |
 |---|---|---|
 | Default for prebuilt NCBI dbs | No (legacy) | Yes (since 2020) |
-| Per-sequence taxid at build time (`-taxid_map`) | No | Yes |
+| Per-sequence taxid at build time (`-taxid_map`) | Yes (stored, but not filterable) | Yes |
 | `-taxids`, `-taxidlist` support (with `taxdb.tar.gz` present) | No | Yes |
 | `blastdbcmd -taxids` | No | Yes |
 | New `-info` output fields | No | Yes |
 
 `update_blastdb.pl` downloads v5 by default. When building a database manually with `makeblastdb`, v5 format requires `-blastdb_version 5`. **Always pass `-blastdb_version 5` and `-parse_seqids` when building from scratch.**
 
-**Taxonomy filtering silently no-ops without `taxdb.tar.gz`.** A v5 DB built with `-taxid_map` alone is NOT enough for `-taxids`/`-taxidlist` to actually filter. Without `taxdb.tar.gz` in `$BLASTDB` or the CWD, `blastp`/`blastn` print `The -taxids command line option requires additional data files ...` to stderr but still **exit 0 and return the unfiltered hit set** -- verified on 2.17.0+: a `-taxidlist` restricted to one taxid returned both the matching and the non-matching hit, byte-identical to the unfiltered run, at exit code 0.
+**A v5 taxonomy filter silently no-ops without `taxdb.tar.gz`.** A v5 DB built with `-taxid_map` alone is NOT enough for `-taxids`/`-taxidlist` to actually filter. Without `taxdb.tar.gz` in `$BLASTDB` or the CWD, `blastp`/`blastn` print `The -taxids command line option requires additional data files ...` to stderr but still **exit 0 and return the unfiltered hit set** -- verified on 2.17.0+: a `-taxidlist` restricted to one taxid returned both the matching and the non-matching hit, byte-identical to the unfiltered run, at exit code 0.
 
 ```bash
 # Fetch once, into $BLASTDB or the working directory
@@ -72,7 +72,9 @@ tar -xzf taxdb.tar.gz   # taxdb.bti, taxdb.btd
 # over the network -- expect a one-time delay, not a hang.
 ```
 
-**Detect the no-op -- exit 0 does not mean it worked.** Compare row counts before and after filtering, or grep stderr for `requires additional data files`. If a `-taxidlist` search returns the same row count as the unfiltered search, the filter did not apply: fetch `taxdb.tar.gz` and rerun before trusting the result as filtered. (Verified: 2 unfiltered rows -> still 2 rows without `taxdb.tar.gz` -> 1 row, correctly excluding the non-matching taxid, once `taxdb.tar.gz` was present.)
+**Detect the v5 no-op -- exit 0 does not mean it worked.** Compare row counts before and after filtering, or grep stderr for `requires additional data files`. If a `-taxidlist` search returns the same row count as the unfiltered search, the filter did not apply: fetch `taxdb.tar.gz` and rerun before trusting the result as filtered. (Verified: 2 unfiltered rows -> still 2 rows without `taxdb.tar.gz` -> 1 row, correctly excluding the non-matching taxid, once `taxdb.tar.gz` was present.)
+
+**Do not treat this as a v4 fallback.** Although a v4 database can retain and report assigned taxids (for example through `blastdbcmd -outfmt %T` or `staxids`), it cannot apply `-taxids`/`-taxidlist`. With the taxonomy data installed, BLAST+ fails loudly (nonzero exit; `Taxonomy filtering is not supported in v4 BLAST dbs`) rather than returning a silently unfiltered result. Rebuild as v5 for taxonomy filtering.
 
 ## `makeblastdb` flag taxonomy
 
@@ -159,7 +161,7 @@ Field key fields for analysis:
 - `pident` = percent identity over the HSP (NOT the query); for query-level, use `qcovhsp`
 - `qcovs` = total query coverage by all HSPs of this subject (the "coverage" most users want)
 - `qcovhsp` = query coverage by best HSP alone (use when there's only one HSP per hit)
-- `staxids` = taxonomy IDs (v5 only); critical for any "what species" workflow
+- `staxids` = taxonomy IDs assigned to subject sequences; taxonomy filtering still requires v5 plus its companion taxonomy data
 
 ## Prebuilt NCBI databases via `update_blastdb.pl`
 
@@ -358,11 +360,11 @@ def parse_tabular(path):
 - **Symptom:** No speedup or slowdown.
 - **Fix:** Cap at 8-16; split FASTA and run parallel processes instead for very large batches.
 
-### Taxonomy filter no-op (v4 DB, or v5 DB missing `taxdb.tar.gz`)
-- **Trigger:** `-taxids`/`-taxidlist` on a v4 DB, or on a v5 DB before `taxdb.tar.gz` has been fetched into `$BLASTDB`/CWD.
-- **Mechanism:** v4 has no per-sequence taxid support at all. v5 embeds the taxid assignment but still needs `taxdb.tar.gz` for name lookup, plus an auto-fetched `taxonomy4blast.sqlite3` on first use -- without both, the filter cannot run.
-- **Symptom:** `requires additional data files` printed to stderr, but `blastp`/`blastn` exit 0 and return the full, unfiltered hit set -- easy to miss.
-- **Fix:** Rebuild as v5 with `-taxid`/`-taxid_map` if still on v4; either way, fetch `taxdb.tar.gz` into `$BLASTDB` or the CWD before trusting a filtered result (see Database format section). Confirm by row count, not exit code.
+### Taxonomy filtering: v5 no-op versus v4 hard error
+- **Trigger:** `-taxids`/`-taxidlist` on a v5 DB before `taxdb.tar.gz` is in `$BLASTDB`/CWD, or on a v4 DB.
+- **Mechanism:** v5 stores the taxid assignment and can filter, but needs `taxdb.tar.gz` for taxonomy lookup plus an auto-fetched `taxonomy4blast.sqlite3` on first use. v4 can retain assigned taxids but does not implement taxonomy filtering.
+- **Symptom:** v5 without the data prints `requires additional data files` yet exits 0 and returns the full, unfiltered hit set. A v4 DB with taxonomy data present fails loudly with a nonzero exit and `Taxonomy filtering is not supported in v4 BLAST dbs`.
+- **Fix:** For v5, fetch `taxdb.tar.gz` into `$BLASTDB` or the CWD and confirm filtering by row count, not exit code. For v4, rebuild as v5; fetching taxonomy data cannot make a v4 DB filterable.
 
 ### Soft-masking confusion
 - **Trigger:** Hard-masking input (replacing repeats with N or X) instead of using `-dust`/`-seg`.
@@ -382,7 +384,8 @@ def parse_tabular(path):
 |---|---|---|
 | `BLAST Database error` | DB path wrong, or alias missing | `blastdbcmd -db <db> -info` to confirm |
 | `Error: entry not found` | Built without `-parse_seqids` | Rebuild |
-| Taxonomy filter no-op (exit 0, unfiltered rows) | v4 DB, or v5 DB missing `taxdb.tar.gz` | v4: rebuild as v5. Either way: fetch `taxdb.tar.gz` into `$BLASTDB`/CWD -- exit 0 does not mean it filtered; check row counts |
+| Taxonomy filter no-op (exit 0, unfiltered rows) | v5 DB missing `taxdb.tar.gz` | Fetch `taxdb.tar.gz` into `$BLASTDB` or the CWD; exit 0 does not mean it filtered, so check row counts |
+| `Taxonomy filtering is not supported in v4 BLAST dbs` (nonzero exit) | v4 DB cannot apply `-taxids`/`-taxidlist` | Rebuild as v5; v4 may report assigned taxids but cannot filter on them |
 | Threads >16 not faster | I/O bound | Split input + parallel invocations |
 | `nt` download fills disk | Database is huge | Use refseq_select |
 | `Sequence too short` | Query < word_size | Use `-task blastn-short` (word=7) |

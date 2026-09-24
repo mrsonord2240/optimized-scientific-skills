@@ -8,8 +8,8 @@ import numpy as np
 def gen_conformer_ensemble(smiles, n_conf=20, seed=42, optimize=True):
     '''Generate 3D conformer ensemble via ETKDGv3 + MMFF94 optimization.'''
     mol = Chem.MolFromSmiles(smiles)
-    if mol is None:
-        return None, []
+    if mol is None or mol.GetNumAtoms() == 0:
+        raise ValueError(f'Invalid SMILES: {smiles!r}')
     mol = Chem.AddHs(mol)
 
     params = AllChem.ETKDGv3()
@@ -17,6 +17,8 @@ def gen_conformer_ensemble(smiles, n_conf=20, seed=42, optimize=True):
     params.useRandomCoords = True
     params.maxIterations = 1000
     ids = AllChem.EmbedMultipleConfs(mol, numConfs=n_conf, params=params)
+    if not ids:
+        raise RuntimeError(f'No conformers embedded for {smiles!r}')
 
     if not optimize:
         return mol, [(int(cid), None) for cid in ids]
@@ -42,7 +44,7 @@ def gen_conformer_ensemble(smiles, n_conf=20, seed=42, optimize=True):
 def macrocycle_conformers(smiles, n_conf=200, seed=42):
     '''Generate conformers with macrocycle torsion preferences for >=12 atom rings.'''
     mol = Chem.MolFromSmiles(smiles)
-    if mol is None:
+    if mol is None or mol.GetNumAtoms() == 0:
         raise ValueError(f'Invalid SMILES: {smiles!r}')
     mol = Chem.AddHs(mol)
 
@@ -55,7 +57,7 @@ def macrocycle_conformers(smiles, n_conf=200, seed=42):
     ids = list(AllChem.EmbedMultipleConfs(mol, numConfs=n_conf, params=params))
     if not ids:
         raise RuntimeError(f'No macrocycle conformers embedded for {smiles!r}')
-    return mol
+    return mol, ids
 
 
 def prune_rmsd(mol, conf_data, rmsd_cutoff=0.5):
@@ -86,6 +88,14 @@ def filter_energy_window(conf_data, window_kcal=10.0):
 def boltzmann_average(values, energies, T=300.0):
     '''Boltzmann-weighted average of per-conformer properties.'''
     energies = np.array(energies)
+    if energies.size == 0:
+        raise ValueError('Boltzmann averaging requires at least one energy')
+    if len(values) != len(energies):
+        raise ValueError('values and energies must have the same length')
+    if not np.all(np.isfinite(energies)):
+        raise ValueError('Boltzmann averaging requires finite energies')
+    if T <= 0:
+        raise ValueError('Temperature must be positive')
     kt = 0.001987 * T  # kcal/mol per K (Boltzmann's constant in chemistry units)
     rel = energies - energies.min()
     w = np.exp(-rel / kt)

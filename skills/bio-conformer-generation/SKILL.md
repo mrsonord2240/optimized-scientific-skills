@@ -81,7 +81,7 @@ from rdkit.Chem import AllChem
 
 def gen_conformers(smiles, n_conf=20, seed=42):
     mol = Chem.MolFromSmiles(smiles)
-    if mol is None:
+    if mol is None or mol.GetNumAtoms() == 0:
         raise ValueError(f'Invalid SMILES: {smiles!r}')
     mol = Chem.AddHs(mol)
     params = AllChem.ETKDGv3()
@@ -176,6 +176,10 @@ Remove conformers above a project-justified energy cutoff only when the energy m
 
 ```python
 def filter_by_energy(mol, conf_ids, energies, window_kcal=10.0):
+    if len(conf_ids) != len(energies):
+        raise ValueError('conf_ids and energies must have the same length')
+    if not conf_ids:
+        return []
     min_e = min(energies)
     keep = []
     for cid, e in zip(conf_ids, energies):
@@ -188,14 +192,17 @@ Treat any numerical energy window as a starting parameter. Calibrate it against 
 
 ## Macrocycle Handling
 
-Macrocycles (>=12 atom rings) have distinct conformational issues: ETKDGv3 default knowledge base under-samples macrocycle torsions. Use macrocycle-specific torsion preferences:
+Macrocycles (>=12 atom rings) have distinct conformational issues. In current RDKit, `ETKDGv3()` enables
+`useMacrocycleTorsions` by default; preserve that setting and test whether the ensemble is adequate for the
+specific molecule and downstream metric. Do not claim that this flag universally improves sampling: use the
+packaged default-versus-opt-out comparison below to check a representative macrocycle before escalating.
 
 ```python
 from rdkit.Chem import AllChem
 
 def macrocycle_conformers(smiles, n_conf=200, seed=42):
     mol = Chem.MolFromSmiles(smiles)
-    if mol is None:
+    if mol is None or mol.GetNumAtoms() == 0:
         raise ValueError(f'Invalid SMILES: {smiles!r}')
     mol = Chem.AddHs(mol)
     params = AllChem.ETKDGv3()
@@ -211,6 +218,19 @@ def macrocycle_conformers(smiles, n_conf=200, seed=42):
 ```
 
 For difficult macrocycles, CREST + GFN2-xTB is a useful higher-cost option; validate coverage against experimental or downstream evidence rather than treating one method as universally definitive.
+
+### Macrocycle setting check
+
+Run the packaged comparison on a representative macrocycle before treating the default ensemble as adequate:
+
+```bash
+python examples/compare_macrocycle_embedding.py --smiles 'O=C1CCCCCCCCCCCNC1' --n-conf 40 --seed 42
+```
+
+It reports embedding counts and MMFF94s energy ranges for the ETKDGv3 default and an explicit
+`useMacrocycleTorsions=False` opt-out. A difference is molecule-specific evidence, not a general benchmark;
+equal results mean only that this test did not show a benefit. Increase sampling or use an orthogonal method
+when the downstream metric has not converged.
 
 ## CREST + GFN2-xTB for High-Quality Sampling
 
@@ -244,7 +264,7 @@ from pathlib import Path
 
 def crest_workflow(smiles, out_dir='crest_out'):
     mol = Chem.MolFromSmiles(smiles)
-    if mol is None:
+    if mol is None or mol.GetNumAtoms() == 0:
         raise ValueError(f'Invalid SMILES: {smiles!r}')
     mol = Chem.AddHs(mol)
     params = AllChem.ETKDGv3()
@@ -281,12 +301,20 @@ import numpy as np
 
 def boltzmann_weights(energies, T=300.0):
     energies = np.array(energies)
+    if energies.size == 0:
+        raise ValueError('Boltzmann weighting requires at least one energy')
+    if not np.all(np.isfinite(energies)):
+        raise ValueError('Boltzmann weighting requires finite energies')
+    if T <= 0:
+        raise ValueError('Temperature must be positive')
     kt = 0.001987 * T  # kcal/mol at 300K
     rel = energies - energies.min()
     w = np.exp(-rel / kt)
     return w / w.sum()
 
 def boltzmann_average(values, energies, T=300.0):
+    if len(values) != len(energies):
+        raise ValueError('values and energies must have the same length')
     w = boltzmann_weights(energies, T)
     return float(np.sum(np.array(values) * w))
 ```

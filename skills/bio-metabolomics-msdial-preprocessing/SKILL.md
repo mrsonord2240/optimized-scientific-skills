@@ -51,6 +51,7 @@ Use MS-DIAL when DIA deconvolution or built-in lipid annotation is the point; us
 | GC-EI run | `MSDIALCUI.exe gcms`, or AMDIS/eRah | EI fragments every co-eluting compound; deconvolution IS detection (see below) |
 | Headless / Linux cluster | `MSDIALCUI` (cross-platform console binary) with a `-m` param file | GUI is Windows-only; console is the reproducible batch path |
 | Lipid-focused study | MS-DIAL + LipidBlast | -> metabolomics/lipidomics for lipid annotation mode |
+| Fixed panel of known targets; MRM/SRM/PRM quantification | Do not use this untargeted-alignment workflow | -> metabolomics/targeted-analysis for calibration, internal standards, and validated concentrations; the console's `-t`/`--target` mode is not a substitute for a targeted assay |
 | Already have an alignment CSV | skip processing, parse + filter | See import + honest-filter sections below |
 
 ## Why GC-EI Is Different
@@ -84,7 +85,9 @@ MSDIALCUI.exe lcms -i ./filelist.csv -o ./LCMS_out/ -m ./Msdial-lcms-Param.txt
 MSDIALCUI.exe gcms -i ./GCMS/ -o ./GCMS_out/ -m ./Msdial-GCMS-Param.txt -p
 ```
 
-The parameter (`-m`) file is plain text with **`Key: Value`** pairs (colon-separated, one per line, `#` for comments) -- not `Key=Value`. The `Minimum peak height` key is the direct analog of an intensity floor and is instrument-dependent: the GUI default is tuned for a TOF and is often far too high (or its baseline assumption wrong) for an Orbitrap. Set the alignment reference to a pooled QC, never to file #1 by default.
+The per-file `acquisition_type` mechanism above is documented by the official console tutorial and the CSV input itself has been accepted by the console, but it has not yet been exercised here on real DIA/ABF data. Treat true DIA MS2Dec behavior as a run-specific acceptance check: retain the input CSV, method file, and representative deconvolved spectra, then confirm them before interpreting DIA identifications.
+
+The parameter (`-m`) file is plain text with **`Key: Value`** pairs (colon-separated, one per line, `#` for comments) -- not `Key=Value`. A malformed or misspelled line can be **silently ignored**: the console may exit 0 with no warning while using its built-in default. Before trusting a batch, run a small representative input twice with one safely extreme, known key (for example `Minimum peak height`) and confirm that the output feature count changes in the expected direction; archive both parameter files and counts. The `Minimum peak height` key is the direct analog of an intensity floor and is instrument-dependent: the GUI default is tuned for a TOF and is often far too high (or its baseline assumption wrong) for an Orbitrap. Set the alignment reference to a pooled QC, never to file #1 by default.
 
 ## Import the Alignment Result into R
 
@@ -237,6 +240,7 @@ Confidence-level honesty and orthogonal-evidence identification belong to metabo
 | `Annotation tag` column not found | Header changes across versions (e.g. `Annotation tag (VS1.0)`) | Match by prefix / inspect `colnames()`; do not hard-code the suffix |
 | Console command not found on Linux | Expecting the GUI executable | The GUI (`MSDIAL.exe`) is Windows-only and hangs on unrecognized args; run the separately-packaged `MSDIALCUI` console binary (cross-platform) |
 | Few features detected | `Minimum peak height` default too high for the instrument | Lower it toward the real baseline; defaults are TOF-tuned |
+| Clean console exit but a method change appears to have no effect | A `Key=Value` line or misspelled method key was silently ignored, so defaults were used | Use only `Key: Value`; prove the method is read by changing one known key on a representative input and checking that the resulting feature count changes, then retain both methods and counts |
 
 ## References
 
@@ -254,6 +258,7 @@ Confidence-level honesty and orthogonal-evidence identification belong to metabo
 - The data is already lipid-annotated or the question is lipid-class/species-level -> metabolomics/lipidomics.
 - The question is about confidence-level honesty or orthogonal-evidence identification for a feature you already have -> metabolomics/metabolite-annotation.
 - The question is drift correction, QC-CV/D-ratio filtering, blank filtering, or MNAR-aware imputation on an already-aligned table -> metabolomics/normalization-qc (this skill only routes the Fill%/MS-MS/annotation-tag columns to the right level; it does not implement those filters).
+- Need concentrations for a predefined MRM/SRM/PRM panel of known analytes -> metabolomics/targeted-analysis. MS-DIAL console target mode (`-t`/`--target`) does not replace calibration, co-eluting internal standards, and method validation.
 
 ## Related Skills
 
@@ -261,3 +266,4 @@ Confidence-level honesty and orthogonal-evidence identification belong to metabo
 - metabolomics/lipidomics - Lipid annotation mode and LipidBlast workflows
 - metabolomics/metabolite-annotation - MSI confidence levels and orthogonal-evidence identification
 - metabolomics/normalization-qc - Drift correction, QC/CV/D-ratio filtering, MNAR-aware imputation
+- metabolomics/targeted-analysis - Validated targeted MRM/SRM/PRM quantification for a predefined analyte panel

@@ -105,6 +105,9 @@ if (length(nrep) != 2 || min(nrep) < 2) stop('need exactly 2 conditions with >= 
 if (min(nrep) < 3) warning('fewer than 3 replicates per condition: raw-count calls are not reliable (label-shuffled splits of a real 2 v 2 set were called almost as often as the true one); see SKILL.md "Null check"')
 print(design)
 
+# importRdata(detectUnwantedEffects = TRUE) may run stochastic sva. Keep the
+# default enabled, but make a run reproducible and report this seed with results.
+set.seed(1)
 aSwitchList <- importRdata(isoformCountMatrix = salmonQuant$counts, isoformRepExpression = salmonQuant$abundance,
                            designMatrix = design, isoformExonAnnoation = gtf, isoformNtFasta = fasta,
                            addAnnotatedORFs = TRUE, showProgress = FALSE)

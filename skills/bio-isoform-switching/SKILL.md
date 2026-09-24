@@ -9,7 +9,7 @@ author: GPTomics
 
 ## Version Compatibility
 
-Checked 2026-09 on R 4.4.3 / Bioconductor 3.20: IsoformSwitchAnalyzeR 2.6.0, DRIMSeq 1.34.0, DEXSeq 1.52.0, satuRn 1.14.0, stageR 1.28.0, fishpond 2.12.0, tximport 1.34.0, tximeta 1.24.0, on Salmon 2.7.0 output. CPC2 (standalone), HMMER 3.4 with Pfam-A (2026-09 release). The IsoformSwitchAnalyzeR v2 paper (Han et al. 2026, *NAR Genom Bioinform*; preprint 2025) says v2 uses DEXSeq for smaller studies and satuRn for larger ones and for single-cell data, and imports quantifications from long-read and single-cell pipelines. **2.6.0 does not choose the test for you** (it only warns; call the DEXSeq or satuRn test explicitly, see below), and no newer release was available to check whether a later one does.
+Checked 2026-09 on R 4.4.3 / Bioconductor 3.20: IsoformSwitchAnalyzeR 2.6.0, DRIMSeq 1.34.0, DEXSeq 1.52.0, satuRn 1.14.0, stageR 1.28.0, fishpond 2.12.0, tximport 1.34.0, tximeta 1.24.0, on Salmon 2.7.0 output. CPC2 (standalone), HMMER 3.4 with Pfam-A (2026-09 release). The IsoformSwitchAnalyzeR v2 paper (Han et al. 2026, *NAR Genom Bioinform*; preprint 2025) says v2 uses DEXSeq for smaller studies and satuRn for larger ones and for single-cell data, and imports quantifications from long-read and single-cell pipelines. In 2.6.0, the one-call `isoformSwitchAnalysisPart1()` selects DEXSeq when every condition has <=5 replicates and satuRn when any condition has >5; the direct test wrappers only warn when that rule is not followed. The same selection rule was read in the public 2.8.0, 2.10.0 and 2.12.0 source tarballs (not executed in this environment). In 2.12.0 source, `analyzeNetSurfP2()` is replaced by `analyzeNetSurfP3()`; check your installed help before importing NetSurfP results.
 
 ```r
 BiocManager::install(c('IsoformSwitchAnalyzeR', 'DRIMSeq', 'DEXSeq', 'satuRn', 'stageR', 'fishpond', 'tximeta', 'tximport'))
@@ -57,7 +57,7 @@ DTU and event-level differential splicing answer related but distinct questions:
 | stageR | Two-stage testing framework | Required for proper OFDR control on top of DRIMSeq/DEXSeq/satuRn | Standalone — wraps another tool's output |
 | sleuth | Bootstrap-based DTE on kallisto | When committed to kallisto pipeline | Less active development; superseded by fishpond+swish |
 
-**Choose the test yourself: `isoformSwitchTestDEXSeq()` when every condition has <=5 replicates, `isoformSwitchTestSatuRn()` when any has >5.** IsoformSwitchAnalyzeR 2.6.0 enforces this only by warning (DEXSeq wrapper: "You seem to have many replicates... use isoformSwitchTestSatuRn()"; satuRn wrapper: "You seem to have few replicates... use isoformSwitchTestDEXSeq()"). At exactly 5 replicates results may differ; document the choice.
+`isoformSwitchAnalysisPart1()` applies the <=5 / >5 rule automatically. This Skill calls the direct wrappers deliberately: use `isoformSwitchTestDEXSeq()` when every condition has <=5 replicates, and `isoformSwitchTestSatuRn()` when any has >5. The direct 2.6.0 wrappers only warn on a mismatch (DEXSeq: "You seem to have many replicates... use isoformSwitchTestSatuRn()"; satuRn: "You seem to have few replicates... use isoformSwitchTestDEXSeq()"). At exactly 5 replicates results may differ; document the choice.
 
 ## Decision Tree by Research Question
 
@@ -80,6 +80,7 @@ DTU and event-level differential splicing answer related but distinct questions:
 
 ```r
 library(IsoformSwitchAnalyzeR)
+set.seed(1)  # importRdata() may call stochastic sva when it detects unwanted effects
 
 salmonQuant <- importIsoformExpression(
     parentDir = 'salmon_quant/',              # one sub-directory per sample, each holding quant.sf
@@ -139,7 +140,7 @@ sum(f$isoform_switch_q_value < 0.05 & abs(f$dIF) > 0.1, na.rm = TRUE)   # 0 -> s
 - `removeSingleIsoformGenes = TRUE` — drop genes with only one detectable isoform (cannot have DTU)
 - `keepIsoformInAllConditions = TRUE` — require expression across all conditions
 
-**Replicates and covariates.** IsoformSwitchAnalyzeR stops on 1 replicate per condition ("A statistical test cannot be performed without replicates"). 2 per condition runs but is not trustworthy on the raw-count route (see "Count route": label-shuffled 2 v 2 splits of real data are called almost as often as the true split); plan >=3, ideally >=5. Any extra `designMatrix` column is treated as a covariate: on a batch-confounded synthetic set a batch column removed the batch artefacts (19/30 artefact genes called without it, 0 with it) at no cost to the 20/20 planted switches; a covariate identical to condition stops with "not full rank", and a constant one with "Contain constant information". `importRdata(detectUnwantedEffects = TRUE)` (the default) also runs `sva` and adds any surrogate variables it finds to the model (`sv1` appeared for one of the label-shuffled chrX 2 v 2 splits; check `colnames(aSwitchList$designMatrix)`). Per `?importRdata` and the package NEWS, abundance, IF and dIF are then corrected for these covariates (counts stay unmodified but the test includes them), so with a covariate the reported dIF is no longer the plain mean of per-sample isoform fractions (up to 0.08 from a hand computation on the synthetic 3 v 3 set with a batch column; 7e-5 without).
+**Replicates and covariates.** IsoformSwitchAnalyzeR stops on 1 replicate per condition ("A statistical test cannot be performed without replicates"). 2 per condition runs but is not trustworthy on the raw-count route (see "Count route": label-shuffled 2 v 2 splits of real data are called almost as often as the true split); plan >=3, ideally >=5. Any extra `designMatrix` column is treated as a covariate: on a batch-confounded synthetic set a batch column removed the batch artefacts (19/30 artefact genes called without it, 0 with it) at no cost to the 20/20 planted switches; a covariate identical to condition stops with "not full rank", and a constant one with "Contain constant information". `importRdata(detectUnwantedEffects = TRUE)` (the default) also runs stochastic `sva` and adds any surrogate variables it finds to the model. Set a seed before `importRdata()` (the workflow uses `set.seed(1)`) and record it with the results: on one label-shuffled chrX 2 v 2 split, `sv1` made the call count vary from 0 to 11 across seeds. Check `colnames(aSwitchList$designMatrix)` and treat such small-n lists as exploratory. Per `?importRdata` and the package NEWS, abundance, IF and dIF are then corrected for these covariates (counts stay unmodified but the test includes them), so with a covariate the reported dIF is no longer the plain mean of per-sample isoform fractions (up to 0.08 from a hand computation on the synthetic 3 v 3 set with a batch column; 7e-5 without).
 
 For long-read data pass the long-read transcript count matrix to `importRdata` directly (a count-only import recovered 20/20 planted switches on the synthetic set) — no Salmon EM uncertainty.
 
@@ -250,7 +251,7 @@ aSwitchList <- analyzeSwitchConsequences(
 | CPC2 (standalone, Python 2 code) | Coding vs non-coding | `coding_potential` | Ran on `isoformSwitchAnalyzeR_isoform_nt.fasta`: `python CPC2.py -i <nt.fasta> -o cpc2_result` (needs a Python 2.7 env and its bundled libsvm built) |
 | Pfam: `hmmscan --cut_ga --domtblout` against Pfam-A, then `examples/hmmscan_to_pfamscan.py` | Protein domains | `domains_identified` | Ran (HMMER 3.4 output; below) |
 | SignalP 6.0 | Signal peptides | `signal_peptide_identified` | Licence-gated, **not run**; import per `?analyzeSignalP` |
-| IUPred2A or NetSurfP-2 | Intrinsically disordered regions | `IDR_identified`; `IDR_type` needs IUPred2A | Licence/registration-gated, **not run**; read from source: `IDR_identified` needs `analyzeIUPred2A()` or `analyzeNetSurfP2()` |
+| IUPred2A or NetSurfP | Intrinsically disordered regions | `IDR_identified`; `IDR_type` needs IUPred2A | Licence/registration-gated, **not run**; 2.6.0 source uses `analyzeNetSurfP2()`, while 2.12.0 source uses `analyzeNetSurfP3()`; consult installed help |
 | DeepTMHMM | Transmembrane topology | `isoform_topology` (via `analyzeDeepTMHMM()`), not the IDR types | Cloud service, **not run**; read from source only |
 
 Behaviours checked by running:
@@ -262,7 +263,7 @@ Behaviours checked by running:
   python examples/hmmscan_to_pfamscan.py pfam_domtbl.txt pfam_scanfmt.txt Pfam-A.clans.tsv.gz
   ```
   On the synthetic set (10 genes carrying a planted ubiquitin domain in exon E3): PF00240 found in every isoform containing it and never in the exon-skipped one; 60 domain rows imported; "Domain loss" called 10/10 in the right direction.
-- **Missing annotators are an error, not silent.** Requesting a type without its annotation stops: "To test differences in signal peptides, the result of the SignalP analysis must be advailable (sic)"; likewise for CPC2/CPAT (`coding_potential`), Pfam (`domains_identified`) and NetSurfP2/IUPred2A (`IDR_*`). Build `consequencesToAnalyze` only from what you imported. A missing file gives "The file(s) ... does not exist".
+- **Missing annotators are an error, not silent.** Requesting a type without its annotation stops: "To test differences in signal peptides, the result of the SignalP analysis must be advailable (sic)"; likewise for CPC2/CPAT (`coding_potential`), Pfam (`domains_identified`) and the installed NetSurfP/IUPred importer (`IDR_*`). Build `consequencesToAnalyze` only from what you imported. A missing file gives "The file(s) ... does not exist".
 - **`removeNoncodinORFs` has no default.** `TRUE` drops the ORFs of CPC2-"noncoding" isoforms, which removes PTC-bearing isoforms from the NMD call: on the planted set 8/10 poison isoforms were called NMD-sensitive with `TRUE` (2 were CPC2 noncoding) and 10/10 with `FALSE` or no CPC2. Use `FALSE` when NMD is the question.
 
 The external tools run *outside* R; IsoformSwitchAnalyzeR writes the FASTA files and re-imports the parsed results.
@@ -306,6 +307,11 @@ library(tximport); library(DRIMSeq); library(DEXSeq); library(stageR)
 
 # meta: data.frame(sample_id, condition); files: named vector of quant.sf paths (names = sample_id)
 # tx2gene: data.frame(tx = transcript ID, gene = gene ID)
+# DRIMSeq normalizes count-column names. Normalize both inputs here so IDs such as
+# `1-ctrl` remain aligned; keep the original metadata separately for display/reporting.
+stopifnot(identical(names(files), meta$sample_id))
+manual_sample_id <- make.names(meta$sample_id, unique = TRUE)
+names(files) <- meta$sample_id <- manual_sample_id
 txi <- tximport(files, type = 'salmon', txOut = TRUE, countsFromAbundance = 'no')
 cts <- txi$counts
 txdf <- data.frame(gene_id = tx2gene$gene[match(rownames(cts), tx2gene$tx)], feature_id = rownames(cts), cts, check.names = FALSE)
@@ -502,7 +508,7 @@ Messages quoted from runs (IsoformSwitchAnalyzeR 2.6.0, DRIMSeq 1.34.0, fishpond
 | `A statistical test cannot be performed without replicates` | One sample in a condition | Add replicates |
 | `No genes were considered switching with the used cutoff values` | Test called with `reduceToSwitchingGenes = TRUE` and nothing passed (often the count route, see above) | Use `reduceToSwitchingGenes = FALSE` and check the count route |
 | `Please run the 'addORFfromGTF()' ... to detect ORFs` | `extractSequence()` / `analyzePFAM()` before ORFs exist (GTF without CDS) | `analyzeORF()` first (only when there is no CDS) |
-| `To test differences in <signal peptides / protein domains / IDR>, the result of the <SignalP / Pfam / NetSurfP2> analysis must be advailable (sic)` | Consequence type requested without its annotator imported | Drop the type or import the annotation |
+| `To test differences in <signal peptides / protein domains / IDR>, the result of the <SignalP / Pfam / installed NetSurfP importer> analysis must be advailable (sic)` | Consequence type requested without its annotator imported | Drop the type or import the annotation |
 | `The 'removeNoncodinORFs' argument must be supplied` | `analyzeCPC2()` called without it | Pass `FALSE` (see above) |
 | `analyzePFAM: more columns than column names` | Raw `hmmscan --domtblout` file | Convert with `examples/hmmscan_to_pfamscan.py` |
 | `The file(s) 'pathToSignalPresultFile' points to does not exist` (also `pathToIUPred2AresultFile`) | Annotator output missing or wrong path | Check the path; run the annotator |

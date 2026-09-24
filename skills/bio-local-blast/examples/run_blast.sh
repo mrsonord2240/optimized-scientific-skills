@@ -13,7 +13,7 @@ THREADS="${6:-8}"
 EVALUE="${7:-1e-10}"
 
 # qcovs = total query coverage by all HSPs of subject; qcovhsp = best-HSP coverage.
-# staxids/sscinames require v5 database with taxonomy indexed.
+# staxids report assigned subject taxids; taxonomy filtering itself requires v5 plus taxonomy data.
 FMT="6 qseqid sseqid pident length qcovs qcovhsp evalue bitscore staxids sscinames stitle"
 
 echo "=== ${PROGRAM} -task ${TASK} ==="

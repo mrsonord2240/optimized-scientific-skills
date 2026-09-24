@@ -25,6 +25,7 @@ Tell your AI agent what you want to do:
 - "Parse my MS-DIAL alignment export into a clean feature matrix in R"
 - "Filter my MS-DIAL table by Fill% and MS/MS support, mapping annotation tags to MSI levels"
 - "Should I use MS-DIAL or XCMS for this cohort?"
+- "I have a fixed MRM/PRM/SRM panel and need concentrations" (this is out of scope: use metabolomics/targeted-analysis)
 
 ## Example Prompts
 
@@ -54,7 +55,9 @@ Tell your AI agent what you want to do:
 ## Tips
 
 - DIA/SWATH mode accepts ABF input only; convert before running, and set `acquisition_type=DIA` per file (it is not a separate console subcommand).
+- The `acquisition_type` CSV layout is documented by the official console tutorial and accepted by the console, but true DIA/ABF deconvolution has not been run in this local evidence set; retain input/method files and inspect representative MS2Dec spectra before interpreting DIA identifications.
 - The GUI is Windows-only and hangs on `--help`; use the separately-packaged MSDIALCUI console for headless and cluster runs.
+- Method files use `Key: Value`, never `Key=Value`. A malformed or misspelled key may be silently ignored despite exit code 0, so test one safely extreme known key on representative data and verify the feature count changes before a full batch.
 - Set the alignment reference to a pooled QC, never to file #1 by default.
 - A low Fill% means the value is mostly gap-filled noise; report the filled fraction of every hit. MS-DIAL 5.x reports Fill% as 0-1, not 0-100.
 - An annotation name without MS/MS is at best a putative (MSI Level 3) ID - require MS/MS before believing it (real value is `True`/`False` text; compare case-insensitively).
@@ -66,3 +69,4 @@ Tell your AI agent what you want to do:
 - metabolomics/lipidomics - Lipid annotation mode and LipidBlast workflows
 - metabolomics/metabolite-annotation - MSI confidence levels and orthogonal-evidence identification
 - metabolomics/normalization-qc - Drift correction, QC/CV/D-ratio filtering, MNAR-aware imputation
+- metabolomics/targeted-analysis - MRM/SRM/PRM calibration, internal standards, and validated concentrations for a predefined panel
