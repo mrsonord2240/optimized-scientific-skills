@@ -14,9 +14,9 @@ Tell your AI agent what you want to do:
 ## Example Prompts
 
 ### Standard Replicate Designs
-> "I have n=3 vs n=3 RNA-seq BAMs; run rMATS-turbo with FDR<0.05 and |dPSI|>0.10, then filter for >=10 junction reads per replicate."
+> "I have n=3 vs n=3 RNA-seq BAMs; run rMATS-turbo with FDR<0.05 and |dPSI|>0.10, then require inclusion plus skipping coverage >=10 in at least half the replicates of each group."
 
-> "Use leafcutter Dirichlet-multinomial GLM on intron clusters from regtools junctions for annotation-free differential splicing."
+> "Use leafcutter Dirichlet-multinomial GLM on intron clusters from regtools junctions for annotation-free differential splicing; include batch as a groups-file covariate if it is not aliased with condition."
 
 ### Heterogeneous Cohorts
 > "I have 30 tumor and 30 normal samples from heterogeneous patients; use MAJIQ V3 HET module with posterior threshold P(|dPSI|>0.2)>0.95."

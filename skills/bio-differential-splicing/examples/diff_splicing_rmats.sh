@@ -11,7 +11,7 @@ THREADS=8
 OUTPUT_DIR="rmats_output"
 TMP_DIR="rmats_tmp"
 LIB_TYPE="fr-unstranded"   # fr-firststrand / fr-secondstrand for stranded libraries (check with RSeQC infer_experiment.py)
-MIN_COVERAGE=10            # min inclusion + min skipping reads over all replicates (both groups)
+MIN_COVERAGE=10            # min inclusion + min skipping reads in at least half of each group's replicates
 
 # Sample list files
 # Each file has ONE line: comma-separated BAM paths for one condition
@@ -60,15 +60,20 @@ echo "  - IncLevelDifference: deltaPSI (positive = higher in condition1)"
 echo "  - FDR: Benjamini-Hochberg corrected p-value"
 echo "  - IJC/SJC: Inclusion/Skipping junction counts"
 
-# Filter significant events: FDR < 0.05, |deltaPSI| > 0.1, and >= MIN_COVERAGE reads (per-replicate minima summed)
+# Filter significant events: FDR < 0.05, |deltaPSI| > 0.1, and >= MIN_COVERAGE total reads in at least half of each group.
+# Do not sum independent inclusion/skipping minima: they can come from different replicates and lose true calls as n grows.
 echo ""
 echo "Significant SE events (|deltaPSI| > 0.1, FDR < 0.05, coverage >= $MIN_COVERAGE):"
 awk -F'\t' -v mincov="$MIN_COVERAGE" '
-function minof(s,   a, n, i, m) { n = split(s, a, ","); m = a[1] + 0; for (i = 2; i <= n; i++) if (a[i] + 0 < m) m = a[i] + 0; return m }
+function half_or_more_covered(inc, skip, minimum,   a, b, n, i, covered) {
+    n = split(inc, a, ","); if (split(skip, b, ",") != n) return 0
+    for (i = 1; i <= n; i++) if (a[i] + b[i] >= minimum) covered++
+    return covered >= int((n + 1) / 2)
+}
 NR == 1 { for (i = 1; i <= NF; i++) col[$i] = i; print; next }
 $col["FDR"] != "NA" && $col["IncLevelDifference"] != "NA" {
-    mi = minof($col["IJC_SAMPLE_1"]); t = minof($col["IJC_SAMPLE_2"]); if (t < mi) mi = t
-    ms = minof($col["SJC_SAMPLE_1"]); t = minof($col["SJC_SAMPLE_2"]); if (t < ms) ms = t
     d = $col["IncLevelDifference"] + 0
-    if ($col["FDR"] + 0 < 0.05 && (d > 0.1 || d < -0.1) && mi + ms >= mincov) print
+    if ($col["FDR"] + 0 < 0.05 && (d > 0.1 || d < -0.1) &&
+        half_or_more_covered($col["IJC_SAMPLE_1"], $col["SJC_SAMPLE_1"], mincov) &&
+        half_or_more_covered($col["IJC_SAMPLE_2"], $col["SJC_SAMPLE_2"], mincov)) print
 }' "$OUTPUT_DIR/SE.MATS.JC.txt" | head -20

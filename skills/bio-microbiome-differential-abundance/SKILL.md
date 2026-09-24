@@ -176,11 +176,18 @@ MaAsLin2 fits a flexible per-feature GLM; its package DEFAULT is TSS + LOG + LM 
 library(Maaslin2)
 fit <- Maaslin2(input_data = as.data.frame(t(otu)), input_metadata = meta,
                 output = 'maaslin2_out', fixed_effects = c('Group', 'Age'),
-                random_effects = c('SubjectID'),
                 normalization = 'TSS', transform = 'LOG', analysis_method = 'LM',
-                min_prevalence = 0.10, max_significance = 0.05)
+                min_prevalence = 0.10, max_significance = 0.05,
+                plot_heatmap = FALSE, plot_scatter = FALSE)
 # writes all_results.tsv / significant_results.tsv with columns feature, metadata, coef, pval, qval
+# This is a cross-sectional example: do not add random_effects when every SubjectID occurs once.
+# For a true repeated/paired dataset, use random_effects = c('SubjectID') only after checking
+# each included subject has repeated observations; otherwise MaAsLin2 can silently write no usable fits.
 ```
+
+The numeric result tables do not require MaAsLin2 plots. Disabling plots keeps a batch run focused on
+`all_results.tsv`/`significant_results.tsv` and avoids making analysis success depend on optional graphics
+packages; create publication figures separately from the checked numeric results.
 
 MaAsLin3 (`maaslin3()`) splits each feature into an abundance model (level when present) and a logistic prevalence model (present/absent) tested jointly, and can ingest total-load measurements for absolute-abundance inference. Its API differs from MaAsLin2's: `input_data`/`input_metadata` take data frames (features x samples or the transpose, auto-detected), and results land in `fit$fit_data_abundance$results` / `fit$fit_data_prevalence$results` keyed by `qval_individual` (per-model FDR) and `qval_joint` (combined).
 
@@ -286,6 +293,7 @@ sig_deseq2 <- rownames(results(dds, alpha = 0.05))[which(results(dds)$padj < 0.0
 | `passed_ss` column missing | `pseudo_sens = FALSE` | set `pseudo_sens = TRUE` (the default) |
 | Far fewer hits than expected | ANCOM-BC2 `p_adj_method` left at `holm` | set `p_adj_method = 'BH'` deliberately if FDR is wanted |
 | MaAsLin2 finds nothing / orientation error | features in rows, not columns | transpose so samples are rows, features columns |
+| MaAsLin2 writes no usable Group rows and warns `number of levels of each grouping factor must be < number of observations` | `random_effects='SubjectID'` was used on a cross-sectional table with one row per subject | remove `random_effects` for that analysis; use it only when each modeled subject has repeated observations |
 | Mixed-model hits disagree across tools | `rand_formula` correctness varies by version | cross-check ANCOM-BC2 against LinDA/MaAsLin2 |
 | Tools disagree on the hit list | normal - tool choice drives results | report the consensus and the disagreement, do not cherry-pick |
 | Many "depleted" taxa in a host/plant sample | host mitochondria/chloroplast 16S inflates the table | filter Mitochondria/Chloroplast features (see taxonomy-assignment) before DA |

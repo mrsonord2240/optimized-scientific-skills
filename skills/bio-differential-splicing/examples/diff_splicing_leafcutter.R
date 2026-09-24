@@ -33,6 +33,13 @@ run('python', c(file.path(LEAFCUTTER_DIR, 'clustering', 'leafcutter_cluster_regt
 
 # Step 3: groups file. Sample names must equal the counts-table column names (the .junc basenames)
 counts_file <- 'leafcutter_perind_numers.counts.gz'
+if (!file.exists(counts_file)) {
+    stop('Clustering did not write ', counts_file, '; check LEAFCUTTER_DIR and the clustering log.')
+}
+counts_rows <- length(readLines(gzfile(counts_file), warn = FALSE)) - 1L
+if (counts_rows < 1L) {
+    stop('Clustering produced zero introns. Use -k True for nonstandard contigs, lower -m for shallow data, and verify BAM XS tags.')
+}
 counts_samples <- scan(gzfile(counts_file), what = '', nlines = 1, quiet = TRUE)
 groups <- data.frame(sample = samples, group = rep(c('control', 'treatment'), c(length(CONTROL), length(TREATMENT))))
 missing <- setdiff(groups$sample, counts_samples)

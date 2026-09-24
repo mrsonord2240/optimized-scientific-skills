@@ -107,7 +107,7 @@ rmats.py \
 
 **`--paired-stats`** (paired designs: entry *i* of the comma-separated `--b1` list pairs with entry *i* of `--b2`) needs the R package **PAIRADISE** in the R that rMATS finds. Without it rMATS logs `no package called PAIRADISE`, exits 0 and writes header-only tables with no FDR column, so run the table check above. Install (public, no login): `git clone https://github.com/Xinglab/PAIRADISE`, install R packages `nloptr doParallel foreach iterators`, then `R CMD INSTALL PAIRADISE/pairadise/src/pairadise_model`.
 
-Progress is written to `<od>/tmp/JC_SE/pairadise_status.txt`. If it stalls at a few percent with idle R workers (seen on WSL2: PAIRADISE's default socket cluster hung in 3 of 6 runs), force forked workers: put `parallel:::setDefaultClusterOptions(type = "FORK")` in a file and run rMATS with `R_PROFILE_USER=<file>`. Checked on 5 vs 5 pairs (120 SE events): 31 s, 22/24 strong planted events found with correct direction, 0 calls on the null comparison.
+Progress is written to `<od>/tmp/JC_SE/pairadise_status.txt`. On WSL2, PAIRADISE's default socket cluster hung in 3 of 6 runs, including after progress reached 100%; set a wall-clock timeout and inspect the output table rather than trusting the progress display. For idle workers, force forked workers: put `parallel:::setDefaultClusterOptions(type = "FORK")` in a file and run rMATS with `R_PROFILE_USER=<file>`. Checked on 5 vs 5 pairs (120 SE events): 31 s, 22/24 strong planted events found with correct direction, 0 calls on the null comparison.
 
 ```python
 import pandas as pd
@@ -115,16 +115,25 @@ import numpy as np
 
 se = pd.read_csv('rmats_output/SE.MATS.JC.txt', sep='\t')
 
-def min_per_rep(s):
-    return s.str.split(',').apply(lambda x: min(int(v) for v in x))
+def has_coverage_in_half_or_more_reps(inc, skip, minimum=10):
+    """Require total junction coverage in >= half the replicates of one group."""
+    inc_values = [int(v) for v in inc.split(',')]
+    skip_values = [int(v) for v in skip.split(',')]
+    if not inc_values or len(inc_values) != len(skip_values):
+        return False
+    covered = sum((i + s) >= minimum for i, s in zip(inc_values, skip_values))
+    return covered >= (len(inc_values) + 1) // 2
 
-se['min_inc'] = min_per_rep(se['IJC_SAMPLE_1']).combine(min_per_rep(se['IJC_SAMPLE_2']), min)
-se['min_skip'] = min_per_rep(se['SJC_SAMPLE_1']).combine(min_per_rep(se['SJC_SAMPLE_2']), min)
+se['coverage_ok'] = se.apply(
+    lambda row: has_coverage_in_half_or_more_reps(row['IJC_SAMPLE_1'], row['SJC_SAMPLE_1']) and
+                has_coverage_in_half_or_more_reps(row['IJC_SAMPLE_2'], row['SJC_SAMPLE_2']),
+    axis=1,
+)
 
 significant = se[
     (se['FDR'] < 0.05) &
     (se['IncLevelDifference'].abs() > 0.10) &
-    ((se['min_inc'] + se['min_skip']) >= 10)
+    se['coverage_ok']  # >=10 total reads in >= half of each group's replicates
 ].copy()
 ```
 
@@ -191,7 +200,7 @@ Simulated data, p.adjust < 0.05 and max |ΔPSI| > 0.10; 4 of 26 calls at 2v2 and
 
 - Pipeline (V3): `majiq build <gff3> <experiments_tsv> <output_dir>` writes `splicegraph.zarr` and one `<experiment>.sj` per sample (options include `--min-experiments`, `--mindenovo`, `--simplify`, `--strandness`); `majiq psi-coverage <splicegraph> <psi_coverage> <sj ...>` prepares coverage (`--minreads`, `--minbins`); `majiq deltapsi` (two groups of replicates, `-grp1/-grp2`, `-n NAME1 NAME2`, `--splicegraph`) and `majiq heterogen` (two groups of independent experiments) quantify.
 - V3 replaced V2's `.majiq` files, `-c settings.ini` and SQLite splicegraph; V2-era flags (`--minpos`, `--mem-profile`, `-j`) and `voila view` on V3 output are unverified. The documentation says VOILA "currently only supports MAJIQ v2".
-- Use HET for n>=10 vs n>=10 cohort designs (clinical, GTEx-style; conservative at n=5-10, where deltapsi reports more) and deltapsi for tightly controlled n=3-5.
+- Use HET for n>=10 vs n>=10 cohort designs (clinical, GTEx-style) and deltapsi for tightly controlled n=3-5. The documentation's statistical guidance is TNOM for n<5 and Wilcoxon for n>5; it does not support a general claim that HET is conservative at n=5-10.
 
 ## SUPPA2 Differential Analysis
 
@@ -325,14 +334,14 @@ For MAJIQ: posterior probability `P(|ΔPSI| > 0.2) >= 0.95` is roughly equivalen
 
 ## Confounder Handling
 
-**Trigger:** sequencing batch, RIN, library prep date or sex correlates with the comparison. rMATS' default LRT takes no covariates (`--paired-stats` handles pairing only), so hits can be driven by batch: PCA on the PSI matrix shows samples clustering by batch rather than group. **Check this first**; if PC1 separates by batch rather than group, the comparison is confounded.
+**Trigger:** sequencing batch, RIN, library prep date or sex correlates with the comparison. rMATS' default LRT takes no covariates (`--paired-stats` handles pairing only), so hits can be driven by batch: PCA on the PSI matrix shows samples clustering by batch rather than group. **Check this first**; test every leading PC against batch and group, not only PC1 (a batch effect can appear on PC2 or later).
 
-**Batch identical to (or perfectly nested in) condition cannot be adjusted.** leafcutter_ds.R with `batch = group` still exits 0 and returns significant clusters, with no warning; test the design matrix rank before trusting any covariate model (the snippet below does).
+**Batch identical to (or perfectly nested in) condition cannot be adjusted.** leafcutter_ds.R with `batch = group` exits 0 with no warning but returns non-informative cluster p-values near 1; test the design-matrix rank before trusting any covariate model (the snippet below does).
 
 Workarounds for rMATS:
 1. **Stratification**: run rMATS within each batch separately and meta-analyze.
 2. **Per-event regression with a group term (logit-transformed PSI)**: PSI is bounded [0,1], so logit-transform, fit `logit_psi ~ group + batch (+ RIN)` and test the **group coefficient**. Do not regress out batch alone and rank-test the residuals: with 3 vs 3 the rank-sum test cannot go below p=0.1 (0/20 strong events reached p<0.05), and residualizing on an imbalanced batch removes group signal.
-3. **Switch to leafcutter** (R function accepts `confounders` matrix; CLI accepts confounders as additional columns in the groups file).
+3. **For n<=4 per group, switch to leafcutter with a batch column first** (R function accepts `confounders` matrix; CLI accepts confounders as additional columns in the groups file). On the checked 4v4 simulation it retained 18/30 true events while removing batch-driven calls; the per-event regression was much less powered.
 
 ```python
 import numpy as np

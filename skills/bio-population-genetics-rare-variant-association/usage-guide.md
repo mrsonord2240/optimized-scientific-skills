@@ -61,7 +61,7 @@ Tell your AI agent what you want to do:
 - A burden hit with a null SKAT (or vice versa) is diagnostic of the architecture, not a contradiction - report both and let SKAT-O/ACAT-O adjudicate.
 - ACAT-O is dominated by its smallest input p-value by design, so a single artifactual variant can drive a gene; QC the inputs (INFO/R2, genotype quality) before trusting a hit.
 - Reuse the step-1 null across single-variant and gene tests (regenie, SAIGE) so the relatedness/structure model is identical for both.
-- For genome-wide gene scans in R, use SSD files (`Generate_SSD_SetID`, `Open_SSD`, `SKAT.SSD.All`) instead of holding every gene's matrix in memory.
+- For genome-wide gene scans in R, use SSD files (`Generate_SSD_SetID`, `Open_SSD`, `SKAT.SSD.All`) instead of holding every gene's matrix in memory. `SKAT.SSD.All` matches the null-model rows to the SSD by **position**, not by sample ID: before fitting `SKAT_Null_Model`, read the PLINK `.fam` and require `stopifnot(identical(fam$V2, covar_df$IID))`. Reorder `covar_df` to that IID order first; a shuffled table can otherwise yield a plausible but invalid gene scan.
 
 ## Related Skills
 

@@ -19,6 +19,7 @@ print('Arbitrarily rooted input (as written by the inference program):')
 Phylo.draw_ascii(tree)
 
 outgroup = [{'name': 'OutA'}, {'name': 'OutB'}]
+ingroup = [{'name': 'Human'}, {'name': 'Chimp'}, {'name': 'Gorilla'}, {'name': 'Macaque'}]
 print('Naive monophyly test on the input:',
       bool(tree.is_monophyletic([tree.find_any(**o) for o in outgroup])))
 
@@ -28,6 +29,10 @@ if tree.is_monophyletic([tree.find_any(**o) for o in outgroup]):
     tree.root_with_outgroup(*outgroup, outgroup_branch_length=stem / 2)
     print('\nRooted on the (OutA, OutB) stem; root children:',
           [sorted(t.name for t in c.get_terminals()) for c in tree.root.clades])
+    if not tree.is_monophyletic([tree.find_any(**i) for i in ingroup]):
+        print('WARNING: a-priori ingroup is not monophyletic; reconsider the outgroup (possible long-branch attraction)')
+    else:
+        print('A-priori ingroup is monophyletic after rooting.')
     Phylo.draw_ascii(tree)
 else:
     print('\nOutgroup is not monophyletic: root placement is unreliable')

@@ -81,7 +81,6 @@ Changed in staging after their latest audit, so the score below describes earlie
 | --- | ---: | --- |
 | `bio-phylo-tree-manipulation` | 86 | 2026-09-15 |
 | `bio-pileup-generation` | 85 | 2026-09-20 |
-| `bio-population-genetics-rare-variant-association` | 89 | 2026-09-15 |
 | `bio-splicing-qc` | 85 | 2026-09-20 |
 | `bio-variant-annotation` | 86 | 2026-09-15 |
 | `bio-variant-calling-filtering-best-practices` | 88 | 2026-09-15 |

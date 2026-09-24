@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "18179c6c6722f540cea46387490fb359f0c40df6"
+      "staging_commit": "58a18a1244cc415c3084f527a0b6a1452ae729fa"
     }
   },
   "skills": [
@@ -1309,11 +1309,11 @@
     {
       "id": "bio-differential-splicing",
       "upstream_path": "alternative-splicing/differential-splicing",
-      "score": 85,
-      "grade": "Limited Release",
+      "score": 89,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-20",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-differential-splicing.md",
       "fix_pass": "done",
       "reaudit": "not needed",
@@ -1324,7 +1324,7 @@
         "diff_splicing_rmats.sh",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-duplicate-handling",
@@ -1857,11 +1857,11 @@
     {
       "id": "bio-microbiome-differential-abundance",
       "upstream_path": "microbiome/differential-abundance",
-      "score": 89.2,
-      "grade": "Limited Release",
+      "score": 96,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-19",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-microbiome-differential-abundance.md",
       "fix_pass": "done",
       "reaudit": "not needed",
@@ -1870,7 +1870,7 @@
         "SKILL.md",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-microbiome-diversity-analysis",
@@ -2380,20 +2380,21 @@
     {
       "id": "bio-population-genetics-rare-variant-association",
       "upstream_path": "population-genetics/rare-variant-association",
-      "score": 89,
+      "score": 94,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-15",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-population-genetics-rare-variant-association.md",
       "fix_pass": "done",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
-        "rare_variant_test.sh"
+        "rare_variant_test.sh",
+        "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-pose-validation",
