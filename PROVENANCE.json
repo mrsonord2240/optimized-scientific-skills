@@ -293,7 +293,7 @@
       "id": "bio-alignment-trimming",
       "upstream_path": "alignment/alignment-trimming",
       "score": 96,
-      "grade": "Ready",
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-24",
@@ -309,7 +309,7 @@
         "specialist-trimmers.md",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-alignment-validation",
@@ -2218,7 +2218,7 @@
       "id": "bio-phylo-distance-calculations",
       "upstream_path": "phylogenetics/distance-calculations",
       "score": 97,
-      "grade": "Ready",
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-24",
@@ -2236,7 +2236,7 @@
         "sim8_true.nwk",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-phylo-divergence-dating",
@@ -3408,7 +3408,7 @@
       "id": "bio-vcf-manipulation",
       "upstream_path": "variant-calling/vcf-manipulation",
       "score": 93,
-      "grade": "Production Ready (self-audited)",
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
       "audited_on": "2026-09-24",
@@ -3420,7 +3420,7 @@
         "SKILL.md",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-vcf-statistics",
