@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 159,
+    "refined": 160,
     "audited_and_excluded": 9,
     "out_of_scope": 1,
-    "remaining": 393
+    "remaining": 392
   },
   "remaining": [
     {
@@ -361,10 +361,6 @@
     {
       "id": "bio-data-visualization-circos-plots",
       "upstream_path": "data-visualization/circos-plots"
-    },
-    {
-      "id": "bio-data-visualization-distribution-plots",
-      "upstream_path": "data-visualization/distribution-plots"
     },
     {
       "id": "bio-data-visualization-flow-and-transition-plots",

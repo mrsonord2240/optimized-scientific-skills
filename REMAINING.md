@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**393 remaining** across 52 folders. 159 are already refined and live in `skills/`.
+**392 remaining** across 52 folders. 160 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 159 refined, 9 audited and excluded, 1 out of scope, 393 remaining.
+The source tree holds 562 Skills: 160 refined, 9 audited and excluded, 1 out of scope, 392 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -28,7 +28,6 @@ The source tree holds 562 Skills: 159 refined, 9 audited and excluded, 1 out of 
 | flow-cytometry | 8 | 0 |
 | genome-intervals | 8 | 0 |
 | metagenomics | 8 | 0 |
-| data-visualization | 7 | 4 |
 | genome-annotation | 7 | 0 |
 | imaging-mass-cytometry | 7 | 0 |
 | liquid-biopsy | 7 | 0 |
@@ -36,6 +35,7 @@ The source tree holds 562 Skills: 159 refined, 9 audited and excluded, 1 out of 
 | sequence-manipulation | 7 | 0 |
 | systems-biology | 7 | 0 |
 | variant-calling | 7 | 6 |
+| data-visualization | 6 | 5 |
 | ecological-genomics | 6 | 0 |
 | gene-regulatory-networks | 6 | 0 |
 | immunoinformatics | 6 | 0 |
@@ -265,7 +265,6 @@ fixed.
 ### data-visualization
 
 - `bio-data-visualization-circos-plots` — `data-visualization/circos-plots`
-- `bio-data-visualization-distribution-plots` — `data-visualization/distribution-plots`
 - `bio-data-visualization-flow-and-transition-plots` — `data-visualization/flow-and-transition-plots`
 - `bio-data-visualization-genome-tracks` — `data-visualization/genome-tracks`
 - `bio-data-visualization-heatmaps-clustering` — `data-visualization/heatmaps-clustering`
