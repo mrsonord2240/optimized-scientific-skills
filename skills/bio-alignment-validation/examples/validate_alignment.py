@@ -16,7 +16,8 @@
 # unmapped tail is not reached, so the mapping rate is then an overestimate. Use `samtools flagstat` for the exact rate.
 import sys
 import argparse
-import numpy as np
+import math
+from collections import Counter
 import pysam
 
 
@@ -28,16 +29,35 @@ def grade_strand(fraction):
     return 'PASS' if 0.48 <= fraction <= 0.52 else 'WARN' if 0.45 <= fraction <= 0.55 else 'FAIL'
 
 
+def weighted_median(counts, total):
+    """Return the exact median without retaining one element per read."""
+    def value_at(rank):
+        seen = 0
+        for value in sorted(counts):
+            seen += counts[value]
+            if seen >= rank:
+                return value
+        raise ValueError('median rank was not present')
+
+    lower = value_at((total + 1) // 2)
+    upper = value_at((total + 2) // 2)
+    return (lower + upper) / 2
+
+
 def validate_bam(bam_file, sample_size=0):
     mapped = unmapped = 0
     proper_pair = paired = 0
     forward = reverse = 0
-    insert_sizes = []
-    mapqs = []
+    insert_counts = Counter()
+    insert_total = insert_sum = insert_sum_sq = 0
+    mapq_total = mapq_sum = mapq_ge_30 = 0
     n_read = 0
 
     try:
         with pysam.AlignmentFile(bam_file, 'rb', check_sq=False) as bam:
+            if not bam.header.references:
+                print(f'ERROR: {bam_file} has no @SQ header; nothing to validate', file=sys.stderr)
+                return 2
             for read in bam.fetch(until_eof=True):
                 if read.is_secondary or read.is_supplementary:
                     continue
@@ -54,14 +74,20 @@ def validate_bam(bam_file, sample_size=0):
                     reverse += 1
                 else:
                     forward += 1
-                mapqs.append(read.mapping_quality)
+                mapq_total += 1
+                mapq_sum += read.mapping_quality
+                mapq_ge_30 += read.mapping_quality >= 30
 
                 if read.is_paired:
                     paired += 1
                     if read.is_proper_pair:
                         proper_pair += 1
                         if read.template_length > 0:
-                            insert_sizes.append(read.template_length)
+                            insert_size = read.template_length
+                            insert_counts[insert_size] += 1
+                            insert_total += 1
+                            insert_sum += insert_size
+                            insert_sum_sq += insert_size * insert_size
     except (OSError, ValueError) as e:
         print(f'ERROR: cannot read {bam_file} completely: {e}', file=sys.stderr)
         return 2
@@ -73,6 +99,8 @@ def validate_bam(bam_file, sample_size=0):
 
     scope = f'first {n_read} primary records' if sample_size and n_read == sample_size else f'all {n_read} primary records'
     print(f'=== Alignment Validation ({scope}) ===\n')
+    if sample_size:
+        print('WARNING: -n samples the first records only; results can be head-of-file biased. Use samtools flagstat for the exact mapping rate.\n')
     results = []  # (label, grade)
 
     print('--- Mapping ---')
@@ -82,23 +110,32 @@ def validate_bam(bam_file, sample_size=0):
     results.append(('Mapping rate', grade_min(map_rate, 95, 90)))
 
     print('\n--- Pairing ---')
-    if paired > 0:
+    enough_for_pairing_and_strand = total >= 100
+    if paired > 0 and enough_for_pairing_and_strand:
         pair_rate = 100 * proper_pair / paired
         print(f'Properly paired: {proper_pair} ({pair_rate:.2f}% of mapped paired reads)')
         results.append(('Proper pairing', grade_min(pair_rate, 90, 80)))
+    elif paired > 0:
+        print('Too few primary reads to grade pairing or strand balance (n<100)')
     else:
         print('No mapped paired reads (single-end or unpaired): proper pairing not graded')
 
     print('\n--- Insert Size ---')
-    if insert_sizes:
-        print(f'Median: {np.median(insert_sizes):.0f} bp')
-        print(f'Mean: {np.mean(insert_sizes):.0f} bp')
-        print(f'Std: {np.std(insert_sizes):.0f} bp')
+    if insert_total:
+        insert_mean = insert_sum / insert_total
+        insert_std = math.sqrt(max(0, insert_sum_sq / insert_total - insert_mean ** 2))
+        print(f'Median: {weighted_median(insert_counts, insert_total):.0f} bp')
+        print(f'Mean: {insert_mean:.0f} bp')
+        print(f'Std: {insert_std:.0f} bp')
+    elif not enough_for_pairing_and_strand:
+        print('\nToo few primary reads to grade pairing or strand balance (n<100)')
     else:
         print('No proper pairs with a positive template length')
 
     if mapped == 0:
         print('\nNo mapped reads: strand balance and MAPQ not computed')
+    elif not enough_for_pairing_and_strand:
+        pass
     else:
         print('\n--- Strand Balance ---')
         strand_ratio = forward / (forward + reverse)
@@ -107,10 +144,9 @@ def validate_bam(bam_file, sample_size=0):
         results.append(('Strand balance', grade_strand(strand_ratio)))
 
         print('\n--- MAPQ (mapped primary reads) ---')
-        mean_mapq = float(np.mean(mapqs))
-        high_qual = sum(1 for m in mapqs if m >= 30)
+        mean_mapq = mapq_sum / mapq_total
         print(f'Mean MAPQ: {mean_mapq:.1f}')
-        print(f'MAPQ >= 30: {100*high_qual/len(mapqs):.1f}%')
+        print(f'MAPQ >= 30: {100*mapq_ge_30/mapq_total:.1f}%')
         results.append(('Mean MAPQ', grade_min(mean_mapq, 40, 30)))
 
     print('\n--- Quality Summary ---')

@@ -6,7 +6,7 @@ Bulk-query Ensembl BioMart for cross-database ID mapping, coordinate tables, and
 
 ## Quick Start
 
-- "Convert 5,000 Ensembl Gene IDs to HGNC + RefSeq + UniProt in one query"
+- "Convert 5,000 Ensembl Gene IDs to HGNC + RefSeq + UniProt in safe BioMart batches"
 - "Pull all protein-coding genes on chr17 with coordinates and biotype"
 - "Get a wide ortholog table: human Ensembl Gene ID, mouse ortholog, zebrafish ortholog"
 - "Fetch GO term annotations for a list of genes (long format)"
@@ -16,7 +16,7 @@ Bulk-query Ensembl BioMart for cross-database ID mapping, coordinate tables, and
 
 ### Bulk ID mapping
 
-> "I have 8,000 Ensembl Gene IDs. Convert them to HGNC symbol, NCBI Entrez Gene ID, RefSeq mRNA accessions, and Swiss-Prot UniProt accessions. Use one pybiomart query against hsapiens_gene_ensembl with filters={'ensembl_gene_id': [...]}. Don't loop Ensembl REST -- that's 8,000 sequential calls."
+> "I have 8,000 Ensembl Gene IDs. Convert them to HGNC symbol, NCBI Entrez Gene ID, RefSeq mRNA accessions, and Swiss-Prot UniProt accessions. Use the Skill's `query_raw()` helper against hsapiens_gene_ensembl; it batches the ID list safely rather than making 8,000 Ensembl REST calls."
 
 ### Coordinate table
 

@@ -37,11 +37,11 @@ Tell your AI agent what you want to do:
 > "Compare GC coverage across my samples to identify problematic ones"
 
 ### Strand Balance
-> "Calculate the forward/reverse strand ratio for sample.bam"
+> "Calculate the forward fraction F/(F+R) for sample.bam"
 
 > "Check strand balance per chromosome to identify bias"
 
-> "Validate strand balance meets expected 0.5 ratio"
+> "Validate that the forward fraction F/(F+R) is near 0.5"
 
 ### Comprehensive QC
 > "Run a complete alignment validation pipeline with all metrics"
@@ -55,7 +55,7 @@ Tell your AI agent what you want to do:
 1. Check the BAM is intact (`samtools quickcheck`; the example validators need no index)
 2. Calculate mapping statistics using samtools flagstat
 3. Extract insert size distribution from properly paired reads
-4. Compute strand balance (forward/reverse ratio)
+4. Compute strand balance (forward fraction F/(F+R))
 5. Check mapping quality distribution
 6. Generate per-chromosome coverage statistics
 7. Optionally run Picard metrics for GC bias and alignment summary

@@ -1,6 +1,6 @@
 ---
 name: bio-alignment-sorting
-description: Sort alignment files by coordinate or read name using samtools and pysam. Use when preparing BAM files for indexing, variant calling, or paired-end analysis.
+description: Sort, merge, collate, and verify alignment-file order with samtools and pysam. Use when preparing BAM files for indexing, variant calling, or paired-end analysis.
 tool_type: cli
 primary_tool: samtools
 license: MIT
@@ -22,6 +22,10 @@ package and adapt the example to match the actual API rather than retrying.
 
 Sort alignment files by coordinate or read name using samtools and pysam.
 
+## Reference Files
+
+- Read [performance-and-errors.md](references/performance-and-errors.md) when choosing compression or diagnosing a failed sort. It contains the measured compression comparison and the Common Errors table.
+
 **"Sort a BAM file"** -> Reorder reads by genomic coordinate (for indexing/variant calling) or by name (for paired-end processing).
 - CLI: `samtools sort -o sorted.bam input.bam`
 - Python: `pysam.sort('-o', 'sorted.bam', 'input.bam')`
@@ -40,7 +44,7 @@ Only coordinate-sorted files can be indexed. `-n`, `-N` and `-t` output fail `sa
 
 ### Name sort: `-n` vs `-N`
 
-In samtools 1.24 `-n` is **natural** order (`read2` before `read10`), not lexicographic. `-N` is ASCII order (`read10` before `read2`), which is what Picard writes and expects for queryname. Picard 3.5.0 `MarkDuplicates` on `sort -n` output dies with `Alignments added out of order ... Sort order is queryname`, and `ValidateSamFile` reports `RECORD_OUT_OF_ORDER`; the same reads sorted with `-N` pass (planted-duplicate BAM: 50 pairs, 100 reads flagged). Rule: use `-N` whenever a Picard/GATK/htsjdk tool will read the name-sorted file (or sort with Picard `SortSam`); `-n` is fine when only samtools reads it.
+In samtools 1.24 `-n` is **natural** order (`read2` before `read10`), not lexicographic. `-N` is ASCII order (`read10` before `read2`), which is what Picard writes and expects for queryname. When those orders differ (as they do for most numeric-suffix read names), Picard 3.5.0 `MarkDuplicates` on `sort -n` output dies with `Alignments added out of order ... Sort order is queryname`, and `ValidateSamFile` reports `RECORD_OUT_OF_ORDER`; the same reads sorted with `-N` pass (planted-duplicate BAM: 50 pairs, 100 reads flagged). If the orders coincide, `-n` can be accepted, but that is not a portable assumption. Rule: use `-N` whenever a Picard/GATK/htsjdk tool will read the name-sorted file (or sort with Picard `SortSam`); `-n` is fine when only samtools reads it.
 
 ## samtools sort
 
@@ -61,21 +65,21 @@ samtools sort -N -o namesorted.bam input.bam    # ASCII; Picard/GATK/htsjdk cons
 ```bash
 samtools sort -@ 8 -o sorted.bam input.bam
 ```
-`-@ N` adds N threads (N+1 total). Output is identical for any `-@`.
+`-@ N` requests N additional worker threads. The number observed by a process monitor depends on the data, host, and samtools implementation, so do not treat it as a fixed `N+1` total. Output records are identical for any `-@` setting.
 
 ### Control Memory Usage
 ```bash
 samtools sort -m 4G -@ 4 -o sorted.bam input.bam
 ```
-`-m` is per thread, so peak memory is about (`-@` + 1) x `-m`. Values below `1M` are rejected. Data beyond the budget spills to temp files and is merged; the result is unchanged.
+`-m` is a per-thread budget, but observed peak memory also depends on data, spills, and implementation; measure it on your host instead of treating (`-@` + 1) x `-m` as exact. Values below `1M` are rejected. Data beyond the budget spills to temp files and is merged; the result is unchanged.
 
 ### Set Temporary Files
 ```bash
 samtools sort -T /tmp/sort_tmp -o sorted.bam input.bam
 ```
-`-T` is a **prefix** (temp files are `PREFIX.nnnn.bam`), not a directory.
+`-T` is a **prefix**. For a non-existent path, temp files are named like `PREFIX.nnnn.bam`; if the supplied path is an existing directory, samtools creates its generated temporary files inside that directory. Put either form on fast local storage.
 
-Slow sort: raise `-@` and `-m`, put `-T` on fast local disk, use `-l 1` for the final output (see Compression Level Decision).
+Slow sort: raise `-@` and `-m`, put `-T` on fast local disk, and consult [performance-and-errors.md](references/performance-and-errors.md) before choosing final-output compression.
 
 ### Specify Output Format
 ```bash
@@ -106,7 +110,7 @@ Without `MC` tags the sort stops with `no MC tag. Please run samtools fixmate on
 | `sort -n` / `sort -N` | Full sort by QNAME | Strict total order by name |
 | `collate` | Hash-bucket grouping | Mates adjacent; between-mate order undefined (`SO:unsorted GO:query`) |
 
-Use `collate` when a tool only needs mates adjacent (paired FASTQ extraction, re-aligning, fixmate, markdup pre-processing). It is not reliably faster: on a 192k-read slice `collate` took 0.74 s against 0.66 s for `sort -n` (samtools 1.24), so time it on your own data. `sort -n`/`-N` are only needed when a tool requires a real name order (see the table below).
+Use `collate` when a tool only needs mates adjacent (paired FASTQ extraction, re-aligning, fixmate, markdup pre-processing). It is not reliably faster: on a 192k-read slice on local WSL storage, `collate` took 0.74 s against 0.66 s for `sort -n` (samtools 1.24); on a network mount it was slower. Time both on the storage that will hold your data. `sort -n`/`-N` are only needed when a tool requires a real name order (see the table below).
 
 ```bash
 # Paired FASTQ extraction
@@ -121,15 +125,15 @@ samtools collate -O -u in.bam tmp_prefix | \
 | `samtools index` | coordinate (hard requirement) |
 | `samtools fixmate -m` | name (`-n` or `-N`) or collate (needs mates adjacent); coordinate input stops with `Coordinate sorted, require grouped/sorted by queryname` |
 | `samtools markdup` | coordinate (after fixmate) |
-| Picard MarkDuplicates / ValidateSamFile | coordinate, or queryname in `-N` (ASCII) order; `-n` output is rejected |
+| Picard MarkDuplicates / ValidateSamFile | coordinate, or queryname in `-N` (ASCII) order; `-n` is rejected when natural and ASCII orders differ, so use `-N` |
 | GATK MarkDuplicatesSpark | coordinate or queryname |
 | `samtools mpileup` / `bcftools mpileup` | coordinate (name-sorted input stops with `The input is not sorted`) |
-| GATK HaplotypeCaller | coordinate and indexed (Mutect2 †) |
-| htseq-count | `-r pos` for coordinate-sorted, `-r name` for name-sorted; `-r name` on a coordinate-sorted file over-counts pairs (5599 vs 2820 on the test BAM) (`-p` here is `--samout-format`, not "paired") |
+| GATK HaplotypeCaller / Mutect2 | coordinate and indexed |
+| htseq-count | `-r pos` for coordinate-sorted, `-r name` for name-sorted; in a one-gene GTF test over the DNA test BAM, `-r name` on coordinate-sorted input counted 5599 vs 2820 reads with `-r pos`, so do not treat that ratio as universal (`-p` here is `--samout-format`, not "paired") |
 | featureCounts † | coordinate or name; `-p` for paired-end |
 | umi_tools dedup | coordinate (with index) |
 | fgbio GroupReadsByUmi | any order accepted (template-coordinate recommended to avoid an internal re-sort; run `samtools fixmate -m`/`fgbio SetMateInformation` first) |
-| fgbio CallMolecularConsensusReads † | grouped by MI tag (consumes GroupReadsByUmi output) |
+| fgbio CallMolecularConsensusReads | template-coordinate order, as emitted by `fgbio GroupReadsByUmi` after mate information is set |
 | Sniffles, cuteSV, Manta, Delly † | coordinate and indexed |
 | Salmon alignment-mode, RSEM (STAR `--quantMode TranscriptomeSAM`) † | mates adjacent, grouped by name; not verified whether a strict lexicographic order is needed, so `sort -N` is the safe choice |
 
@@ -180,24 +184,27 @@ pysam.sort('-@', '4', '-m', '2G', '-T', '/tmp/sortpfx',
 ```python
 import pysam
 
-def is_coordinate_sorted(path):
-    """True only if the records really are in (reference order, POS) order, fully unmapped reads last."""
-    with pysam.AlignmentFile(path, 'rb') as bam:
+def is_coordinate_sorted(path, reference_filename=None):
+    """True only if records are in (reference order, POS) order, with unmapped reads last."""
+    with pysam.AlignmentFile(path, 'rb', check_sq=False,
+                             reference_filename=reference_filename) as bam:
+        if not bam.references:       # uBAM has no coordinate order to verify
+            return False
         prev = (-1, -1)
         for r in bam.fetch(until_eof=True):
-            key = (r.reference_id if r.reference_id >= 0 else float('inf'), r.reference_start)
+            key = (r.reference_id, r.reference_start) if r.reference_id >= 0 else (float('inf'), float('inf'))
             if key < prev:
                 return False
             prev = key
     return True
 
-def ensure_coordinate_sorted(input_bam, output_bam):
-    if is_coordinate_sorted(input_bam):
+def ensure_coordinate_sorted(input_bam, output_bam, reference_filename=None):
+    if is_coordinate_sorted(input_bam, reference_filename):
         return input_bam
     pysam.sort('-o', output_bam, input_bam)
     return output_bam
 ```
-This catches a mislabelled `SO:coordinate` BAM and reference blocks in the wrong order; reading `bam.header['HD']['SO']` alone does not.
+This catches a mislabelled `SO:coordinate` BAM and reference blocks in the wrong order; reading `bam.header['HD']['SO']` alone does not. For CRAM, set `REF_PATH` or pass its reference as `reference_filename`; otherwise pysam cannot decode records and may report a misleading truncation error.
 
 ### Stream Sort from Aligner
 For streaming from aligners, use shell pipes, and make the shell fail if any stage fails (`pipefail`); with `shell=True` alone a crashed aligner still returns 0 and leaves a truncated BAM:
@@ -283,38 +290,6 @@ samtools collate -O -u in.bam tmp_prefix | \
     samtools markdup - out.bam
 samtools index out.bam
 ```
-
-## Compression Level Decision
-
-| Level | Use | Wall-time vs default | Size vs default |
-|-------|-----|----------------------|------------------|
-| `-l 0` / `-u` | Pipe between samtools tools | fastest | many times larger (39x on the test slice) |
-| `-l 1` | Final output if disk is cheap | faster | ~8% larger |
-| `-l 6` | Default | baseline | baseline |
-| `-l 9` | Archival, write-once | ~10x slower | ~4% smaller |
-
-Measured once on a 192k-read 1000 Genomes slice with samtools 1.24 (`-@ 0`); the ratios depend on the data, so treat them as direction, not promises.
-
-```bash
-# WRONG -- pipe re-compresses then decompresses every step
-samtools fixmate -m in.bam - | samtools sort -o out.bam
-
-# RIGHT -- uncompressed (-u) between piped samtools commands
-samtools fixmate -m -u in.bam - | samtools sort -o out.bam
-```
-
-## Common Errors
-
-| Error | Cause | Solution |
-|-------|-------|----------|
-| `out of memory` | Insufficient RAM | Use `-m` to limit per-thread memory (peak is about (`-@`+1) x `-m`) |
-| `-m setting ... is less than the minimum required (1M)` | `-m` too small | Use `-m 1M` or more |
-| `disk full` | Temp files filling disk | Use `-T` to point the temp prefix at a different disk |
-| `truncated file` | Interrupted sort | Re-run sort from the original (keep it until the output passes `samtools quickcheck -v`) |
-| `Unsorted positions on sequence` (index) | Not coordinate-sorted, or `@HD` says so wrongly | Re-sort; verify records, not the header |
-| `NO_COOR reads not in a single block` / `cannot be indexed` | Indexing a `-n`, `-N` or `-t` output | Sort by coordinate first |
-| `Alignments added out of order` (Picard) | Name-sorted with `-n` (natural) | Re-sort with `-N` |
-| `no MC tag. Please run samtools fixmate` | `--template-coordinate` without mate tags | `samtools fixmate -m` first |
 
 ## Related Skills
 

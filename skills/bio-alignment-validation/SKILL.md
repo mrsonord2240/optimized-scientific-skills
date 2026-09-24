@@ -1,6 +1,6 @@
 ---
 name: bio-alignment-validation
-description: Validate alignment quality with insert size distribution, proper pairing rates, GC bias, strand balance, and other post-alignment metrics. Use when verifying alignment data quality before variant calling or quantification.
+description: Validate BAM integrity, reference-dictionary identity, alignment quality, contamination, and sample swaps with insert size, pairing, GC bias, strand balance, and post-alignment metrics. Use before variant calling or quantification.
 tool_type: mixed
 primary_tool: samtools
 license: MIT
@@ -11,7 +11,7 @@ author: GPTomics
 
 Reference examples tested with: matplotlib 3.8+, numpy 1.26+, picard 3.1+, pysam 0.22+, samtools 1.19+
 Checked on: samtools 1.24, pysam 0.24.1, Picard 3.5.0, VerifyBamID2 2.0.3, somalier 0.3.5, deepTools 4.0.0, RSeQC 5.0.4
-Install: `conda install -c bioconda samtools picard` and `pip install pysam numpy matplotlib`. `picard <Tool> KEY=VALUE` is the bioconda wrapper for `java -jar picard.jar <Tool> KEY=VALUE`; Picard 3.x still accepts the `KEY=VALUE` form.
+Install: `conda install -c bioconda samtools picard` and `pip install pysam numpy matplotlib`. Install R when requesting Picard charts (`H=` / `CHART=`): Picard invokes `Rscript` for those plots, while omitting the chart argument still writes the metrics table. `picard <Tool> KEY=VALUE` is the bioconda wrapper for `java -jar picard.jar <Tool> KEY=VALUE`; Picard 3.x still accepts the `KEY=VALUE` form.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - Python: `pip show <package>` then `help(module.function)` to check signatures
@@ -30,11 +30,15 @@ Post-alignment quality control to verify alignment quality and identify issues.
 
 ## What Each Validation Covers
 
+## Reference Files
+
+- `references/library-metrics.md` — Read when selecting or interpreting insert-size and GC-bias metrics, including the Picard chart/R requirement and the runnable Python insert-size example.
+
 | Concern | Tools | What it catches |
 |---------|-------|-----------------|
 | **File integrity** | `samtools quickcheck`, `samtools view -c`, `picard ValidateSamFile` | See the detection table below: each tool sees a different slice of the damage |
 | **Sequence dictionary identity** | `samtools dict` + SN/LN/M5 comparison | BAM aligned to wrong reference flavor / different decoy / chr vs no-chr |
-| **QC metrics** | `samtools stats`, `flagstat`, `mosdepth`, Picard `CollectMultipleMetrics` / `CollectHsMetrics` / `CollectWgsMetrics`, `examples/validate_alignment.*` | Are the data biologically reasonable for the assay? |
+| **QC metrics** | `samtools stats`, `flagstat`, `mosdepth`, Picard `CollectMultipleMetrics` / `CollectHsMetrics` / `CollectWgsMetrics`, `examples/validate_alignment.*`; `references/library-metrics.md` | Are the data biologically reasonable for the assay? Read the reference for insert size and GC bias. |
 | **Contamination / sample swap** | `verifybamid2`, `somalier`, Picard `CrosscheckFingerprints` | Cross-sample contamination, tumor-normal swap, mislabeled sample |
 
 A file can pass `quickcheck` and still be malformed in ways that crash GATK three hours into HaplotypeCaller. Conversely, a QC-poor BAM can be structurally valid.
@@ -45,7 +49,7 @@ A file can pass `quickcheck` and still be malformed in ways that crash GATK thre
 samtools quickcheck -v in.bam || echo "QUICKCHECK FAILED"
 samtools quickcheck -v *.bam > bad_bams.fofn   # one fail-line per bad file
 
-# Slow but thorough: structural validation (R= enables the NM/MD checks)
+# Slow but thorough: structural validation (R= enables the NM check; use samtools calmd to check MD)
 picard ValidateSamFile I=in.bam MODE=SUMMARY R=ref.fa
 ```
 
@@ -60,7 +64,7 @@ What each check caught in 21 planted defects (synthetic BAMs derived from a real
 
 No tool here sees a whole block removed from the middle unless mates are orphaned; for transfers compare `md5sum` or the read count with the source.
 
-Picard noise on valid files (observed): `MATE_NOT_FOUND` on region-extracted BAMs (mates fall outside the slice), `MISSING_TAG_NM` warnings on BAMs without NM tags (STAR output), `RECORD_OUT_OF_ORDER` on a samtools name-sorted BAM (Picard likely orders query names differently from samtools). Read the SUMMARY before trusting a non-zero count.
+Picard noise on valid files (observed): `MATE_NOT_FOUND` on region-extracted BAMs (mates fall outside the slice), `MISSING_TAG_NM` warnings on BAMs without NM tags (STAR output), `RECORD_OUT_OF_ORDER` on a samtools name-sorted BAM (Picard likely orders query names differently from samtools). Long-read BAMs can also report missing `@RG PL` / other required header tags and NM-convention errors. Read the SUMMARY before trusting a non-zero count.
 
 `IGNORE=<TYPE>` removes a check. On the planted files `IGNORE=INVALID_MAPPING_QUALITY IGNORE=MISMATCH_FLAG_MATE_NEG_STRAND` turned 40, 2 and 2820 genuine errors into "No errors found". Ignore a type only after tracing it to a known harmless source.
 
@@ -103,86 +107,16 @@ somalier extract -d extracted/ -s /resources/sites.hg38.vcf.gz \
     -f ref.fa sample.bam
 somalier relate --infer extracted/*.somalier
 
-# Tumor/normal pairing verification: give both BAMs the same SM (patient id), or add
-# EXPECT_ALL_GROUPS_TO_MATCH=true; the exit code is 1 on an unexpected mismatch
+# Tumor/normal pairing verification: compare whole files so duplicate RG IDs/PUs cannot collapse
+# two samples into one group. Alternatively give every BAM a distinct RG ID and PU.
+# Give paired tumor/normal BAMs the same SM (patient id) or add EXPECT_ALL_GROUPS_TO_MATCH=true.
 picard CrosscheckFingerprints I=tumor.bam I=normal.bam \
     HAPLOTYPE_MAP=Homo_sapiens_assembly38.haplotype_database.txt \
-    LOD_THRESHOLD=-5 OUTPUT=crosscheck.metrics
+    CROSSCHECK_BY=FILE LOD_THRESHOLD=-5 OUTPUT=crosscheck.metrics
 # With LOD_THRESHOLD=-5: LOD > 5 = same individual; < -5 = different; in between = ambiguous
 ```
 
 Checked here: `CrosscheckFingerprints` and `somalier extract` + `relate --infer` ran end-to-end on a 40-site chr22 haplotype map / sites VCF built for the test slice (same reads: LOD +12.6, somalier relatedness 1.0; genotype-flipped reads: LOD -63, exit 1 for a same-SM pair, somalier relatedness -140, concordance 0). `verifybamid2` ran to the marker check only, so no FREEMIX value was produced here; the `HAPLOTYPE_MAP` above is the GATK-bundle file and the somalier/VerifyBamID2 panels are downloads, none shipped with this Skill.
-
-## Insert Size Distribution
-
-**Goal:** Verify that the fragment length distribution matches the library preparation protocol.
-
-**Approach:** Extract template_length from properly paired reads and compare the distribution to expected values for the library type.
-
-### samtools stats
-
-```bash
-samtools stats input.bam > stats.txt
-grep "^IS" stats.txt | cut -f2,3 > insert_sizes.txt
-```
-
-### Picard CollectInsertSizeMetrics
-
-```bash
-picard CollectInsertSizeMetrics \
-    I=input.bam \
-    O=insert_metrics.txt \
-    H=insert_histogram.pdf
-```
-
-### Expected Insert Sizes by Library
-
-| Library | Mean insert | Distribution shape | Diagnostic |
-|---------|-------------|-------------------|-----------|
-| TruSeq DNA PCR-free WGS | 400-500 bp | Roughly Gaussian, tight/sharp | Sharpest, most symmetric peak (no PCR bias); bimodality = degraded sample |
-| TruSeq DNA Nano (PCR) WGS | 300-400 bp | Gaussian, broadened by PCR amplification bias | |
-| Twist / IDT exome capture | 250-350 bp | Gaussian | |
-| TruSeq Stranded mRNA | 200-300 bp | Right-skewed (transcript distribution) | Long tail = poor size selection |
-| Ribo-Zero rRNA-depleted | 250-400 bp | Right-skewed | |
-| Smart-seq2 / Smart-seq3 | 200-700 bp | Broad | |
-| 10x Chromium (3') | n/a -- not informative | n/a | |
-| TruSeq ChIP | 200-400 bp | Sharp | |
-| ATAC-seq (Buenrostro / Omni-ATAC) | Multimodal | Peaks at ~50, ~180, ~370 bp | **Missing multimodal pattern = bad library**; missing ~180 bp mononucleosome peak = Tn5 over- or under-titrated, or degraded DNA. Check with the `samtools stats` `IS` histogram above |
-| Hi-C / Micro-C | Multimodal | Peak at ligation-junction size | |
-| cfDNA / ctDNA | 160-180 bp | Multimodal; ~167 bp mononucleosomal + ~340 dinuc | Tumor-derived shorter (~145 bp); shape itself is a biomarker |
-| FFPE | 100-250 bp | Right-skewed, broad | |
-| aDNA | 30-80 bp | Sharp left-skewed | |
-| ONT (native) | 1-30 kb | n/a | |
-| PacBio HiFi | 10-25 kb | Sharp peak | |
-
-### Python Insert Size Analysis
-
-```python
-import pysam
-import numpy as np
-import matplotlib.pyplot as plt
-
-def get_insert_sizes(bam_file, max_reads=100000):
-    sizes = []
-    bam = pysam.AlignmentFile(bam_file, 'rb')
-    for i, read in enumerate(bam.fetch(until_eof=True)):  # until_eof: no index needed
-        if i >= max_reads:
-            break
-        if read.is_proper_pair and not read.is_secondary and read.template_length > 0:
-            sizes.append(read.template_length)
-    bam.close()
-    return sizes
-
-sizes = get_insert_sizes('sample.bam')
-print(f'Median insert size: {np.median(sizes):.0f}')
-print(f'Mean insert size: {np.mean(sizes):.0f}')
-print(f'Std dev: {np.std(sizes):.0f}')
-
-plt.hist(sizes, bins=100, range=(0, 1000))
-plt.xlabel('Insert Size')
-plt.ylabel('Count')
-plt.savefig('insert_size_dist.pdf')
-```
 
 ## Proper Pairing Rate
 
@@ -205,42 +139,6 @@ awk -v p="$proper" -v n="$paired" 'BEGIN{if (n) printf "Proper pairing rate: %.2
 ```
 
 Multiply before dividing: `bc` with `scale=2` on `$proper / $paired * 100` truncates the quotient first (99.96% prints as 99.00%).
-
-## GC Bias
-
-GC content correlation with coverage.
-
-### Picard CollectGcBiasMetrics
-
-```bash
-picard CollectGcBiasMetrics \
-    I=input.bam \
-    O=gc_bias_metrics.txt \
-    CHART=gc_bias_chart.pdf \
-    S=gc_summary.txt \
-    R=reference.fa
-```
-
-The summary (`S=`) has `AT_DROPOUT` and `GC_DROPOUT` (percent of reads lost in the low-AT / low-GC windows); the detail file (`O=`) has `NORMALIZED_COVERAGE` per GC bin (1.0 = mean coverage). The "GC bias" bands in the Quality Thresholds table are applied to `NORMALIZED_COVERAGE` of well-populated bins.
-
-### deepTools computeGCBias
-
-```bash
-computeGCBias \
-    -b input.bam \
-    --effectiveGenomeSize 2913022398 \
-    -g hg38.2bit \
-    -o gc_bias.txt \
-    --biasPlot gc_bias.pdf
-```
-
-### Interpret GC Bias
-
-| Issue | Symptom |
-|-------|---------|
-| Under-representation | Low GC coverage drops |
-| Over-representation | High GC coverage elevated |
-| PCR bias | Strong correlation |
 
 ## Strand Balance
 
@@ -354,7 +252,7 @@ python examples/validate_alignment.py sample.bam        # whole file, no index n
 python examples/validate_alignment.py sample.bam -n 100000
 ```
 
-It reads with `fetch(until_eof=True)`: unplaced unmapped reads (RNAME `*`) are counted, whereas `fetch()` and `get_index_statistics()` never see them (a BAM with 30% unplaced unmapped reads then reads as 100% mapped). `-n N` samples the first N records only: head-of-file biased (chr1 differs in GC content and complexity from chrM/chrX/chrY/alt contigs), and in a coordinate-sorted BAM the unplaced tail is not reached, so the mapping rate is overestimated. For unbiased per-chromosome statistics use `samtools view -s 42.01 input.bam` (the `INT.FRAC` form uses `INT` as the seed; specify an explicit nonzero seed so the subsample is documented and consistent across paired runs).
+It reads with `fetch(until_eof=True)`: unplaced unmapped reads (RNAME `*`) are counted, whereas `fetch()` and `get_index_statistics()` never see them (a BAM with 30% unplaced unmapped reads then reads as 100% mapped). `-n N` prints a head-of-file bias warning: it samples the first N records only, and in a coordinate-sorted BAM the unplaced tail is not reached, so the mapping rate is overestimated. Both validators require `@SQ` and do not grade pairing or strand balance below 100 primary records; they print that limit instead of interpreting a one-read fraction. For unbiased per-chromosome statistics use `samtools view -s 42.01 input.bam` (the `INT.FRAC` form uses `INT` as the seed; specify an explicit nonzero seed so the subsample is documented and consistent across paired runs).
 
 ## Quality Thresholds Summary
 

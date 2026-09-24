@@ -23,13 +23,13 @@ The BioMart XML query format is stable across Ensembl releases; the underlying m
 
 **"Bulk-convert IDs / pull coordinate tables / extract ortholog wide tables"** -> BioMart is the right answer for any Ensembl-rooted query producing >5,000 rows. It is a separate service from the Ensembl REST API, with separate rate behavior and a different query model (XML-based, batch-oriented). For one-off lookups (<100 records), Ensembl REST is more convenient; for bulk anything, BioMart wins.
 
-The single most important fact: **BioMart returns a flat table from a single query**. There is no per-record loop, no rate-limit cascade, no async polling. One XML query in; one TSV out.
+The single most important fact: **BioMart returns a flat table per query**. There is no per-record loop, no rate-limit cascade, and no async polling. Large ID lists are sent as a small number of batched XML queries, then concatenated locally.
 
 - Python: `pybiomart` (https://github.com/jrderuiter/pybiomart) is the lightest client
 - R: `biomaRt` Bioconductor (Durinck et al. 2009 *Nat Protoc* 4:1184) is the canonical client -- more mature and Bioconductor-supported than pybiomart; prefer it for R-based pipelines
 - CLI: `curl` against the XML endpoint works but is rarely used directly
 - Web: `https://www.ensembl.org/biomart/martview` for interactive query design
-- Non-vertebrate species: swap the host for the Ensembl Genomes BioMart, e.g. `Server(host='http://plants.ensembl.org')`
+- Ensembl Genomes instances are **not** a drop-in `Server(host=...)` swap for this pybiomart pattern: their endpoint and schema configuration must be verified against that instance before use. This Skill only documents the tested Ensembl gene mart path.
 
 ## Installation
 
@@ -66,7 +66,7 @@ print(ds.filters)                                            # list filters
 
 | Question | BioMart | Ensembl REST |
 |---|---|---|
-| Bulk ID mapping (>5000 IDs) | yes (1 query) | rate-limited cascade |
+| Bulk ID mapping (>5000 IDs) | yes (batched XML queries) | rate-limited cascade |
 | Single-gene lookup | overkill | yes |
 | Coordinate tables for thousands of genes | yes | rate-limited |
 | Ortholog wide-table across species | yes (multi-species mart) | per-gene loop |
@@ -110,55 +110,29 @@ For >5K rows, BioMart is the right tool. For real-time per-record lookups, REST.
 
 ### Querying with ID-list filters (pybiomart 0.2.0 workaround)
 
-`ds.query(filters={'ensembl_gene_id': [...]})` fails as described above. The fix confirmed live
-(TP53/BRCA1/PTEN/EGFR/MYC, real HGNC/RefSeq/UniProt cross-refs, checked 2026-09-17): build the same
-XML `ds.query()` builds internally and send it through `ds.get()`, which skips the broken
-attribute/filter-dict validation and lets Ensembl answer directly. This also guards against
-Ensembl's intermittent "Service unavailable" page, which comes back as HTTP 200 and would otherwise
-be silently parsed as data (see Failure modes).
+`ds.query(filters={'ensembl_gene_id': [...]})` fails as described above. Use the shared
+`scripts/biomart_query.py` helper: it builds the same XML `ds.query()` builds internally and sends it
+through `ds.get()`, which skips the broken attribute/filter-dict validation. It also validates empty
+ID lists locally, distinguishes HTML outage pages from other malformed responses, and starts one ID
+list in 500-value requests before concatenating their TSV tables. If an instance responds 414
+Request-URI Too Large, it halves only that failed batch automatically. Run its offline
+check with `python scripts/biomart_query.py --self-test`.
 
 ```python
-from io import StringIO
-from xml.etree import ElementTree
-import pandas as pd
+import sys
+from pathlib import Path
 
-def query_raw(ds, attributes, filters):
-    root = ElementTree.Element('Query')
-    root.set('virtualSchemaName', 'default')
-    root.set('formatter', 'TSV')
-    root.set('header', '1')
-    root.set('uniqueRows', '1')
-    root.set('datasetConfigVersion', '0.6')
-    dataset_el = ElementTree.SubElement(root, 'Dataset')
-    dataset_el.set('name', ds.name)
-    dataset_el.set('interface', 'default')
-    for name, value in filters.items():
-        f = ElementTree.SubElement(dataset_el, 'Filter')
-        f.set('name', name)
-        f.set('value', ','.join(value) if isinstance(value, (list, tuple)) else str(value))
-    for name in attributes:
-        a = ElementTree.SubElement(dataset_el, 'Attribute')
-        a.set('name', name)
-
-    response = ds.get(query=ElementTree.tostring(root))
-    body = response.text.strip()
-    if 'Query ERROR' in body:
-        raise RuntimeError(f'BioMart rejected the query: {body}')
-    if body.lower().startswith('<html') or not body:
-        raise RuntimeError(
-            'BioMart returned a non-TSV response (an outage page served with HTTP '
-            '200, or an empty body) -- retry with backoff, this is not a code error.'
-        )
-    return pd.read_csv(StringIO(body), sep='\t')
+sys.path.insert(0, str(Path('scripts').resolve()))
+from biomart_query import query_raw
 ```
 
-The patterns below all use `query_raw()`, defined once here, instead of `ds.query()`.
+The patterns below all use `query_raw()` from `scripts/biomart_query.py`, instead of `ds.query()`.
 
 ### Bulk ID mapping: Ensembl Gene -> HGNC + RefSeq + UniProt
 
-**Goal:** Convert 5,000 Ensembl Gene IDs to HGNC symbols, RefSeq mRNA accessions, and UniProt accessions in one query.
+**Goal:** Convert 5,000 Ensembl Gene IDs to HGNC symbols, RefSeq mRNA accessions, and UniProt accessions in bounded BioMart batches.
 
-**Approach:** `query_raw()` with three cross-ref attributes; ID list as a filter; returns one TSV.
+**Approach:** `query_raw()` with three cross-ref attributes; ID list as a filter; returns one concatenated TSV. The helper starts at 500 IDs per request and halves a batch if that BioMart instance returns HTTP 414; it only accepts one such large list filter at a time.
 Stick to 3 attributes from the "External References" attribute page (`hgnc_id`, `refseq_mrna`,
 `uniprotswissprot` here) -- combining 4 or more of them (e.g. adding `entrezgene_id`) makes Ensembl
 reject the query server-side with "Too many attributes selected for External References"; query
@@ -172,7 +146,7 @@ server = Server(host='http://www.ensembl.org')
 mart = server['ENSEMBL_MART_ENSEMBL']
 ds = mart['hsapiens_gene_ensembl']
 
-ensembl_ids = ['ENSG00000139618', 'ENSG00000141510', 'ENSG00000171862']  # ...up to 5K+
+ensembl_ids = ['ENSG00000139618', 'ENSG00000141510', 'ENSG00000171862']  # ...5K is split into 500-ID batches
 
 df = query_raw(ds,
     attributes=['ensembl_gene_id', 'external_gene_name', 'hgnc_id',
@@ -319,9 +293,9 @@ chrom_filts = [f for f in filts if 'chrom' in f]
   downstream column lookups (e.g. `next(c for c in df.columns if ...)`) crash with an opaque
   `StopIteration` that gives no hint of the real cause.
 - **Symptom:** `StopIteration`, or a one-row/one-column garbage DataFrame, with no BioMart error text.
-- **Fix:** Use `query_raw()` (Code patterns), which checks the raw response body for an HTML/empty
-  payload before parsing and raises a clear `RuntimeError` telling you to retry. Retry with backoff;
-  this is a live-service availability issue, not a code error.
+- **Fix:** Use `query_raw()` (Code patterns), which raises `BioMartOutageError` for an HTML/status
+  response and `BioMartResponseError` for an empty or non-TSV response. Retry only the outage error
+  with backoff; inspect the query/filter values for the other error.
 
 ### ID-list filter rejected even though it's a real filter
 - **Trigger:** `ds.query(filters={'ensembl_gene_id': [...]})` or `external_gene_name` / `entrezgene_id`.
@@ -338,6 +312,9 @@ chrom_filts = [f for f in filts if 'chrom' in f]
 | Empty result | Wrong attribute / filter name | List with `ds.attributes` and `ds.filters` |
 | `BiomartException: Unknown filter ensembl_gene_id` (or `external_gene_name`, `entrezgene_id`) | ID-list filter not exposed by `Dataset.filters` in pybiomart 0.2.0 | Use `query_raw()` instead of `ds.query()` |
 | `StopIteration` with no BioMart error text | Outage page served as HTTP 200, parsed as data | Use `query_raw()`; retry with backoff |
+| `BioMartInputError: filter '...' is empty` | An empty list was supplied | Correct the input; no network request was made |
+| `BioMartOutageError` | HTML/status page served instead of TSV | Retry with backoff; this is a service issue |
+| `BioMartResponseError` | Empty, rejected, or non-TSV response | Inspect filter values and response; do not assume it is an outage |
 | Timeout on big query | No filter, too many rows | Chunk by chromosome |
 | Drift between re-runs | No version pinning | `useEnsembl(version=110)` |
 | Row count > expected | Many-to-many cross-ref joins | Filter to canonical isoform |

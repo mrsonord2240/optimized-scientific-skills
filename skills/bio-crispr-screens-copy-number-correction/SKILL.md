@@ -114,8 +114,15 @@ corrected_counts <- ccr.correctCounts('my_screen',
 
 ```python
 # Chronos (pip install crispr_chronos, or pip install git+https://github.com/broadinstitute/chronos)
+import numpy as np
 import chronos
 from chronos.hit_calling import get_probability_dependent
+
+# Chronos initializes model parameters with NumPy draws. Seed *before* constructing the model,
+# and record the Chronos version, seed, input hashes, epochs, and platform in the run manifest.
+# This makes a CPU rerun materially comparable; do not promise bitwise-identical estimates across
+# TensorFlow/BLAS versions or hardware. Re-run important panels and report their stability.
+np.random.seed(20260924)  # replace with and record a project-specific seed
 
 # Every input is a dict keyed by library name, not a bare DataFrame, and Chronos checks the
 # schema below (chronos.check_inputs) before training:
@@ -244,7 +251,7 @@ If post-CRISPRcleanR or post-Chronos the CN-LFC Spearman is still significantly 
 2. **CRISPRcleanR position-based correction missed it:** The amplification is small relative to the segmentation algorithm's resolution. Use Chronos with matched CN profile.
 3. **Genomic rearrangement creates a "ghost" amplification:** A complex rearrangement appears as normal CN but Cas9 cuts at multiple sites due to translocation breakpoints. Combine WGS structural variants with the analysis.
 4. **Cell line has an unusually strong cut-toxicity response:** The artifact may persist; use CRISPRi screens for that line.
-5. **`alternate_CN` fits one CN-effect curve across the whole panel:** it is a fitted average, not a per-line correction, so a single extreme-CN line can retain residual signal even after correction. On a real 3-line CN dose-response panel (CN=2/8/15), the CN=15 line's amplicon genes moved from -1.92 to only -1.20 -- still essential-looking -- while the essentials stayed untouched. Re-run `detect_cn_bias` per cell line, not only pooled, after `alternate_CN`.
+5. **`alternate_CN` fits one CN-effect curve across the whole panel:** it is a fitted average, not a per-line correction, so a single extreme-CN line can retain residual signal even after correction. On a real 3-line CN dose-response panel (CN=2/8/15), the CN=15 line's amplicon genes moved from -1.92 to only -1.20 -- still essential-looking -- while the essentials stayed untouched. Re-run `detect_cn_bias` per cell line after `alternate_CN`; compare those results with a pooled summary, but do not assume either view will always conceal the other.
 
 ## Apply CN Correction to Pipeline
 
@@ -345,6 +352,7 @@ See [[library-design]] for CRISPRi (Dolcetto) and CRISPRa (Calabrese) library op
 | `RuntimeError: Correct for CN should not be used with fewer than 3 cell lines` | `alternate_CN` needs a panel | CN-correct with CRISPRcleanR instead; Chronos can still score the screen |
 | `AssertionError: ... Is your data transposed?` | readcounts passed as guides x samples | Transpose: rows = sequence_ID, columns = sgRNA |
 | `ValueError: excess_variance was passed as dict without key for '<library>': {}` at `chronos.Chronos(...)` construction (not `train()`) | `negative_control_sgrnas` not supplied | Pass a dict of non-targeting/non-essential sgRNAs per library |
+| `ValueError: set of negative_control_sgrnas is empty` at `chronos.Chronos(...)` construction | `negative_control_sgrnas` was supplied, but one library's list is empty | Populate every library with real non-targeting/non-essential sgRNAs; do not use an empty placeholder list |
 | CRISPRcleanR removes a known essential | Segment-based over-correction | Manually inspect segments; cross-check with non-corrected |
 | Spearman ρ still -0.15 after correction | Method too coarse for the amp | Refine CN profile; use Chronos |
 | ERBB2 listed as essential in SK-BR-3 | Uncorrected HER2 amplification | Always apply correction before hit calling |

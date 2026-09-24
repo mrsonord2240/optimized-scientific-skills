@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "a0f8d0973ab151551a4e9d5f4fece9badf26d1bb"
+      "staging_commit": "aa465d0494ed00d2fab44bc7007374715d23ef6d"
     }
   },
   "skills": [
@@ -247,21 +247,22 @@
     {
       "id": "bio-alignment-sorting",
       "upstream_path": "alignment-files/alignment-sorting",
-      "score": 86,
-      "grade": "Limited Release",
+      "score": 95,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-20",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-alignment-sorting.md",
       "fix_pass": "done",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
+        "performance-and-errors.md",
         "sort_pipeline.sh",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-alignment-structural",
@@ -313,22 +314,23 @@
     {
       "id": "bio-alignment-validation",
       "upstream_path": "alignment-files/alignment-validation",
-      "score": 85,
-      "grade": "Limited Release",
+      "score": 95,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-20",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-alignment-validation.md",
       "fix_pass": "done",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
+        "library-metrics.md",
         "usage-guide.md",
         "validate_alignment.py",
         "validate_alignment.sh"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-bam-statistics",
@@ -377,23 +379,24 @@
     {
       "id": "bio-biomart-queries",
       "upstream_path": "database-access/biomart-queries",
-      "score": 87,
-      "grade": "Limited Release",
+      "score": 95,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-17",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-biomart-queries.md",
       "fix_pass": "done",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
+        "biomart_query.py",
         "bulk_id_mapping.py",
         "coordinate_table.sh",
         "ortholog_table.py",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-blast-searches",
@@ -974,11 +977,11 @@
     {
       "id": "bio-crispr-screens-copy-number-correction",
       "upstream_path": "crispr-screens/copy-number-correction",
-      "score": 82,
-      "grade": "Limited Release",
+      "score": 98,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-16",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-crispr-screens-copy-number-correction.md",
       "fix_pass": "done",
       "reaudit": "not needed",
@@ -988,7 +991,7 @@
         "run_crispr_cleanr.R",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-crispr-screens-crispresso-editing",
