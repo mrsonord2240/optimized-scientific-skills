@@ -45,8 +45,8 @@ Tell the AI agent what to do:
 3. Apply the stages defined by that pipeline; ChEMBL does not canonicalize tautomers, while the custom RDKit and canSARchem-style workflows shown here can.
 4. Generate canonical SMILES and InChIKey for each standardized compound.
 5. Deduplicate by InChIKey; aggregate activity if multiple records.
-6. Output standardized CSV with `smiles`, `inchikey`, `activity`, `n_replicates` columns.
-7. Report parse failures, ChEMBL exclusion flags, fragments stripped, and any tautomer changes when a tautomer step was requested. Do not silently admit `exclude_flag=True` structures into registration or QSAR output.
+6. Output standardized CSV with `smiles`, `inchikey`, `activity`, `activity_range`, `replicate_disagreement`, and `n_replicates` columns.
+7. Retain and report the returned status tally: parse failures, ChEMBL exclusion flags, multi-fragment parents, fallback selections, inorganic parents, and standardization errors. Do not silently admit `exclude_flag=True` or an unstripped multi-fragment parent into registration or QSAR output.
 
 ## Tips
 
@@ -54,6 +54,8 @@ Tell the AI agent what to do:
 - Use InChIKey for cross-database identity (more robust than canonical SMILES).
 - Preserve permanent charges with the selected uncharging policy (normally `force=False`) and inspect charge-sensitive structures; `canonicalOrder=True` controls site ordering, not whether a charge is chemically permanent.
 - Tautomer canonicalization is the most contentious step; document choice and apply consistently across train + test.
+- For a mixed tracer library, use a boolean per-record `keep_isotopes` column, preserve that choice in the output, and do not infer the policy from the SMILES alone.
+- Review `replicate_disagreement=True` groups before training. The bundled example flags a max-minus-min activity span above 1.0 log unit; only drop them under a documented assay-QC policy after reconciling endpoint, units, and assay format.
 - For natural products / peptides, default tautomer rules may not apply; manual review.
 - Standardize entire library before deduplication; tautomer differences cause duplicate misses.
 

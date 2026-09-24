@@ -22,6 +22,7 @@ OUT_PREFIX=${7:-rg_t1_t2}
 MIN_MEAN_CHISQ=1.02
 
 # Local-rg trigger: |rg| > 0.5 from global LDSC warrants LAVA local rg per
+# This is separate from the stricter |rg| > 0.3 CHP-aware MR sensitivity rule in SKILL.md.
 # locus and (if MR is downstream) CHP-aware sensitivity (CAUSE / LHC-MR).
 RG_LOCAL_TRIGGER=0.5
 

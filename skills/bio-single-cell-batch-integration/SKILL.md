@@ -32,7 +32,7 @@ Integration trades batch-mixing against biological-signal preservation, and the 
 
 Visualize the uncorrected data first; integration is a bias-variance trade and removing batch variance risks removing biology correlated with batch.
 
-- Confounded design (each condition is its own batch, e.g. all controls day 1, all treated day 2): no algorithm can separate batch from biology. The diagnostic: cluster the uncorrected data and cross-tabulate clusters x batch x condition; pure-by-batch clusters that are also condition-aligned mean integration is unsafe. The fix is experimental - multiplex conditions across batches (cell hashing; genetic demux via souporcell/vireo; split each condition across capture days).
+- Confounded design (each condition is its own batch, e.g. all controls day 1, all treated day 2): no algorithm can separate batch from biology. **Before looking at an embedding, cross-tabulate condition x batch:** stop if any condition occurs in only one batch. Then cluster the uncorrected data and cross-tabulate clusters x batch x condition to size a visible technical effect; this follow-up does not make a confounded design safe when clusters mix. The fix is experimental - multiplex conditions across batches (cell hashing; genetic demux via souporcell/vireo; split each condition across capture days).
 - Technical replicates of the same tissue that already mix well: over-correction risk outweighs benefit.
 - Per-sample analyses (CNV/tumor-clone inference): integration would erase the signal of interest.
 
@@ -44,13 +44,13 @@ No method wins universally - the scIB benchmark (Luecken 2022, 68 method/preproc
 
 | Method | Model / assumption | Use when | Fails when |
 |--------|-------------------|----------|------------|
-| Harmony | Iterative soft k-means linear correction in PCA space; outputs an embedding, not counts | Few/simple batches, fast, low memory; strong default; best usability | Strong nonlinear batch effects; high `theta` over-mixes and collapses distinct types |
-| scVI | Conditional VAE on raw counts (ZINB), batch as covariate -> batch-invariant latent | Large atlases, many nested batches, strong effects; memory-efficient at scale | Small data (under-trained); latent dims over-interpreted as "biology minus batch" |
-| scANVI | Semi-supervised scVI using partial labels to protect biology | Some cell labels exist and bio fidelity is paramount (tops bio-conservation) | Labels noisy/wrong; training cost; closed-world for the labeled states |
-| Seurat CCA | Anchor-based, canonical correlation across datasets | Strong shared structure under large shifts; smaller data | Substantial non-overlap or many samples -> over-correction (CCA aligns distinct states) |
-| Seurat RPCA | Reciprocal-PCA anchors; faster, more conservative | Large/many-sample data, substantial non-overlap | Under-correction when truly shared structure is subtle (raise `k.anchor`) |
+| [Harmony](references/harmony.md) | Iterative soft k-means linear correction in PCA space; outputs an embedding, not counts | Few/simple batches, fast, low memory; strong default; best usability | Strong nonlinear batch effects; high `theta` over-mixes and collapses distinct types |
+| [scVI](references/scvi-scanvi.md) | Conditional VAE on raw counts (ZINB), batch as covariate -> batch-invariant latent | Large atlases, many nested batches, strong effects; memory-efficient at scale | Small data (under-trained); latent dims over-interpreted as "biology minus batch" |
+| [scANVI](references/scvi-scanvi.md) | Semi-supervised scVI using partial labels to protect biology | Some cell labels exist and bio fidelity is paramount (tops bio-conservation) | Labels noisy/wrong; training cost; closed-world for the labeled states |
+| [Seurat CCA](references/seurat-v5.md) | Anchor-based, canonical correlation across datasets | Strong shared structure under large shifts; smaller data | Substantial non-overlap or many samples -> over-correction (CCA aligns distinct states) |
+| [Seurat RPCA](references/seurat-v5.md) | Reciprocal-PCA anchors; faster, more conservative | Large/many-sample data, substantial non-overlap | Under-correction when truly shared structure is subtle (raise `k.anchor`) |
 | fastMNN | Mutual nearest neighbors in PCA space | Rare-population preservation; moderate data | Order-sensitive (set `merge.order`, most-heterogeneous first); legacy mnnCorrect is slow |
-| Scanorama | Mutual NN across all dataset pairs | Partial cell-type overlap across datasets; balanced bio/batch | Very large data (slower than Harmony/BBKNN) |
+| Scanorama | Mutual NN across all dataset pairs | Partial cell-type overlap across datasets; balanced bio/batch; sort cells by batch key before calling `scanorama_integrate` | Very large data (slower than Harmony/BBKNN) |
 | BBKNN | Modifies only the neighbor graph (batch-balanced kNN) | Speed; only clustering/UMAP needed downstream | Leans toward batch removal; no embedding or corrected counts for other uses |
 
 scIB headline: top combined performers were scANVI, scVI, Scanorama, scGen; Harmony and Seurat were strong on simpler tasks with the best usability; BBKNN sits at the batch-removal end. "Deep methods are always best" is not supported - Harmony/Seurat win simple/small tasks; deep methods win complex/large/label-rich tasks.
@@ -61,35 +61,25 @@ Aggressive settings increase mixing and over-correction risk in lockstep - raise
 
 | Parameter | Tool | Effect | Rationale |
 |-----------|------|--------|-----------|
-| theta | Harmony | Higher -> more aggressive batch mixing | Default is an internal fallback, not the signature default; larger theta over-corrects |
+| theta | Harmony | Higher -> more aggressive batch mixing | Start near 2 (roughly 0.5-5 is usually the useful tuning range); below that, batch-effect size can dominate the setting. `theta = 0` does not disable correction, so judge each change with paired batch/bio metrics and rare-population checks. |
 | k.anchor | Seurat | Higher -> more anchors, stronger correction | Raise (e.g. 20) only when under-correcting |
 | CCA vs RPCA | Seurat | CCA more sensitive but can over-correct; RPCA conservative | Prefer RPCA for large/non-overlapping data |
 | n_latent | scVI | Latent dimensionality of the embedding | ~10-30; too high refits noise, too low under-fits |
 | merge.order | fastMNN | Order batches are merged | Order-sensitive; merge most-heterogeneous batch first |
+
+## Reference Files
+
+- [`references/harmony.md`](references/harmony.md): read when using Harmony or adjusting `theta`.
+- [`references/scvi-scanvi.md`](references/scvi-scanvi.md): read when using scVI/scANVI and preparing raw-count layers or labels.
+- [`references/seurat-v5.md`](references/seurat-v5.md): read when integrating a Seurat v5 object, including the RPCA memory setting and optional wrapper methods.
 
 ## Integrate with Harmony
 
 **Goal:** Correct batch in PCA space and run downstream steps on the corrected embedding.
 **Approach:** Joint preprocessing -> PCA -> Harmony -> neighbors/UMAP/clustering on `X_pca_harmony`.
 
-```python
-import scanpy as sc
-import scanpy.external as sce
-
-adata = sc.read_h5ad('merged.h5ad')
-sc.pp.normalize_total(adata, target_sum=1e4)
-sc.pp.log1p(adata)
-sc.pp.highly_variable_genes(adata, n_top_genes=2000, batch_key='batch')
-adata.raw = adata
-adata = adata[:, adata.var.highly_variable]
-sc.pp.scale(adata, max_value=10)
-sc.tl.pca(adata, n_comps=50)
-
-sce.pp.harmony_integrate(adata, key='batch')  # writes adata.obsm['X_pca_harmony']
-sc.pp.neighbors(adata, use_rep='X_pca_harmony')
-sc.tl.umap(adata)
-sc.tl.leiden(adata, flavor='igraph', n_iterations=2, directed=False)
-```
+Run `python scripts/harmony_integration.py merged.h5ad integrated_harmony.h5ad --batch-key batch --seed 0`.
+It preserves `X_pca` for the required before/after comparison and writes `X_pca_harmony` for downstream work.
 
 In Seurat: `RunHarmony(obj, group.by.vars = 'orig.ident', reduction.use = 'pca')` writes a `harmony` reduction; `group.by.vars` takes a vector to correct multiple covariates.
 
@@ -98,25 +88,8 @@ In Seurat: `RunHarmony(obj, group.by.vars = 'orig.ident', reduction.use = 'pca')
 **Goal:** Learn a batch-invariant latent space from raw counts, optionally protecting known labels.
 **Approach:** Put raw counts in a layer, register batch (and labels for scANVI), train, and use the latent embedding downstream.
 
-```python
-import scvi
-import scanpy as sc
-
-adata = sc.read_h5ad('merged.h5ad')
-adata.layers['counts'] = adata.X.copy()  # scVI needs raw counts
-sc.pp.highly_variable_genes(adata, n_top_genes=2000, flavor='seurat_v3',
-                            layer='counts', batch_key='batch')
-adata = adata[:, adata.var.highly_variable].copy()
-
-scvi.model.SCVI.setup_anndata(adata, layer='counts', batch_key='batch')
-model = scvi.model.SCVI(adata, n_latent=10, gene_likelihood='zinb')
-model.train()  # default max_epochs heuristic scales down for large data
-adata.obsm['X_scVI'] = model.get_latent_representation()
-
-scanvi = scvi.model.SCANVI.from_scvi_model(model, 'Unknown', labels_key='cell_type')
-scanvi.train(max_epochs=20)
-adata.obs['scanvi_label'] = scanvi.predict()
-```
+Run `python scripts/scvi_scanvi_integration.py merged.h5ad integrated_scvi.h5ad --batch-key batch --labels-key cell_type --max-epochs 100 --seed 0`.
+The script keeps raw counts in `layers['counts']`, sets `scvi.settings.seed`, fixes training duration, and writes `X_scVI` (plus `X_scANVI` when `--labels-key` contains `Unknown`).
 
 The scVI latent space is not "biology with batch removed": it is a learned nonlinear embedding optimized to reconstruct counts while being marginally independent of batch. Its dimensions are entangled, individually uninterpretable, and carry no guaranteed correspondence to any biological quantity - treat it as a coordinate system for neighbors/clustering, not a measurement. Note `unlabeled_category` ('Unknown') is the second positional argument to `from_scvi_model`, before `labels_key`.
 
@@ -125,24 +98,9 @@ The scVI latent space is not "biology with batch removed": it is a learned nonli
 **Goal:** Use Seurat v5's modular layer-based integration with a chosen method.
 **Approach:** Split layers by batch, run the standard pipeline, call IntegrateLayers, rejoin.
 
-```r
-library(Seurat)
+Run `Rscript scripts/seurat_v5_integration.R merged.rds integrated_rpca.rds batch RPCAIntegration` (from this skill directory). The script sets `future.globals.maxSize = 4 * 1024^3` before `IntegrateLayers`; raise it only when the object and available memory justify it.
 
-merged[['RNA']] <- split(merged[['RNA']], f = merged$batch)
-merged <- NormalizeData(merged)
-merged <- FindVariableFeatures(merged)
-merged <- ScaleData(merged)
-merged <- RunPCA(merged)
-
-merged <- IntegrateLayers(merged, method = RPCAIntegration,
-                          orig.reduction = 'pca', new.reduction = 'integrated.rpca')
-merged <- JoinLayers(merged)
-merged <- FindNeighbors(merged, reduction = 'integrated.rpca', dims = 1:30)
-merged <- FindClusters(merged, resolution = 0.5)
-merged <- RunUMAP(merged, reduction = 'integrated.rpca', dims = 1:30)
-```
-
-Methods are passed as bare symbols: `CCAIntegration`, `RPCAIntegration`, `HarmonyIntegration`, `FastMNNIntegration`, `scVIIntegration`. For graph-only correction with BBKNN in Python: `sce.pp.bbknn(adata, batch_key='batch')` rewrites the neighbor graph in place (very fast, feeds Leiden/UMAP only).
+Seurat supplies `CCAIntegration`, `RPCAIntegration`, and `HarmonyIntegration`. `FastMNNIntegration` and `scVIIntegration` are optional **SeuratWrappers** methods, not bare Seurat symbols; the latter also needs a working reticulate/scvi-tools installation. If SeuratWrappers is unavailable, use `batchelor::fastMNN` or the Python scVI path rather than retrying an unresolved method. For graph-only correction with BBKNN in Python: `sce.pp.bbknn(adata, batch_key='batch')` rewrites the neighbor graph in place (very fast, feeds Leiden/UMAP only).
 
 ## Evaluating Integration
 
@@ -181,6 +139,8 @@ De-novo integration jointly embeds all datasets symmetrically (everything above)
 | scVI latent dimension interpreted as a biological axis | Latent space is entangled, not "biology minus batch" | Use the embedding only for neighbors/clustering; do not read individual dims |
 | Reference-mapped labels look confident but wrong | Closed-world projection of a novel/shifted state | Inspect mapping uncertainty; treat poorly-mapping clusters as candidate novelty/batch |
 | Results differ run to run | Stochastic training / unpinned seeds (scVI, Harmony) | Set seeds; for scVI fix `max_epochs` and report it |
+| `future` globals exceed 500 MiB during Seurat RPCA | Anchor integration exports a large object to future workers | Set `options(future.globals.maxSize = 4 * 1024^3)` before `IntegrateLayers`, after checking available memory |
+| `Detected non-contiguous batches` from Scanorama | Cells are not contiguous by the batch key | Stable-sort cells by batch before `scanorama_integrate`; retain the original order mapping for plotting/metadata joins |
 
 ## Related Skills
 

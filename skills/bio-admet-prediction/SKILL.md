@@ -1,15 +1,17 @@
 ---
 name: bio-admet-prediction
-description: Predicts ADMET properties using ADMETlab 3.0 (119 platform features, including 77 prediction models with modeled-endpoint uncertainty), ADMET-AI, DeepChem MolNet, and chemprop D-MPNN with explicit handling of OECD QSAR principles, applicability domain assessment, calibration, hERG/CYP/AMES endpoints, and PAINS / Lipinski / Ro5 / Veber / BBB druglikeness filters. Use when filtering compounds for drug-likeness, prioritizing leads by predicted safety, or building an in-house ADMET QSAR model.
+description: Predicts common small-molecule ADMET properties with an executable offline ADMET-AI route, optional current ADMETlab 3.0 service results, chemprop D-MPNN, and rule-based drug-likeness filters. Includes applicability-domain, calibration, hERG/CYP/AMES, and structural-alert safeguards. Use for lead triage or in-house ADMET QSAR work; not for clinical or regulatory conclusions from a single prediction.
 tool_type: python
-primary_tool: ADMETlab
+primary_tool: admet-ai
 license: MIT
 author: GPTomics
 ---
 
 ## Version Compatibility
 
-Reference examples tested with: RDKit 2024.09+, requests 2.31+, DeepChem 2.8+, chemprop 2.0+ (note major API change from 1.x), admet-ai 1.3+, pandas 2.2+.
+Reference examples tested with: RDKit 2024.09+, requests 2.31+, DeepChem 2.8+, chemprop 2.3.1, admet-ai 2.0.1, pandas 2.2+.
+
+The bundled ADMET-AI example targets the 2.x package API: `pip install "admet-ai>=2,<3"`. Its predictions differ from the v1 paper/server; do not compare them as if they were interchangeable. Inspect the installed task names before selecting endpoint columns.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - Python: `pip show <package>` then `help(module.function)` to check signatures
@@ -37,13 +39,14 @@ For PAINS / Brenk / structural alerts, see `chemoinformatics/substructure-search
 | FAF-Drugs4 | filters | Rule-based | None | Web | Static rules |
 | chemprop (in-house) | User-defined | D-MPNN ± descriptors | Ensemble and other estimators; optional calibration | Python package | Requires suitable training and calibration data |
 
-**Decision:** For batch screening with no in-house data, **ADMETlab 3.0** provides 119 reported platform features and uncertainty for modeled endpoints through its web service and hosted API; verify the live API documentation before automating access. For a sufficiently large, relevant in-house endpoint dataset, benchmark a **chemprop D-MPNN**, descriptors, and simpler baselines under a deployment-relevant split rather than assuming a universal sample-size threshold. Shan et al. (2022) reported an AUC of 0.956 for a D-MPNN combined with 206 MOE descriptors on their random-split hERG benchmark.
+**Decision:** For a reproducible offline first pass, use the bundled **ADMET-AI 2.x** route with the input and applicability-domain gate below. Use **ADMETlab 3.0** only after obtaining its current official API contract when its broader hosted coverage and modeled-endpoint uncertainty are needed. For a sufficiently large, relevant in-house endpoint dataset, benchmark a **chemprop D-MPNN**, descriptors, and simpler baselines under a deployment-relevant split rather than assuming a universal sample-size threshold. Shan et al. (2022) reported an AUC of 0.956 for a D-MPNN combined with 206 MOE descriptors on their random-split hERG benchmark.
 
 ## Decision Tree by Scenario
 
 | Scenario | Workflow | Reasoning |
 |----------|----------|-----------|
-| Library triage, no in-house data | ADMETlab 3.0 API batch | Broad platform coverage plus modeled-endpoint uncertainty |
+| Library triage, no in-house data | Bundled ADMET-AI 2.x batch + reference-similarity gate | Reproducible offline route; use its point predictions only after the gate |
+| Need ADMETlab's 119 reported platform features | Current official ADMETlab 3.0 API workflow + `load_admetlab_results` | Hosted coverage and modeled-endpoint uncertainty; retain task ID and uncertainty columns |
 | Single endpoint, adequate in-house data | Benchmark chemprop D-MPNN, descriptors, and simpler baselines | Select by prospective or deployment-relevant validation |
 | Need calibrated probabilities | chemprop with ensemble + Platt | Native deep learning rarely calibrated |
 | FDA / regulatory submission | OECD-compliant QSAR with AD | See OECD principles below |
@@ -76,7 +79,35 @@ For non-regulatory work, AD assessment is still critical. The OECD's *applicabil
 
 For deep-learning ADMET, **conformal prediction** can provide calibrated prediction sets or intervals when its exchangeability and calibration assumptions are appropriate (McShane et al. 2024).
 
-## ADMETlab 3.0 API
+## Executable Offline Route: ADMET-AI 2.x
+
+`examples/predict_admet.py` includes an offline batch route. ADMET-AI 2.0.1 ships its model artefacts with the installed package and returns a pandas DataFrame for a list of valid SMILES. It covers common endpoints including hERG, AMES, DILI, Caco-2, BBB, and CYP models; inspect the returned columns in the installed version rather than assuming a fixed endpoint list.
+
+Run the chemistry/input gate before predicting. It rejects malformed, disconnected, inorganic, and metal-containing inputs, and reports maximum Morgan-fingerprint Tanimoto similarity to a **relevant local reference set**. The reference set is a transparent similarity screen, not proof of the model's training applicability domain. Derive its threshold from your reference chemistry with `fit_similarity_threshold`; do not use an arbitrary universal cutoff.
+
+```python
+from pathlib import Path
+from examples.predict_admet import (
+    assess_applicability_domain,
+    fit_similarity_threshold,
+    predict_admet_ai,
+)
+
+reference_smiles = [line.strip() for line in Path('relevant_reference.smi').read_text().splitlines()
+                    if line.strip()]
+threshold = fit_similarity_threshold(reference_smiles)  # low-tail, leave-one-out similarity
+gate = assess_applicability_domain(smiles_batch, reference_smiles, threshold=threshold)
+accepted = gate.loc[gate['decision'] == 'predict', 'smiles'].tolist()
+
+predictions = predict_admet_ai(accepted, endpoints=['hERG', 'AMES', 'DILI', 'BBB_Martins'])
+# Point predictions are prioritisation evidence, not safety or regulatory decisions.
+```
+
+Inputs marked `manual_review` have organic chemistry but lie outside the local similarity threshold or exceed the configured size limit. Do not silently drop them: retain the gate table and choose experimental data, a more relevant model, or a justified expanded reference set. Inputs marked `reject` are outside this small-molecule organic route and must not be passed to the predictor.
+
+ADMET-AI does not supply a per-prediction uncertainty or formal applicability-domain column in this route. Do not describe its DrugBank percentile columns as uncertainty. If modeled-endpoint uncertainty is required, use a service or an in-house model that actually supplies and documents it.
+
+## ADMETlab 3.0 API (optional hosted route)
 
 ADMETlab 3.0 reports 119 platform features: 77 prediction models, 34 computed physicochemical properties, and 8 medicinal-chemistry rules. The modeled endpoints include prediction uncertainty; do not imply that computed properties and rules have model uncertainty.
 
@@ -85,12 +116,17 @@ ADMETlab 3.0 reports 119 platform features: 77 prediction models, 34 computed ph
 **Approach:** Follow the live ADMETlab 3.0 API tutorial to wash molecules, submit batch predictions, and retrieve the returned results. The 2024 paper documents API/batch support and modeled-endpoint uncertainty. Obtain current rate limits, routes, payloads, task identifiers, and output contracts from the live official documentation rather than attributing them to the paper or hard-coding an unofficial example.
 
 ```python
-import pandas as pd
+from examples.predict_admet import load_admetlab_results
 
-# After submitting with the current official API example, load its CSV output.
-results = pd.read_csv('admetlab3_results.csv')
-# Preserve the uncertainty columns and task identifier in downstream reports.
+# After submitting with the current official API example, validate its CSV.
+# Supply the current task-ID column name published by that API contract.
+results = load_admetlab_results(
+    'admetlab3_results.csv', task_id_column='task_id'
+)
+# Preserve the validated uncertainty columns and task identifier downstream.
 ```
+
+The package deliberately does not bundle a request URL, payload, rate limit, or task identifier because those must come from the current official service documentation. This is an optional hosted integration, not the Skill's executable prediction route. If the service's current output cannot meet the loader contract, stop and reconcile the contract instead of treating an unrelated CSV as predictions.
 
 ADMETlab 3.0 endpoints (sample):
 - Absorption: Caco-2 permeability (logPapp), HIA (%), Pgp inhibitor/substrate, MDCK
@@ -198,9 +234,9 @@ def druglike_score(mol):
 
 **Mechanism:** ADMETlab training set is drug-like organic molecules. Predictions on PROTACs, macrocycles, peptides extrapolate.
 
-**Symptom:** High reported uncertainty, disagreement with neighbors or orthogonal models, or unstable conclusions under reasonable preprocessing.
+**Symptom:** High reported uncertainty (where the hosted response supplies it), disagreement with neighbors or orthogonal models, or unstable conclusions under reasonable preprocessing.
 
-**Fix:** Check uncertainty band; if interval is broad, do not trust point estimate. For PROTACs / macrocycles, prefer literature-derived experimental data.
+**Fix:** For an ADMETlab response, inspect its modeled-endpoint uncertainty using the current service contract. For the offline ADMET-AI route, run `assess_applicability_domain` against a relevant local reference set before prediction; it rejects metals/inorganics and flags low-similarity or oversized organic chemistry for manual review. For PROTACs / macrocycles, prefer literature-derived experimental data.
 
 ### hERG D-MPNN -- training data bias
 
@@ -210,7 +246,7 @@ def druglike_score(mol):
 
 **Symptom:** Model predicts hERG- (false negative) for compound that experimentally inhibits.
 
-**Fix:** Use ensemble + applicability-domain assessment (kNN distance, ensemble variance). If kNN distance to training set > P95, treat prediction as low-confidence.
+**Fix:** Use ensemble + applicability-domain assessment (kNN distance, ensemble variance). If kNN distance to training set > P95, treat prediction as low-confidence. For the bundled offline route, use `fit_similarity_threshold` and `assess_applicability_domain` as a transparent reference-similarity screen; it is not a substitute for model-specific AD validation.
 
 ### CYP3A4 inhibitor + substrate ambiguity
 
@@ -270,7 +306,7 @@ When ADMETlab, ProTox-3.0, and an independently trained chemprop model disagree 
 | QED calculation fails | Molecule is missing, unsanitized, or unsupported | Reject parse failures; sanitize inputs and handle calculation exceptions |
 | ProTox endpoints missing | Web scrape uses CSS selector | Use formal API |
 | BBB+ true but TPSA > 90 | Different BBB model | Use the simple physicochemical screen as an orthogonal heuristic |
-| Predictions inconsistent across runs | Random seed for chemprop ensemble | `--seed 42` and reuse model |
+| Predictions inconsistent across runs | Data split and PyTorch randomness for chemprop ensemble | Use `--data-seed 42 --pytorch-seed 42` and reuse the saved model; verify flags against the installed Chemprop release |
 | Calibration mismatch | DL native probabilities not calibrated | Apply Platt scaling on validation set |
 
 ## References

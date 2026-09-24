@@ -28,7 +28,7 @@ For reaction-based enumeration and Free-Wilson, see `chemoinformatics/reaction-e
 | Representation | Origin | Definition | Use case | Fails when |
 |----------------|--------|------------|----------|------------|
 | Bemis-Murcko scaffold | Bemis & Murcko 1996 | Ring systems + linkers, R-groups stripped | Default chemotype identifier | Linear molecules (no rings) -> empty scaffold |
-| Generic framework | Bemis & Murcko 1996 | Bemis-Murcko with all atoms set to C, all bonds single | Topology comparison | Loses heteroatom info |
+| Generic framework | Bemis & Murcko 1996 | Bemis-Murcko with all atoms set to C, all bonds single | Topology comparison | Loses heteroatom info; may merge distinct chemotypes |
 | Cyclic skeleton (CSK) | Custom RDKit transformation | Ring atoms only, all C, all single | Pure ring-topology view | Loses linker info; not a built-in Murcko option |
 | Murcko atom indices | Derived by matching the scaffold to the parent | Parent-molecule atom indices | Programmatic operations | Symmetry can yield multiple equivalent matches |
 
@@ -50,7 +50,9 @@ def all_scaffold_views(smi):
     }
 ```
 
-Example: `Cc1ccc(C(=O)NCC2CCCC2)cc1` -> Bemis-Murcko `c1ccc(C(=O)NCC2CCCC2)cc1`; generic `C1CCC(C(C)CCC2CCCC2)CC1` in current RDKit.
+Example (RDKit 2026.03.6 canonical SMILES): `Cc1ccc(C(=O)NCC2CCCC2)cc1` -> Bemis-Murcko `O=C(NCC1CCCC1)c1ccccc1`; generic `CC(CCC1CCCC1)C1CCCCC1`.
+
+The amount of collapse is library-dependent. For scale only, 1,500 ChEMBL hERG compounds in the reference run produced 857 Bemis-Murcko scaffolds but 583 generic frameworks (1.47-fold fewer groups); its largest generic framework merged four Bemis-Murcko scaffolds. Measure this ratio on the library at hand before using the generic view for a decision.
 
 ## Library Chemotype Clustering
 
@@ -82,7 +84,8 @@ For QSAR / ML, random train/test split causes data leakage: compounds from the s
 ```python
 from rdkit.Chem.Scaffolds import MurckoScaffold
 
-def scaffold_split(df, smiles_col='smiles', train_frac=0.8, seed=42):
+def scaffold_split(df, smiles_col='smiles', train_frac=0.8, seed=42,
+                   return_diagnostics=False):
     import random
     rng = random.Random(seed)
 
@@ -99,7 +102,10 @@ def scaffold_split(df, smiles_col='smiles', train_frac=0.8, seed=42):
     if invalid_positions:
         raise ValueError(f'Invalid SMILES at row positions: {invalid_positions}')
 
+    if not 0 < train_frac < 1:
+        raise ValueError('train_frac must be strictly between 0 and 1')
     scaffold_sets = list(scaffolds.values())
+    # Shuffle before size sorting so equal-size groups do not get a positional bias.
     rng.shuffle(scaffold_sets)
     scaffold_sets.sort(key=lambda x: len(x), reverse=True)
 
@@ -107,24 +113,60 @@ def scaffold_split(df, smiles_col='smiles', train_frac=0.8, seed=42):
     n_train = int(n_total * train_frac)
     if len(scaffold_sets) < 2:
         raise ValueError('A scaffold split requires at least two scaffolds')
-    train_idx = list(scaffold_sets[0])
-    test_idx = []
-    for i, scaff_set in enumerate(scaffold_sets[1:], start=1):
-        if not test_idx and i == len(scaffold_sets) - 1:
-            test_idx.extend(scaff_set)
-        elif abs(len(train_idx) + len(scaff_set) - n_train) < abs(len(train_idx) - n_train):
+    n_test = n_total - n_train
+    if n_train == 0 or n_test == 0:
+        raise ValueError('train_frac produces an empty partition; use a larger dataset or a less extreme fraction')
+    train_idx, test_idx = [], []
+    train_group_sizes, test_group_sizes = [], []
+    # Allocate large groups to the currently less-filled partition. This preserves
+    # whole-scaffold isolation while spreading multi-member groups across splits;
+    # singleton groups then make the requested fraction as close as possible.
+    for scaff_set in scaffold_sets:
+        train_fill = len(train_idx) / n_train
+        test_fill = len(test_idx) / n_test
+        if train_fill <= test_fill:
             train_idx.extend(scaff_set)
+            train_group_sizes.append(len(scaff_set))
         else:
             test_idx.extend(scaff_set)
+            test_group_sizes.append(len(scaff_set))
 
-    return df.iloc[train_idx], df.iloc[test_idx]
+    # A last singleton-only adjustment can hit an exact target without moving a
+    # multi-member scaffold. Otherwise report the closest whole-group split.
+    if len(train_idx) != n_train:
+        # Move singleton rows only; every singleton is its own scaffold group.
+        train_singleton_groups = [s for s in scaffold_sets if len(s) == 1 and s[0] in train_idx]
+        test_singleton_groups = [s for s in scaffold_sets if len(s) == 1 and s[0] in test_idx]
+        while len(train_idx) < n_train and test_singleton_groups:
+            group = test_singleton_groups.pop()
+            test_idx.remove(group[0]); train_idx.extend(group)
+            test_group_sizes.remove(1); train_group_sizes.append(1)
+        while len(train_idx) > n_train and train_singleton_groups:
+            group = train_singleton_groups.pop()
+            train_idx.remove(group[0]); test_idx.extend(group)
+            train_group_sizes.remove(1); test_group_sizes.append(1)
+
+    diagnostics = {
+        'requested_train_fraction': train_frac,
+        'achieved_train_fraction': len(train_idx) / n_total,
+        'scaffold_overlap': 0,
+        'train_singleton_compound_fraction': sum(size == 1 for size in train_group_sizes) / len(train_idx),
+        'test_singleton_compound_fraction': sum(size == 1 for size in test_group_sizes) / len(test_idx),
+    }
+    if any(len(group) > 1 for group in scaffold_sets):
+        assert diagnostics['test_singleton_compound_fraction'] < 1, (
+            'All test compounds are singleton scaffolds; inspect the split diagnostics')
+    train, test = df.iloc[train_idx], df.iloc[test_idx]
+    if return_diagnostics:
+        return train, test, diagnostics
+    return train, test
 ```
 
 **Effect on benchmark metrics:** A scaffold split often produces different performance from a random split because it tests transfer across scaffold groups. The size and meaning of the gap are dataset- and deployment-dependent; it is not a direct universal measure of memorization.
 
 **Caveat:** Bemis-Murcko split is *one* scaffold-split; for production ML, consider time split (newer compounds in test) or activity-cliff-balanced split.
 
-**Class-imbalanced datasets:** Scaffold-only assignment can yield skewed class distributions. Chemprop's `scaffold_balanced` split balances scaffold-group sizes; it is not label-stratified. If both group isolation and label balance are required, use a validated group-aware stratification procedure such as `StratifiedGroupKFold` where its assumptions fit, then audit every fold for scaffold overlap and endpoint balance.
+**Class-imbalanced datasets:** The bundled splitter spreads large scaffold groups across the two partitions and returns `test_singleton_compound_fraction` with `return_diagnostics=True`; audit it with scaffold overlap and endpoint balance. Chemprop's `scaffold_balanced` split balances scaffold-group sizes; it is not label-stratified. If both group isolation and label balance are required, use a validated group-aware stratification procedure such as `StratifiedGroupKFold` where its assumptions fit, then audit every fold for scaffold overlap and endpoint balance.
 
 ## R-Group Decomposition
 
@@ -163,10 +205,19 @@ Output: list of {'Core': scaffold, 'R1': r1_smiles, 'R2': r2_smiles} dicts. Used
 ```bash
 mmpdb fragment data.smi -o data.fragments
 mmpdb index data.fragments -o data.mmpdb
+mmpdb loadprops -p props.tsv data.mmpdb
 mmpdb transform --smiles 'COc1ccccc1' --property pIC50 data.mmpdb
 ```
 
-Output: ranked transformations with delta(pIC50), N pairs, confidence.
+`props.tsv` must be a tab-separated file with an `ID` column matching the compound IDs in `data.smi` and a numeric `pIC50` column, for example:
+
+```text
+ID	pIC50
+cmpd-001	6.4
+cmpd-002	7.1
+```
+
+`mmpdb transform` emits TSV rows in tool order, not a ranked confidence table. Sort the output explicitly for the question at hand; useful reported columns are property-prefixed (for example, `pIC50_count`, `pIC50_avg`, `pIC50_std`, `pIC50_paired_t`, and `pIC50_p_value`). There is no mmpdb `confidence` column.
 
 Interpret transformation effects from pair count, chemical-context diversity, dependence among pairs, uncertainty intervals, and prospective validation. Do not convert a universal pair-count/effect-size table into reliability labels.
 
@@ -245,11 +296,11 @@ Series counts depend on library provenance, standardization, scaffold definition
 
 **Trigger:** Library has many singletons + few large scaffolds.
 
-**Mechanism:** Large scaffolds dominate; greedy assignment puts them in train.
+**Mechanism:** A largest-first greedy assignment can put all multi-member scaffolds in train.
 
 **Symptom:** Test set is mostly singleton scaffolds; metrics misleading.
 
-**Fix:** Use stratified scaffold split (balance test classes); or scaffold-balanced cross-validation.
+**Fix:** Use an allocation that spreads large scaffold groups across partitions (the bundled splitter does this and reports singleton fractions); or use scaffold-balanced cross-validation. Audit both scaffold overlap and label balance.
 
 ### MMPA -- low pair count for novel transformations
 
@@ -290,7 +341,7 @@ For ML splits: Bemis-Murcko. For library diversity: Bemis-Murcko + cluster size.
 | Singleton scaffolds dominate library | Aggressive standardization | Check for tautomer-induced scaffold variation; canonicalize first |
 | R-group decomposition empty | Mol doesn't match scaffold | Use FMCS to find actual shared core |
 | mmpdb missing transformations | Cores too restrictive | Try smaller core requirement |
-| Scaffold split gives all to train | Few scaffolds; large clusters | Add singleton-spread strategy; use Murcko-and-Linker variant |
+| Scaffold split test is all singletons | Largest-first greedy allocation | Use the bundled balanced allocation and inspect `test_singleton_compound_fraction`; consider scaffold-balanced cross-validation |
 | Generic framework same for different drugs | Stripped heteroatom info | Use Bemis-Murcko (preserves heteroatoms) |
 | MakeScaffoldGeneric error | RDKit version issue | RDKit 2024.09+ uses `Chem.Scaffolds.MurckoScaffold` |
 

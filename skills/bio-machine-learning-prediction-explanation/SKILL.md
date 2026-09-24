@@ -31,8 +31,8 @@ A feature attribution describes the function the model learned on this training 
 
 | Method | What it estimates | Correlated-feature behavior | Cost | Best use |
 |--------|-------------------|------------------------------|------|----------|
-| TreeSHAP `tree_path_dependent` | Conditional Shapley via tree coverage; approximates E[f \| x_S] | Can give nonzero credit to a feature the model never uses (correlation leak); no background needed | Fast, exact for this estimand | Fast cohort summaries when conditional semantics are acceptable |
-| TreeSHAP `interventional` | Marginal/do-operator Shapley; features replaced from a background | Zero credit to unused features even if correlated | Scales with background size (~100-1000) | "What the model actually uses"; most defensible default |
+| TreeSHAP `tree_path_dependent` | Conditional Shapley via tree coverage; approximates E[f \| x_S] | Changes the credit split among correlated features used in tree splits; a feature absent from every split has zero attribution | Fast, exact for this estimand; no background needed | Fast cohort summaries when conditional semantics are acceptable |
+| TreeSHAP `interventional` | Marginal/do-operator Shapley; features replaced from a background | Uses a background and can split correlated-feature credit differently; a feature absent from every split has zero attribution | Scales with background size (~100-1000) | Model-reliance questions with a stated baseline; most defensible default |
 | KernelSHAP | Model-agnostic Shapley via masking; assumes independence | Masking lands off-manifold under correlation; corrupted | Expensive | Last resort for non-tree/non-net models |
 | DeepSHAP / GradientSHAP | SHAP for nets via backprop relative to a background | Background-dependent under correlation | Moderate | Neural omics models |
 | LinearExplainer | Exact Shapley for linear models | `interventional` vs `correlation_dependent` give different values | Cheap | Penalized linear models; choose the mode |
@@ -44,8 +44,8 @@ A feature attribution describes the function the model learned on this training 
 
 When Shapley values "drop" a feature subset, they replace it by some distribution, and two incompatible choices exist:
 
-- **Conditional / observational** (`tree_path_dependent`): dropped features drawn from `p(x_dropped | x_S)`. A feature the model *never uses* can still receive nonzero attribution purely because it is correlated with a used feature. So **high SHAP does not mean the model relies on this gene.**
-- **Marginal / interventional** (`interventional`): dropped features drawn from the marginal `p(x_dropped)`, i.e. `do(x_dropped = background)`. Features the model genuinely ignores get **exactly zero**, even if correlated. Janzing 2020 argues this is the principled "drop" for attribution; it is why modern SHAP added and (pre-0.47) defaulted to it.
+- **Conditional / observational** (`tree_path_dependent`): tree coverage approximates dropped features under `p(x_dropped | x_S)` along fitted paths. For correlated features that the fitted trees do use, this can split credit differently from an interventional estimator. A feature absent from **every** tree split receives zero attribution under this TreeSHAP implementation; do not claim the contrary from correlation alone. High SHAP still does not establish biology: a model can use a batch-correlated proxy.
+- **Marginal / interventional** (`interventional`): dropped features are replaced from the marginal background, i.e. `do(x_dropped = background)`. It can produce a different credit split among correlated tree-split features because it asks a different counterfactual question. Janzing 2020 argues this is the principled "drop" for attribution; it is why modern SHAP added and (pre-0.47) defaulted to it.
 
 There is no free lunch: every method either extrapolates off-manifold (interventional SHAP, unrestricted permutation -- Hooker 2021's "no free variable importance") or leaks credit through correlation (conditional SHAP). Decide which pathology the question can tolerate, and **aggregate attributions over co-expression modules before ranking** -- "gene A ranked above gene B" within a correlated module is governed by off-manifold value-function behavior, not biology.
 
@@ -53,7 +53,7 @@ There is no free lunch: every method either extrapolates off-manifold (intervent
 
 | Scenario | Recommended approach | Why |
 |----------|---------------------|-----|
-| "Which genes is my model actually keying on" (debug shortcuts) | TreeSHAP `interventional` with a representative background | Gives unused genes zero; reveals true reliance |
+| "Which genes is my model actually keying on" (debug shortcuts) | TreeSHAP `interventional` with a representative background | States a marginal baseline explicitly; compare with path-dependent if correlated-feature credit matters |
 | "Which genes are informative about the outcome here" (descriptive) | TreeSHAP `tree_path_dependent`, but never call it model reliance | Conditional semantics answer the descriptive question |
 | Ranking importance across correlated genes | Aggregate \|SHAP\| within co-expression clusters first | Within-module order is arbitrary |
 | Penalized linear model | `LinearExplainer` (choose `interventional` vs `correlation_dependent`) | Or just read the coefficients -- the model is its own explanation |
@@ -76,7 +76,18 @@ background = shap.utils.sample(X_train, 200)
 explainer = shap.TreeExplainer(model, data=background, feature_perturbation='interventional')
 sv = explainer(X_test)                                  # modern Explanation object
 
-# Aggregate over correlated modules BEFORE ranking (clusters = a precomputed gene->module map).
+# Build one reproducible module map before ranking. This is an analysis choice:
+# report the correlation, linkage, cut, and a sensitivity check because module ranks move with them.
+from scipy.cluster.hierarchy import fcluster, linkage
+from scipy.spatial.distance import squareform
+abs_rho = X_train.corr(method='spearman').abs().fillna(0.0)
+abs_rho_values = abs_rho.to_numpy(copy=True)  # pandas 3 may expose .values read-only
+np.fill_diagonal(abs_rho_values, 1.0)
+tree = linkage(squareform(1.0 - abs_rho_values, checks=False), method='average')
+module_id = fcluster(tree, t=0.7, criterion='distance')  # declared starting cut; not a universal threshold
+clusters = dict(zip(X_train.columns, module_id))
+
+# Aggregate over those correlated modules BEFORE ranking.
 mean_abs = np.abs(sv.values).mean(axis=0)
 module_importance = {}
 for gene, m in zip(X_test.columns, mean_abs):
@@ -89,7 +100,7 @@ Three layers of "not": (1) **not biology** -- the attribution describes the mode
 
 ## LIME and Explanation Instability
 
-LIME fits a sparse linear surrogate to predictions on perturbed samples around one instance. It is **non-reproducible by construction**: different seeds, different `kernel_width`, and `discretize_continuous=True` (the default) each flip the top features, and the per-feature perturbations land off-manifold for correlated genes. Worse, perturbation-based explainers can be deliberately fooled -- a biased model can be wrapped to look innocuous on the out-of-distribution points LIME/KernelSHAP probe (Slack 2020). Use LIME only to eyeball a single prediction's local logic with a pinned seed, never for global ranking, and never as evidence a model is unbiased.
+LIME fits a sparse linear surrogate to predictions on perturbed samples around one instance. Its rankings **can** change with seed, `kernel_width`, and `discretize_continuous=True` (the default), especially in the tail; the head may be stable on a particular model. Its per-feature perturbations also land off-manifold for correlated genes. Measure this instead of assuming either stability or instability: rerun the same explanation under at least two seeds/settings and report top-k rank overlap alongside the explanation. Worse, perturbation-based explainers can be deliberately fooled -- a biased model can be wrapped to look innocuous on the out-of-distribution points LIME/KernelSHAP probe (Slack 2020). Use LIME only to eyeball a single prediction's local logic with a pinned seed, never for global ranking, and never as evidence a model is unbiased.
 
 ```python
 from lime.lime_tabular import LimeTabularExplainer
@@ -102,7 +113,7 @@ exp = explainer.explain_instance(X_test.values[0], model.predict_proba, num_feat
 
 ## Background / Baseline Choice (the silent attribution-changer)
 
-SHAP explains the deviation from `E[f(X)]` over the background dataset, so the background defines what "absence of a feature" means and changes every attribution. A tumor sample explained against a tumor-heavy vs a healthy-tissue background yields different "important genes" -- only one matches the scientific question. Use a background of real samples representative of the contrast of interest (a single global mean across a heterogeneous cohort is no real sample). `check_additivity=True` (default) raises when the SHAP values plus the base value do not sum to the model output (a local-accuracy violation) -- often a probability-vs-raw-margin or implementation mismatch; investigate rather than disabling it. Attributions in log-odds (`model_output='raw'`) differ from probability space -- report the scale.
+SHAP explains the deviation from `E[f(X)]` over the background dataset, so the background defines what "absence of a feature" means and can change every attribution. A tumor sample explained against a tumor-heavy vs a healthy-tissue background can yield a different ordering; the amount of movement is model- and data-dependent, so compare at least two scientifically defensible backgrounds and report top-k rank overlap as well as the ranking. A stable head does not make an arbitrary baseline defensible. Use real samples representative of the contrast of interest (a single global mean across a heterogeneous cohort is no real sample). `check_additivity=True` (default) raises when the SHAP values plus the base value do not sum to the model output (a local-accuracy violation) -- often a probability-vs-raw-margin or implementation mismatch; investigate rather than disabling it. Attributions in log-odds (`model_output='raw'`) differ from probability space -- report the scale.
 
 ## Permutation Importance Also Breaks Under Correlation
 
@@ -110,11 +121,11 @@ A common error is to "fix" SHAP's correlation problem by switching to permutatio
 
 ## Per-Method Failure Modes
 
-### Reading high `tree_path_dependent` SHAP as model reliance
-- **Trigger:** Using path-dependent SHAP (no background) and concluding the model depends on a top gene.
-- **Mechanism:** Conditional Shapley leaks credit to unused-but-correlated features.
-- **Symptom:** A gene the model never splits on ranks high.
-- **Fix:** Use `interventional` with a background for reliance questions; state the estimand.
+### Reading `tree_path_dependent` SHAP as a unique model-reliance answer
+- **Trigger:** Using path-dependent SHAP (no background) and treating its within-module ordering as the model's unique reliance ranking.
+- **Mechanism:** Conditional tree coverage and an interventional background answer different questions and can split credit differently among correlated features used by the trees.
+- **Symptom:** The A-versus-B credit split changes when the conditioning mode changes, while the module total is more stable.
+- **Fix:** Use `interventional` with a representative background for marginal-reliance questions; state the estimand and aggregate correlated modules before ranking.
 
 ### Within-module ranking treated as a finding
 - **Trigger:** Reporting "gene A more important than gene B" for co-expressed A, B.

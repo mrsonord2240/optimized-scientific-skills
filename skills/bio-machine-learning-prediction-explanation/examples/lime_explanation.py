@@ -1,8 +1,9 @@
-'''LIME is non-reproducible: the same prediction yields different top features per seed.
+'''Measure LIME's seed sensitivity for one prediction before interpreting its ranking.
 
 Runs end-to-end on synthetic data. Explaining ONE fixed prediction with LIME under
-several random seeds returns different top-feature sets, so a LIME ranking is not a
-stable finding. Use LIME only to eyeball one local prediction, never for global ranking.
+several random seeds can return different top-feature sets. The head may be stable
+while the tail moves, so report a top-k overlap instead of claiming either result in
+advance. Use LIME only to eyeball one local prediction, never for global ranking.
 '''
 # Reference: numpy 1.26+, scikit-learn 1.4+, lime 0.2+ | Verify API if version differs
 
@@ -26,5 +27,7 @@ for seed in range(5):
     print(f'seed {seed}: top-5 features = {top_feats}')
 
 distinct = len(set(top_sets))
+overlaps = [len(set(a) & set(b)) for i, a in enumerate(top_sets) for b in top_sets[i + 1:]]
 print(f'\n{distinct} distinct top-5 sets across 5 seeds for the SAME prediction.')
-print('LIME rankings are seed-dependent -- never use them as a stable importance measure.')
+print(f'Mean pairwise top-5 overlap: {np.mean(overlaps):.2f}/5.')
+print('This is a sensitivity measurement, not a universal instability claim; keep LIME local.')

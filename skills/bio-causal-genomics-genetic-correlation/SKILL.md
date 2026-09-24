@@ -20,6 +20,12 @@ If code throws an LD-score "category not found" error, an HDL reference-panel mi
 
 # Genetic Correlation
 
+## Scope
+
+Genetic correlation is a cohort-level GWAS statistic describing shared genetic
+architecture across populations. Never use rg to diagnose, predict prognosis,
+or choose treatment for an individual.
+
 **"Estimate the genetic correlation between two traits from GWAS summary statistics"** -> Decompose the bivariate genetic architecture into a single global rg (cross-trait LDSC, HDL), per-locus local rg (LAVA, rho-HESS, HDL-L), or cross-population rg (Popcorn). Genetic correlation is the central cross-trait statistic in causal genomics: it quantifies shared etiology, motivates CHP-aware MR sensitivity when high, gates LCV's gcp partial-causation parameter, and feeds into multi-trait analysis frameworks (MTAG, GenomicSEM). Tool choice is a decision about the **regime** (sumstats vs individual-level; global vs local; same-ancestry vs trans-ancestry) and the **sample-overlap structure** between input GWAS.
 
 - CLI (LDSC, robust to overlap): `ldsc.py --rg trait1.sumstats.gz,trait2.sumstats.gz --ref-ld-chr eur_w_ld_chr/ --w-ld-chr eur_w_ld_chr/ --out rg`

@@ -10,14 +10,14 @@ Explain ML predictions on omics data with SHAP, LIME, and permutation importance
 pip install shap lime scikit-learn xgboost pandas
 ```
 
-Conceptual prerequisites: a model that already generalizes (interpreting an over-fit or batch-confounded model explains an artifact), a representative background dataset for interventional SHAP, and a co-expression module map for aggregating attributions over correlated genes.
+Conceptual prerequisites: a model that already generalizes (interpreting an over-fit or batch-confounded model explains an artifact), a representative background dataset for interventional SHAP, and a co-expression module map for aggregating attributions over correlated genes. Build and report the map's correlation, linkage, cut, and sensitivity check; it changes module rankings.
 
 ## Quick Start
 
 Tell your AI agent what you want to do:
 - "Explain my classifier with interventional SHAP and a representative background"
 - "Use SHAP to check whether my model is keying on batch instead of biology"
-- "Aggregate SHAP over co-expression modules before ranking genes"
+- "Build a stated co-expression module map, then aggregate SHAP over it before ranking genes"
 - "Explain one prediction locally, clearly labeled as model-internal"
 
 ## Example Prompts
@@ -45,7 +45,7 @@ Tell your AI agent what you want to do:
 1. Confirm the model generalizes before interpreting it
 2. Choose the Shapley conditioning for the question (interventional for reliance, path-dependent for description) and state it
 3. Supply a representative background and report the attribution scale (log-odds vs probability)
-4. Aggregate attributions over correlated modules before ranking
+4. Build a stated correlated-module map (correlation, linkage, cut, sensitivity), then aggregate attributions before ranking
 5. Use attribution to audit for batch/shortcut learning
 6. Route any "select a biomarker panel" request to biomarker-discovery with independent validation
 
@@ -53,9 +53,9 @@ Tell your AI agent what you want to do:
 
 - A high-SHAP gene can be a correlate of a batch shortcut the model exploited -- attribution explains the model, not biology
 - `feature_perturbation='auto'` (shap 0.47+) silently flips the estimand on whether you pass `data=`; set it explicitly
-- Path-dependent SHAP can give a gene nonzero credit even if the model never uses it (correlation leak); interventional gives unused genes zero
+- For TreeSHAP, a gene absent from every fitted-tree split receives zero under either mode; the modes can still split credit differently among correlated genes the model uses
 - The split of credit among correlated genes is mode-dependent and not identifiable from biology -- aggregate over modules before ranking
-- LIME is non-reproducible across seeds and kernel widths; use it only to eyeball one local prediction, never for global ranking
+- LIME sensitivity to seed and kernel width is data-dependent; rerun it under at least two settings and report top-k overlap, then keep it local rather than global
 - Permutation importance breaks under correlation the same way SHAP does; cluster features or use conditional permutation
 - The best, most trustworthy use of attribution is catching shortcut/batch learning, not selecting biomarkers
 

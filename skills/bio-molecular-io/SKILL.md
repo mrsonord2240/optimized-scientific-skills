@@ -30,7 +30,7 @@ For full standardization (canonicalization, salt stripping, tautomer enumeration
 |--------|-----|--------|---------|----------|------------|
 | SMILES | 2D | Atom chirality `@/@@`; double-bond `/` and `\` | Atom-local formal charges | Compact, web-friendly, fast parse | Loses absolute coordinates; aromatic perception ambiguous across toolkits; tautomers not canonical |
 | InChI | 2D | `/b`, `/t`, `/m`, `/s` stereo sublayers | `/q` charge and `/p` added/removed-proton sublayers; `/p` is not a pH model | Canonical by construction; cross-toolkit identity | Standard InChI normalizes mobile-H forms; limited organometallic stereo; large molecules may require special handling |
-| SDF V2000 | 2D/3D | Wedge bonds | M CHG line | Industry default; metadata via tags | 999-atom limit; cannot encode multi-component reactions; query atoms ambiguous |
+| SDF V2000 | 2D/3D | Wedge bonds | M CHG line | Industry default; metadata via tags | 999-atom count-field limit; cannot encode multi-component reactions; query atoms ambiguous |
 | SDF V3000 | 2D/3D | Wedge + stereo flag | Inline charge | No atom limit; query support; rich properties | Some software (legacy) cannot read; verbose |
 | MOL2 (Tripos) | 3D | Common records rely on 3D coordinates and toolkit perception; no portable explicit stereo field | Per-atom partial | SYBYL atom types preserved for docking | Atom-type dialects diverge (SYBYL vs Corina); RDKit MOL2 parser brittle |
 | PDB | 3D | None | None standard | Universal protein format | No bond orders; aromatic perception lost; ligand names truncated to 3 chars |
@@ -74,8 +74,10 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 
 def parse_smiles_safe(smi):
+    if not isinstance(smi, str) or not smi.strip():
+        return None, 'empty_input'
     mol = Chem.MolFromSmiles(smi)
-    if mol is None:
+    if mol is None or mol.GetNumAtoms() == 0:
         return None, 'parse_failure'
     Chem.AssignStereochemistry(mol, cleanIt=True, force=True)
     canon = Chem.MolToSmiles(mol)
@@ -98,7 +100,7 @@ supplier = Chem.SDMolSupplier('library.sdf', removeHs=False, sanitize=True)
 mols = []
 fails = []
 for i, mol in enumerate(supplier):
-    if mol is None:
+    if mol is None or mol.GetNumAtoms() == 0:
         fails.append(i)
         continue
     props = mol.GetPropsAsDict()
@@ -106,7 +108,9 @@ for i, mol in enumerate(supplier):
 print(f'parsed: {len(mols)}; failed: {len(fails)}')
 ```
 
-If a large fraction fails, try `sanitize=False` then `Chem.SanitizeMol(mol, catchErrors=True)` to identify per-step failures (kekulization, valence, aromaticity).
+An empty or whitespace-only SMILES is not a molecule: RDKit can return a zero-atom `Mol` rather than `None`, so reject it before parsing and check `GetNumAtoms() == 0` at file boundaries.
+
+For a failed non-empty SMILES, first distinguish grammar from chemistry. Bad parentheses, unclosed rings, and invalid tokens return `None` even with `sanitize=False`; correct the source text. If `Chem.MolFromSmiles(smi, sanitize=False)` returns a molecule, use `Chem.SanitizeMol(mol, catchErrors=True)` to identify a chemistry failure such as kekulization, valence, or aromaticity.
 
 ## Open Babel for MOL2 / PDBQT
 
@@ -114,12 +118,19 @@ RDKit's MOL2 parser is incomplete (SYBYL atom-type sets differ). Open Babel is m
 
 ```python
 from openbabel import pybel
+from rdkit import Chem
+from rdkit.Chem.inchi import MolToInchi
 
 mols = list(pybel.readfile('mol2', 'ligands.mol2'))
 for mol in mols:
     smi = mol.write('smi').strip().split()[0]
-    inchi = mol.write('inchi').strip()
+    rdkit_mol = Chem.MolFromSmiles(smi)
+    if rdkit_mol is None:
+        raise ValueError(f'Open Babel produced an unreadable SMILES: {smi!r}')
+    inchi = MolToInchi(rdkit_mol)
 ```
+
+Use Open Babel for MOL2/PDBQT conversion, but generate registry InChI with RDKit as above. Open Babel's InChI support is build-dependent; if an Open Babel InChI route is required, verify it first with `obabel -L formats` and handle an absent `inchi` format rather than assuming `mol.write('inchi')` works.
 
 For docking output PDBQT, use Open Babel rather than RDKit:
 ```python
@@ -161,9 +172,9 @@ inchi_fixedH, aux_info = Chem.MolToInchiAndAuxInfo(mol, options='/FixedH')
 
 **Mechanism:** V2000 header uses fixed 3-character atom count field.
 
-**Symptom:** Truncated atom block; parse failure with cryptic error.
+**Symptom:** Current RDKit writers automatically emit V3000 for oversized molecules, so the usual symptom is a downstream/legacy reader rejecting the resulting V3000 record. A workflow that explicitly writes V2000 cannot represent more than 999 atoms.
 
-**Fix:** Switch to V3000. RDKit auto-detects V3000 on read; explicitly request it on the writer:
+**Fix:** Treat V3000 as the required interchange format, and confirm every downstream reader accepts it. RDKit auto-detects V3000 on read; request it explicitly when the format choice must be visible and reproducible:
 
 ```python
 writer = Chem.SDWriter('out.sdf')
@@ -245,7 +256,9 @@ def draw_grid(mols, fname, mols_per_row=5, sub_img_size=(250, 200)):
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| `Chem.MolFromSmiles` returns None | Invalid SMILES, bad parentheses, ring not closed | Try `sanitize=False`, inspect with `Chem.MolFromSmiles(smi, sanitize=False)` |
+| `Chem.MolFromSmiles` returns None even with `sanitize=False` | Grammar error: invalid token, bad parentheses, or ring not closed | Correct or reject the source string; there is no molecule to inspect |
+| `Chem.MolFromSmiles` returns None, but `sanitize=False` returns a molecule | Chemistry error: valence, kekulization, or aromaticity | Run `Chem.SanitizeMol(mol, catchErrors=True)` to identify the failing step |
+| Empty/whitespace SMILES becomes a zero-atom `Mol` | Empty field is accepted as an empty graph | Reject blank text before parsing and reject `mol.GetNumAtoms() == 0` |
 | Round-trip SMILES changes | Aromaticity perception drift | Always canonicalize within analysis toolkit |
 | All bonds single in PDB ligand | PDB has no bond orders | `AllChem.AssignBondOrdersFromTemplate(template, mol)` |
 | Stereo lost on SDF write | Stereo was absent, removed, or not represented by coordinates/bond directions | Verify assigned chiral tags and bond stereo before writing; preserve suitable 2D/3D coordinates and inspect the round trip |

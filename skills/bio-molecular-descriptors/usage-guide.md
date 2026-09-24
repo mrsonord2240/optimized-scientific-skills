@@ -26,7 +26,7 @@ Tell your AI agent what you want to do:
 ### Drug-Likeness
 > "Check which compounds pass Lipinski's rule of 5."
 
-> "Calculate QED scores and apply QED > 0.5 as a documented project triage heuristic; show the unfiltered distribution too."
+> "Calculate QED scores and apply QED > 0.5 only as a documented project triage heuristic; show the unfiltered distribution and do not use it as the sole gate for fragments, peptides, or natural products."
 
 ### Full Descriptor Set
 > "Calculate all available RDKit descriptors for my molecules."
@@ -43,10 +43,11 @@ Tell your AI agent what you want to do:
 ## Tips
 - ECFP4 = radius 2 and ECFP6 = radius 3 (the ECFP number denotes diameter, `2 * radius`)
 - Include `useChirality=True` for stereo-sensitive fingerprints
-- QED > 0.5 can be used as a repository/project triage heuristic, but calibrate it for the library and do not treat it as a universal drug-likeness boundary
-- RDKit defaults to ETKDG; select `AllChem.ETKDGv3()` explicitly when the v3 small-ring and macrocycle improvements are intended
+- QED > 0.5 can be used as a repository/project triage heuristic, but calibrate it for the library: small fragments can be over-ranked, while peptide- and natural-product-like chemistry can be under-ranked
+- RDKit defaults to ETKDG; select `AllChem.ETKDGv3()` explicitly when the v3 small-ring and macrocycle improvements are intended, set and record a `randomSeed`, and use an ensemble when 3D shape matters
 - Lipinski thresholds: MW <= 500, LogP <= 5, HBD <= 5, HBA <= 10
-- 3D descriptors require conformer generation first
+- 3D descriptors require conformer generation first; optimize with an adequate iteration budget and record any conformers excluded for non-convergence
+- Gasteiger charges are an organic-molecule approximation: include explicit hydrogens when checking charge balance and reject metals or other unsupported elements rather than trusting a finite output
 
 ## Related Skills
 - molecular-io - Load molecules for descriptor calculation

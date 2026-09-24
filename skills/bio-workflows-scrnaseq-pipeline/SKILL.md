@@ -321,6 +321,43 @@ QC cutoffs above are illustrative starting points, not universal thresholds: set
 | Too many/few clusters | Wrong resolution | Adjust resolution parameter |
 | Unknown cell types | Missing markers | Check known marker genes manually |
 
+## Multi-sample completion and checkpoints
+
+For a multi-sample study, apply ambient removal, QC, and doublet removal to each
+sample independently, then merge and integrate before neighbors/clustering. Emit
+these four checkpoints in every run: after loading, after QC, after normalization,
+and after clustering.
+
+~~~r
+stopifnot(!any(grepl("^ENSG", rownames(seu)))) # map Ensembl IDs before ^MT- QC
+cat("[after_loading] cells=", ncol(seu), "\n")
+seu <- subset(seu, subset=nFeature_RNA > median(nFeature_RNA)-3*mad(nFeature_RNA) &
+                         nCount_RNA > median(nCount_RNA)-3*mad(nCount_RNA) &
+                         percent.mt < min(25, median(percent.mt)+3*mad(percent.mt)))
+cat("[after_qc] cells=", ncol(seu), "\n")
+seu <- SCTransform(seu, verbose=FALSE)
+cat("[after_normalization] cells=", ncol(seu), "\n")
+merged <- merge(samples[[1]], y=samples[-1], add.cell.ids=names(samples))
+merged <- RunHarmony(merged, group.by.vars="sample_id")
+merged <- FindNeighbors(merged, reduction="harmony", dims=1:30)
+merged <- FindClusters(merged)
+cat("[after_clustering] clusters=", length(unique(merged$seurat_clusters)), "\n")
+~~~
+
+Use raw counts for sample-aware inference, never cell-level DE:
+
+~~~r
+pb <- AggregateExpression(merged, assays="RNA", group.by=c("sample_id","cell_type"),
+                          return.seurat=FALSE)$RNA
+# DESeq2: design = ~ condition; run separately per cell type after preserving sample IDs.
+# Differential abundance: run propeller(clusters=merged$cell_type,
+# sample=merged$sample_id, group=merged$condition) on sample-by-cell-type proportions.
+~~~
+
+If ambient correction is intended, start from the raw matrix; filtered matrices
+cannot recover empty droplets. Warn before QC if ncol(seu) is implausibly close
+to the raw barcode count, and inspect rownames(seu) before applying the MT pattern.
+
 ## Complete R Workflow
 
 ```r

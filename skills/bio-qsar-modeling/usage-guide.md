@@ -4,14 +4,6 @@
 
 Build target-specific QSAR / QSPR models from in-house assay data by comparing chemprop D-MPNN, RandomForest + ECFP4, and, when justified, transformer-based MolFormer / Uni-Mol / ChemBERTa under the same validation design. Apply OECD 5 principles with deployment-relevant splits, ensemble uncertainty, applicability-domain assessment, and conformal prediction where its assumptions and interface are satisfied.
 
-## Prerequisites
-
-```bash
-pip install chemprop rdkit scikit-learn mapie shap
-```
-
-These examples target chemprop 2.2.x (note the major API change from 1.x).
-
 ## Quick Start
 
 Tell the AI agent what to do:
@@ -44,14 +36,6 @@ Tell the AI agent what to do:
 5. Compute test metrics + calibration plots.
 6. Build applicability domain assessment (kNN Tanimoto distance or conformal prediction).
 7. Optionally compute SHAP feature importance.
-
-## Tips
-
-- Use scaffold splitting when transfer to unseen scaffold groups is the question; use time, external, or prospective splits when they better match deployment. Label random splits as interpolation-focused.
-- Always benchmark a fingerprint baseline and a graph model on the same deployment-relevant split; add pretrained transformers when their representation and compute cost are justified.
-- Check calibration on held-out data; apply Platt or isotonic calibration only with a proper calibration split.
-- Conformal prediction targets marginal coverage under exchangeability; verify empirical coverage on relevant held-out data.
-- Use ensemble variance as one uncertainty diagnostic, not as a complete applicability-domain definition.
 
 ## Related Skills
 

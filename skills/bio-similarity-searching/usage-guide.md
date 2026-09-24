@@ -45,7 +45,10 @@ Tell your AI agent what you want to do:
 - Butina distance cutoff = 1 - centroid-neighbor similarity threshold (cutoff 0.3 assigns neighbors at >=0.7 similarity to a selected centroid; it does not guarantee >=0.7 for every member pair)
 - BulkTanimotoSimilarity is faster for large libraries
 - ECFP4 (radius=2) is the most common fingerprint for similarity
-- MCS timeout should be set for large molecule sets
+- Tversky is a feature-overlap ranker, not proof of substructure containment; confirm retained candidates with a SMARTS match
+- Set a finite MCS timeout and inspect `result.canceled`: a tiny MCS with `canceled=False` needs pre-clustering, not a longer timeout
+- Calibrate each fingerprint's cutoff to a retained-pair percentile on the actual library rather than reusing a raw score
+- Strip salts before comparison and use chirality-aware Morgan fingerprints when stereoisomers matter; use standardized canonical SMILES or InChIKey for identity
 
 ## Related Skills
 - molecular-descriptors - Generate fingerprints for similarity

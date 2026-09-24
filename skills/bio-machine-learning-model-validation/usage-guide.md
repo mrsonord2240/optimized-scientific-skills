@@ -51,16 +51,16 @@ Tell your AI agent what you want to do:
 1. Choose the CV scheme from the generalization question (random, group, site, temporal)
 2. Wrap all preprocessing and feature selection in a `Pipeline` so they refit per fold
 3. Use nested CV whenever hyperparameters or options are tuned
-4. Report discrimination with an interval, plus calibration (reliability curve, Brier) and, for decisions, net benefit
+4. Report discrimination with an interval, plus calibration (intercept, slope, reliability curve, Brier) and, for decisions, net benefit at pre-specified thresholds
 5. Flag leakage, threshold-on-test, and resampling-for-imbalance pitfalls
-6. Point to external/temporal validation and TRIPOD+AI reporting for clinical claims
+6. Produce an auditable TRIPOD+AI-oriented report: cohort/prevalence, split and independence unit, leakage controls, tuning choices, discrimination and uncertainty, calibration, utility, subgroup results, and limitations
 
 ## Tips
 
 - A clean train/test split does not prevent leakage if a scaler, ComBat, or a duplicate patient already contaminated the test set
 - AUC is invariant to monotone transforms of the score, so it cannot tell you whether the probabilities are honest -- check calibration separately
 - The calibration slope is the single most informative calibration number; <1 means overfitting
-- SMOTE/oversampling destroys calibration for no AUC gain on risk models; move the threshold on a calibrated model instead
+- SMOTE/oversampling changes training prevalence and can miscalibrate a risk model, especially under severe imbalance; keep it in train folds, then evaluate/recalibrate at the deployment prevalence rather than assuming AUC cannot improve
 - Choosing the classification threshold on the test set is leakage; pick it on a separate fold and report the locked threshold once
 - "10 events per variable" is obsolete; size the sample with the Riley framework (`pmsampsize`)
 - TRIPOD+AI (2024) is the reporting target; it requires calibration and fairness, not just discrimination

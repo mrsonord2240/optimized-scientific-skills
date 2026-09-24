@@ -45,7 +45,9 @@ Tell your AI agent what you want to do:
 - For Open Babel 3.x, use `from openbabel import pybel` not `import pybel`
 - Standardization order is policy-specific; use the molecular-standardization skill and document whether tautomer canonicalization occurs before or after parent selection
 - Use rdMolDraw2D when direct control over molecular drawing is needed; `Draw.MolToImage` remains a supported convenience API
-- Always check for None when loading molecules (invalid structures return None)
+- Reject blank SMILES before parsing and check both `mol is None` and `mol.GetNumAtoms() == 0`; an empty field can otherwise become a zero-atom molecule
+- For malformed non-empty SMILES, `sanitize=False` only helps when RDKit returns a molecule; grammar errors such as unmatched parentheses still return `None` and must be corrected or rejected
+- Generate registry InChI with RDKit after Open Babel format conversion; Open Babel InChI support is build-dependent and should be checked with `obabel -L formats` if required
 
 ## Related Skills
 - molecular-descriptors - Calculate properties after loading

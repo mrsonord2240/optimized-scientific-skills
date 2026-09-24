@@ -28,7 +28,7 @@ package and adapt the example to match the actual API rather than retrying.
 
 Doublets fabricate fake biology, so the goal is not a "doublet-free" dataset but avoiding false conclusions. Three facts govern every decision.
 
-Doublets create fake intermediate populations. A heterotypic doublet (two distinct types, e.g. T cell + monocyte) sums to a profile that lands between clusters and reads as a novel "transitional" state - the most damaging failure mode, because it corrupts trajectory inference and RNA velocity by building false bridges between lineages. Treat any small cluster co-expressing two lineage programs (CD3+LYZ, EPCAM+PTPRC) as doublet-suspect until proven otherwise.
+Doublets create fake intermediate populations. A heterotypic doublet (two distinct types, e.g. T cell + monocyte) sums to a profile that lands between clusters and reads as a novel "transitional" state - the most damaging failure mode, because it corrupts trajectory inference and RNA velocity by building false bridges between lineages. Treat any small cluster co-expressing two lineage programs (CD3+LYZ, EPCAM+PTPRC) as doublet-suspect until proven otherwise, but first remove ambient RNA and compare co-expression with the dataset-wide rate; prioritize the per-cell doublet score over raw co-expression alone.
 
 Detect per sample, before integration or clustering. A doublet is a physical event within one droplet in one capture, so two cells from different samples can never share one - any cross-sample doublet called on a merged object is meaningless. Merging also corrupts the kNN/PCA neighborhood that scoring depends on. scDblFinder's `samples=` handles this internally; Scrublet and DoubletFinder must be looped per sample. All three want raw counts after basic QC.
 
@@ -78,15 +78,21 @@ scDblFinder is the 2024-2026 best-balance default and is recommended by sc-best-
 ```r
 library(scDblFinder)
 library(SingleCellExperiment)
+library(BiocParallel)
 
 sce <- as.SingleCellExperiment(seurat_obj)                 # or build directly from a counts matrix
-sce <- scDblFinder(sce, samples = 'sample_id')             # per-capture; dbr defaults from cell count via dbr.per1k=0.008
+if (!'sample_id' %in% colnames(colData(sce))) stop("Add a capture-level 'sample_id' column before doublet detection.")
+sce <- scDblFinder(
+  sce,
+  samples = 'sample_id',
+  BPPARAM = SerialParam(RNGseed = 20260924)
+)                                                         # per-capture; dbr defaults from cell count via dbr.per1k=0.008
 table(sce$scDblFinder.class)                               # adds scDblFinder.class ('singlet'/'doublet') and .score
 seurat_obj$scDblFinder_class <- sce$scDblFinder.class
 seurat_obj$scDblFinder_score <- sce$scDblFinder.score
 ```
 
-`clusters=NULL` (default) generates purely random artificial doublets and is generally recommended; pass a vector for cluster-based generation. `dbr=NULL` computes the rate from cell count; set `dbr`/`dbr.sd` explicitly to encode a known loading.
+`clusters=NULL` (default) generates purely random artificial doublets and is generally recommended; pass a vector for cluster-based generation. `dbr=NULL` computes the rate from cell count; set `dbr`/`dbr.sd` explicitly to encode a known loading. `set.seed()` alone does not control BiocParallel workers: pass a recorded `SerialParam(RNGseed=...)` (or an equivalently seeded `BPPARAM`) whenever calls must be reproducible.
 
 ## Scrublet (Python)
 
@@ -96,6 +102,7 @@ seurat_obj$scDblFinder_score <- sce$scDblFinder.score
 
 ```python
 import scanpy as sc
+import numpy as np
 
 n_cells = adata.n_obs
 expected_rate = 0.008 * n_cells / 1000                     # from recovered cells, not the 0.05 placeholder
@@ -104,7 +111,33 @@ sc.pp.scrublet(adata, expected_doublet_rate=expected_rate)  # adds obs['doublet_
 adata_singlets = adata[~adata.obs['predicted_doublet']].copy()
 ```
 
-For pooled samples, loop `sc.pp.scrublet(adata[adata.obs.sample == s], ...)` per sample (or pass `batch_key`), never on the merged object.
+For pooled samples, score each sample/capture in a `.copy()` and assign the result back to the parent; scoring an AnnData view silently loses its columns. `sample_key` must identify the independent capture being scored. If demultiplexed samples share a capture, use a separate `lane_key` to calculate the expected rate from the total lane count.
+
+```python
+sample_key = 'sample_id'  # independent capture / sample to score
+lane_key = 'lane_id'      # use sample_key here when each sample is its own capture
+required = {sample_key, lane_key}
+missing = required - set(adata.obs.columns)
+if missing:
+    raise ValueError(f'Add capture metadata before per-sample Scrublet: {sorted(missing)}')
+
+adata.obs['doublet_score'] = np.nan
+adata.obs['predicted_doublet'] = False
+for sample, cells in adata.obs.groupby(sample_key, observed=True).groups.items():
+    mask = adata.obs_names.isin(cells)
+    sub = adata[mask].copy()  # never call scrublet on a view
+    if sub.obs[lane_key].nunique() != 1:
+        raise ValueError(f'{sample!r} spans multiple lanes; score each capture separately.')
+    lane = sub.obs[lane_key].iloc[0]
+    lane_cells = int((adata.obs[lane_key] == lane).sum())
+    expected_rate = 0.008 * lane_cells / 1000
+    sc.pp.scrublet(sub, expected_doublet_rate=expected_rate)
+    adata.obs.loc[mask, 'doublet_score'] = sub.obs['doublet_score'].to_numpy()
+    adata.obs.loc[mask, 'predicted_doublet'] = sub.obs['predicted_doublet'].to_numpy()
+
+if adata.obs['doublet_score'].isna().any():
+    raise RuntimeError('Scrublet did not return scores for every sample; do not continue unscored.')
+```
 
 ## DoubletFinder (R, legacy Seurat)
 
@@ -122,7 +155,7 @@ pK <- as.numeric(as.character(bcmvn$pK[which.max(bcmvn$BCmetric)]))   # no defau
 rate <- 0.008 * ncol(seurat_obj) / 1000
 nExp <- round(rate * ncol(seurat_obj))
 nExp <- round(nExp * (1 - modelHomotypic(seurat_obj$seurat_clusters)))  # discount undetectable homotypic doublets
-seurat_obj <- doubletFinder(seurat_obj, PCs = 1:20, pN = 0.25, pK = pK, nExp = nExp, sct = FALSE)
+seurat_obj <- doubletFinder(seurat_obj, PCs = 1:20, pN = 0.25, pK = pK, nExp = nExp, sct = FALSE) # omit reuse.pANN unless supplying an existing pANN column name
 ```
 
 `pN` (artificial-doublet proportion) defaults to 0.25 and performance is largely insensitive to it. DoubletFinder requires a normalized, PCA'd, clustered object and is the most version-sensitive of the three.
@@ -131,17 +164,25 @@ seurat_obj <- doubletFinder(seurat_obj, PCs = 1:20, pN = 0.25, pK = pK, nExp = n
 
 Simulated doublets are a model, not the real thing: real doublets share one RT/PCR reaction (capture competition, barcode effects), so simulated-doublet density only approximates where real doublets sit, and even the best method has a low ceiling (max mean AUPRC ~0.537 in Xi and Li 2021 - every method misses a lot). Over-removal culls proliferating (S/G2M) and genuine transitional cells that legitimately score high, so cross-check removed cells against cell-cycle and activation signatures. When available, experimental ground truth beats inference: cell hashing (CITE-seq HTOs) and MULTI-seq call inter-sample doublets directly regardless of expression similarity (catching even cross-sample homotypic doublets), and serve as a complementary filter. Heavy ambient RNA can mimic co-expression and nudge scores, so handle empty droplets and ambient RNA first (see single-cell/preprocessing).
 
+## What to report
+
+- Per sample/capture: cells scored, expected doublet rate, and whether that rate came from its own recovered count or the total multiplexed lane.
+- Method, tool version, seed/BPPARAM (when applicable), and whether the threshold was automatic or manually chosen after histogram review.
+- Doublet calls as both a count and percentage, retained as flags/scores unless removal is explicitly requested.
+- The homotypic limitation: reported calls estimate the expression-detectable fraction, not a doublet-free population.
+
 ## Common Errors
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | Doublet calls look random / too many | Run on merged multi-sample data | Run per sample before integration (`samples=` or loop) |
+| `doublet_score` / `predicted_doublet` are missing after a per-sample loop | Scrublet was run on an AnnData view, so results were not written to the parent | Run each subset with `.copy()`, assign both columns back with `.obs.loc[...]`, and stop if any scores remain missing |
 | Auto-threshold splits the histogram badly | Scrublet histogram is unimodal | Inspect the histogram and set `threshold` manually |
 | A high-RNA cell type was wiped out | Count-based QC and doublet removal double-penalized the same axis | Coordinate the filters; do not stack aggressive cutoffs |
 | "Novel transitional state" co-expresses two lineages | Heterotypic doublets masquerading as a cluster | Confirm per-sample detection; check marker co-expression / hashing before claiming a new type |
 | Trajectory has an implausible bridge between lineages | Doublets forming a false intermediate | Remove/flag doublets before trajectory inference |
 | Reported "0% doublets" | Homotypic doublets are invisible | Do not claim doublet-free; report only the detectable fraction |
-| DoubletFinder call errors after a Seurat upgrade | `*_v3` names removed; API drift | Use current function names; re-tune `pK` |
+| DoubletFinder errors with `cannot xtfrm data frames` | `reuse.pANN = FALSE` is invalid: the argument is a prior pANN column name or omitted | Omit `reuse.pANN` unless reusing a named pANN column; then re-tune `pK` |
 | Expected rate clearly wrong | Used a package default | Set rate from recovered cells (~0.008 x cells/1000) |
 | Multiplexed pool underestimates doublets | Rate derived from one demultiplexed sample, not total lane | Set the expected rate from total capture-lane cells |
 

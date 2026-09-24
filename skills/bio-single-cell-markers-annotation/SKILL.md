@@ -105,10 +105,10 @@ sc.tl.score_genes(adata, gene_list=t_cell_panel, ctrl_size=50, n_bins=25, score_
 ```
 
 ```r
-seurat_obj <- AddModuleScore(seurat_obj, features = list(c('CD3D', 'CD3E', 'CD4', 'CD8A', 'CD8B')), ctrl = 100, name = 'T_cell_score')
+seurat_obj <- AddModuleScore(seurat_obj, features = list(c('CD3D', 'CD3E', 'CD4', 'CD8A', 'CD8B')), ctrl = 50, nbin = 25, name = 'T_cell_score')
 ```
 
-scanpy uses 25 control bins, Seurat uses 24 by default (both follow Tirosh 2016) - a real cross-ecosystem non-reproducibility source for small panels.
+For a cross-ecosystem comparison, set the number of expression bins and control genes explicitly (the examples use 25 bins and 50 controls). Do not rely on an unverified Seurat default; the implementations still need not produce identical scores for small panels, so compare their ordering and label calls rather than porting an absolute cutoff.
 
 ## Cell-cycle scoring
 
@@ -151,17 +151,24 @@ seurat_obj$cell_type <- Idents(seurat_obj)
 
 ```python
 import scanpy as sc
+import numpy as np
+from scipy import sparse
 
 cell_type = adata[adata.obs['cell_type'] == 'CD14 Mono']
-pseudobulk = sc.get.aggregate(cell_type, by='sample', func='sum')
+if 'counts' not in cell_type.layers:
+    raise ValueError("Pseudobulk requires raw integer counts in adata.layers['counts']; do not sum normalized .X")
+pseudobulk = sc.get.aggregate(cell_type, by='sample', func='sum', layer='counts')
 counts_df = pseudobulk.layers['sum']
+values = counts_df.data if sparse.issparse(counts_df) else np.asarray(counts_df).ravel()
+if not np.allclose(values, np.round(values)):
+    raise ValueError("Pseudobulk counts must be integral; verify that layer='counts' contains raw counts")
 ```
 
 ```r
 pb <- AggregateExpression(seurat_obj, group.by = c('cell_type', 'sample'), assays = 'RNA', layer = 'counts')$RNA
 ```
 
-Pull the summed counts slot, build a sample-level design (condition + covariates), and run DESeq2/edgeR; see differential-expression/deseq2-basics for the modeling step. Never run DE on batch-corrected or normalized expression.
+Pull the summed counts slot, build a sample-level design (condition + covariates), and run DESeq2/edgeR; see differential-expression/deseq2-basics for the modeling step. Never run DE on batch-corrected or normalized expression. If raw counts were not retained, stop and reacquire the count matrix rather than converting normalized values into pseudobulk.
 
 ## Canonical PBMC markers (context-dependent, validate per dataset)
 
@@ -174,6 +181,14 @@ Pull the summed counts slot, build a sample-level design (condition + covariates
 
 A marker is a conditional statement, not a property of a gene: a marker in blood may be expressed broadly in tumor, and "vs rest" markers depend on what "rest" is. Re-validate any ported panel.
 
+**CD8 T versus NK needs a lineage gate.** NKG7 and GNLY describe cytotoxic state and can be high in cytotoxic CD8 T cells; do not name an NK cluster from those genes alone. First establish T-lineage support with `CD3D`/`CD3E`, then interpret `CD8A`/`CD8B` versus `GNLY`/`NCAM1` together with the full marker ranking and tissue context.
+
+## What to report
+
+- State the ranking test, package version, and explicit filtering thresholds.
+- For each cluster, report top markers with effect size and in-group/out-group expression fractions, plus any lineage gate used for a close call.
+- State that cluster-marker p-values are descriptive annotations, not evidence that the cluster is a cell type.
+
 ## Common Errors
 
 | Symptom | Cause | Fix |
@@ -181,6 +196,7 @@ A marker is a conditional statement, not a property of a gene: a marker in blood
 | Thousands of "significant" markers between two visually-similar clusters | Over-clustering + double-dipping inflation | Significance-test the split (scSHC/ClusterDE) or merge; never quote raw marker p-values as proof of a cell type |
 | Marker p-values used as evidence clusters are real | Selective-inference violation; BH cannot fix invalid p-values | Report markers as descriptive labels; validate identity with orthogonal markers |
 | Condition DE returns huge gene lists, none replicate | Cells treated as replicates (pseudoreplication) | Aggregate to pseudobulk per sample x cell type; test across donors |
+| Pseudobulk matrix has non-integer values / DESeq2 rejects counts | Normalized `.X` was summed, or raw counts were discarded | Aggregate `layer='counts'` in Scanpy (or `layer='counts'` in `AggregateExpression`); if no raw counts remain, reacquire them rather than using normalized values |
 | `FindAllMarkers` hangs for minutes | presto not installed; slow base-R Wilcoxon | `install.packages('presto')` (or `remotes::install_github('immunogenomics/presto')`) |
 | Same top markers in every cluster | Resolution too high; clusters split one population | Lower resolution / merge; check stability |
 | Gene cutoff ported from another dataset misclassifies cells | Module scores are dataset-relative | Set thresholds from this dataset's score distribution |

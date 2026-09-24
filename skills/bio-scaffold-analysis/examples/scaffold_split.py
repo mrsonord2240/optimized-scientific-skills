@@ -39,37 +39,63 @@ def scaffold_clusters(df, smiles_col='smiles'):
     return dict(clusters)
 
 
-def scaffold_split(df, smiles_col='smiles', train_frac=0.8, seed=42):
-    '''Assign whole scaffolds; 0.8 is a starting split to match to deployment.'''
+def scaffold_split(df, smiles_col='smiles', train_frac=0.8, seed=42,
+                   return_diagnostics=False):
+    '''Assign whole scaffolds and expose split diagnostics when requested.'''
     clusters = scaffold_clusters(df, smiles_col)
-    # Sort by cluster size desc so large clusters go to train first
-    scaffold_sets = sorted(clusters.values(), key=lambda x: len(x), reverse=True)
+    if not 0 < train_frac < 1:
+        raise ValueError('train_frac must be strictly between 0 and 1')
+    scaffold_sets = list(clusters.values())
     n_total = sum(len(s) for s in scaffold_sets)
     n_train = int(n_total * train_frac)
+    n_test = n_total - n_train
 
     rng = random.Random(seed)
-    # Keep the largest cluster first, but reproducibly shuffle the actual tail.
-    tail = scaffold_sets[1:]
-    rng.shuffle(tail)
-    scaffold_sets[1:] = tail
+    rng.shuffle(scaffold_sets)
+    scaffold_sets.sort(key=lambda group: len(group), reverse=True)
 
     if len(scaffold_sets) < 2:
         raise ValueError('A scaffold split requires at least two distinct scaffolds')
+    if n_train == 0 or n_test == 0:
+        raise ValueError('train_frac produces an empty partition; use a larger dataset or a less extreme fraction')
 
-    train_idx = list(scaffold_sets[0])
-    test_idx = []
-    for i, scaff_set in enumerate(scaffold_sets[1:], start=1):
-        remaining_groups = len(scaffold_sets) - i - 1
-        if not test_idx and remaining_groups == 0:
-            test_idx.extend(scaff_set)
-            continue
-        add_to_train_error = abs((len(train_idx) + len(scaff_set)) - n_train)
-        keep_train_error = abs(len(train_idx) - n_train)
-        if add_to_train_error < keep_train_error:
+    train_idx, test_idx = [], []
+    train_group_sizes, test_group_sizes = [], []
+    for scaff_set in scaffold_sets:
+        if len(train_idx) / n_train <= len(test_idx) / n_test:
             train_idx.extend(scaff_set)
+            train_group_sizes.append(len(scaff_set))
         else:
             test_idx.extend(scaff_set)
-    return df.iloc[train_idx].reset_index(drop=True), df.iloc[test_idx].reset_index(drop=True)
+            test_group_sizes.append(len(scaff_set))
+
+    # Exact fractions are possible only when singleton groups can close the gap.
+    train_singletons = [s for s in scaffold_sets if len(s) == 1 and s[0] in train_idx]
+    test_singletons = [s for s in scaffold_sets if len(s) == 1 and s[0] in test_idx]
+    while len(train_idx) < n_train and test_singletons:
+        group = test_singletons.pop()
+        test_idx.remove(group[0]); train_idx.extend(group)
+        test_group_sizes.remove(1); train_group_sizes.append(1)
+    while len(train_idx) > n_train and train_singletons:
+        group = train_singletons.pop()
+        train_idx.remove(group[0]); test_idx.extend(group)
+        train_group_sizes.remove(1); test_group_sizes.append(1)
+
+    diagnostics = {
+        'requested_train_fraction': train_frac,
+        'achieved_train_fraction': len(train_idx) / n_total,
+        'scaffold_overlap': 0,
+        'train_singleton_compound_fraction': sum(size == 1 for size in train_group_sizes) / len(train_idx),
+        'test_singleton_compound_fraction': sum(size == 1 for size in test_group_sizes) / len(test_idx),
+    }
+    if any(len(group) > 1 for group in scaffold_sets):
+        assert diagnostics['test_singleton_compound_fraction'] < 1, (
+            'All test compounds are singleton scaffolds; inspect the split diagnostics')
+    train = df.iloc[train_idx].reset_index(drop=True)
+    test = df.iloc[test_idx].reset_index(drop=True)
+    if return_diagnostics:
+        return train, test, diagnostics
+    return train, test
 
 
 def detect_analog_series(df, smiles_col='smiles', min_size=3):

@@ -82,8 +82,10 @@ Set the rate from recovered cells, not a package default: rate ~= 0.008 x cells 
 - **Homotypic doublets are invisible** - removal is never complete; do not claim a doublet-free dataset.
 - **Flag, then inspect** - prefer keeping the score and examining high-score clusters over blind deletion.
 - **Treat intermediate clusters as suspect** - any cluster co-expressing two lineage programs is doublet-suspect until ruled out.
+- **Rule out ambient RNA first** - compare lineage co-expression with the dataset-wide background and prioritize doublet scores over raw co-expression alone.
 - **Do not double-penalize** - doublet score correlates with total counts; coordinate with count-based QC to keep real high-RNA cells.
 - **Use hashing as ground truth** - cell hashing and MULTI-seq call inter-sample doublets experimentally, regardless of expression similarity.
+- **Report the decision trail** - per-capture cell count/rate, threshold, calls (count and percent), and the homotypic limitation; record the scDblFinder BPPARAM seed for reproducibility.
 
 ## Related Skills
 

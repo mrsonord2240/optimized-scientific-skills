@@ -38,7 +38,7 @@ Leiden is the current default for graph community detection because Louvain can 
 | Louvain | Modularity optimization without refinement | Legacy pipelines; Seurat default (`algorithm=1`) | Can yield internally disconnected communities; superseded by Leiden (Traag 2019) |
 | SLM | Smart Local Moving refinement | Seurat option (`algorithm=3`) for tighter modularity optima | Slower; rarely needed over Leiden |
 
-Scanpy 1.10 backend migration (pin for reproducibility): `sc.tl.leiden` still defaults to the `leidenalg` backend through 1.10-1.12 and emits a FutureWarning that the default will switch to igraph. The exact flip version is unconfirmed, so pin the backend explicitly: `sc.tl.leiden(adata, flavor='igraph', n_iterations=2, directed=False)`. Switching backend or `n_iterations` changes the labels - a pipeline that pins neither is non-reproducible across versions. Seurat's Leiden (`algorithm=4`) requires the `leidenalg` Python module via reticulate, which is why most Seurat pipelines still run Louvain.
+Scanpy 1.10 backend migration (pin for reproducibility): `sc.tl.leiden` still defaults to the `leidenalg` backend through 1.10-1.12 and emits a FutureWarning that the default will switch to igraph. The exact flip version is unconfirmed, so pin the backend explicitly: `sc.tl.leiden(adata, flavor='igraph', n_iterations=2, directed=False)`. Switching backend or `n_iterations` changes the labels - a pipeline that pins neither is non-reproducible across versions. In Seurat 5, `algorithm=4` uses the R `leidenbase` backend by default; install it with `install.packages('leidenbase')`, or select `leiden_method='igraph'` when that is the intended backend. Older Seurat installations may instead require the Python `leidenalg` module through reticulate, so verify `?FindClusters` for the installed version.
 
 ## Parameter Reference
 
@@ -46,12 +46,12 @@ Scanpy 1.10 backend migration (pin for reproducibility): `sc.tl.leiden` still de
 
 | Parameter | Typical range | Rationale | Validation |
 |-----------|--------------|-----------|------------|
-| n_pcs | 30-50 (check elbow) | Captures biological variance while denoising; effect dwarfs n_neighbors | Elbow plot; cluster stability across nearby n_pcs values |
+| n_pcs | max(elbow, ~30), commonly 30-50 | The elbow is a lower bound, not a target: use enough PCs to retain stable biological structure without blindly adding noise | Cluster stability across nearby n_pcs values; do not lower below ~30 solely because a variance elbow appears early |
 | n_neighbors | 10-30 (15 default) | Higher = smoother, fewer fine clusters; lower = more local, fragmented | Secondary lever; vary only after n_pcs is set |
 | resolution | 0.2-2.0 (sweep, do not fix) | Higher = more, smaller clusters; has no biological meaning | clustree across the sweep; marker check; significance test |
 | min_dist (UMAP) | 0.1-0.5 | Visualization only; lower = tighter visual clusters | Affects display, never the partition |
 
-Resolution is an unidentifiable nuisance parameter: it cannot be validated internally (no ground truth), so tuning it until clusters "match known cell types" is confirmation bias laundered as analysis. Sweep a range, visualize cell flow with clustree, and pick the coarsest level whose populations are defensible by orthogonal evidence - label finer splits as hypotheses.
+Resolution is an unidentifiable nuisance parameter: it cannot be validated internally (no ground truth), so tuning it until clusters "match known cell types" is confirmation bias laundered as analysis. Sweep a range, visualize cell flow with clustree, and pick the coarsest level whose populations are defensible by orthogonal evidence - label finer splits as hypotheses. The elbow never overrules stability: when it is below about 30 PCs, evaluate the elbow-adjacent value and nearby values in the 30-50 range, then retain only structure stable across that neighborhood.
 
 ## Cluster Cells with Scanpy
 
@@ -88,9 +88,13 @@ for res in [0.2, 0.4, 0.6, 0.8, 1.0]:
     print(res, adata.obs[f'leiden_r{res}'].nunique(), 'clusters')
 
 sc.pl.umap(adata, color=['leiden_r0.2', 'leiden_r0.6', 'leiden_r1.0'], ncols=3)
-# clustree (R) or sc.tl.dendrogram for flow across resolutions; merge clusters
-# whose top markers are indistinguishable -> they are one population over-split
+# clustree (R) or sc.tl.dendrogram for flow across resolutions. Do not merge or
+# retain a split because of its post-clustering marker p-values; use the checks below.
 ```
+
+### What to report from a sweep
+
+For every candidate resolution, report: (1) cluster count and size distribution, (2) the chosen coarsest level and the non-circular evidence for it, (3) each cluster's batch/sample/QC composition, and (4) marker genes as ranking or annotation evidence only — never as a significance claim. If a split is not validated, call it a hypothesis rather than a population.
 
 ## Cluster Cells with Seurat
 
@@ -113,7 +117,7 @@ clustree(seurat_obj, prefix = 'RNA_snn_res.')  # cell flow across the sweep
 DimPlot(seurat_obj, reduction = 'umap', label = TRUE)
 ```
 
-`FindClusters` defaults to Louvain (`algorithm=1`); pass `algorithm=4` for Leiden (requires the leidenalg Python module). Resolutions stored as `RNA_snn_res.<r>` columns feed clustree directly.
+`FindClusters` defaults to Louvain (`algorithm=1`); pass `algorithm=4` for Leiden. In Seurat 5 the default Leiden route uses `leidenbase`; install it with `install.packages('leidenbase')`, or explicitly request the documented `leiden_method` for the installed version. Resolutions stored as `RNA_snn_res.<r>` columns feed clustree directly.
 
 ## Subclustering
 
@@ -130,7 +134,7 @@ sc.pp.neighbors(sub, n_neighbors=15, n_pcs=20)
 sc.tl.leiden(sub, resolution=0.4, flavor='igraph', n_iterations=2, directed=False)
 ```
 
-Reusing the global PCA imports axes uninformative within a homogeneous subset and manufactures artifactual sub-splits. Subclustering compounds double-dipping (cells selected twice), so stop when splits lose distinct markers or fail a significance test - not when resolution can technically still split (it always can).
+Reusing the global PCA imports axes uninformative within a homogeneous subset and manufactures artifactual sub-splits. Subclustering compounds double-dipping (cells selected twice). Do not use distinct markers or post-clustering p-values as a stop rule: they are selected on the same data as the split. Stop and merge or retain the split only as a hypothesis when it aligns with batch/sample/QC, fails resampling stability, fails a formal split test, or does not reproduce in an independent sample. Never continue merely because resolution can technically split (it always can).
 
 ## Validating That Clusters Are Real
 
@@ -139,6 +143,69 @@ Stability and significance are separate questions, and both differ from biologic
 - Stability (necessary, not sufficient): bootstrap cells, re-cluster, measure per-cluster label agreement (Jaccard >= ~0.6-0.7 = stable). A perfectly reproducible split can still be technical - driven by cell-cycle phase, dissociation stress (FOS/JUN/HSPA1A), mitochondrial fraction, ambient RNA, or batch. Stable does not mean real.
 - Significance (whether a split is two populations or one): scSHC (Grabski 2023) and CHOIR (2025) test each split under a null with error control; a failed split is over-clustering and the clusters should be merged.
 - Biological-vs-technical adjudication: check that a split survives regressing out cycle/mito and carries non-stress markers before claiming a population.
+
+### Runnable non-circular checks
+
+Run these after a candidate partition. They can flag technical or unstable splits, but passing them is not proof of a new cell population; a biological claim still needs formal split testing and independent replication.
+
+The same helper is bundled at `examples/validate_partition.py`.
+
+```python
+import numpy as np
+import pandas as pd
+import scanpy as sc
+from sklearn.metrics import adjusted_rand_score
+
+def partition_checks(adata, cluster_key, covariates=('batch', 'sample'),
+                     resolution=0.5, n_neighbors=15, n_pcs=30,
+                     n_bootstrap=20, seed=0):
+    """Check confounding and resampling stability for an already chosen partition."""
+    base = adata.obs[cluster_key].astype(str).to_numpy()
+    for covariate in covariates:
+        if covariate in adata.obs:
+            score = adjusted_rand_score(base, adata.obs[covariate].astype(str))
+            print(f'ARI({cluster_key}, {covariate}) = {score:.3f}')
+
+    rng = np.random.default_rng(seed)
+    rows = []
+    for replicate in range(n_bootstrap):
+        keep = rng.choice(adata.n_obs, int(0.8 * adata.n_obs), replace=False)
+        boot = adata[keep].copy()
+        sc.pp.neighbors(boot, n_neighbors=n_neighbors, n_pcs=n_pcs,
+                        random_state=seed + replicate)
+        sc.tl.leiden(boot, resolution=resolution, key_added='_bootstrap',
+                     flavor='igraph', n_iterations=2, directed=False,
+                     random_state=seed + replicate)
+        bootstrap = boot.obs['_bootstrap'].astype(str).to_numpy()
+        for original in np.unique(base[keep]):
+            original_mask = base[keep] == original
+            best = max(
+                (original_mask & (bootstrap == candidate)).sum()
+                / (original_mask | (bootstrap == candidate)).sum()
+                for candidate in np.unique(bootstrap))
+            rows.append((original, best))
+    stability = pd.DataFrame(rows, columns=['cluster', 'jaccard']).groupby('cluster').jaccard.mean()
+    print('mean bootstrap Jaccard by cluster:')
+    print(stability.sort_values().round(3).to_string())
+    return stability
+
+stability = partition_checks(adata, 'leiden_r0.6', covariates=('batch', 'sample', 'condition'),
+                             resolution=0.6, n_neighbors=15, n_pcs=30)
+# Treat high covariate alignment or Jaccard below roughly 0.6-0.7 as a reason
+# to reject the split. Passing is necessary, not sufficient: seek a formal test
+# and an independent sample/replicate before naming a population.
+```
+
+For a formal hierarchical split test, `scSHC` accepts an HVG expression matrix with genes in rows and cells in columns. It is optional and may require a separate R installation; fail clearly rather than silently treating marker p-values as a substitute.
+
+```r
+if (!requireNamespace('scSHC', quietly = TRUE)) {
+  stop("Install scSHC from github.com/igrabski/sc-SHC before making a cluster-significance claim")
+}
+# expr_hvg: normalized or transformed HVG matrix, genes x cells; use the package
+# documentation to choose its preprocessing options for the installed version.
+significant_clusters <- scSHC::scSHC(expr_hvg)
+```
 
 Double-dipping (post-clustering inference is invalid, not just inflated): `rank_genes_groups`/`FindAllMarkers` p-values are conditioned on a clustering chosen to maximize separation, so under one homogeneous population they do not follow their nominal null - type-I error approaches 1 as resolution rises, and BH correction does nothing because the p-values are invalid before correction. Use these marker tests for ranking and labeling only. To make a defensible claim that a cluster is a distinct population, pair a cluster significance test (scSHC/CHOIR) with a double-dipping-robust DE method (ClusterDE's synthetic null, or count splitting where the noise model holds - Poisson thinning on overdispersed counts silently reinstates the bias). See markers-annotation for marker testing and the pseudobulk path for cross-condition DE.
 
@@ -151,8 +218,8 @@ Cluster on the graph or PCA, never on embedding coordinates. Inter-cluster dista
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | One giant blob, no structure | Too few HVGs or wrong n_pcs (too few), or the sample is genuinely one cell type | Increase HVGs (~2000), raise n_pcs, check the elbow plot; if markers stay uniform across a resolution sweep, the blob may be a single real population, not a parameter bug |
-| Far too many clusters | Resolution too high; n_pcs too high (noise) | Lower resolution; sweep with clustree; reduce n_pcs to the elbow |
-| Adjacent clusters share all top markers | Over-clustering one population | Merge them; lower resolution; significance-test the split (scSHC/CHOIR) |
+| Far too many clusters | Resolution too high; n_pcs may add noise | Lower resolution; sweep with clustree; test stability across nearby PCs rather than treating the elbow as an upper bound |
+| Adjacent clusters share all top markers | Possible over-clustering one population | Lower resolution and use covariate alignment, bootstrap stability, formal split testing, and independent replication; marker overlap alone cannot decide |
 | Labels change between runs/versions | Leiden backend or n_iterations unpinned | Pin `flavor='igraph', n_iterations=2, directed=False`; set random_state |
 | A cluster maps to one sample/lane only | Batch effect, not biology | Integrate batches first (batch-integration); inspect QC covariates |
 | A "stable" cluster of stress/cycle genes | Technical split (dissociation, cycle, mito) | Regress out cycle/mito or score and exclude; require non-stress markers |

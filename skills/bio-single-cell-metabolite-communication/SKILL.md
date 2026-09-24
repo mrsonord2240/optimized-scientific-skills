@@ -57,21 +57,30 @@ Methods and their curated databases evolve; before committing, verify current be
 from mebocost import mebocost
 import scanpy as sc
 
-adata = sc.read_h5ad('adata_annotated.h5ad')   # log-normalized, gene SYMBOLS not Ensembl IDs
+def run_mebocost(adata_path='adata_annotated.h5ad', config_path='./mebocost.conf'):
+    adata = sc.read_h5ad(adata_path)  # log-normalized, gene SYMBOLS not Ensembl IDs
 
-# config_path points to mebocost.conf listing the metabolite-enzyme-sensor database paths
-# cutoff_prop=0.15: a gene must be expressed in >=15% of a group to count (dropout floor)
-# species MUST match the data: mouse data against the human enzyme/sensor DB returns almost nothing
-mebo = mebocost.create_obj(adata=adata, group_col='cell_type', condition_col=None,
-                           met_est='mebocost', config_path='./mebocost.conf', species='human',
-                           cutoff_exp='auto', cutoff_met='auto', cutoff_prop=0.15,
-                           sensor_type='All', thread=8)
+    # config_path points to mebocost.conf listing the metabolite-sensor database paths
+    # cutoff_prop=0.15: a gene must be expressed in >=15% of a group to count (dropout floor)
+    # species MUST match the data: mouse data against the human enzyme/sensor DB returns almost nothing
+    mebo = mebocost.create_obj(adata=adata, group_col='cell_type', condition_col=None,
+                               met_est='mebocost', config_path=config_path, species='human',
+                               cutoff_exp='auto', cutoff_met='auto', cutoff_prop=0.15,
+                               sensor_type='All', thread=8)
 
-# n_shuffle=1000: label-permutation null for FDR; min_cell_number=10 drops tiny groups
-commu_res = mebo.infer_commu(n_shuffle=1000, seed=12345, Return=True,
-                             min_cell_number=10, pval_method='permutation_test_fdr',
-                             pval_cutoff=0.05, thread=None)
+    # n_shuffle=1000: label-permutation null for FDR; min_cell_number=10 drops tiny groups
+    return mebo.infer_commu(n_shuffle=1000, seed=12345, Return=True,
+                            min_cell_number=10, pval_method='permutation_test_fdr',
+                            pval_cutoff=0.05, thread=None)
+
+if __name__ == '__main__':  # required on Windows: infer_commu uses multiprocessing
+    commu_res = run_mebocost()
 ```
+
+Before this step, call `prepare_data_for_mebocost()` from
+[`examples/metabolite_communication.py`](examples/metabolite_communication.py) to check
+log normalization and remove undersized cell types. For a reproducible smoke-test input,
+generate the tiny fixture described in [`examples/README.md`](examples/README.md).
 
 ## Filter and Summarize Results
 
@@ -80,16 +89,21 @@ commu_res = mebo.infer_commu(n_shuffle=1000, seed=12345, Return=True,
 **Approach:** Filter on the permutation FDR (not the raw p-value), then summarize by metabolite and by sender->receiver pair; column names are capitalized in the result table.
 
 ```python
-sig = commu_res[commu_res['permutation_test_fdr'] < 0.05].copy()
+def summarize_results(commu_res):
+    sig = commu_res[commu_res['permutation_test_fdr'] < 0.05].copy()
 
-# Result columns: Sender, Receiver, Metabolite_Name, Sensor, Annotation (Transporter/Enzyme),
-# Commu_Score, Norm_Commu_Score, met_in_sender, sensor_in_receiver, permutation_test_fdr
-sig['pair'] = sig['Sender'] + ' -> ' + sig['Receiver']
-top_metabolites = sig['Metabolite_Name'].value_counts().head(10)
-top_pairs = sig['pair'].value_counts().head(10)
+    # Result columns: Sender, Receiver, Metabolite_Name, Sensor, Annotation (Transporter/Enzyme),
+    # Commu_Score, Norm_Commu_Score, met_in_sender, sensor_in_receiver, permutation_test_fdr
+    sig['pair'] = sig['Sender'] + ' -> ' + sig['Receiver']
+    top_metabolites = sig['Metabolite_Name'].value_counts().head(10)
+    top_pairs = sig['pair'].value_counts().head(10)
 
-# Transporter-based sensors are lower-confidence (bidirectional); separate them
-transporter_calls = sig[sig['Annotation'] == 'Transporter']
+    # Transporter-based sensors are lower-confidence (bidirectional); separate them
+    transporter_calls = sig[sig['Annotation'] == 'Transporter']
+    return sig, top_metabolites, top_pairs, transporter_calls
+
+if __name__ == '__main__':
+    sig, top_metabolites, top_pairs, transporter_calls = summarize_results(commu_res)
 ```
 
 ## Compare Conditions
@@ -99,14 +113,19 @@ transporter_calls = sig[sig['Annotation'] == 'Transporter']
 **Approach:** Either pass `condition_col` to a single object, or run MEBOCOST separately per condition subset and compare the significant sets; never compare raw interaction counts across conditions without controlling for cell number and depth.
 
 ```python
-results = {}
-for cond in adata.obs['condition'].unique():
-    sub = adata[adata.obs['condition'] == cond].copy()
-    obj = mebocost.create_obj(adata=sub, group_col='cell_type', met_est='mebocost',
-                              config_path='./mebocost.conf', species='human',
-                              cutoff_prop=0.15, thread=8)
-    results[cond] = obj.infer_commu(n_shuffle=1000, seed=12345, Return=True,
-                                    min_cell_number=10, pval_cutoff=0.05)
+def compare_conditions(adata, config_path='./mebocost.conf'):
+    results = {}
+    for cond in adata.obs['condition'].unique():
+        sub = adata[adata.obs['condition'] == cond].copy()
+        obj = mebocost.create_obj(adata=sub, group_col='cell_type', met_est='mebocost',
+                                  config_path=config_path, species='human',
+                                  cutoff_prop=0.15, thread=8)
+        results[cond] = obj.infer_commu(n_shuffle=1000, seed=12345, Return=True,
+                                        min_cell_number=10, pval_cutoff=0.05)
+    return results
+
+if __name__ == '__main__':  # required on Windows: infer_commu uses multiprocessing
+    results = compare_conditions(sc.read_h5ad('adata_annotated.h5ad'))
 # A "differential" metabolite call (significant in one condition only) is a HYPOTHESIS for metabolomics
 ```
 
@@ -130,6 +149,7 @@ for cond in adata.obs['condition'].unique():
 | A cell type "secretes" a metabolite implausibly | Synthase mRNA present but substrate/cofactor absent, or ambient RNA inflated the enzyme | Decontaminate ambient RNA; treat as "machinery consistent with", validate with metabolomics |
 | Sender/receiver direction looks reversed | Sensor is a bidirectional/promiscuous transporter | Check `Annotation == 'Transporter'` calls separately; confirm transport direction |
 | More communications in condition B than A | Counts scale with cell number and depth | Compare score magnitudes or matched subsets, not raw counts |
+| `RuntimeError` about starting a process before bootstrapping finishes (Windows) | `infer_commu()` uses multiprocessing and re-imports unguarded top-level code | Put inference in a function and call it only under `if __name__ == '__main__':` as in the examples above |
 
 ## Related Skills
 

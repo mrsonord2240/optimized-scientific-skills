@@ -14,7 +14,7 @@ COMMON_SMARTS = {
     'secondary_amine': '[NX3;H1;$(N(-[#6])-[#6]);!$(N-[C,S,P]=[O,S,N])]',
     'carboxylic_acid': '[CX3](=O)[OX2H1]',
     'amide': '[CX3](=O)[NX3]',
-    'ester': '[CX3](=O)[OX2][C]',
+    'ester': '[CX3](=[OX1])[OX2][#6]',
     'benzene': 'c1ccccc1',
     'aromatic': '[a]',
     'halogen': '[F,Cl,Br,I]',
@@ -25,27 +25,31 @@ COMMON_SMARTS = {
 }
 
 
+def compile_smarts(smarts):
+    '''Compile a non-empty SMARTS query or raise a concise user-facing error.'''
+    if not isinstance(smarts, str) or not smarts.strip():
+        raise ValueError('SMARTS must be a non-empty string')
+    pattern = Chem.MolFromSmarts(smarts)
+    if pattern is None or pattern.GetNumAtoms() == 0:
+        raise ValueError(f'Invalid SMARTS: {smarts}')
+    return pattern
+
+
 def has_substructure(mol, smarts):
     '''Check if molecule contains substructure.'''
-    pattern = Chem.MolFromSmarts(smarts)
-    if pattern is None:
-        raise ValueError(f'Invalid SMARTS: {smarts}')
-    return mol.HasSubstructMatch(pattern)
+    return bool(mol and mol.HasSubstructMatch(compile_smarts(smarts)))
 
 
 def get_matches(mol, smarts):
     '''Get all substructure matches as atom indices.'''
-    pattern = Chem.MolFromSmarts(smarts)
-    if pattern is None:
-        raise ValueError(f'Invalid SMARTS: {smarts}')
-    return mol.GetSubstructMatches(pattern)
+    if mol is None:
+        return ()
+    return mol.GetSubstructMatches(compile_smarts(smarts))
 
 
 def filter_by_substructure(molecules, smarts, exclude=False):
     '''Filter molecules by substructure presence/absence.'''
-    pattern = Chem.MolFromSmarts(smarts)
-    if pattern is None:
-        raise ValueError(f'Invalid SMARTS: {smarts}')
+    pattern = compile_smarts(smarts)
 
     filtered = []
     for mol in molecules:
@@ -67,12 +71,12 @@ def filter_multiple(molecules, include=None, exclude=None):
 
     if include:
         for smarts in include:
-            pattern = Chem.MolFromSmarts(smarts)
+            pattern = compile_smarts(smarts)
             result = [m for m in result if m and m.HasSubstructMatch(pattern)]
 
     if exclude:
         for smarts in exclude:
-            pattern = Chem.MolFromSmarts(smarts)
+            pattern = compile_smarts(smarts)
             result = [m for m in result if m and not m.HasSubstructMatch(pattern)]
 
     return result
@@ -85,7 +89,7 @@ def identify_functional_groups(mol, patterns=None):
 
     found = {}
     for name, smarts in patterns.items():
-        pattern = Chem.MolFromSmarts(smarts)
+        pattern = compile_smarts(smarts)
         matches = mol.GetSubstructMatches(pattern)
         if matches:
             found[name] = len(matches)
@@ -94,7 +98,7 @@ def identify_functional_groups(mol, patterns=None):
 
 def draw_with_highlight(mol, smarts, filename, size=(400, 300)):
     '''Draw molecule with substructure highlighted.'''
-    pattern = Chem.MolFromSmarts(smarts)
+    pattern = compile_smarts(smarts)
     match = mol.GetSubstructMatch(pattern)
 
     drawer = rdMolDraw2D.MolDraw2DCairo(size[0], size[1])
@@ -110,7 +114,7 @@ def draw_with_highlight(mol, smarts, filename, size=(400, 300)):
 
 def find_scaffold_matches(molecules, scaffold_smarts):
     '''Find molecules matching a scaffold pattern.'''
-    pattern = Chem.MolFromSmarts(scaffold_smarts)
+    pattern = compile_smarts(scaffold_smarts)
     matches = []
     for i, mol in enumerate(molecules):
         if mol and mol.HasSubstructMatch(pattern):
@@ -136,3 +140,15 @@ if __name__ == '__main__':
     library = [Chem.MolFromSmiles(s) for s in ['CCO', 'CCN', 'CCC', 'c1ccccc1O', 'c1ccccc1N']]
     alcohols = filter_by_substructure(library, '[OX2H]')
     print(f'\nAlcohols in library: {len(alcohols)}')
+
+    # Regression probes for the ester and malformed-query contracts.
+    ester = COMMON_SMARTS['ester']
+    assert has_substructure(Chem.MolFromSmiles('CC(=O)OC(C)C'), ester)
+    assert has_substructure(Chem.MolFromSmiles('CC(=O)Oc1ccccc1'), ester)
+    for invalid in ('', '[OX2H', '[Q]'):
+        try:
+            compile_smarts(invalid)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f'Expected invalid SMARTS to fail: {invalid!r}')

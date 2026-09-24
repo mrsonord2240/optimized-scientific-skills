@@ -17,7 +17,7 @@ def read_sdf(filepath):
     supplier = Chem.SDMolSupplier(str(filepath))
     molecules = []
     for mol in supplier:
-        if mol is not None:
+        if mol is not None and mol.GetNumAtoms() > 0:
             molecules.append(mol)
     print(f'Loaded {len(molecules)} molecules from {filepath}')
     return molecules
@@ -33,8 +33,10 @@ def read_smiles_file(filepath, delimiter='\t', smiles_col=0, name_col=1):
                 continue
             parts = stripped.split(delimiter)
             smiles = parts[smiles_col]
+            if not smiles.strip():
+                continue
             mol = Chem.MolFromSmiles(smiles)
-            if mol:
+            if mol is not None and mol.GetNumAtoms() > 0:
                 if len(parts) > name_col:
                     mol.SetProp('_Name', parts[name_col])
                 molecules.append(mol)
@@ -48,7 +50,7 @@ def write_sdf(molecules, filepath, properties=None):
     if properties is not None:
         writer.SetProps(list(properties))
     for mol in molecules:
-        if mol is not None:
+        if mol is not None and mol.GetNumAtoms() > 0:
             writer.write(mol)
     writer.close()
     print(f'Wrote {len(molecules)} molecules to {filepath}')
@@ -58,7 +60,7 @@ def write_smiles(molecules, filepath, include_name=True):
     '''Write molecules to SMILES file.'''
     with open(filepath, 'w') as f:
         for mol in molecules:
-            if mol is None:
+            if mol is None or mol.GetNumAtoms() == 0:
                 continue
             smiles = Chem.MolToSmiles(mol)
             if include_name and mol.HasProp('_Name'):

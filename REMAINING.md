@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**391 remaining** across 52 folders. 157 are already refined and live in `skills/`.
+**396 remaining** across 52 folders. 157 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 157 refined, 13 audited and excluded, 1 out of scope, 391 remaining.
+The source tree holds 562 Skills: 157 refined, 8 audited and excluded, 1 out of scope, 396 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -18,6 +18,7 @@ The source tree holds 562 Skills: 157 refined, 13 audited and excluded, 1 out of
 | clip-seq | 12 | 0 |
 | spatial-transcriptomics | 12 | 0 |
 | copy-number | 11 | 0 |
+| data-visualization | 10 | 2 |
 | methylation-analysis | 10 | 0 |
 | structural-biology | 10 | 0 |
 | genome-assembly | 9 | 0 |
@@ -45,7 +46,6 @@ The source tree holds 562 Skills: 157 refined, 13 audited and excluded, 1 out of
 | tcr-bcr-analysis | 6 | 0 |
 | temporal-genomics | 6 | 0 |
 | chemoinformatics | 5 | 15 |
-| data-visualization | 5 | 2 |
 | differential-expression | 5 | 1 |
 | epidemiological-genomics | 5 | 0 |
 | epitranscriptomics | 5 | 0 |
@@ -71,25 +71,6 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 
 | skill | score | grade |
 | --- | ---: | --- |
-| `bio-admet-prediction` | 86 | Limited Release |
-| `bio-data-visualization-forest-funnel-plots` | 76 | Limited Release |
-| `bio-machine-learning-model-validation` | 93 | Limited Release |
-| `bio-machine-learning-prediction-explanation` | 89 | Limited Release |
-| `bio-molecular-descriptors` | 86 | Limited Release |
-| `bio-molecular-io` | 91 | Limited Release |
-| `bio-molecular-standardization` | 90 | Limited Release |
-| `bio-qsar-modeling` | 88 | Limited Release |
-| `bio-scaffold-analysis` | 88 | Limited Release |
-| `bio-similarity-searching` | 90 | Limited Release |
-| `bio-single-cell-batch-integration` | 90 | Limited Release |
-| `bio-single-cell-cell-annotation` | 87 | Limited Release |
-| `bio-single-cell-clustering` | 89 | Limited Release |
-| `bio-single-cell-doublet-detection` | 85 | Limited Release |
-| `bio-single-cell-markers-annotation` | 88 | Production Ready |
-| `bio-single-cell-metabolite-communication` | 88 | Limited Release |
-| `bio-single-cell-preprocessing` | 85 | Limited Release |
-| `bio-substructure-search` | 88 | Limited Release |
-| `bio-workflows-scrnaseq-pipeline` | 85 | Limited Release |
 
 ## Promoted, re-audit still needed
 
@@ -98,21 +79,14 @@ Changed in staging after their latest audit, so the score below describes earlie
 
 | skill | score at last audit | audited on |
 | --- | ---: | --- |
-| `bio-alignment-multiple` | 85 | 2026-09-11 |
 | `bio-alignment-trimming` | 83 | 2026-09-15 |
-| `bio-causal-genomics-genetic-correlation` | 89 | 2026-09-17 |
-| `bio-clinical-databases-clinvar-lookup` | 84 | 2026-09-15 |
 | `bio-clinical-databases-dbsnp-queries` | 86 | 2026-09-15 |
 | `bio-clinical-databases-gnomad-frequencies` | 86 | 2026-09-15 |
-| `bio-clinical-databases-myvariant-queries` | 84 | 2026-09-15 |
 | `bio-crispr-screens-perturb-seq-analysis` | 89 | 2026-09-23 |
 | `bio-outlier-splicing-detection` | 82 | 2026-09-20 |
 | `bio-phylo-bayesian-inference` | 87 | 2026-09-15 |
 | `bio-phylo-distance-calculations` | 87 | 2026-09-15 |
-| `bio-phylo-divergence-dating` | 87 | 2026-09-15 |
 | `bio-phylo-modern-tree-inference` | 88 | 2026-09-15 |
-| `bio-phylo-species-trees` | 86 | 2026-09-15 |
-| `bio-phylo-tree-io` | 88 | 2026-09-15 |
 | `bio-phylo-tree-manipulation` | 86 | 2026-09-15 |
 | `bio-pileup-generation` | 85 | 2026-09-20 |
 | `bio-population-genetics-rare-variant-association` | 89 | 2026-09-15 |
@@ -133,16 +107,11 @@ fixed.
 | --- | ---: | --- | ---: |
 | `bio-data-visualization-color-palettes` | 71.8 | Beta Only | 0 |
 | `bio-data-visualization-dimensionality-reduction-plots` | 75 | Beta Only | 0 |
-| `bio-data-visualization-distribution-plots` | 69.5 | Beta Only | 0 |
 | `bio-data-visualization-ggplot2-fundamentals` | 75 | Beta Only | 0 |
-| `bio-data-visualization-heatmaps-clustering` | 78 | Reject | 1 |
-| `bio-data-visualization-lollipop-protein-maps` | 65 | Beta Only | 0 |
 | `bio-data-visualization-matplotlib-fundamentals` | 75 | Beta Only | 0 |
-| `bio-data-visualization-multipanel-figures` | 71 | Beta Only | 0 |
 | `bio-data-visualization-network-visualization` | 74 | Beta Only | 0 |
 | `bio-data-visualization-oncoprint-mutation-matrices` | 73 | Beta Only | 0 |
 | `bio-data-visualization-statistical-annotation` | 71.2 | Beta Only | 0 |
-| `bio-data-visualization-upset-plots` | 70.4 | Beta Only | 0 |
 | `bio-data-visualization-volcano-and-ma-plots` | 76 | Beta Only | 0 |
 
 ## Out of scope
@@ -269,10 +238,15 @@ fixed.
 ### data-visualization
 
 - `bio-data-visualization-circos-plots` — `data-visualization/circos-plots`
+- `bio-data-visualization-distribution-plots` — `data-visualization/distribution-plots`
 - `bio-data-visualization-flow-and-transition-plots` — `data-visualization/flow-and-transition-plots`
 - `bio-data-visualization-genome-tracks` — `data-visualization/genome-tracks`
+- `bio-data-visualization-heatmaps-clustering` — `data-visualization/heatmaps-clustering`
 - `bio-data-visualization-interactive-visualization` — `data-visualization/interactive-visualization`
+- `bio-data-visualization-lollipop-protein-maps` — `data-visualization/lollipop-protein-maps`
 - `bio-data-visualization-manhattan-qq-locuszoom` — `data-visualization/manhattan-qq-locuszoom`
+- `bio-data-visualization-multipanel-figures` — `data-visualization/multipanel-figures`
+- `bio-data-visualization-upset-plots` — `data-visualization/upset-plots`
 
 ### database-access
 

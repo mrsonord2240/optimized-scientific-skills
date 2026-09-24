@@ -45,6 +45,8 @@ Tell your AI agent what you want to do:
 - Use recursive SMARTS for complex patterns: $(...) notation
 - Common patterns: `[OX2H]` neutral hydroxyl, `[NX3;H2;$(N-[#6]);!$(N-[C,S,P]=[O,S,N])]` carbon-substituted primary amine excluding common amide-like N, and `c1ccccc1` an aromatic six-cycle (including cycles embedded in fused systems)
 - HasSubstructMatch is faster than GetSubstructMatches for presence check
+- Compile each user-supplied SMARTS before searching; reject empty strings and malformed queries rather than allowing an include filter to return an unexplained empty set
+- Structural-alert catalogs flag patterns for review, not automatic deletion. BRENK can flag a large share of a lead-like collection, so report alert category and attrition per catalog.
 
 ## Related Skills
 - molecular-io - Load molecules for searching

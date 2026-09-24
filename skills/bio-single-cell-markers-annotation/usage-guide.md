@@ -69,7 +69,9 @@ Ask your AI agent:
 - **Cluster-marker p-values are double-dipping** - they label clusters, they do not prove a cluster is a real cell type; significance-test a suspicious split (scSHC/ClusterDE) before naming it.
 - **scanpy defaults to t-test** - pass `method='wilcoxon'` explicitly; Seurat v5 thresholds dropped to logfc 0.1 / min.pct 0.01, so refilter.
 - **Install presto** - Seurat's Wilcoxon silently falls back to slow base-R without it.
-- **Markers are context-dependent** - re-validate any panel ported across tissue or condition; aggregate raw counts (never normalized) for pseudobulk.
+- **Markers are context-dependent** - re-validate any panel ported across tissue or condition. In PBMC, distinguish CD8 T from NK with a CD3D/CD3E lineage gate, not NKG7/GNLY alone; aggregate raw counts (never normalized) for pseudobulk.
+- **Pseudobulk needs an integer count layer** - aggregate `adata.layers['counts']` with `layer='counts'`; if the object retains only normalized values, reacquire raw counts instead of summing `.X`.
+- **Report reproducibly** - state the ranking test and thresholds, show effect sizes plus in/out fractions per cluster, and label marker p-values as descriptive.
 
 ## Related Skills
 

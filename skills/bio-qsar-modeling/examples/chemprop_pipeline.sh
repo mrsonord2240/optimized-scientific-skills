@@ -36,7 +36,8 @@ chemprop train \
     --split scaffold_balanced \
     --split-sizes 0.8 0.1 0.1 \
     --metric "${METRIC}" \
-    --data-seed 42
+    --data-seed 42 \
+    --pytorch-seed 42
 
 # Prediction requires the actual checkpoint path(s) produced by the installed
 # chemprop version. Inspect `chemprop predict --help` and the saved run directory;

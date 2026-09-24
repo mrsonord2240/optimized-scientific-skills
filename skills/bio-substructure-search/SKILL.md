@@ -1,6 +1,6 @@
 ---
 name: bio-substructure-search
-description: Searches molecular libraries for substructure matches using SMARTS patterns with explicit handling of recursive SMARTS, ring membership, aromaticity dialect, vector binding, atom map indices, and reactive/PAINS/REOS/Brenk filter catalogs. Use when filtering compounds by pharmacophore features, functional groups, scaffold matches, or screening for assay-interference / structural alerts.
+description: Searches molecular libraries for substructure matches using SMARTS patterns with explicit handling of recursive SMARTS, ring membership, aromaticity dialect, vector binding, atom map indices, and reactive/PAINS/Brenk filter catalogs. Use when filtering compounds by pharmacophore features, functional groups, scaffold matches, or screening for assay-interference / structural alerts.
 tool_type: python
 primary_tool: RDKit
 license: MIT
@@ -56,7 +56,7 @@ For SMARTS-based reactions (transforming matched substructures), see `chemoinfor
 | Aliphatic OH only | `[OX2H][CX4]` | OH attached to sp3 C |
 | Carboxylic acid | `[CX3](=O)[OX2H1]` | C(=O)OH |
 | Carboxylate | `[CX3](=O)[O-]` | C(=O)O- (deprotonated) |
-| Ester | `[CX3](=O)[OX2][!H]` | C(=O)O-R |
+| Ester | `[CX3](=[OX1])[OX2][#6]` | C(=O)O-R; supports alkyl and aryl esters |
 | Amide | `[CX3](=[OX1])[NX3]` | C(=O)N-R |
 | Primary amine attached to carbon (excluding common amide-like N) | `[NX3;H2;$(N-[#6]);!$(N-[C,S,P]=[O,S,N])]` | Carbon-substituted -NH2; extend the exclusions for a project-specific amine definition |
 | Secondary amine attached to two carbons | `[NX3;H1;$(N(-[#6])-[#6]);!$(N-[C,S,P]=[O,S,N])]` | Carbon-substituted -NH- excluding common amide-like N |
@@ -82,8 +82,16 @@ For SMARTS-based reactions (transforming matched substructures), see `chemoinfor
 ```python
 from rdkit import Chem
 
+def compile_smarts(smarts):
+    if not isinstance(smarts, str) or not smarts.strip():
+        raise ValueError('SMARTS must be a non-empty string')
+    pattern = Chem.MolFromSmarts(smarts)
+    if pattern is None or pattern.GetNumAtoms() == 0:
+        raise ValueError(f'Invalid SMARTS: {smarts}')
+    return pattern
+
 mol = Chem.MolFromSmiles('c1ccc(O)cc1CCO')
-pattern = Chem.MolFromSmarts('[OX2H]')
+pattern = compile_smarts('[OX2H]')
 
 if mol.HasSubstructMatch(pattern):
     matches = mol.GetSubstructMatches(pattern)
@@ -127,7 +135,7 @@ n_acceptors = Lipinski.NumHAcceptors(mol)
 | NIH | NIH MLSMR | 180 in RDKit 2024.09 | Reactive groups, unstable | Legacy filter; verify count after toolkit upgrades |
 | ZINC | ZINC clean-leads | 50 in RDKit 2024.09 | Drug-like cleanup | Verify definitions after toolkit upgrades |
 | Glaxo / Eli Lilly | Vendor lists | varies | Internal "ugly" filters | Often unpublished |
-| REOS | Walters & Murcko 2002 | property + structural | Drug-likeness combined filter | Hand-curated thresholds |
+| REOS | Walters & Murcko 2002 | property + structural | Requires an explicit project implementation; not bundled here | Hand-curated thresholds |
 
 The PAINS A/B/C families encode pattern population in the original screening dataset, not increasing or decreasing external evidence strength.
 
@@ -142,7 +150,7 @@ The PAINS A/B/C families encode pattern population in the original screening dat
 | Natural product analog | None | Filters trained on synthetic chemistry |
 | Covalent inhibitor design | Skip warhead filter | Warheads ARE the design |
 
-**Critical:** Capuzzi et al. (2017) found PAINS alerts in 87 FDA-approved small-molecule drugs. PAINS is a *flag for assay validation*, not a *killing filter*.
+**Critical:** Capuzzi et al. (2017) found PAINS alerts in 87 FDA-approved small-molecule drugs. PAINS is a *flag for assay validation*, not a *killing filter*. Catalog rates are collection-dependent: in the reference 800-compound lead-like collection, BRENK flagged 36% and PAINS_A+BRENK+ZINC flagged 39.4% in union. Review BRENK hits by alert category rather than treating a high flag rate as a deletion quota.
 
 ## PAINS Filter
 
@@ -161,18 +169,20 @@ def pains_filter(mols, catalogs=('PAINS_A',)):
 
     flagged = []
     clean = []
-    for mol in mols:
+    invalid = []
+    for index, mol in enumerate(mols):
         if mol is None:
+            invalid.append(index)
             continue
         entry = catalog.GetFirstMatch(mol)
         if entry is None:
             clean.append(mol)
         else:
             flagged.append((mol, entry.GetDescription()))
-    return clean, flagged
+    return clean, flagged, invalid
 ```
 
-Available catalog names: `PAINS_A`, `PAINS_B`, `PAINS_C`, `PAINS` (all), `BRENK`, `NIH`, `ZINC`, `ALL`.
+Available catalog names: `PAINS_A`, `PAINS_B`, `PAINS_C`, `PAINS` (all), `BRENK`, `NIH`, `ZINC`, `ALL`. `invalid` contains zero-based input positions whose molecules did not parse; report them rather than silently dropping records.
 
 ## Reaction-Reactive Group Filter (custom)
 
@@ -198,16 +208,23 @@ REACTIVE_SMARTS = {
     'vinyl_sulfone': '[SX4](=O)(=O)C=C',
 }
 
+# Compile once per filter configuration, not once per molecule.
+COMPILED_REACTIVE_SMARTS = {
+    name: compile_smarts(smarts) for name, smarts in REACTIVE_SMARTS.items()
+}
+
 def reactive_filter(mol, exclude_warheads=True):
     if not exclude_warheads:
         return False, None
-    for name, smarts in REACTIVE_SMARTS.items():
-        if mol.HasSubstructMatch(Chem.MolFromSmarts(smarts)):
+    if mol is None:
+        return False, None
+    for name, pattern in COMPILED_REACTIVE_SMARTS.items():
+        if mol.HasSubstructMatch(pattern):
             return True, name
     return False, None
 ```
 
-For covalent-inhibitor design, see `chemoinformatics/covalent-design`; these warheads are the desired chemistry, not noise to filter.
+For covalent-inhibitor design, see `chemoinformatics/covalent-design`; these warheads are the desired chemistry, not noise to filter. Treat custom reactive alerts as flags, not deletions: broad Michael-acceptor patterns also flag designed enones (including curcumin), and beta-lactam patterns flag antibiotics. Review assay format, intended mechanism, and orthogonal evidence before excluding a series.
 
 ## Library Filtering with Multiple Patterns
 
@@ -220,11 +237,11 @@ def filter_library(mols, include=None, exclude=None):
     keep = list(mols)
     if include:
         for s in include:
-            p = Chem.MolFromSmarts(s)
+            p = compile_smarts(s)
             keep = [m for m in keep if m and m.HasSubstructMatch(p)]
     if exclude:
         for s in exclude:
-            p = Chem.MolFromSmarts(s)
+            p = compile_smarts(s)
             keep = [m for m in keep if m and not m.HasSubstructMatch(p)]
     return keep
 ```
@@ -247,7 +264,7 @@ amide_C, amide_N, aryl_C = match
 
 **Trigger:** Library contains natural products, polyphenols, flavonoids, quinones.
 
-**Mechanism:** PAINS_A patterns target rhodanines, curcumins, polyhydroxylated polyphenols -- legitimate scaffolds in natural-product chemistry.
+**Mechanism:** RDKit PAINS patterns target rhodanines, catechols, and polyhydroxylated polyphenols -- legitimate scaffolds in natural-product chemistry. RDKit's PAINS implementation does not reproduce every alert class discussed in the original paper; for example, it does not contain a curcumin-specific pattern.
 
 **Symptom:** Library hits flagged as PAINS but trace back to validated natural products with confirmed activity.
 
@@ -299,7 +316,7 @@ amide_C, amide_N, aryl_C = match
 
 **Mechanism:** Each `[$()]` re-evaluates the inner pattern for every candidate atom.
 
-**Symptom:** Search 10x-100x slower than expected.
+**Symptom:** Search is materially slower than a flatter query; the magnitude depends on the pattern and library. On a 2,000-molecule reference run, one-level recursion was 1.6x and a deeply nested pattern 3.7x slower.
 
 **Fix:** Flatten recursion where possible; pre-filter with simpler pattern, then re-test with the recursive one.
 

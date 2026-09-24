@@ -65,12 +65,12 @@ For non-regulatory QSAR, all 5 still good practice; especially **AD definition**
 
 | Method | Definition | Pro | Con |
 |--------|-----------|-----|-----|
-| **Ensemble variance** | Std across N-model ensemble predictions | Supported by `chemprop predict --uncertainty-method ensemble` when multiple model paths are supplied | Assumes useful ensemble diversity; not calibrated coverage |
+| **Ensemble variance** | Variance across N-model ensemble predictions | Supported by `chemprop predict --uncertainty-method ensemble` when multiple model paths are supplied | Assumes useful ensemble diversity; not calibrated coverage; variance is in squared endpoint units |
 | kNN distance | Mean Tanimoto to k nearest in training | Easy to interpret | Doesn't account for label distribution |
-| Leverage | Hat matrix diagonal | Statistical | Linear assumptions |
+| Leverage | Hat-matrix diagonal | Statistical on low-dimensional, well-conditioned continuous descriptors | Do not apply directly to sparse ECFP bits; reduce/select descriptor space first and reject a calculation with any `h < 0` or `h > 1` |
 | KDE on PCA | Density in feature space | Captures multivariate structure | Density choice subjective |
-| Mahalanobis distance | Covariance-aware distance | Theoretically motivated | High-dim instability |
-| Conformal prediction | Per-prediction interval or set | Finite-sample marginal coverage under exchangeability | Requires a calibration design and compatible predictor |
+| Mahalanobis distance | Covariance-aware distance | Theoretically motivated in a low-dimensional, well-conditioned descriptor/PCA space | Reduce/select descriptor space first; unstable on high-dimensional fingerprints |
+| Conformal prediction | Per-prediction interval or set | Finite-sample marginal coverage under exchangeability | Requires a calibration design and compatible predictor; evaluate held-out empirical coverage after scaffold/time splits |
 | Bayesian / MC-dropout | Posterior or dropout variance | Direct uncertainty | Computational cost |
 | Tanimoto coverage | At least 1 NN within threshold | Practical | Threshold subjective |
 
@@ -95,7 +95,9 @@ chemprop train \
     --batch-size 128 \
     --split scaffold_balanced \
     --split-sizes 0.8 0.1 0.1 \
-    --metric roc
+    --metric roc \
+    --data-seed 42 \
+    --pytorch-seed 42
 
 # chemprop 1.x legacy CLI (for backwards reference):
 # chemprop_train --data_path data.csv --dataset_type classification ...
@@ -107,17 +109,21 @@ Key flags (chemprop 2.x):
 - `--ensemble-size 5`: train five models per replicate for an ensemble prediction
 - `--split scaffold_balanced`: prevent scaffold leakage (was `--split_type` in 1.x)
 - `--split-sizes 0.8 0.1 0.1`: 80/10/10 train/val/test
+- `--data-seed 42` and `--pytorch-seed 42`: respectively fix split/data-order randomness and PyTorch training randomness; set both when reproducing a run
 
-Total models: 25 (5 replicates x 5 ensemble members). Report which predictions are being aggregated and treat ensemble standard deviation as an uncertainty diagnostic, not a calibrated guarantee.
+Total models: 25 (5 replicates x 5 ensemble members). Report which predictions are aggregated. `chemprop predict --uncertainty-method ensemble` writes `pred_*_unc` as ensemble **variance**, not standard deviation; take its square root only when a standard-deviation diagnostic is required. Neither is a calibrated guarantee.
 
 At prediction time, uncertainty output is opt-in and requires the actual saved model paths:
 
 ```bash
 chemprop predict --test-path test.csv \
     --model-paths path/to/model_1.ckpt path/to/model_2.ckpt \
+    --molecule-featurizers rdkit_2d \
     --uncertainty-method ensemble \
     --preds-path predictions.csv
 ```
+
+Every molecule featurizer used at training must be supplied again at prediction. If it is omitted here, a model trained with `rdkit_2d` can fail with a 517-versus-300 tensor-shape error because prediction supplied graph features without the 217 descriptor features.
 
 ## Scaffold-Balanced Split
 
@@ -128,6 +134,8 @@ chemprop predict --test-path test.csv \
 `scaffold_balanced` assigns each scaffold group to one of train / validation / test, reducing direct scaffold leakage. It is not universally the correct validation design: time splits, externally defined series, grouped cross-validation, and prospective tests may better represent a particular deployment setting.
 
 Choose and document the primary split before model selection. A random split can answer an interpolation question but often shares close analogues across partitions; a scaffold split tests transfer across scaffold groups; a time or prospective split tests the historical deployment process. If several splits are reported, interpret their differences as split-specific sensitivity rather than a universal "true generalization gap."
+
+This split choice also constrains conformal interpretation: scaffold and time partitions can make calibration and test examples non-exchangeable, so nominal conformal coverage is not guaranteed. Report empirical coverage on the held-out deployment-relevant partition beside the nominal level; consider Mondrian or group-conditional conformal variants when group coverage is required.
 
 ## Conformal Prediction for Calibrated Uncertainty
 
@@ -140,13 +148,15 @@ Use conformal prediction when calibrated marginal coverage under the stated exch
 from mapie.regression import MapieRegressor
 from sklearn.ensemble import RandomForestRegressor
 
-base = RandomForestRegressor(n_estimators=500, random_state=42)
+base = RandomForestRegressor(n_estimators=500, random_state=42, n_jobs=-1)
 mapie = MapieRegressor(estimator=base, method='plus', cv=5)
 mapie.fit(X_train, y_train)
 y_pred, y_intervals = mapie.predict(X_test, alpha=0.1)  # alpha=0.1 -> 90% coverage
 ```
 
 Alpha 0.05 targets 95% marginal coverage and alpha 0.10 targets 90%, subject to the conformal method's assumptions. MAPIE supports the sklearn baseline directly; integrating chemprop requires a separately implemented and tested compatible wrapper.
+
+`method='plus', cv=5` fits the base estimator six times, so this is expensive for large fingerprint matrices even with `n_jobs=-1`. Use a cheaper split-conformal design when repeated base-model fitting is not affordable, and always report held-out empirical coverage for the selected split.
 
 ## SHAP / Atomic Attribution
 
@@ -240,7 +250,7 @@ Multitask learning can help when endpoints share predictive signal or data, but 
 
 **Mechanism:** Compounds from same scaffold scatter across train/test; performance optimistic.
 
-**Symptom:** Performance drops substantially from random splits to scaffold, time, external-series, or prospective evaluation.
+**Symptom:** Performance can drop from random splits to scaffold, time, external-series, or prospective evaluation; quantify the size rather than assuming it will be large.
 
 **Fix:** Use `--split scaffold_balanced` in chemprop 2.x (or `--split_type scaffold_balanced` in chemprop 1.x legacy); or `scaffold_split` from `chemoinformatics/scaffold-analysis`.
 
@@ -270,9 +280,9 @@ Multitask learning can help when endpoints share predictive signal or data, but 
 
 **Mechanism:** Model extrapolates; predictions unreliable.
 
-**Symptom:** Confident predictions but actual values different.
+**Symptom:** On low-similarity compounds, explained variance or rank ordering can collapse even when MAE changes little because the novel subset has a narrower label range.
 
-**Fix:** Predefine and validate one or more domain/uncertainty diagnostics, such as neighborhood similarity, ensemble disagreement, or conformal output, and report what each diagnostic does and does not guarantee.
+**Fix:** Predefine and validate one or more domain/uncertainty diagnostics, such as neighborhood similarity, ensemble disagreement, or conformal output. Stratify held-out R2 or Spearman correlation by the AD diagnostic (not MAE alone), and report what each diagnostic does and does not guarantee.
 
 ### chemprop 1.x vs 2.x confusion
 
@@ -321,7 +331,7 @@ Multitask learning can help when endpoints share predictive signal or data, but 
 |---------|-------|-----|
 | chemprop hangs at start | GPU OOM | Reduce batch_size; check CUDA |
 | All predictions same value | Constant target | Standardize labels |
-| AUC mismatched across folds | Random seed not set | `--seed 42` |
+| AUC mismatched across folds | Split/data-order or PyTorch seed not fixed | `--data-seed 42 --pytorch-seed 42` (they control different randomness sources) |
 | Test AUC = train AUC | No held-out data | Use scaffold_balanced split |
 | Ensemble variance always small | Ensemble members insufficiently diverse | Check the documented seed behavior and training randomness for each replicate/member |
 | SHAP fails on D-MPNN | Graph inputs are not compatible with the tree-model interface | Use a tested graph-attribution implementation or report the fingerprint baseline attribution |

@@ -1,6 +1,6 @@
 ---
 name: bio-molecular-descriptors
-description: Calculates molecular fingerprints (ECFP/Morgan, FCFP, MACCS, RDKit, AtomPair, TopologicalTorsion, Avalon, MAP4, MHFP6) and physicochemical descriptors (Lipinski, QED, TPSA, Crippen LogP, 3D shape) with explicit choice tables, bit vs count semantics, and partial-charge model selection. Use when featurizing molecules for similarity, QSAR, virtual screening, or ML, or selecting the correct fingerprint for a chemotype-aware task.
+description: Calculates molecular fingerprints (ECFP/Morgan, FCFP, MACCS, RDKit, AtomPair, TopologicalTorsion, Avalon, MHFP6) and physicochemical descriptors (Lipinski, QED, TPSA, Crippen LogP, 3D shape), with explicit choice tables, bit vs count semantics, MAP4 installation boundaries, and partial-charge model selection. Use when featurizing molecules for similarity, QSAR, virtual screening, or ML, or selecting the correct fingerprint for a chemotype-aware task.
 tool_type: python
 primary_tool: RDKit
 license: MIT
@@ -9,7 +9,7 @@ author: GPTomics
 
 ## Version Compatibility
 
-Reference examples tested with: RDKit 2024.09+, numpy 1.26+, pandas 2.2+, map4 1.1+ (MAP4), mhfp 1.9+. Use `mapchiral` separately when the stereochemistry-aware MAP4C fingerprint is intended.
+Reference examples tested with: RDKit 2024.09+, numpy 1.26+, pandas 2.2+, and mhfp 1.9+ with `numpy>=1.26,<2`. `mhfp` 1.9 raises an `OverflowError` with NumPy 2 in the tested environments, so put MHFP6 in a separate NumPy-1.x environment until that upstream compatibility issue is resolved.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - Python: `pip show <package>` then `help(module.function)` to check signatures
@@ -34,7 +34,7 @@ For canonicalization before featurization, see `chemoinformatics/molecular-stand
 | AtomPair | Pair + topological distance | All atom pairs | 2048 | Long-range topological similarity | Slower than ECFP; harder to interpret |
 | TopologicalTorsion | 4-atom torsion | All TT | 2048 | Path-pattern similarity | Like AP, slower than ECFP |
 | Avalon | Substructure + atom pairs | Mixed | 512/1024 | Fast similarity | Less standard; older |
-| MAP4 (MinHashed atom-pair) | MinHash atom-pair | r=1,2 | 1024/2048 | Biological + metabolite diversity | `map4` library required; slower hash |
+| MAP4 (MinHashed atom-pair) | MinHash atom-pair | r=1,2 | 1024/2048 | Biological + metabolite diversity | No supported PyPI `map4` distribution; see the MAP4 installation boundary below |
 | MHFP6 (MinHash) | MinHash ECFP-like | r=3 (diam 6) | 2048 | Large-library nearest-neighbor with a compatible MinHash/LSH index | Different distance semantics from folded-bit Tanimoto |
 | Pharm2D | 2D pharmacophore | feature pairs/triplets | sparse | Pharmacophore search | Sparse, slower |
 
@@ -111,14 +111,25 @@ if not conf_ids:
     raise RuntimeError('ETKDGv3 failed to generate any conformers')
 if not AllChem.MMFFHasAllMoleculeParams(mol):
     raise ValueError('MMFF94 parameters are unavailable for this molecule')
-optimization_results = AllChem.MMFFOptimizeMoleculeConfs(mol)
-if any(status != 0 for status, _ in optimization_results):
-    raise RuntimeError('MMFF94 optimization did not converge for every conformer')
+optimization_results = AllChem.MMFFOptimizeMoleculeConfs(mol, maxIters=2000)
+converged_ids = [
+    conf_id for conf_id, (status, _) in zip(conf_ids, optimization_results)
+    if status == 0
+]
+if not converged_ids:
+    raise RuntimeError('MMFF94 did not converge for any generated conformer')
+if len(converged_ids) != len(conf_ids):
+    import warnings
+    warnings.warn(
+        f'MMFF94 did not converge for {len(conf_ids) - len(converged_ids)} '
+        'conformer(s); excluding them from the descriptor aggregate',
+        RuntimeWarning,
+    )
 
-asphericities = [Descriptors3D.Asphericity(mol, confId=c) for c in conf_ids]
+asphericities = [Descriptors3D.Asphericity(mol, confId=c) for c in converged_ids]
 ```
 
-**Decision:** For QSAR / ML, choose and document the conformer count using a convergence check on representative molecules. Report the aggregation rule, such as a simple mean or a Boltzmann-weighted average, and the energy model used for any weights.
+**Decision:** For QSAR / ML, choose and document the conformer count using a convergence check on representative molecules. RDKit MMFF status `1` means that the optimizer needs more iterations, not that embedding or force-field setup failed. Use a higher iteration budget, retain only converged conformers, record how many were excluded, and fail only if none converge. Report the aggregation rule, such as a simple mean or a Boltzmann-weighted average, and the energy model used for any weights.
 
 ## Partial Charge Methods
 
@@ -131,18 +142,41 @@ asphericities = [Descriptors3D.Asphericity(mol, confId=c) for c in conf_ids]
 | OpenFF Recharge | openff-recharge | Workflow-dependent | Framework for generating/retrieving QC ESP data and fitting library charges, BCCs, RESP charges, or virtual sites | Developing or evaluating charge models; it is not one charge-assignment method |
 
 ```python
+import math
+from rdkit import Chem
 from rdkit.Chem import AllChem
 
-AllChem.ComputeGasteigerCharges(mol)
-for atom in mol.GetAtoms():
-    print(atom.GetIdx(), atom.GetPropsAsDict().get('_GasteigerCharge', None))
+# Conservative organic-subset check: do not interpret a finite value for a
+# metal or other unsupported element as a validated Gasteiger parameter.
+GASTEIGER_ORGANIC_ELEMENTS = {'H', 'C', 'N', 'O', 'F', 'P', 'S', 'Cl', 'Br', 'I'}
+
+def gasteiger_charges(mol):
+    unsupported = sorted({atom.GetSymbol() for atom in mol.GetAtoms()
+                          if atom.GetSymbol() not in GASTEIGER_ORGANIC_ELEMENTS})
+    if unsupported:
+        raise ValueError(
+            'Gasteiger charges are not validated here for: ' + ', '.join(unsupported))
+    mol_h = Chem.AddHs(Chem.Mol(mol))
+    AllChem.ComputeGasteigerCharges(mol_h)
+    charges = [float(atom.GetProp('_GasteigerCharge')) for atom in mol_h.GetAtoms()]
+    if not all(math.isfinite(charge) for charge in charges):
+        raise ValueError('Gasteiger charge calculation returned a non-finite value')
+    if not math.isclose(sum(charges), Chem.GetFormalCharge(mol_h), abs_tol=1e-4):
+        raise ValueError('Gasteiger charges did not balance to the formal charge')
+    return mol_h, charges
 ```
+
+`_GasteigerCharge` on heavy atoms alone does not balance when hydrogens are implicit: their charge is stored in `_GasteigerHCharge`. The helper makes hydrogens explicit and sums every atom's `_GasteigerCharge` instead. RDKit can return a finite formal-charge-like number for metals (for example, iron) without signalling parameter coverage, so reject non-organic elements rather than treating that number as a usable partial charge.
 
 **Critical:** Charge method must match downstream. Gasteiger charges in an AMBER MD run violate the assumptions of the protein force field.
 
 ## MAP4 and MHFP6 for Diverse Libraries
 
 For libraries spanning drug-like molecules, natural products, peptides, and metabolites, compare ECFP4 with MAP4 or MHFP6 on task-relevant retrieval benchmarks. MAP4 and MHFP6 use MinHash with atom-pair or circular-substructure shingles, but no universal pairwise-similarity range establishes that ECFP4 is saturated for every mixed library.
+
+### MAP4 installation boundary
+
+Do **not** use `pip install map4`: the historical `map4` name has no supported PyPI distribution in the tested environment, so this Skill does not provide a runnable MAP4 snippet or claim a tested `map4` version. If MAP4 is essential, install and pin a maintained upstream source implementation in a separately reproducible environment; its `tmap` dependency may require a conda/source installation and has no tested Windows build here. Record the source commit, Python/conda platform, and a one-molecule construction check before using its scores. For a separately packaged stereochemistry-aware MinHash option, evaluate `mapchiral` against the task benchmark rather than assuming it is a drop-in MAP4 replacement.
 
 ```python
 from mhfp.encoder import MHFPEncoder
@@ -209,7 +243,7 @@ def physchem(mol):
 
 QED (Bickerton 2012) is a single-number drug-likeness measure (0-1) combining 8 properties (MW, LogP, HBD, HBA, PSA, RotBonds, AromaticRings, structural alerts) via desirability functions.
 
-**Caveat:** QED summarizes desirability functions derived from property distributions of marketed oral drugs; it is not a supervised predictor trained specifically on FDA-approved drugs. It can under-rank fragment-like or natural-product-like molecules, so do not use it as the sole filter for those libraries.
+**Caveat:** QED summarizes desirability functions derived from property distributions of marketed oral drugs; it is not a supervised predictor trained specifically on FDA-approved drugs. It can under-rank large natural-product-like or peptide-like chemistry, while small fragments can be over-ranked because they easily satisfy several desirability functions. Do not use it as the sole filter in either regime; inspect the unfiltered distribution and calibrate against the project objective.
 
 ## Common Errors
 
@@ -220,6 +254,8 @@ QED (Bickerton 2012) is a single-number drug-likeness measure (0-1) combining 8 
 | Crippen LogP differs from XLogP | Different model | Use `Descriptors.MolLogP` for Crippen; `XLogP3` requires external lib |
 | 3D descriptor differs between calls | Different conformer | Set `confId=0` explicitly; or average over ensemble |
 | QED returns nan | Charged species or non-standard atom | Standardize (uncharge) before QED |
+| Gasteiger charges do not sum to formal charge | Only heavy-atom `_GasteigerCharge` values were summed while hydrogens were implicit | Add explicit H and sum all atom charges, or include each heavy atom's `_GasteigerHCharge` |
+| A metal has a neat-looking Gasteiger value | RDKit can emit a finite formal-charge-like value outside the intended organic use case | Reject non-organic elements and use a charge model validated for the element and downstream force field |
 | Count-vector similarity differs from bit-vector similarity | Count multiplicities change the generalized Tanimoto calculation | RDKit supports Tanimoto on sparse count vectors; record the vector type and do not compare its threshold directly with a folded-bit threshold |
 | MolWt off by ~1 from PubChem | Implicit H counted differently | Use `Descriptors.ExactMolWt` for monoisotopic; PubChem reports average |
 

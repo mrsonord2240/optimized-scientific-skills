@@ -12,6 +12,8 @@ from rdkit.Chem import rdFMCS
 
 SUPPORTED_FP_TYPES = {'ecfp4', 'maccs'}
 ECFP4_GENERATOR = rdFingerprintGenerator.GetMorganGenerator(radius=2, fpSize=2048)
+ECFP4_CHIRAL_GENERATOR = rdFingerprintGenerator.GetMorganGenerator(
+    radius=2, fpSize=2048, includeChirality=True)
 
 
 def validate_fp_type(fp_type):
@@ -21,19 +23,21 @@ def validate_fp_type(fp_type):
         raise ValueError(f'Unsupported fingerprint type: {fp_type}. Choose from: {supported}')
 
 
-def tanimoto_similarity(mol1, mol2, fp_type='ecfp4'):
+def tanimoto_similarity(mol1, mol2, fp_type='ecfp4', include_chirality=False):
     '''Calculate Tanimoto similarity between two molecules.'''
     validate_fp_type(fp_type)
     if fp_type == 'ecfp4':
-        fp1 = ECFP4_GENERATOR.GetFingerprint(mol1)
-        fp2 = ECFP4_GENERATOR.GetFingerprint(mol2)
+        generator = ECFP4_CHIRAL_GENERATOR if include_chirality else ECFP4_GENERATOR
+        fp1 = generator.GetFingerprint(mol1)
+        fp2 = generator.GetFingerprint(mol2)
     elif fp_type == 'maccs':
         fp1 = MACCSkeys.GenMACCSKeys(mol1)
         fp2 = MACCSkeys.GenMACCSKeys(mol2)
     return DataStructs.TanimotoSimilarity(fp1, fp2)
 
 
-def find_similar(query_smiles, library_smiles, threshold=0.7, fp_type='ecfp4'):
+def find_similar(query_smiles, library_smiles, threshold=0.7, fp_type='ecfp4',
+                 include_chirality=False):
     '''
     Find molecules similar to query in library.
 
@@ -45,7 +49,8 @@ def find_similar(query_smiles, library_smiles, threshold=0.7, fp_type='ecfp4'):
         raise ValueError('Invalid query SMILES')
 
     if fp_type == 'ecfp4':
-        query_fp = ECFP4_GENERATOR.GetFingerprint(query)
+        generator = ECFP4_CHIRAL_GENERATOR if include_chirality else ECFP4_GENERATOR
+        query_fp = generator.GetFingerprint(query)
     elif fp_type == 'maccs':
         query_fp = MACCSkeys.GenMACCSKeys(query)
 
@@ -55,7 +60,7 @@ def find_similar(query_smiles, library_smiles, threshold=0.7, fp_type='ecfp4'):
         if mol is None:
             continue
         if fp_type == 'ecfp4':
-            lib_fp = ECFP4_GENERATOR.GetFingerprint(mol)
+            lib_fp = generator.GetFingerprint(mol)
         elif fp_type == 'maccs':
             lib_fp = MACCSkeys.GenMACCSKeys(mol)
 
@@ -105,8 +110,22 @@ def find_mcs(molecules, timeout=60):
     return {
         'smarts': mcs.smartsString,
         'num_atoms': mcs.numAtoms,
-        'num_bonds': mcs.numBonds
+        'num_bonds': mcs.numBonds,
+        'canceled': mcs.canceled
     }
+
+
+def confirm_substructure_hits(query_smarts, candidate_smiles):
+    '''Return candidate SMILES that actually contain the query SMARTS pattern.'''
+    pattern = Chem.MolFromSmarts(query_smarts)
+    if pattern is None:
+        raise ValueError('Invalid query SMARTS')
+    confirmed = []
+    for smiles in candidate_smiles:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is not None and mol.HasSubstructMatch(pattern):
+            confirmed.append(smiles)
+    return confirmed
 
 
 def similarity_matrix(molecules, fp_type='ecfp4'):

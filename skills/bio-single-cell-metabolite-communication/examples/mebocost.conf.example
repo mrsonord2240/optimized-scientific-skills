@@ -1,0 +1,13 @@
+[common]
+hmdb_info_path = /path/to/MEBOCOST/database/common/metabolite_annotation_HMDB_summary.tsv
+scfea_info_path = /path/to/MEBOCOST/database/scFEA/Human_M168_information.symbols.csv
+compass_rxt_ann_path = /path/to/MEBOCOST/database/Compass/rxn_md.csv
+compass_met_ann_path = /path/to/MEBOCOST/database/Compass/met_md.csv
+
+[human]
+met_enzyme_path = /path/to/MEBOCOST/database/human/metabolite_associated_gene_reaction_HMDB_summary.tsv
+met_sensor_path = /path/to/MEBOCOST/database/human/human_met_sensor.tsv
+
+[mouse]
+met_enzyme_path = /path/to/MEBOCOST/database/mouse/metabolite_associated_gene_reaction_HMDB_summary_mouse.tsv
+met_sensor_path = /path/to/MEBOCOST/database/mouse/mouse_met_sensor.tsv

@@ -14,15 +14,29 @@ sc.pp.calculate_qc_metrics(adata, qc_vars=['mt'], percent_top=[20], log1p=True, 
 
 def is_outlier(adata, metric, nmads):
     M = adata.obs[metric]
-    return (M < np.median(M) - nmads * median_abs_deviation(M)) | (np.median(M) + nmads * median_abs_deviation(M) < M)
+    mad = median_abs_deviation(M)
+    print(f'{metric}: median={np.median(M):.3f}, MAD={mad:.3f}')
+    if mad == 0:
+        raise ValueError(f'MAD collapsed for {metric}; use documented fixed cutoffs instead of MAD filtering')
+    return (M < np.median(M) - nmads * mad) | (np.median(M) + nmads * mad < M)
 
 
-# MAD-adaptive thresholds, not fixed cutoffs: 5 MAD on counts/genes, 3 MAD on mito plus a hard cap
+# Choose the tissue before filtering. Nuclei and unknown tissues use MAD only;
+# do not copy a PBMC hard cap into a biologically different sample.
+mito_hard_caps = {'nuclei': None, 'pbmc': 8, 'cardiac': 30, 'hepatic': 30,
+                  'skeletal_muscle': 40, 'unknown': None}
+tissue = 'unknown'  # set from sample metadata
+mito_hard_cap = mito_hard_caps[tissue]
+hard_mito = (adata.obs['pct_counts_mt'] > mito_hard_cap
+             if mito_hard_cap is not None else np.zeros(adata.n_obs, dtype=bool))
+
+# MAD-adaptive thresholds: 5 MAD on counts/genes and 3 MAD on mitochondrial fraction.
 adata.obs['outlier'] = (is_outlier(adata, 'log1p_total_counts', 5) | is_outlier(adata, 'log1p_n_genes_by_counts', 5)
                         | is_outlier(adata, 'pct_counts_in_top_20_genes', 5))
-# pct_counts_mt is a biology metric, not just quality: high baselines are normal in cardiomyocytes/hepatocytes/muscle
-# and near-zero in nuclei. The 8% hard cap is tissue-dependent; raise or lower it for the tissue being analyzed
-adata.obs['mt_outlier'] = is_outlier(adata, 'pct_counts_mt', 3) | (adata.obs['pct_counts_mt'] > 8)
+adata.obs['mt_outlier'] = is_outlier(adata, 'pct_counts_mt', 3) | hard_mito
+survival_fraction = float((~(adata.obs['outlier'] | adata.obs['mt_outlier'])).mean())
+if survival_fraction < 0.80:
+    raise ValueError(f'Only {survival_fraction:.1%} of barcodes survive QC; inspect MADs and use fixed, tissue-aware cutoffs')
 adata = adata[~(adata.obs['outlier'] | adata.obs['mt_outlier'])].copy()
 sc.pp.filter_genes(adata, min_cells=3)  # drop genes detected in fewer than 3 cells
 print(f'Filtered: {adata.n_obs} cells, {adata.n_vars} genes')

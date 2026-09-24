@@ -33,7 +33,7 @@ nExp_poi <- round(nExp_poi * (1 - modelHomotypic(seurat_obj$seurat_clusters)))
 cat('Expected detectable doublets:', nExp_poi, '\n')
 
 seurat_obj <- doubletFinder(seurat_obj, PCs = 1:20, pN = 0.25, pK = optimal_pk,
-                             nExp = nExp_poi, reuse.pANN = FALSE, sct = FALSE)
+                             nExp = nExp_poi, sct = FALSE)
 
 df_col <- grep('DF.classifications', colnames(seurat_obj@meta.data), value = TRUE)
 n_doublets <- sum(seurat_obj@meta.data[[df_col]] == 'Doublet')

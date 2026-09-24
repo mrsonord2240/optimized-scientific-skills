@@ -50,10 +50,10 @@ Tell the agent what to do:
 
 ## What the Agent Will Do
 
-1. Run PCA and choose n_pcs from the elbow (n_pcs dominates the result more than n_neighbors).
+1. Run PCA and treat the elbow as a lower bound for n_pcs; check stability across nearby values, including the usual 30-50 range.
 2. Build the kNN graph and partition with Leiden, pinning the backend (`flavor='igraph', n_iterations=2, directed=False`) for reproducibility.
 3. Sweep a resolution range rather than fixing one value, and visualize cell flow with clustree.
-4. Validate clusters: stability by bootstrapping, distinct markers per cluster, and a significance test (scSHC/CHOIR) before claiming populations.
+4. Validate clusters: check batch/sample/QC alignment, bootstrap stability, a formal split test (scSHC/CHOIR), and independent replication before claiming populations. Distinct markers and their p-values rank candidates but cannot validate a split.
 5. Adjudicate biological vs technical: rule out cell-cycle, dissociation stress, mitochondrial, ambient, and batch drivers.
 6. Generate UMAP/tSNE for display, treating distances as non-metric.
 
@@ -61,10 +61,11 @@ Tell the agent what to do:
 
 - **Leiden over Louvain** - Louvain can return disconnected communities (Traag 2019); Scanpy uses Leiden, Seurat defaults to Louvain (`algorithm=1`).
 - **Pin the Leiden backend** - Scanpy 1.10 is mid-migration; unpinned `flavor`/`n_iterations` gives different labels across versions.
-- **n_pcs is the big lever** - it matters far more than n_neighbors; set it from the elbow, then tune neighbors.
+- **n_pcs is the big lever** - it matters far more than n_neighbors; use the elbow as a floor, then retain structure stable across nearby values.
 - **Resolution is not a truth knob** - sweep it, use clustree, pick the coarsest defensible level; tuning to match a reference is confirmation bias.
 - **Stable does not mean real** - a reproducible cluster can be cell-cycle, stress, mito, ambient, or batch; pair stability with a significance test.
-- **Over-clustering is the default failure** - if adjacent clusters share all markers, merge them.
+- **Over-clustering is the default failure** - do not let marker overlap decide; reject technical, unstable, or non-replicating splits and use a formal split test for a population claim.
+- **Report the decision evidence** - cluster count and sizes per resolution, chosen coarsest level, batch/sample/QC composition, and the fact that marker p-values are ranking-only.
 - **Marker p-values are not inference** - clustering then testing on the same data is double-dipping; use markers for ranking, validate with scSHC/CHOIR + ClusterDE.
 - **UMAP is for the eye, not the ruler** - cluster on the graph; never read embedding distances as biology (Chari & Pachter 2023).
 

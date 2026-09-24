@@ -11,6 +11,7 @@ from rdkit.Chem import MACCSkeys
 from rdkit.ML.Descriptors import MoleculeDescriptors
 import numpy as np
 import pandas as pd
+import warnings
 
 
 def get_morgan_fingerprint(mol, radius=2, n_bits=2048, use_chirality=False):
@@ -67,19 +68,27 @@ def calculate_druglikeness(mol):
     return props
 
 
-def calculate_3d_descriptors(mol):
-    '''Calculate 3D descriptors (requires conformer).'''
+def calculate_3d_descriptors(mol, random_seed=42, max_iters=2000):
+    '''Calculate reproducible 3D descriptors for one MMFF94-parameterized conformer.'''
     from rdkit.Chem import Descriptors3D
 
     mol = Chem.AddHs(mol)
-    embed_status = AllChem.EmbedMolecule(mol, AllChem.ETKDGv3())
+    params = AllChem.ETKDGv3()
+    params.randomSeed = random_seed
+    embed_status = AllChem.EmbedMolecule(mol, params)
     if embed_status != 0:
         raise RuntimeError('ETKDGv3 failed to generate a conformer')
     if not AllChem.MMFFHasAllMoleculeParams(mol):
         raise ValueError('MMFF94 parameters are unavailable for this molecule')
-    optimization_status = AllChem.MMFFOptimizeMolecule(mol)
-    if optimization_status != 0:
-        raise RuntimeError('MMFF94 optimization did not converge')
+    optimization_status = AllChem.MMFFOptimizeMolecule(mol, maxIters=max_iters)
+    if optimization_status == 1:
+        warnings.warn(
+            'MMFF94 needs more iterations; returning a descriptor from the current conformer. '
+            'Increase max_iters or use a conformer ensemble for a model feature.',
+            RuntimeWarning,
+        )
+    elif optimization_status != 0:
+        raise RuntimeError('MMFF94 optimization failed')
 
     return {
         'Asphericity': Descriptors3D.Asphericity(mol),
@@ -153,3 +162,8 @@ if __name__ == '__main__':
     print('\nDrug-likeness:')
     for k, v in calculate_druglikeness(mol).items():
         print(f'  {k}: {v}')
+
+    print('\n3D descriptors (atenolol; fixed seed):')
+    atenolol = Chem.MolFromSmiles('CC(C)NCC(O)COc1ccc(CC(N)=O)cc1')
+    for k, v in calculate_3d_descriptors(atenolol, random_seed=42).items():
+        print(f'  {k}: {v:.4f}')

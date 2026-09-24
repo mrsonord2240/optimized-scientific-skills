@@ -39,7 +39,7 @@ Tell the AI agent what to do:
 2. Compute Bemis-Murcko scaffolds (and generic framework if requested).
 3. Group compounds by scaffold; report chemotype distribution.
 4. For ML splits: assign whole scaffolds to train or test; output partitioned data.
-5. For MMPA: fragment compounds, index by mmpdb, run transform queries.
+5. For MMPA: fragment compounds, index by mmpdb, load activity properties, then run transform queries.
 6. For R-decomposition: align compounds to scaffold, extract R-group SMILES.
 
 ## Tips
@@ -47,6 +47,7 @@ Tell the AI agent what to do:
 - Bemis-Murcko gives **empty scaffold** for linear molecules; supplement with linear features.
 - Generic framework loses heteroatom info; use only for topology comparison.
 - MMPA evidence depends on matched-pair count, independence, context diversity, and validation, not a universal dataset-size cutoff.
+- For property-dependent MMPA, create a tab-separated `props.tsv` with `ID` values matching `data.smi` plus the property column, then run `mmpdb loadprops -p props.tsv data.mmpdb` before `transform`. Sort transform TSV rows yourself by property-prefixed fields such as `pIC50_count`, effect, or uncertainty; mmpdb does not emit a confidence column.
 - Choose scaffold, time, random, or other splits to match deployment; always audit overlap and label balance.
 - Preserve original row identifiers and unmatched indices during R-group decomposition.
 

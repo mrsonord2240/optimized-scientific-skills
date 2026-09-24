@@ -18,6 +18,27 @@ Before using code patterns, verify installed versions match. If versions differ:
 If code throws ImportError, AttributeError, or TypeError, introspect the installed
 package and adapt the example to match the actual API rather than retrying.
 
+## Installation
+
+Install only the route the analysis will use; ambient-removal tools are
+alternatives, not a stack.
+
+```bash
+pip install scanpy matplotlib scikit-misc
+# Optional GPU-backed ambient removal:
+pip install cellbender
+```
+
+```r
+install.packages(c('Seurat', 'SoupX'))
+BiocManager::install(c('scran', 'celda'))
+```
+
+`scikit-misc` supplies the loess implementation used by Scanpy's
+`flavor='seurat_v3'`; `celda::decontX` is the DecontX route. CellBender is a
+separate Python CLI and normally requires a suitable PyTorch/CUDA setup for
+practical datasets.
+
 # Single-Cell Preprocessing
 
 **"Preprocess my scRNA-seq data"** -> Remove bad barcodes, correct technical biases, and select informative genes before dimensionality reduction.
@@ -69,11 +90,24 @@ sc.pp.calculate_qc_metrics(adata, qc_vars=['mt', 'ribo', 'hb'], percent_top=[20]
 
 def is_outlier(adata, metric, nmads):
     M = adata.obs[metric]
-    return (M < np.median(M) - nmads * median_abs_deviation(M)) | (np.median(M) + nmads * median_abs_deviation(M) < M)
+    mad = median_abs_deviation(M)
+    print(f'{metric}: median={np.median(M):.3f}, MAD={mad:.3f}')
+    if mad == 0:
+        raise ValueError(f'MAD collapsed for {metric}; use documented fixed cutoffs instead of MAD filtering')
+    return (M < np.median(M) - nmads * mad) | (np.median(M) + nmads * mad < M)
+
+# Choose before filtering; use None when tissue is unknown rather than copying a PBMC cap.
+mito_hard_caps = {'nuclei': None, 'pbmc': 8, 'cardiac': 30, 'hepatic': 30, 'skeletal_muscle': 40, 'unknown': None}
+tissue = 'unknown'  # set from sample metadata; known high-mito parenchyma needs a raised cap or no hard cap
+mito_hard_cap = mito_hard_caps[tissue]
+hard_mito = adata.obs['pct_counts_mt'] > mito_hard_cap if mito_hard_cap is not None else np.zeros(adata.n_obs, dtype=bool)
 
 adata.obs['outlier'] = (is_outlier(adata, 'log1p_total_counts', 5) | is_outlier(adata, 'log1p_n_genes_by_counts', 5)
                         | is_outlier(adata, 'pct_counts_in_top_20_genes', 5))
-adata.obs['mt_outlier'] = is_outlier(adata, 'pct_counts_mt', 3) | (adata.obs['pct_counts_mt'] > 8)
+adata.obs['mt_outlier'] = is_outlier(adata, 'pct_counts_mt', 3) | hard_mito
+survival_fraction = float((~(adata.obs['outlier'] | adata.obs['mt_outlier'])).mean())
+if survival_fraction < 0.80:
+    raise ValueError(f'Only {survival_fraction:.1%} of barcodes survive QC; inspect MADs and use fixed, tissue-aware cutoffs')
 adata = adata[~(adata.obs['outlier'] | adata.obs['mt_outlier'])].copy()
 sc.pp.filter_genes(adata, min_cells=3)
 ```
@@ -91,7 +125,26 @@ adata.obs['outlier'] = adata.obs.groupby('sample', observed=True).apply(
 # '^MT-' matches gene SYMBOLS; with Ensembl-ID feature names it matches nothing and the mito filter silently does nothing
 seurat_obj[['percent.mt']] <- PercentageFeatureSet(seurat_obj, pattern = '^MT-')
 VlnPlot(seurat_obj, features = c('nFeature_RNA', 'nCount_RNA', 'percent.mt'), ncol = 3)
-seurat_obj <- subset(seurat_obj, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & percent.mt < 20)
+is_outlier <- function(x, nmads) {
+  centre <- median(x)
+  spread <- mad(x, constant = 1)
+  if (spread == 0) stop('MAD collapsed; use documented fixed cutoffs instead of MAD filtering')
+  x < centre - nmads * spread | x > centre + nmads * spread
+}
+mito_hard_caps <- c(nuclei = NA_real_, pbmc = 8, cardiac = 30, hepatic = 30,
+                    skeletal_muscle = 40, unknown = NA_real_)
+tissue <- 'unknown'  # set from sample metadata
+mito_hard_cap <- unname(mito_hard_caps[tissue])
+hard_mito <- if (is.na(mito_hard_cap)) rep(FALSE, ncol(seurat_obj)) else seurat_obj$percent.mt > mito_hard_cap
+seurat_obj$qc_outlier <- (
+  is_outlier(log1p(seurat_obj$nCount_RNA), 5) |
+  is_outlier(log1p(seurat_obj$nFeature_RNA), 5) |
+  is_outlier(seurat_obj$percent.mt, 3) |
+  hard_mito
+)
+survival_fraction <- mean(!seurat_obj$qc_outlier)
+if (survival_fraction < 0.80) stop(sprintf('Only %.1f%% of barcodes survive QC', 100 * survival_fraction))
+seurat_obj <- subset(seurat_obj, cells = colnames(seurat_obj)[!seurat_obj$qc_outlier])
 ```
 
 ### QC Thresholds and Rationale
@@ -100,8 +153,8 @@ seurat_obj <- subset(seurat_obj, subset = nFeature_RNA > 200 & nFeature_RNA < 50
 |--------|-----------------|----------------------|
 | `min_genes` | 200 | Below this is mostly empty droplets / debris; raise for deep data |
 | `log1p_total_counts` / `log1p_n_genes_by_counts` | 5 MAD | sc-best-practices loosens from scater's 3 MAD to avoid cutting real biology; filter on the log scale (depth is right-skewed) |
-| `pct_counts_in_top_20_genes` | 5 MAD | High value flags low-complexity / dying cells |
-| `pct_counts_mt` | 3 MAD plus hard >8% | Tissue-dependent: 5-20% typical, but cardiomyocytes/hepatocytes/muscle are constitutively high; nuclei are ~0-2% and any mito flags ambient |
+| `pct_counts_in_top_20_genes` | 5 MAD | High value can flag low-complexity / dying cells, but platelets/megakaryocytes, erythrocytes, and other transcriptionally simple types are constitutively high; report removal rates per preliminary cluster or known cell type before subsetting |
+| `pct_counts_mt` | 3 MAD plus tissue-aware hard cap | Nuclei and unknown tissue = MAD only; PBMC 8%; cardiac/hepatic ~30%; skeletal muscle ~40%. Raise or remove the hard cap for known high-mito parenchyma |
 | `min_cells` (genes) | 3 | Remove genes seen in too few cells to be informative |
 
 Fixed cutoffs are a fast first pass for well-characterized tissue but silently delete valid populations; MAD-adaptive is the modern default; miQC (a mito-vs-detected-genes mixture model) helps when that relationship varies across samples.
@@ -125,9 +178,23 @@ High mito is ambiguous: apoptosis co-occurs with low gene counts and apoptotic m
 ```r
 library(SoupX)
 sc <- load10X('cellranger_outs/')          # needs BOTH raw and filtered
+# load10X imports clusters only when Cell Ranger's analysis/clustering output is present.
+# Otherwise, derive clusters on the filtered matrix before autoEstCont:
+if (is.null(sc$metaData$clusters)) {
+  so <- Seurat::CreateSeuratObject(sc$toc)
+  so <- Seurat::NormalizeData(so, verbose = FALSE)
+  so <- Seurat::FindVariableFeatures(so, verbose = FALSE)
+  so <- Seurat::ScaleData(so, verbose = FALSE)
+  so <- Seurat::RunPCA(so, npcs = 30, verbose = FALSE)
+  so <- Seurat::FindNeighbors(so, dims = 1:20, verbose = FALSE)
+  so <- Seurat::FindClusters(so, resolution = 0.8, verbose = FALSE)
+  sc <- setClusters(sc, setNames(as.character(Seurat::Idents(so)), colnames(so)))
+}
 sc <- autoEstCont(sc)                       # estimates contamination fraction rho
 counts_adj <- adjustCounts(sc, roundToInt = TRUE)   # output is non-integer by default; round for NB models
 ```
+
+If `autoEstCont` reports `Clustering information must be supplied, run setClusters first`, do not accept an unclustered estimate: provide clusters from a quick Seurat or scran pass as above.
 
 SoupX and CellBender disagree on what "ambient" is: SoupX subtracts a per-cell scalar of a single global soup profile; CellBender learns a probabilistic per-droplet background in a generative model. There is no consensus on which is better - CellBender is more powerful and more dangerous. Subtracting a shared soup vector from every cell can manufacture artificial negative correlations and zero out genes cells genuinely lacked, so validate. Matters most for solid tumors, snRNA-seq, and blood. Do not stack tools; double-correction compounds over-removal.
 
@@ -177,6 +244,23 @@ sc.pp.highly_variable_genes(adata, n_top_genes=2000, flavor='seurat_v3', layer='
 
 Running `seurat_v3` on logged values, or `seurat` on raw counts, runs silently and yields garbage HVGs. The field is shifting toward binomial-deviance and Pearson-residual feature selection on raw counts because dispersion HVGs are sensitive to the upstream normalization choice. Set `batch_key` to compute HVGs per batch and avoid batch-specific technical genes.
 
+For `flavor='seurat_v3'`, `batch_key` also needs a non-sparse gene universe within **each** batch. Filter genes before the per-batch loess; otherwise a shallow batch can fail with `ValueError: reciprocal condition number ...` and produce no HVGs. This helper retains genes detected in at least `min_cells` cells in every batch, then runs the documented selection:
+
+```python
+def filter_genes_per_batch(adata, batch_key, min_cells=3):
+    keep_by_batch = []
+    for _, positions in adata.obs.groupby(batch_key, observed=True).indices.items():
+        detected = np.asarray((adata.X[positions] > 0).sum(axis=0)).ravel()
+        keep_by_batch.append(detected >= min_cells)
+    keep = np.logical_and.reduce(keep_by_batch)
+    if not keep.any():
+        raise ValueError('No genes meet the per-batch min_cells requirement; lower min_cells or inspect the shallow batch')
+    return adata[:, keep].copy()
+
+adata_hvg = filter_genes_per_batch(adata, batch_key='sample', min_cells=3)
+sc.pp.highly_variable_genes(adata_hvg, n_top_genes=2000, flavor='seurat_v3', layer='counts', batch_key='sample')
+```
+
 ## Scaling and Regressing Out
 
 **Goal:** Optionally equalize gene weight in PCA, and remove unwanted covariates - both now discouraged as reflexive defaults.
@@ -196,14 +280,14 @@ sc.pp.scale(adata, max_value=10)        # max_value default is None (no clipping
 |---------|-------|-----|
 | HVGs look random; clustering is mush | `seurat_v3` fed log-normalized (or `seurat` fed raw) | Feed each flavor its required input; use `layer='counts'` for `seurat_v3` |
 | An entire healthy cell type disappeared | Flat mito cutoff deleted high-mito parenchyma | Use MAD/tissue-aware thresholds; inspect what was removed |
-| Values inflated ~2x after re-running normalization | Normalized already-normalized data | Normalize raw once; restore from `layers['counts']` |
+| Values shrink and distributions compress after re-running normalization; Scanpy warns that `X` looks already log-transformed | Normalized already-normalized data | Normalize raw once; restore from `layers['counts']` |
 | `ModuleNotFoundError: skmisc` | `seurat_v3` needs scikit-misc | `pip install scikit-misc` |
 | QC metrics missing from `.obs` | `calculate_qc_metrics` `inplace` defaults to False | Pass `inplace=True` |
 | Proliferation / activation signal vanished | Regressed out `total_counts` / cell-cycle confounded with biology | Do not reflexively regress; validate the covariate is not confounded |
 | New "stressed/transitional" cluster | Warm-dissociation IEG/HSP artifact | Score the dissociation module; exclude those genes from HVG/clustering |
 | Off-target markers everywhere (Hb, Ig) | Ambient RNA contamination | Run SoupX/CellBender/DecontX on the raw matrix before QC |
 | Spike to ~2x counts deflated other genes | Compositional see-saw from a few dominant genes | Use `exclude_highly_expressed=True` or scran; report relative, not absolute, expression |
-| Almost all cells filtered / tiny survivor count | MAD ~ 0 on a low-variance, tiny, or nuclei sample (>50% share a value), so `is_outlier` flags every non-median cell | Assert `n_obs > 0` and a sane survival fraction; fall back to fixed cutoffs when MAD is ~0 |
+| Almost all cells filtered / tiny survivor count | MAD = 0 on a low-variance, tiny, or nuclei sample (>50% share a value), so `is_outlier` flags every non-median cell | Report each QC MAD; stop MAD filtering and use fixed cutoffs if any log1p QC MAD is 0, or if fewer than 80% of input barcodes survive |
 | Mito filter removes nothing (percent.mt all 0) | `'^MT-'` pattern matched against Ensembl-ID feature names | Use gene symbols, or match the mito Ensembl IDs / a mito gene list |
 | Shallow batch over-filtered, deep batch under-filtered | Global MAD thresholds across samples of differing depth | Compute `is_outlier` per `batch_key`/sample group |
 | Batch effects baked into QC/soup/doublet calls | Merged samples before QC, ambient, and doublet steps | Run steps 1-5 per sample, then merge |

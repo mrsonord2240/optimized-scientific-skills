@@ -62,15 +62,28 @@ ChEMBL's standardization is the most widely-used reference. The Python package `
 ```python
 from chembl_structure_pipeline import standardize_mol, get_parent_mol
 from rdkit import Chem
+from rdkit.Chem.MolStandardize import rdMolStandardize
 
-def chembl_pipeline(smi):
-    mol = Chem.MolFromSmiles(smi)
+def chembl_pipeline(smi, multi_fragment_policy='flag'):
+    try:
+        mol = Chem.MolFromSmiles(smi)
+    except (TypeError, ValueError):
+        return None, 'parse_failure'
     if mol is None:
         return None, 'parse_failure'
     standardized = standardize_mol(mol)
     parent, exclude = get_parent_mol(standardized)
     if exclude:
         return None, 'excluded_by_chembl'
+    if len(Chem.GetMolFrags(parent)) > 1:
+        if multi_fragment_policy == 'flag':
+            return None, 'multi_fragment_parent'
+        if multi_fragment_policy == 'largest_fragment':
+            parent = rdMolStandardize.LargestFragmentChooser(
+                preferOrganic=True
+            ).choose(parent)
+            return Chem.MolToSmiles(parent), 'ok_largest_fragment_fallback'
+        raise ValueError("multi_fragment_policy must be 'flag' or 'largest_fragment'")
     return Chem.MolToSmiles(parent), 'ok'
 ```
 
@@ -78,7 +91,7 @@ def chembl_pipeline(smi):
 
 **`get_parent_mol`:** strip salts/counter-ions and choose the parent; returns `(parent_mol, exclude_flag)`.
 
-Output: canonical SMILES of the selected parent after the ChEMBL transformations, or an explicit `excluded_by_chembl` status when the parent carries ChEMBL's exclusion flag. Neutralizable acid/base sites may be normalized, but permanent or otherwise non-removable charges can remain; do not assume every emitted parent is neutral.
+Output: canonical SMILES of the selected parent after the ChEMBL transformations, or an explicit status when parsing, exclusion, or parent selection prevents a safe result. `get_parent_mol` can return more than one fragment when every input fragment is on ChEMBL's salt list (for example sodium acetate or choline chloride). The default `multi_fragment_policy='flag'` rejects this ambiguous, unstripped parent; use the explicit RDKit `largest_fragment` fallback only when its loss of co-crystal information is acceptable. Neutralizable acid/base sites may be normalized, but permanent or otherwise non-removable charges can remain; do not assume every emitted parent is neutral.
 
 ## Full Standardization with rdMolStandardize
 
@@ -120,6 +133,17 @@ def full_standardize(smi, keep_isotopes=False):
 ```
 
 **`canonicalOrder=True`** makes the uncharger choose neutralization sites in canonical order when more than one equivalent site is available. It does not itself decide whether a permanent charge is retained; inspect charge-sensitive structures and keep `force=False` unless a documented policy requires otherwise.
+
+For a mixed tracer library, apply the isotope choice per row rather than forcing one setting across every compound. Store the source decision in a boolean column and pass it to `full_standardize`:
+
+```python
+df['standardized_smiles'] = [
+    full_standardize(smi, keep_isotopes=keep)
+    for smi, keep in zip(df['smiles'], df['keep_isotopes'])
+]
+```
+
+Require `keep_isotopes` to be boolean, preserve it in the output, and record the policy with the exported dataset. Use a library-wide setting only when the entire collection has the same tracer policy.
 
 ## Salt Stripping Edge Cases
 
@@ -193,43 +217,89 @@ For ML, remove stereochemistry only when the endpoint, data curation, and model 
 
 ```python
 import pandas as pd
+from rdkit import Chem
 from chembl_structure_pipeline import standardize_mol, get_parent_mol
 
-def prepare_qsar_data(df, smiles_col='smiles', activity_col='pIC50'):
+def prepare_qsar_data(
+    df, smiles_col='smiles', activity_col='pIC50',
+    max_activity_range=1.0, replicate_policy='flag',
+):
+    missing = [name for name in (smiles_col, activity_col) if name not in df.columns]
+    if missing:
+        raise ValueError(f"Missing required column(s): {', '.join(missing)}")
+    if replicate_policy not in {'flag', 'drop'}:
+        raise ValueError("replicate_policy must be 'flag' or 'drop'")
+
     standardized = []
-    for i, row in df.iterrows():
+    status_counts = {
+        'parse_failure': 0, 'excluded_by_chembl': 0,
+        'multi_fragment_parent': 0, 'standardize_error': 0,
+        'inorganic_no_carbon': 0, 'ok': 0,
+    }
+    for _, row in df.iterrows():
         mol = Chem.MolFromSmiles(row[smiles_col])
         if mol is None:
+            status_counts['parse_failure'] += 1
             continue
         try:
             mol = standardize_mol(mol)
             mol, exclude = get_parent_mol(mol)
             if exclude:
+                status_counts['excluded_by_chembl'] += 1
                 continue
-            standardized.append({
-                'smiles': Chem.MolToSmiles(mol),
-                'inchikey': Chem.MolToInchiKey(mol),
-                'activity': row[activity_col],
-            })
+            if len(Chem.GetMolFrags(mol)) > 1:
+                status_counts['multi_fragment_parent'] += 1
+                continue
         except Exception:
+            status_counts['standardize_error'] += 1
             continue
+        if not any(atom.GetAtomicNum() == 6 for atom in mol.GetAtoms()):
+            status_counts['inorganic_no_carbon'] += 1
+            continue
+        status_counts['ok'] += 1
+        standardized.append({
+            'smiles': Chem.MolToSmiles(mol),
+            'inchikey': Chem.MolToInchiKey(mol),
+            'activity': row[activity_col],
+        })
 
     df_std = pd.DataFrame(standardized)
     if df_std.empty:
-        return pd.DataFrame(columns=['inchikey', 'smiles', 'activity', 'n_replicates'])
+        return pd.DataFrame(), status_counts
     df_std = df_std.groupby('inchikey').agg(
         smiles=('smiles', 'first'),
         activity=('activity', 'mean'),
+        activity_range=('activity', lambda values: values.max() - values.min()),
         n_replicates=('activity', 'count'),
     ).reset_index()
-    return df_std
+    df_std['replicate_disagreement'] = (
+        (df_std['n_replicates'] > 1)
+        & (df_std['activity_range'] > max_activity_range)
+    )
+    if replicate_policy == 'drop':
+        df_std = df_std.loc[~df_std['replicate_disagreement']].reset_index(drop=True)
+    return df_std, status_counts
 ```
 
-Standard InChIKey may collapse some mobile-hydrogen tautomer representations, but this is not a substitute for an explicitly chosen tautomer policy. Replicate count signals measurement reliability.
+The bundled [`examples/standardize_library.py`](examples/standardize_library.py) is the complete reference implementation. It additionally accepts `keep_isotopes_col`, a boolean per-record flag for mixed tracer libraries, and `chembl_multi_fragment_policy='largest_fragment'` when that fallback has been authorized.
+
+`prepare_qsar_data` returns `(deduplicated_dataframe, status_counts)`. Emit and retain `status_counts`; it makes each excluded input traceable rather than silently dropping rows. Standard InChIKey may collapse some mobile-hydrogen tautomer representations, but this is not a substitute for an explicitly chosen tautomer policy.
+
+`activity_range` is the max-minus-min value across every identity group's reported activities. The default threshold, `max_activity_range=1.0` log unit, sets `replicate_disagreement=True`; this is a review flag, not a reason to erase data automatically. Set `replicate_policy='drop'` only after documenting assay format, endpoint, units, and the agreed QC rule. ChEMBL exports can mix binding and functional assays, so reconcile assay scope before averaging.
 
 ## Per-Tool Failure Modes
 
-### ChEMBL pipeline -- inorganic salt fails
+### ChEMBL pipeline -- multi-fragment parent
+
+**Trigger:** Every fragment is on ChEMBL's salt list, including an organic salt such as sodium acetate, sodium benzoate, sodium formate, sodium citrate, potassium acetate, or choline chloride.
+
+**Mechanism:** `get_parent_mol` can return its input unchanged because no fragment qualifies as a surviving parent under its salt-list rules.
+
+**Symptom:** A supposedly standardized ChEMBL parent still has two or more fragments. A carbon-count pre-filter does not catch this: these examples contain carbon.
+
+**Fix:** Check `len(Chem.GetMolFrags(parent)) > 1` immediately after `get_parent_mol`. The safe default is to flag the record for review. Use `LargestFragmentChooser(preferOrganic=True)` only as an explicit fallback, and record that it may discard meaningful co-crystal information.
+
+### ChEMBL pipeline -- inorganic parent
 
 **Trigger:** Molecule is genuinely an inorganic salt (e.g., NaCl, K2SO4).
 
@@ -237,7 +307,7 @@ Standard InChIKey may collapse some mobile-hydrogen tautomer representations, bu
 
 **Symptom:** Returns the salt itself (not a drug).
 
-**Fix:** Pre-filter to compounds with ≥1 carbon atom.
+**Fix:** After the fragment-count check, reject/flag a selected parent with no carbon atoms. This is a separate condition from the all-fragments-are-salts case.
 
 ### Uncharger -- charge-state policy mismatch
 

@@ -31,10 +31,10 @@ A second, equally load-bearing insight: discrimination (AUC/C) and calibration (
 
 ## Leakage Taxonomy
 
-| Leakage type | How it happens in omics | Symptom | Prevention |
-|--------------|-------------------------|---------|------------|
-| Preprocessing (most common, most missed) | z-scoring, quantile/library normalization, ComBat/SVA, PCA, kNN/MICE imputation, VST fit on the *full* dataset before splitting | Test performance suspiciously close to train; collapses on external data | Fit every transform inside the CV fold via a `Pipeline` |
-| Feature selection (severe special case) | top-k DE genes / highest-variance / univariate filter chosen on all samples, then CV only the classifier | Near-perfect CV from pure noise; unstable selected set | Selection lives in the CV fold (Ambroise 2002) |
+| Leakage type | Indicative impact (not a ranking) | How it happens in omics | Symptom | Prevention |
+|--------------|-----------------------------------|-------------------------|---------|------------|
+| Preprocessing (most common, most missed) | A single global scaler may move little; fitted quantile normalization, ComBat/SVA, PCA, or kNN/MICE can move a great deal | z-scoring, quantile/library normalization, ComBat/SVA, PCA, kNN/MICE imputation, VST fit on the *full* dataset before splitting | Test performance suspiciously close to train; collapses on external data | Fit every transform inside the CV fold via a `Pipeline` |
+| Feature selection (severe special case) | Can manufacture near-perfect CV from pure noise when p >> n | top-k DE genes / highest-variance / univariate filter chosen on all samples, then CV only the classifier | Near-perfect CV from pure noise; unstable selected set | Selection lives in the CV fold (Ambroise 2002) |
 | Target / label | a feature is a proxy for or downstream of the outcome (post-diagnosis labs, treatment-derived fields, a collection-site that tracks case/control) | One feature dominates implausibly; fails when removed | Audit temporal/causal admissibility; exclude post-outcome variables |
 | Group / patient / replicate | same patient, tumor, organoid, or technical replicate in train and test; `KFold` scatters them | Inflated metrics that vanish under leave-one-group-out | Split by the highest independent unit (`GroupKFold`/`StratifiedGroupKFold`) |
 | Batch | batch correlated with outcome and not respected in the split, or ComBat across the train/test boundary | Model discriminates batches not biology; external batch destroys it | Block the split by batch; never run unsupervised correction across the split |
@@ -81,7 +81,7 @@ scores = cross_val_score(search, X, y, cv=outer, scoring='roc_auc')   # unbiased
 print(f'Nested AUC: {scores.mean():.3f} +/- {scores.std():.3f}')
 ```
 
-Nested CV is needed whenever model selection happens -- even informal "tried three options, kept the best." Flat CV with tuning is a known reviewer red flag (Varma-Simon 2006).
+Nested CV is needed whenever model selection happens -- even informal "tried three options, kept the best." Flat CV with tuning is a known reviewer red flag (Varma-Simon 2006). Its optimism is not a fixed size: it tends to grow with more (and less correlated) configurations, weaker signal, and smaller samples. When practical, report the nested estimate, the flat selected score, the number of configurations searched, and the sample size; a small observed gap does not license same-data tune-and-grade.
 
 ## Group-Aware, Structured, and Small-Sample CV
 
@@ -145,6 +145,10 @@ The multiple-threshold problem: reporting the *best* F1/accuracy over thresholds
 - **Sample size.** The "10 events per variable" heuristic (Peduzzi 1996) is obsolete; the standard is Riley et al.'s minimum-sample-size framework (2019, Stat Med Parts I-II), which sizes for shrinkage >=0.9 and precise risk estimation (`pmsampsize`). For p>>n omics these formulas are out of regime, which is precisely why heavy penalization + nested validation, not unpenalized multivariable fits, are mandatory.
 - **Reporting.** TRIPOD+AI (Collins 2024, *BMJ* 385:e078378) supersedes TRIPOD 2015 and is the 2024+ target for any biomedical predictive-model claim -- it demands data-splitting and leakage controls, calibration (not just discrimination), fairness/subgroup performance, and uncertainty. PROBAST+AI is the companion risk-of-bias appraisal.
 
+### Minimum validation-report skeleton
+
+Produce a report a reviewer can audit, rather than a bare metric. State: (1) cohort, outcome time horizon, prevalence, and intended use; (2) the split design, unit of independence, fold counts/seeds, and any external/temporal test; (3) every leakage control and all preprocessing, selection, tuning, calibration, and threshold decisions, with where each was fit; (4) discrimination with an uncertainty interval, plus the flat-versus-nested gap and number of configurations when tuning occurred; (5) calibration intercept, slope, reliability curve, and Brier/log loss on an untouched evaluation set; (6) net benefit at pre-specified clinically plausible thresholds when a decision is claimed; (7) subgroup performance with subgroup sizes and uncertainty; and (8) missing data, exclusions, limitations, and code/data version identifiers. Mark unavailable fields as unavailable with a reason; do not silently omit them.
+
 ## Per-Method Failure Modes
 
 ### Preprocessing fit before the split
@@ -159,11 +163,11 @@ The multiple-threshold problem: reporting the *best* F1/accuracy over thresholds
 - **Symptom:** Irreproducible "SOTA"; a fresh test set disappoints.
 - **Fix:** Lock one test set, pre-specify metric and threshold rule, choose thresholds on a separate fold.
 
-### SMOTE/resampling to fix imbalance breaks calibration
+### SMOTE/resampling can break calibration for a risk model
 - **Trigger:** Oversampling/SMOTE for a *risk* model.
-- **Mechanism:** Changing training prevalence inflates minority-class probabilities; no AUC gain (van den Goorbergh 2022).
-- **Symptom:** Good AUC, badly miscalibrated risks.
-- **Fix:** Do not resample for probability models; move the threshold on a calibrated model. If resampled, use `imblearn.pipeline.Pipeline` (train-fold only).
+- **Mechanism:** Changing training prevalence shifts minority-class probabilities. The shift grows with the resampling ratio; evidence in van den Goorbergh (2022) is most cautionary under severe imbalance. At mild/moderate imbalance, AUC and a proper score can move in either direction, so do not promise "no AUC gain".
+- **Symptom:** Predicted risks no longer match the deployment prevalence; the problem can be large under severe imbalance even when ranking looks good.
+- **Fix:** For probability models, prefer class-preserving training plus a threshold chosen from clinical utility. If resampling is justified, keep it inside an `imblearn.pipeline.Pipeline` (train folds only), then assess and, if needed, recalibrate on data with the original prevalence.
 
 ### LOO for a ranking metric
 - **Trigger:** Leave-one-out with AUC.

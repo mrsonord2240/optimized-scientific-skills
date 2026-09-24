@@ -1,82 +1,101 @@
-# Reference: metafor 4.4+ | Verify API if version differs
+# Runnable reference: metafor 4.4+, survival, survminer, MendelianRandomization.
+# The meta-analysis and Cox data below are labelled synthetic demonstrations, not clinical findings.
 
-# PhD-level forest + funnel plot encoding the four correctness traps:
-# (1) random-effects REML, (2) log-scale x-axis for ratios,
-# (3) I²/tau²/prediction interval reported, (4) Egger only when k>=10.
+suppressPackageStartupMessages({
+  library(metafor)
+  library(survival)
+  library(survminer)
+  library(MendelianRandomization)
+})
+dir.create("plots", showWarnings = FALSE)
 
-library(metafor)
-
-# 1. INPUT -- per-study effect + variance
-# yi = log-effect (log-OR / log-HR); vi = variance of log-effect
+# 1. Synthetic study-level log-ORs with visible heterogeneity (k = 12).
 studies <- data.frame(
-    author = c('Smith 2010', 'Jones 2012', 'Lee 2014', 'Patel 2015', 'Garcia 2017', 'Khan 2019',
-               'Brown 2020', 'Liu 2021', 'Davis 2022', 'Singh 2023'),
-    yi = log(c(1.3, 1.5, 0.9, 1.2, 1.4, 1.1, 1.8, 1.6, 0.95, 1.25)),
-    vi = c(0.05, 0.08, 0.12, 0.06, 0.07, 0.09, 0.04, 0.05, 0.10, 0.06))
+  author = paste("Synthetic study", seq_len(12)), year = 2010:2021,
+  log_or = log(c(0.48, 0.62, 0.71, 0.83, 0.95, 1.08, 1.20, 1.42, 1.61, 1.82, 2.05, 2.28)),
+  log_or_se = c(0.17, 0.16, 0.20, 0.15, 0.18, 0.16, 0.19, 0.17, 0.21, 0.18, 0.20, 0.22)
+)
+stopifnot(nrow(studies) >= 10)
+res <- rma(yi = log_or, vi = log_or_se^2, data = studies,
+           slab = paste(author, year), method = "REML")
 
-# 2. RANDOM-EFFECTS REML meta-analysis
-res <- rma(yi = yi, vi = vi, data = studies,
-           slab = author, method = 'REML')
-
-# 3. HETEROGENEITY -- report I², tau², Q-test
-cat(sprintf('I-squared = %.1f%%; tau^2 = %.3f; Q = %.2f, p = %s\n',
-            res$I2, res$tau2, res$QE, format.pval(res$QEp, digits = 3)))
-
-# 4. FOREST -- log-scale x with meaningful tick labels
-pdf('forest.pdf', width = 7, height = 5)
-forest(res,
-       atransf = exp,                                         # display as OR (exponentiated)
-       at = log(c(0.5, 1, 1.5, 2, 3)),                       # ticks at meaningful values
-       refline = 0,                                          # log(1) for OR/HR/RR
-       xlab = 'Odds Ratio (95% CI)',
-       header = c('Study', 'OR [95% CI]'),
-       mlab = bquote(paste('RE Model (', I^2, ' = ', .(round(res$I2, 1)), '%; ',
-                            tau^2, ' = ', .(round(res$tau2, 3)), '; Q-p = ',
-                            .(format.pval(res$QEp, digits = 2)), ')')),
-       addpred = TRUE)                                       # 95% prediction interval
-dev.off()
-
-# 5. FUNNEL + Egger test (k >= 10 required for Egger)
-pdf('funnel.pdf', width = 6, height = 5)
-funnel(res,
-       level = c(90, 95, 99),                                 # contour-enhanced (Peters 2008)
-       shade = c('white', 'gray55', 'gray75'),
-       refline = 0,
-       legend = TRUE,
-       xlab = 'log(OR)')
-dev.off()
-
-if (nrow(studies) >= 10) {
-    egger <- regtest(res, model = 'lm', predictor = 'sei')
-    cat(sprintf('Egger test: p = %s\n', format.pval(egger$pval, digits = 3)))
+meta_label <- function(x) {
+  if (x$k < 5) sprintf("RE model (k = %d; HKSJ CI; heterogeneity withheld)", x$k) else
+    sprintf("RE model (tau^2 = %.3f; I^2 = %.1f%%; Q p = %s)",
+            x$tau2, x$I2, format.pval(x$QEp, digits = 2))
 }
-
-# 6. TRIM-AND-FILL as SENSITIVITY (NOT primary)
-res_tf <- trimfill(res)
-cat(sprintf('Trim-and-fill imputed k = %d studies; adjusted OR = %.2f\n',
-            res_tf$k - res$k, exp(res_tf$b[1])))
-
-# 7. SUBGROUP META-ANALYSIS with interaction test
-studies$subtype <- c('A', 'A', 'B', 'B', 'A', 'B', 'A', 'B', 'A', 'B')
-res_sub <- rma(yi = yi, vi = vi, mods = ~ subtype - 1, data = studies, method = 'REML')
-res_int <- rma(yi = yi, vi = vi, mods = ~ subtype, data = studies, method = 'REML')
-cat(sprintf('Interaction p-value (subtype): %s\n',
-            format.pval(res_int$pval[2], digits = 3)))
-
-# 8. COX SUBGROUP FOREST (survminer wrapper)
-library(survival)
-library(survminer)
-fit <- coxph(Surv(time, status) ~ treatment + age + sex + stage, data = clinical_df)
-pdf('cox_subgroup_forest.pdf', width = 8, height = 5)
-ggforest(fit, data = clinical_df, main = 'Treatment HR by subgroup',
-         cpositions = c(0.02, 0.22, 0.4),
-         fontsize = 0.7, refLabel = 'Reference', noDigits = 2)
+pred <- predict(res)
+ticks <- log(c(0.25, 0.5, 1, 2, 4))
+study_lb <- studies$log_or - qnorm(0.975) * studies$log_or_se
+study_ub <- studies$log_or + qnorm(0.975) * studies$log_or_se
+limits <- range(c(study_lb, study_ub, res$ci.lb, res$ci.ub,
+                  pred$pi.lb, pred$pi.ub, ticks), finite = TRUE)
+pdf("plots/forest.pdf", width = 8, height = 6)
+forest(res, atransf = exp, at = ticks, alim = limits, refline = 0,
+       xlab = "Odds ratio (95% CI)", header = c("Study", "OR [95% CI]"),
+       mlab = meta_label(res), addpred = TRUE)
 dev.off()
-# For pre-specified subgroups, test treatment * subgroup interaction explicitly
+cat(sprintf("Synthetic REML OR %.2f [%.2f, %.2f]; tau^2 %.3f; I^2 %.1f%%; Q p %s\n",
+            exp(res$b[1]), exp(res$ci.lb), exp(res$ci.ub), res$tau2, res$I2,
+            format.pval(res$QEp, digits = 3)))
 
-# 9. MR FOREST -- triangulation across methods
-library(MendelianRandomization)
-mr_input <- mr_input(bx = bx, bxse = bxse, by = by, byse = byse)
-mr_results <- mr_allmethods(mr_input)
-mr_forest(mr_input, methods = c('ivw', 'wmedian', 'mbe', 'egger'))
-# Report MR-Egger intercept (pleiotropy test) alongside main estimate
+# 2. Funnel diagnostics: Egger is guarded at k >= 10; trim-and-fill is sensitivity-only.
+pdf("plots/funnel.pdf", width = 7, height = 5)
+funnel(res, level = c(90, 95, 99), shade = c("white", "gray55", "gray75"),
+       refline = as.numeric(coef(res)[1]), legend = TRUE, xlab = "log(OR)")
+dev.off()
+if (res$k >= 10) {
+  egger <- regtest(res, model = "lm", predictor = "sei")
+  cat("Synthetic Egger p =", format.pval(egger$pval, digits = 3), "(asymmetry, not proof of publication bias)\n")
+} else message("Egger withheld: k < 10")
+res_tf <- trimfill(res)
+cat(sprintf("Synthetic trim-and-fill: %d imputed; original OR %.2f; sensitivity OR %.2f\n",
+            res_tf$k - res$k, exp(res$b[1]), exp(res_tf$b[1])))
+
+# 3. Synthetic Cox subgroup display. The interaction p tests effect modification.
+set.seed(20260924)
+n <- 180
+clinical_df <- data.frame(
+  time = rexp(n, rate = 0.004),
+  event = rbinom(n, 1, 0.68),
+  treatment = factor(rbinom(n, 1, 0.5), labels = c("control", "treated")),
+  subgroup = factor(rep(c("A", "B", "C"), each = n / 3)),
+  age = round(rnorm(n, 62, 8))
+)
+if (any(table(clinical_df$subgroup) < 20) || any(tapply(clinical_df$event, clinical_df$subgroup, sum) < 5)) {
+  stop("Synthetic subgroup data unexpectedly sparse")
+}
+main_fit <- coxph(Surv(time, event) ~ treatment + subgroup + age, data = clinical_df)
+int_fit <- coxph(Surv(time, event) ~ treatment * subgroup + age, data = clinical_df)
+interaction_p <- anova(main_fit, int_fit, test = "LRT")[2, "Pr(>|Chi|)"]
+
+sub_hr <- do.call(rbind, lapply(levels(clinical_df$subgroup), function(g) {
+  d <- droplevels(clinical_df[clinical_df$subgroup == g, ])
+  f <- coxph(Surv(time, event) ~ treatment + age, data = d)
+  ci <- confint(f)[1, ]
+  c(log_hr = unname(coef(f)[1]), lo = unname(ci[1]),
+    hi = unname(ci[2]), n = nrow(d))
+}))
+pdf("plots/cox_subgroup_forest.pdf", width = 7, height = 5)
+forest(x = sub_hr[, "log_hr"], ci.lb = sub_hr[, "lo"], ci.ub = sub_hr[, "hi"],
+       slab = paste0(levels(clinical_df$subgroup), " (n=", sub_hr[, "n"], ")"),
+       atransf = exp, refline = 0, xlab = "Treatment hazard ratio (95% CI)")
+title(sprintf("Synthetic treatment-by-subgroup interaction p = %s", format.pval(interaction_p, digits = 3)))
+dev.off()
+pdf("plots/cox_adjusted_covariates.pdf", width = 9, height = 5)
+print(ggforest(main_fit, data = clinical_df, main = "Synthetic adjusted covariate HRs",
+               cpositions = c(0.02, 0.22, 0.4), fontsize = 0.7, noDigits = 2))
+dev.off()
+cat("Synthetic interaction p =", format.pval(interaction_p, digits = 3), "\n")
+
+# 4. MR method comparison on bundled lipid/CHD data. Suppress SNP rows so an outlier cannot hide method diamonds.
+mr_dat <- mr_input(bx = ldlc, bxse = ldlcse, by = chdlodds, byse = chdloddsse)
+mr_results <- mr_allmethods(mr_dat)
+print(mr_results)
+mr_egger_result <- mr_egger(mr_dat)
+cat(sprintf("MR-Egger intercept %.4f; p = %s\n", mr_egger_result@Intercept,
+            format.pval(mr_egger_result@Pleio.pval, digits = 3)))
+pdf("plots/mr_method_forest.pdf", width = 8, height = 4)
+print(mr_forest(mr_dat, snp_estimates = FALSE,
+                methods = c("ivw", "wmedian", "mbe", "egger")))
+dev.off()

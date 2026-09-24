@@ -43,7 +43,7 @@ Where a = set bits in fp1, b = set bits in fp2, c = bits in common.
 |----------|-------------|-----|
 | Standard analog search (drug-like, ECFP4) | Tanimoto, start near 0.7 | Repository starting heuristic; calibrate against project actives and analog judgments |
 | Sensitive search at lower similarity | Dice, threshold 0.45 | Dice is roughly 2*Tanimoto/(1+Tanimoto); more sensitive in middle range |
-| Substructure-like ranking | Tversky alpha=1, beta=0 | Asymmetric: rewards compounds containing query features |
+| Substructure-like ranking | Tversky alpha=1, beta=0 + SMARTS confirmation | Asymmetric ranking rewards query-feature overlap; it does not prove containment |
 | Count fingerprints (neural, atom-environment) | Cosine | Bit-vector Tanimoto loses information |
 | Activity-cliff diagnosis | Tanimoto + property difference | Detect ECFP4>=0.85 but |delta(activity)|>=2 log units |
 | Cross-target / scaffold-hopping | FCFP4 Tanimoto OR AtomPair Tanimoto | Pharmacophore-equivalent matches different scaffolds |
@@ -60,7 +60,13 @@ Where a = set bits in fp1, b = set bits in fp2, c = bits in common.
 | 0.35-0.55 | Distant analog, possible scaffold hop | Many false positives |
 | <0.35 | Mostly noise; use 3D shape or pharmacophore instead | ECFP4 not informative |
 
-These bands are working defaults for ECFP4-like fingerprints, not transferable calibration. Inspect the target dataset's similarity distribution and known series before setting a cutoff. Maggiora's similarity principle states "similar molecules tend to have similar activity" -- but **activity cliffs** (Stumpfe & Bajorath 2012) violate this. Treat high ECFP4 similarity as a prioritization signal, not evidence that activity will be preserved.
+These bands are working defaults for ECFP4-like fingerprints, not transferable calibration. Inspect the target dataset's similarity distribution and known series before setting a cutoff. To make thresholds comparable across fingerprint families, calculate the actual library's pairwise-score distribution and choose the score at a retained-pair percentile (for example, the 99.5th percentile retains roughly the top 0.5% of pairs); sample pairs rather than materializing all pairs for a large library. Maggiora's similarity principle states "similar molecules tend to have similar activity" -- but **activity cliffs** (Stumpfe & Bajorath 2012) violate this. Treat high ECFP4 similarity as a prioritization signal, not evidence that activity will be preserved.
+
+```python
+import numpy as np
+
+threshold = float(np.quantile(pairwise_similarities, 0.995))
+```
 
 ## Decision Tree by Scenario
 
@@ -84,9 +90,9 @@ These bands are working defaults for ECFP4-like fingerprints, not transferable c
 from rdkit import Chem, DataStructs
 from rdkit.Chem import rdFingerprintGenerator
 
-def precompute_fps(smiles_list, radius=2, nBits=2048):
+def precompute_fps(smiles_list, radius=2, nBits=2048, include_chirality=False):
     generator = rdFingerprintGenerator.GetMorganGenerator(
-        radius=radius, fpSize=nBits)
+        radius=radius, fpSize=nBits, includeChirality=include_chirality)
     fps = []
     for smi in smiles_list:
         mol = Chem.MolFromSmiles(smi)
@@ -96,11 +102,12 @@ def precompute_fps(smiles_list, radius=2, nBits=2048):
             fps.append(generator.GetFingerprint(mol))
     return fps
 
-def search(query_smi, library_fps, threshold=0.7):
+def search(query_smi, library_fps, threshold=0.7, include_chirality=False):
     qmol = Chem.MolFromSmiles(query_smi)
     if qmol is None:
         raise ValueError('invalid query SMILES')
-    generator = rdFingerprintGenerator.GetMorganGenerator(radius=2, fpSize=2048)
+    generator = rdFingerprintGenerator.GetMorganGenerator(
+        radius=2, fpSize=2048, includeChirality=include_chirality)
     qfp = generator.GetFingerprint(qmol)
     valid = [(i, fp) for i, fp in enumerate(library_fps) if fp is not None]
     sims = DataStructs.BulkTanimotoSimilarity(qfp, [fp for _, fp in valid])
@@ -121,7 +128,7 @@ def tversky_substructure_like(qfp, lib_fps, alpha=1.0, beta=0.0):
     return [DataStructs.TverskySimilarity(qfp, f, alpha, beta) for f in lib_fps if f]
 ```
 
-Use case: identifying analogs that extend a pharmacophore vs. exact-similarity ranking.
+Use case: identifying analogs that extend a pharmacophore vs. exact-similarity ranking. This is a feature-overlap ranker, not a substructure test: confirm every retained hit with `Chem.MolFromSmarts(query_smarts)` and `candidate.HasSubstructMatch(query_pattern)` (see `chemoinformatics/substructure-search`) before calling it a containing compound. Its precision depends on query size, fingerprint, and threshold.
 
 ## Butina Clustering
 
@@ -181,12 +188,12 @@ def mcs_smarts(mols, timeout=60, ring_match='strict', atom_match='elements'):
     if atom_match == 'elements':
         params.AtomCompareParameters.MatchValences = False
     result = rdFMCS.FindMCS(mols, params)
-    return result.smartsString, result.numAtoms, result.numBonds
+    return result.smartsString, result.numAtoms, result.numBonds, result.canceled
 ```
 
 Use cases: identify scaffold across a series, build scaffold hopping queries, generate consensus pharmacophore.
 
-**Limit:** MCS search can become combinatorial as input count, size, and structural divergence grow. Set a finite timeout, inspect `result.canceled`, and consider pre-clustering or reducing the comparison set; no molecule-count or atom-count boundary guarantees tractability.
+**Limit:** MCS search can become combinatorial as input count, size, and structural divergence grow. Set a finite timeout and inspect `result.canceled`: if `True`, reduce the comparison set or raise the timeout only when the additional runtime is acceptable. If it is `False` but the MCS is tiny, the supplied molecules genuinely share only a trivial fragment; pre-cluster by similarity and run MCS within a coherent cluster instead. No molecule-count or atom-count boundary guarantees tractability.
 
 ## Activity Cliff Diagnosis
 
@@ -195,8 +202,10 @@ Use cases: identify scaffold across a series, build scaffold hopping queries, ge
 **Approach:** Compute pairwise ECFP4 Tanimoto + pIC50 delta. Flag pairs with high similarity and large activity gap.
 
 ```python
-def activity_cliffs(df, sim_threshold=0.85, activity_gap=2.0, activity_col='pIC50'):
-    generator = rdFingerprintGenerator.GetMorganGenerator(radius=2, fpSize=2048)
+def activity_cliffs(df, sim_threshold=0.85, activity_gap=2.0, activity_col='pIC50',
+                    include_chirality=True):
+    generator = rdFingerprintGenerator.GetMorganGenerator(
+        radius=2, fpSize=2048, includeChirality=include_chirality)
     mols = [Chem.MolFromSmiles(s) for s in df['smiles']]
     if any(mol is None for mol in mols):
         raise ValueError('activity-cliff input contains invalid SMILES')
@@ -213,7 +222,7 @@ def activity_cliffs(df, sim_threshold=0.85, activity_gap=2.0, activity_col='pIC5
     return cliffs
 ```
 
-Activity cliffs flag (a) measurement noise, (b) cryptic SAR (e.g. ring-flip changing dihedral), (c) protein conformational selection, or (d) actually informative SAR. Cliffs are an opportunity for medchem investigation, not necessarily an error.
+Activity cliffs flag (a) measurement noise, (b) cryptic SAR (e.g. ring-flip changing dihedral), (c) protein conformational selection, or (d) actually informative SAR. Cliffs are an opportunity for medchem investigation, not necessarily an error. Standardize and strip salts before comparison (`chemoinformatics/molecular-standardization`); leave `include_chirality=True` when stereoisomers are relevant, and record any deliberate achiral setting.
 
 ## Large-Library Nearest Neighbor (MHFP6 + LSH Forest)
 
@@ -264,25 +273,25 @@ The returned neighbors are approximate in MHFP6 space. Benchmark them against an
 
 **Fix:** Use approximate clustering (HDBSCAN on UMAP-reduced fingerprints) or LSH-based clustering on MHFP6.
 
-### MCS -- exponential timeout
+### MCS -- timeout versus a genuinely trivial common fragment
 
 **Trigger:** Mol set with low overlap, large molecules, or many input mols.
 
-**Mechanism:** MCS search is NP-hard; algorithm tries every atom-mapping permutation within timeout.
+**Mechanism:** MCS search can be combinatorial for difficult mappings, but divergent molecules can also converge quickly on a genuinely small common fragment.
 
-**Symptom:** Returns small partial MCS or empty result.
+**Symptom:** Returns a small partial MCS or empty result. Distinguish the two cases with `result.canceled`.
 
-**Fix:** Raise `timeout`; reduce input mol count; pre-cluster by Tanimoto first then MCS within clusters.
+**Fix:** If `result.canceled=True`, reduce input count or raise `timeout` only if the cost is acceptable. If `result.canceled=False` and the MCS is small, do not expect a longer timeout to help: pre-cluster by Tanimoto and run MCS within coherent clusters.
 
 ### Tanimoto = 1.0 != same molecule
 
-**Trigger:** Comparing fingerprints between two molecules that hash to the same bits.
+**Trigger:** Comparing stereoisomers or distinct molecules with identical fingerprint bits.
 
-**Mechanism:** A folded hashed fingerprint can map distinct atom environments to the same bits; collision frequency depends on molecule size, radius, and fingerprint length.
+**Mechanism:** RDKit Morgan fingerprints use `includeChirality=False` unless requested, so enantiomers and some diastereomers can be indistinguishable. Folded hashed fingerprints can also collide, especially as molecules grow or bit length shrinks.
 
 **Symptom:** Two structurally different molecules report Tanimoto 1.0.
 
-**Fix:** For exact identity, compare canonical SMILES or InChIKey, not fingerprint. Use unhashed sparse fingerprint to disambiguate.
+**Fix:** For stereochemistry-sensitive similarity, build both query and library fingerprints with `GetMorganGenerator(..., includeChirality=True)`. For exact identity, compare standardized canonical SMILES or InChIKey, not any fingerprint. An unhashed sparse fingerprint can help diagnose hash collisions but does not rescue a chirality-blind representation.
 
 ### Similarity threshold transfer fails
 
@@ -292,7 +301,7 @@ The returned neighbors are approximate in MHFP6 space. Benchmark them against an
 
 **Symptom:** "Similar" set is much larger or smaller than expected.
 
-**Fix:** Re-tune the threshold per fingerprint and dataset. AtomPair ~0.55, MACCS ~0.85, ECFP4 ~0.7, and FCFP4 ~0.6 are repository starting heuristics, not universal equivalents.
+**Fix:** Re-tune the threshold per fingerprint and dataset. Compute its pairwise-similarity distribution and choose a retained-pair percentile that matches the review capacity (for example p99.5); sample pairs for large libraries. AtomPair ~0.55, MACCS ~0.85, ECFP4 ~0.7, and FCFP4 ~0.6 are repository starting heuristics, not universal equivalents.
 
 ## Reconciliation: Cliffs Across Methods
 
@@ -306,7 +315,7 @@ If a pair flags as an activity cliff under one representation but not another, t
 | Reported similarity > 1 | Custom formula, malformed data, negative features, or an incorrectly normalized external implementation | Verify the coefficient definition and inputs; standard nonnegative RDKit Tanimoto and Tversky similarities are bounded by 1 |
 | Cluster centroids change when input order changes | Taylor-Butina tie handling and assignment are order-sensitive | Standardize and sort inputs by a stable identifier before clustering; record `reordering` and the input order |
 | MaxMinPicker returns first N inputs | All-zero initial similarity matrix | Seed picker explicitly: `picker.LazyBitVectorPick(fps, n_lib, n_pick, seed=42)` |
-| Activity cliff "false positives" | Bit-collisions inflate similarity | Use sparse Morgan or compare canonical SMILES for exact ID |
+| Activity cliff "false positives" | Chirality-blind Morgan fingerprints merge stereoisomers; unstripped salts can create duplicate-like pairs; hash collisions are secondary | Standardize and strip salts first; use `includeChirality=True` when stereochemistry matters; compare standardized canonical SMILES or InChIKey for identity |
 | Diverse subset has duplicates | Standardization not applied | Canonicalize via `chemoinformatics/molecular-standardization` first |
 | Tanimoto incompatible with neural fingerprint | Continuous-valued fingerprint | Use cosine or sklearn `cdist` with `'cosine'` metric |
 
