@@ -38,7 +38,7 @@ Tell your AI agent what you want to do:
 ### FDR and Output Filtering
 > "Filter my DIA-NN report at precursor and protein-group level, and global PG for the matrix"
 
-> "Why is my pg_matrix protein count lower than the report count?"
+> "My pg_matrix and globally filtered report have different protein-group counts -- check the DIA-NN log and explain the version-specific filters"
 
 > "My per-run 1% FDR cohort has irreproducible hits -- fix the FDR context"
 
@@ -52,7 +52,7 @@ Tell your AI agent what you want to do:
 ## What the Agent Will Do
 1. Identify the acquisition design (fixed/variable/staggered windows, diaPASEF, narrow-window Astral) and demultiplex staggered data at conversion if the engine lacks native overlapping-window support
 2. Choose the route -- predicted-library / library-free (default) or library-based -- per the decision tree
-3. Run DIA-NN (or the chosen engine) with auto mass accuracy and two-pass global FDR
+3. Generate the predicted library from FASTA without raw files, then run DIA-NN (or the chosen engine) against that library with fixed instrument-appropriate mass accuracy and two-pass global FDR
 4. Read report.parquet and filter at the correct LEVEL (precursor + protein-group) and CONTEXT (run + global for matrices)
 5. Convert unquantified zeros to NA, then hand the log2 matrix to quantification and differential-abundance
 
@@ -61,7 +61,9 @@ Tell your AI agent what you want to do:
 - "1% FDR" alone is ambiguous; always state the level (precursor/peptide/protein-group) and context (run/experiment/global).
 - For cohorts, filter on Global.PG.Q.Value, not the per-run Q.Value, or the experiment-wide error inflates.
 - DIA-NN 1.9+ writes report.parquet by default; loaders assuming report.tsv silently break.
-- A matrix protein count below the report count is expected (extra 5% run-specific PG filter), not data loss.
+- Matrix and report counts are not interchangeable. DIA-NN 2.6.1 can make the matrix larger than a globally filtered report; inspect `report.log.txt` for the version and actual applied filters.
+- DIA-NN 2.x requires predicted-library generation and raw-data analysis as separate stages. Do not combine raw files with `--fasta-search --predictor` in one command.
+- An EasyPQP `library.tsv` may lack `FragmentCharge`, `FragmentType`, and `FragmentSeriesNumber` required by DIA-NN; prefer a DIA-NN-format export or validate a converter before cohort-scale search.
 - Fix mass accuracies per instrument (timsTOF 15/15, Orbitrap Astral 10/4, TripleTOF 20/20 ppm MS2/MS1); --mass-acc 0 is optimised on the first run and reused, so results depend on run order.
 - Aim for >= 6 MS2 points across each LC peak; if quant is noisy, the window/cycle design may be the cause.
 - Convert DIA-NN's 0 (not-quantified) to NA before log2 or normalization.

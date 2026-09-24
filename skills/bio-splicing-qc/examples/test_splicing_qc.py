@@ -108,7 +108,20 @@ def main():
     assert sq.summarize_junctions({})['pct_ge_min_reads'] == 0.0
     print('ok  BAM without spliced reads')
 
-    # 4. splice-site scoring keeps one output per input
+    # 4. class-level support joins RSeQC coordinates to the helper output without dropping zero support
+    xls = tmp / 'classes.junction.xls'
+    xls.write_text('chrom\tintron_st(0-based)\tintron_end(1-based)\tread_count\tannotation\n'
+                   f'{CHROM}\t1200\t2000\t60\t annotated\n'
+                   f'{CHROM}\t1200\t2500\t10\t partial_novel\n'
+                   f'{CHROM}\t1500\t2550\t10\t complete_novel\n')
+    cls = sq.junction_class_support(xls, ss).set_index('annotation')
+    assert cls.loc['annotated', 'junctions'] == 1
+    assert cls.loc['annotated', 'median_anchored_fragments'] == 60
+    assert cls.loc['partial_novel', 'median_anchored_fragments'] == 10
+    assert cls.loc['complete_novel', 'median_anchored_fragments'] == 10
+    print('ok  annotation-class support diagnostic')
+
+    # 5. splice-site scoring keeps one output per input
     try:
         import maxentpy  # noqa: F401
     except ImportError:

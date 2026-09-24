@@ -1,12 +1,14 @@
 #!/bin/bash
 # Reference: DIA-NN README 1.9.2 / 2.0 / 2.6.1 | Verify API if version differs
-# DIA-NN predicted-library (library-free) analysis: digest FASTA, predict a library and search.
+# DIA-NN 2.x predicted-library analysis: generate from FASTA with NO raw files, then search raw data.
 # Filtering the parquet report is done afterwards (points listed at the end; code in SKILL.md).
 
 set -e
 
 FASTA="uniprot_human_reviewed.fasta"
 OUTPUT_DIR="diann_out"
+PREDICTED_LIBRARY_TEMPLATE="$OUTPUT_DIR/human"
+PREDICTED_LIBRARY="$OUTPUT_DIR/human.predicted.speclib"
 THREADS=8
 
 # QVALUE 0.01 = 1% precursor FDR (run context); DIA-NN's own default is 0.05.
@@ -34,19 +36,27 @@ done
 mkdir -p "$OUTPUT_DIR"
 
 echo "Running DIA-NN predicted-library analysis..."
+# Stage 1: no --f inputs. DIA-NN 2.x requires prediction to be separate from raw-data analysis.
 diann \
-    "${MZML_ARGS[@]}" \
-    --lib "" --fasta "$FASTA" --fasta-search \
+    --fasta "$FASTA" --fasta-search \
     --gen-spec-lib --predictor \
-    --out "$OUTPUT_DIR/report.parquet" \
-    --out-lib "$OUTPUT_DIR/report-lib.parquet" \
-    --qvalue $QVALUE \
-    --matrices \
-    --mass-acc $MASS_ACC --mass-acc-ms1 $MASS_ACC_MS1 \
-    --reanalyse --smart-profiling \
+    --out-lib "$PREDICTED_LIBRARY_TEMPLATE" \
     --cut "K*,R*" --missed-cleavages $MISSED_CLEAVAGES \
     --min-pep-len 7 --max-pep-len 30 \
     --fixed-mod UniMod:4,57.021464,C --var-mods 1 --var-mod UniMod:35,15.994915,M \
+    --threads $THREADS
+
+[ -f "$PREDICTED_LIBRARY" ] || { echo "Predicted library was not written: $PREDICTED_LIBRARY" >&2; exit 1; }
+
+# Stage 2: search the raw files using the predicted library. Do not reactivate FASTA digest or prediction.
+diann \
+    "${MZML_ARGS[@]}" \
+    --lib "$PREDICTED_LIBRARY" --fasta "$FASTA" \
+    --out "$OUTPUT_DIR/report.parquet" \
+    --out-lib "$OUTPUT_DIR/report-lib.parquet" \
+    --qvalue $QVALUE --matrices \
+    --mass-acc $MASS_ACC --mass-acc-ms1 $MASS_ACC_MS1 \
+    --reanalyse --smart-profiling \
     --threads $THREADS
 
 echo "Done. Main report (1.9+ default): $OUTPUT_DIR/report.parquet"
@@ -57,5 +67,5 @@ echo "Matrices: $OUTPUT_DIR/report.pg_matrix.tsv (verify *_matrix dotting vs ins
 #   - filter BOTH levels: Q.Value (precursor) AND PG.Q.Value (protein-group).
 #   - for a cross-run matrix add Global.Q.Value <= 0.01 and Global.PG.Q.Value <= 0.01 (per-run FDR inflates
 #     across runs); DIA-NN 1.9.x with MBR: Lib.Q.Value / Lib.PG.Q.Value instead of the Global.* pair.
-#   - the *_matrix.tsv files apply an extra 5% run-specific PG filter, so matrix count < report count is expected.
+#   - do not infer FDR or a count direction from report vs matrix; inspect report.log.txt for the installed version's filters.
 #   - convert DIA-NN's 0 (not-quantified) to NA before log2 / normalization.

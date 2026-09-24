@@ -21,7 +21,7 @@ package and adapt the example to match the actual API rather than retrying.
 # DIA Analysis -- Scoring Reconstructed Peak Groups Against a Decoy Null, Filtered at the Right q-Value Context
 
 **"Identify and quantify proteins from my DIA runs"** -> Reconstruct, per candidate peptide, a set of co-eluting fragment extracted-ion chromatograms (XICs) and score whether that peak group is real against a decoy null -- because every wide-isolation-window MS2 is chimeric, so the problem is deconvolution and peak-group scoring, not spectrum matching.
-- CLI: `diann --fasta-search --predictor` for library-free search (in DIA-NN this IS the predicted-library route; the modern default)
+- CLI: generate a predicted library from FASTA with no raw files, then search with `diann --lib predicted.speclib` (the modern default)
 - CLI: `diann --lib predicted.speclib` to reuse an in-silico library predicted earlier
 - CLI: `diann --lib empirical.parquet` for an experimental or chromatogram library
 - CLI: `OpenSwathWorkflow` + `pyprophet` when explicit run/experiment/global FDR contexts must be auditable
@@ -68,7 +68,7 @@ Tool leadership moves fast (Astral, AlphaDIA, DIA-NN releases). Confirm the curr
 
 | Scenario | Recommended | Why |
 |----------|-------------|-----|
-| Discovery cohort, no wet-lab library | `diann --fasta-search --gen-spec-lib` (predicted route) then search against it | Bounded, better-calibrated search vs raw directDIA; the modern default |
+| Discovery cohort, no wet-lab library | Generate a predicted library from FASTA **without raw files**, then search against it | Bounded, better-calibrated search vs raw directDIA; the modern default. Required by DIA-NN 2.x. |
 | Quick single-run discovery, Astral 2-Th data | DIA-NN library-free (directDIA) | Near-non-chimeric MS2 makes directDIA trustworthy |
 | Have a deep experimental/chromatogram library | `diann --lib library.parquet --fasta db.fasta` (no `--fasta-search`) | Targeted extraction is most sensitive when the library matches |
 | Need auditable run/experiment/global FDR for a regulated submission | OpenSWATH + PyProphet | Explicit q-value contexts per Rosenberger 2017 |
@@ -77,28 +77,15 @@ Tool leadership moves fast (Astral, AlphaDIA, DIA-NN releases). Confirm the curr
 | Staggered/overlapping acquisition | DIA-NN directly (native support); for engines without it, demultiplex at conversion with peak picking first | Demultiplexing is an optional few-% gain in DIA-NN; required where the engine assumes non-overlapping windows |
 | PTM / peptidoform-resolved work | DIA-NN `--peptidoforms` + matched variable mods | Peptidoform-resolved target-decoy scoring |
 
-Default when uncertain: DIA-NN with the predicted-library route (`--fasta-search --gen-spec-lib --reanalyse`), mass accuracies fixed for the instrument, then filter `Q.Value`, `PG.Q.Value`, `Global.Q.Value` and `Global.PG.Q.Value` at 0.01 for cross-run matrices (DIA-NN 1.9.x with MBR: `Lib.Q.Value`/`Lib.PG.Q.Value` instead of the `Global.*` pair).
+Default when uncertain: use the two-stage DIA-NN predicted-library route in [`examples/diann_analysis.sh`](examples/diann_analysis.sh): generate the predicted library from FASTA with **no raw files**, then search raw files against that library with FASTA digest and prediction off. Fix mass accuracies for the instrument, then filter `Q.Value`, `PG.Q.Value`, `Global.Q.Value` and `Global.PG.Q.Value` at 0.01 for cross-run matrices (DIA-NN 1.9.x with MBR: `Lib.Q.Value`/`Lib.PG.Q.Value` instead of the `Global.*` pair).
 
-## DIA-NN -- Predicted-Library (directDIA) Route
+## DIA-NN -- Predicted-Library Route (two stages on 2.x)
 
-The default route: digest the FASTA in silico, predict a library, and search the DIA data against it in one command. Mass accuracies of 0 (the default) mean automatic: DIA-NN optimises them on the FIRST run and reuses them for every other run, so results depend on run order (`--individual-mass-acc` optimises per run). For production analyses the DIA-NN docs prefer fixed values per instrument: timsTOF `--mass-acc 15 --mass-acc-ms1 15` (shown below), Orbitrap Astral `--mass-acc 10 --mass-acc-ms1 4`, TripleTOF 6600/ZenoTOF `--mass-acc 20 --mass-acc-ms1 20`. `--reanalyse` enables MBR: a second pass using the empirical library built in the first. `--qvalue 0.01` tightens DIA-NN's default 5% precursor filter.
+The default route has two stages: (1) digest the FASTA and predict a library **without any raw files**; (2) search the DIA data against that `.predicted.speclib`, with `--fasta-search` and `--predictor` absent. DIA-NN 2.x rejects a one-command mixture of prediction and raw-data analysis with `WARNING: incorrect settings, the in silico-predicted library must be generated in a separate pipeline step`.
 
-```bash
-diann \
-    --f sample1.mzML --f sample2.mzML \
-    --lib "" --fasta uniprot_human.fasta --fasta-search \
-    --gen-spec-lib --predictor \
-    --out diann_out/report.parquet \
-    --out-lib diann_out/report-lib.parquet \
-    --qvalue 0.01 \
-    --matrices \
-    --mass-acc 15 --mass-acc-ms1 15 \
-    --reanalyse --smart-profiling \
-    --cut K*,R* --missed-cleavages 1 \
-    --min-pep-len 7 --max-pep-len 30 \
-    --unimod4 --var-mods 1 --var-mod UniMod:35,15.994915,M \
-    --threads 8
-```
+Run [`examples/diann_analysis.sh`](examples/diann_analysis.sh) for the complete, single-source command. It validates `diann`, the FASTA, and input mzML files; its Stage 1 writes `diann_out/human.predicted.speclib`, and Stage 2 writes the report and matrices. Keep digestion/modification settings consistent across both stages when PTMs are in scope.
+
+Mass accuracies of 0 (the default) mean automatic: DIA-NN optimises them on the FIRST run and reuses them for every other run, so results depend on run order (`--individual-mass-acc` optimises per run). For production analyses use fixed values per instrument: timsTOF `--mass-acc 15 --mass-acc-ms1 15`, Orbitrap Astral `--mass-acc 10 --mass-acc-ms1 4`, TripleTOF 6600/ZenoTOF `--mass-acc 20 --mass-acc-ms1 20`. In Stage 2, `--reanalyse` enables MBR: a second pass using an empirical library built from the first pass. `--qvalue 0.01` tightens DIA-NN's default 5% precursor filter.
 
 ## DIA-NN -- Library-Based Route
 
@@ -125,8 +112,15 @@ report.stats.tsv        # per-run statistics
 report.pg_matrix.tsv    # protein-group wide matrix
 report.pr_matrix.tsv    # precursor wide matrix (verify exact dotting vs installed version)
 report.gg_matrix.tsv    # gene-group wide matrix
-report-lib.parquet      # generated empirical library (.parquet since 1.9.1; predicted libraries are *.predicted.speclib)
+report-lib.parquet      # generated empirical library (.parquet since 1.9.1)
+report.unique_genes_matrix.tsv # unique-gene wide matrix (when --matrices is used)
+report.protein_description.tsv # protein annotations
+report.manifest.txt     # run inputs and settings summary
+report.log.txt          # authoritative record of the installed version and applied filters
+report-lib.parquet.skyline.speclib # Skyline copy of an empirical library, when generated
 ```
+
+A predicted-library generation stage writes `<template>.predicted.speclib`, not `report-lib.parquet`. Exact filenames vary by version and selected outputs; inspect `report.log.txt` and the output directory instead of treating this list as exhaustive.
 
 ```python
 import pandas as pd, numpy as np
@@ -144,7 +138,7 @@ pg = filt.pivot_table(index='Protein.Group', columns='Run', values='PG.MaxLFQ', 
 pg = np.log2(pg.replace(0, np.nan))  # DIA-NN writes 0 for not-quantified; log2(0) = -Inf
 ```
 
-The `*_matrix.tsv` files apply an EXTRA 5% run-specific protein FDR (DIA-NN default, `--matrix-spec-q`), so the matrix protein count can be lower than the report count. A report-vs-matrix mismatch is EXPECTED, not a bug -- do not panic and do not compare the two counts as if they should match.
+Do not infer a matrix FDR or an expected row-count direction from a report-versus-matrix comparison. DIA-NN 2.6.1 logs matrices as “1% precursor and protein group FDR” and can produce a matrix with **more** protein groups than a globally filtered report; older versions/settings may differ. A mismatch is not automatically data loss or added confidence. Read that run's `report.log.txt`, record the version and filters, and apply the explicit report-level q-value filter above before downstream analysis.
 
 ## Building an Empirical Library from FragPipe DDA Results (EasyPQP)
 
@@ -163,6 +157,8 @@ easypqp library \
 # With psm.tsv + peptide.tsv given, easypqp ignores --psm/--peptide/--protein_fdr_threshold (FragPipe already filtered).
 # FragPipe's DIA workflow can emit a DIA-NN-format library directly -- prefer that when in FragPipe.
 ```
+
+An EasyPQP `library.tsv` is not automatically a DIA-NN library. With DIA-NN 2.6.1, a TSV must include fragment-annotation fields `FragmentCharge`, `FragmentType`, and `FragmentSeriesNumber`; EasyPQP's generic TSV did not provide them in the audited route. Prefer FragPipe's DIA-NN-format export. If converting another TSV, validate those fields and a small DIA-NN load before a cohort search; do not add them by guessing fragment annotations.
 
 ## Per-Method Failure Modes
 
@@ -220,6 +216,8 @@ easypqp library \
 | `easypqp convert --format diann` errors | No such option; `convert`/`library`/`insilico-library` are the real subcommands | `easypqp convert` per run, then `easypqp library ... *.psmpkl *.peakpkl`, or let FragPipe emit a DIA-NN-format library |
 | `easypqp library`: `No PSMs files present` or `There is a psm.tsv but no peptide.tsv` | positional `*.psmpkl`/`*.peakpkl` from `easypqp convert` missing; `--psmtsv` given without `--peptidetsv` | run `convert` first; pass both tsvs and the pickles |
 | `KeyError: 'report.pr.matrix.tsv'` | Matrix filename dotting varies by version (`pr_matrix` vs `pr.matrix`) | `ls` the output dir after a run and match the installed version's exact names |
+| `WARNING: incorrect settings, the in silico-predicted library must be generated in a separate pipeline step` | DIA-NN 2.x was given raw files together with FASTA digest / prediction | Generate the `.predicted.speclib` from FASTA with no raw files, then run a separate `--lib` search with `--fasta-search` and `--predictor` off |
+| DIA-NN cannot load an EasyPQP `library.tsv`, or reports missing fragment fields | The TSV lacks DIA-NN fragment annotations (`FragmentCharge`, `FragmentType`, `FragmentSeriesNumber`) | Prefer FragPipe's DIA-NN-format export; otherwise use a validated converter and test-load the library before searching the cohort |
 | Noisy results on overlapping-window data in an engine without native support | Staggered data not demultiplexed | Demultiplex at conversion (peak picking first); DIA-NN supports overlapping windows natively |
 
 ## References

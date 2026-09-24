@@ -273,86 +273,26 @@ with pysam.AlignmentFile('input.bam', 'rb') as bam:
                 print(f'  {aln.query_name} {strand} {aln.query_sequence[qpos]} (Q{aln.query_qualities[qpos]})')
 ```
 
-### Count Alleles at Position
+### Shipped pysam helpers
+
+`examples/pileup_helpers.py` contains the reusable `allele_counts`,
+`allele_frequency`, `find_variants`, and `pileup_text` functions. For
+`allele_counts`, use a **0-based pos: pass 1-based position minus 1**;
+`find_variants` returns 1-based VCF-style positions. Read-base
+`N`, reference skips, and reference-`N` sites are excluded from the
+SNV-oriented counts, so frequency denominators agree across the helpers.
+
 ```python
-import pysam
-from collections import Counter
+from pileup_helpers import allele_counts, allele_frequency, find_variants
 
-def allele_counts(bam_path, chrom, pos, **pileup_kw):
-    """Base counts (plus 'DEL') at 0-based pos: pass 1-based position minus 1.
-    Reference skips are not counted. SNVs only: insertions/deletions after pos (pileup_read.indel)
-    are not counted; see pileup_text or bcftools mpileup. pileup_kw go to bam.pileup()
-    (e.g. min_mapping_quality=20, min_base_quality=20; see the table above)."""
-    counts = Counter()
-
-    with pysam.AlignmentFile(bam_path, 'rb') as bam:
-        for pileup_column in bam.pileup(chrom, pos, pos + 1, truncate=True, **pileup_kw):
-            if pileup_column.pos != pos:
-                continue
-
-            for pileup_read in pileup_column.pileups:
-                if pileup_read.is_refskip:
-                    continue
-                elif pileup_read.is_del:
-                    counts['DEL'] += 1
-                else:
-                    qpos = pileup_read.query_position
-                    base = pileup_read.alignment.query_sequence[qpos]
-                    counts[base.upper()] += 1
-
-    return dict(counts)
-
-counts = allele_counts('input.bam', 'chr1', 1000000 - 1)  # 1-based chr1:1,000,000
-print(counts)  # {'A': 45, 'G': 5}
+counts = allele_counts('input.bam', 'chr1', 1000000 - 1, min_base_quality=20)
+frequency = allele_frequency('input.bam', 'chr1', 1000000 - 1, min_base_quality=20)
+calls = find_variants('input.bam', 'reference.fa', 'chr1', 999000, 1000000)
 ```
 
-`examples/allele_counts.py` is the command-line version: `python allele_counts.py input.bam chr1:1000000` (1-based, MAPQ >= 20, base quality >= 20).
-
-### Calculate Allele Frequency
-```python
-def allele_frequency(bam_path, chrom, pos, **pileup_kw):
-    counts = allele_counts(bam_path, chrom, pos, **pileup_kw)
-    total = sum(n for base, n in counts.items() if base != 'DEL')
-    if total == 0:
-        return {}
-
-    return {base: n / total for base, n in counts.items() if base != 'DEL'}
-
-freq = allele_frequency('input.bam', 'chr1', 1000000 - 1, min_base_quality=20)
-for base, f in sorted(freq.items(), key=lambda x: -x[1]):
-    print(f'{base}: {f:.1%}')
-```
-
-### Find Variants in a Region
-```python
-def find_variants(bam_path, ref_path, chrom, start, end, min_depth=10, min_alt_freq=0.1, **pileup_kw):
-    """SNVs against the reference in 0-based [start, end); indels are not reported. min_base_quality defaults to 20.
-    Reference-N positions are skipped and read-base N is not counted as an allele (nor in the depth)."""
-    variants = []
-    pileup_kw.setdefault('min_base_quality', 20)
-    with pysam.AlignmentFile(bam_path, 'rb') as bam, pysam.FastaFile(ref_path) as ref:
-        for pileup_column in bam.pileup(chrom, start, end, truncate=True, **pileup_kw):
-            pos = pileup_column.pos
-            ref_base = ref.fetch(chrom, pos, pos + 1).upper()
-            if ref_base == 'N':
-                continue
-            alleles = Counter()
-            for pileup_read in pileup_column.pileups:
-                if pileup_read.is_refskip or pileup_read.is_del:
-                    continue
-                qpos = pileup_read.query_position
-                base = pileup_read.alignment.query_sequence[qpos].upper()
-                if base != 'N':
-                    alleles[base] += 1
-            total = sum(alleles.values())
-            if total < min_depth:
-                continue
-            for base, count in alleles.items():
-                if base != ref_base and count / total >= min_alt_freq:
-                    variants.append({'chrom': chrom, 'pos': pos + 1, 'ref': ref_base, 'alt': base,
-                                     'depth': total, 'alt_count': count, 'freq': count / total})
-    return variants
-```
+Run the command-line counter from its directory with
+`python allele_counts.py input.bam chr1:1000000` (1-based, MAPQ/baseQ >= 20).
+Run `python self_test.py` there to build a temporary BAM and verify all helpers.
 
 ### Pileup with Quality Filtering
 ```python
@@ -367,75 +307,18 @@ with pysam.AlignmentFile('input.bam', 'rb') as bam:
 ```
 
 ### Generate Pileup Text
+
 ```python
-import pysam
-
-def indel_text(aln, ref, chrom, pos):
-    """Markers such as '+2AC-3CGT' that mpileup prints after aln's base at 0-based pos, read from the CIGAR
-    (pileup_read.indel holds only one of two adjacent I/D events)."""
-    ops = []
-    for op, n in aln.cigartuples:  # samtools treats adjacent identical ops as one
-        if ops and ops[-1][0] == op:
-            ops[-1] = (op, ops[-1][1] + n)
-        else:
-            ops.append((op, n))
-    r, q = aln.reference_start, 0
-    for i, (op, n) in enumerate(ops):
-        if op in (0, 2, 3, 7, 8):  # M D N = X consume the reference
-            if r <= pos < r + n:
-                break
-            r += n
-        if op in (0, 1, 4, 7, 8):  # M I S = X consume the read
-            q += n
-    if pos != r + n - 1:  # markers follow the last reference base of an op
-        return ''
-    if op in (0, 7, 8):
-        q += n
-    rest, s = ops[i + 1:], ''
-    if rest and rest[0][0] == 1:  # insertion, possibly followed by a deletion
-        s += f'+{rest[0][1]}' + aln.query_sequence[q:q + rest[0][1]]
-        rest = rest[1:]
-    if rest and rest[0][0] == 2:
-        s += f'-{rest[0][1]}' + ref.fetch(chrom, pos + 1, pos + 1 + rest[0][1])
-    return s.lower() if aln.is_reverse else s.upper()
-
-def pileup_text(bam_path, ref_path, chrom, start, end, **pileup_kw):
-    """Yield 6-column `samtools mpileup -f ref` rows for 0-based [start, end), including ^ $ +N -N and qualities.
-    For `-B` pass compute_baq=False; other mpileup options: see the table above."""
-    kw = dict(stepper='samtools', truncate=True)
-    kw.update(pileup_kw)
-    with pysam.AlignmentFile(bam_path, 'rb') as bam, pysam.FastaFile(ref_path) as ref:
-        for pileup_column in bam.pileup(chrom, start, end, fastafile=ref, **kw):
-            pos = pileup_column.pos
-            ref_base = ref.fetch(chrom, pos, pos + 1)
-            bases, quals = [], []
-            for pileup_read in pileup_column.pileups:
-                aln = pileup_read.alignment
-                rev = aln.is_reverse
-                s = ''
-                if pileup_read.is_head:
-                    s += '^' + chr(min(aln.mapping_quality, 93) + 33)
-                if pileup_read.is_refskip:
-                    s += '<' if rev else '>'
-                elif pileup_read.is_del:
-                    s += '*'
-                else:
-                    qpos = pileup_read.query_position
-                    base = aln.query_sequence[qpos]
-                    if base.upper() == ref_base.upper():
-                        s += ',' if rev else '.'
-                    else:
-                        s += base.lower() if rev else base.upper()
-                s += indel_text(aln, ref, chrom, pos)
-                if pileup_read.is_tail:
-                    s += '$'
-                bases.append(s)
-                quals.append(chr(min(aln.query_qualities[pileup_read.query_position_or_next], 93) + 33))
-            yield f"{chrom}\t{pos + 1}\t{ref_base}\t{len(pileup_column.pileups)}\t{''.join(bases) or '*'}\t{''.join(quals) or '*'}"
+from pileup_helpers import pileup_text
 
 for row in pileup_text('input.bam', 'reference.fa', 'chr1', 1000000, 1000100):
     print(row)
 ```
+
+`pileup_text` matches ordinary aligner CIGARs, including adjacent insertions
+and deletions. It explicitly rejects padded (`P`) CIGARs; use `samtools
+mpileup` when their text rendering is required. A deletion after a read's last
+base is rendered with samtools' Q0 deletion quality rather than crashing.
 
 ## Pileup Options and Defaults
 

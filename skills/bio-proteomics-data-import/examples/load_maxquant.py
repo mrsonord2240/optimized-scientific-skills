@@ -25,22 +25,33 @@ def make_demo_protein_groups(path):
 
 def load_clean_maxquant(path):
     pg = pd.read_csv(path, sep='\t', low_memory=False)  # mixed-type columns
-    # All three flag columns are proteinGroups-only bookkeeping; '+' marks the row to drop
-    mask = (pg.get('Reverse', '') != '+') & (pg.get('Potential contaminant', '') != '+') & (pg.get('Only identified by site', '') != '+')
-    pg = pg[mask].copy()
+    if 'Protein IDs' not in pg:
+        raise ValueError("Expected MaxQuant proteinGroups.txt with a 'Protein IDs' column; this is not that table")
+    flag_cols = ('Reverse', 'Potential contaminant', 'Only identified by site')
+    if not any(c in pg for c in flag_cols):
+        raise ValueError("Expected MaxQuant proteinGroups.txt bookkeeping columns; received none of Reverse, Potential contaminant, Only identified by site")
+    keep = pd.Series(True, index=pg.index)
+    for col in flag_cols:
+        if col in pg:
+            keep &= pg[col].fillna('').ne('+')
+    rows_read, rows_kept = len(pg), int(keep.sum())
+    pg = pg.loc[keep].copy()
 
     # Semicolon lists: first entry is the leading/razor identifier; Gene names may be blank
     pg['leading_protein'] = pg['Protein IDs'].str.split(';').str[0]
-    pg['leading_gene'] = pg['Gene names'].where(pg['Gene names'].notna(), '').str.split(';').str[0]
+    pg['leading_gene'] = pg.get('Gene names', pd.Series('', index=pg.index)).fillna('').str.split(';').str[0]
 
     lfq_cols = [c for c in pg.columns if c.startswith('LFQ intensity ')]  # MaxLFQ-normalized, between-sample comparable
     if not lfq_cols:
-        raise ValueError('No LFQ intensity columns: LFQ was not enabled in MaxQuant')
+        tmt_cols = [c for c in pg.columns if c.startswith('Reporter intensity corrected ')]
+        if tmt_cols:
+            raise ValueError("No LFQ intensity columns: this looks like MaxQuant TMT. Use 'Reporter intensity corrected <channel>' columns; reporter processing -> quantification")
+        raise ValueError('No LFQ intensity columns: use a label-free MaxQuant proteinGroups.txt, or verify the supported quant family')
     matrix = pg[['leading_protein', 'leading_gene'] + lfq_cols].copy()
     matrix[lfq_cols] = matrix[lfq_cols].replace(0, np.nan)  # 0 means not-quantified; log2(0) = -inf
     matrix[lfq_cols] = np.log2(matrix[lfq_cols])
     matrix = matrix[matrix[lfq_cols].notna().any(axis=1)]  # drop groups with no valid LFQ value
-    return matrix, lfq_cols
+    return matrix, lfq_cols, {'rows_read': rows_read, 'after_bookkeeping': rows_kept, 'quantified': len(matrix)}
 
 def assess_missingness(matrix, sample_cols):
     total_pct = 100 * matrix[sample_cols].isna().sum().sum() / matrix[sample_cols].size
@@ -51,8 +62,8 @@ def assess_missingness(matrix, sample_cols):
 with tempfile.TemporaryDirectory() as d:
     pg_path = os.path.join(d, 'proteinGroups.txt')
     make_demo_protein_groups(pg_path)
-    matrix, lfq_cols = load_clean_maxquant(pg_path)
-    print(f'Clean protein groups: {len(matrix)} (decoy/contaminant/site-only removed)')
+    matrix, lfq_cols, counts = load_clean_maxquant(pg_path)
+    print(f"MaxQuant rows: read={counts['rows_read']}, after bookkeeping={counts['after_bookkeeping']}, quantified={counts['quantified']}")
     print(matrix.to_string(index=False))
     total_pct, mnar_corr = assess_missingness(matrix, lfq_cols)
     print(f'Missing: {total_pct:.1f}% | abundance-vs-missingness corr: {mnar_corr:.2f} (negative => MNAR)')

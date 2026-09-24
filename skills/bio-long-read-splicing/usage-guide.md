@@ -1,7 +1,7 @@
 # Long-Read Splicing - Usage Guide
 
 ## Overview
-Alternative splicing from PacBio Iso-Seq (HiFi, Kinnex/MAS-Iso-seq) and Oxford Nanopore (direct cDNA, direct RNA) long reads: minimap2 alignment, isoform discovery and quantification (FLAIR, IsoQuant, Bambu), classification (SQANTI3), event-level testing (rMATS-long) and DTU. Commands, decision tree, install notes and failure modes are in `SKILL.md`.
+Alternative splicing from PacBio Iso-Seq (HiFi, Kinnex/MAS-Iso-seq) and Oxford Nanopore (direct cDNA, direct RNA) long reads: minimap2 alignment, isoform discovery and quantification (FLAIR, IsoQuant, Bambu), classification (SQANTI3), event-level testing (rMATS-long) and DTU. Commands, decision tree, install notes and failure modes are in `SKILL.md`. For a parameterized end-to-end starting point, see [`examples/longread_splicing_pipeline.sh`](examples/longread_splicing_pipeline.sh).
 
 ## Quick Start
 Tell your AI agent what you want to do:

@@ -200,18 +200,20 @@ vcf = VCF('input.vcf.gz')
 writer = Writer('filtered.vcf', vcf)
 for variant in vcf:
     qual = variant.QUAL or 0
-    dp = variant.INFO.get('DP') or 1e9      # missing depth => do not fail on depth
+    dp = variant.INFO.get('DP')
     fs = variant.INFO.get('FS') or 0.0      # missing strand bias => pass (None -> 0)
-    mq = variant.INFO.get('MQ') or 1e9      # missing MQ => pass
+    mq = variant.INFO.get('MQ')
     qd = variant.INFO.get('QD')
     sor = variant.INFO.get('SOR')
     mq_rank_sum = variant.INFO.get('MQRankSum')
     read_pos_rank_sum = variant.INFO.get('ReadPosRankSum')
     qd_ok = qd is None or qd >= 2.0                          # missing QD (rare) => pass
+    dp_ok = dp is None or dp >= 10                            # missing depth => pass; zero/low depth => fail
+    mq_ok = mq is None or mq >= 40.0                          # missing MQ => pass; zero/low MQ => fail
     sor_ok = sor is None or sor <= 3.0                       # missing SOR => pass
     mqrs_ok = mq_rank_sum is None or mq_rank_sum >= -12.5     # undefined at hom-alt sites => pass
     rprs_ok = read_pos_rank_sum is None or read_pos_rank_sum >= -8.0  # undefined at hom-alt sites => pass
-    if qual >= 30 and dp >= 10 and fs <= 60.0 and mq >= 40.0 and qd_ok and sor_ok and mqrs_ok and rprs_ok:
+    if qual >= 30 and dp_ok and fs <= 60.0 and mq_ok and qd_ok and sor_ok and mqrs_ok and rprs_ok:
         writer.write_record(variant)
 writer.close(); vcf.close()
 ```

@@ -21,10 +21,10 @@ package and adapt the example to match the actual API rather than retrying.
 # Mass Spectrometry Data Import -- Inheriting the Acquisition Contract and Stripping the Bookkeeping
 
 **"Load my mass spec data into Python"** -> Parse spectra or a search-engine table AND immediately enforce two contracts -- which quant column carries real biology, and which rows are search-engine bookkeeping that must be deleted -- because the same proteinGroups.txt yields different conclusions depending on the column read and the rows kept.
-- Python: `pyopenms.MzMLFile().load(path, exp)` for raw spectra; `pandas.read_csv(sep='\t')` for MaxQuant; `pandas.read_parquet` for DIA-NN
+- Python: `pyopenms.MzMLFile().load(path, exp)` for `.mzML`, `MzXMLFile().load(path, exp)` for `.mzXML`; `pandas.read_csv(sep='\t')` for MaxQuant; `pandas.read_parquet` for DIA-NN
 - R: `Spectra::Spectra()` / `QFeatures::readQFeatures()` for raw and quantified data (MSnbase still works but is in maintenance mode)
 
-Scope: this skill owns reading spectra/search outputs into memory, deleting decoy/contaminant/site-only rows, picking the correct quant column, and characterizing missingness. Format conversion (RAW -> mzML) -> peptide-identification. MaxLFQ/TMT reporter quant computation -> quantification. Protein-group parsimony -> protein-inference. Normalization and imputation -> differential-abundance and expression-matrix/normalization. OUT OF SCOPE: statistical testing, batch correction, and the actual imputation step (this skill only diagnoses the missingness so the right imputer is chosen later).
+Scope: this skill owns reading spectra/search outputs into memory, deleting decoy/contaminant/site-only rows, selecting an already-computed quant column, and characterizing missingness. Format conversion (RAW -> mzML) -> peptide-identification. MaxLFQ/TMT reporter **computation or correction** -> quantification. Protein-group parsimony -> protein-inference. Normalization and imputation -> differential-abundance and expression-matrix/normalization. OUT OF SCOPE: statistical testing, batch correction, and the actual imputation step (this skill only diagnoses the missingness so the right imputer is chosen later).
 
 ## The Single Most Important Modern Insight -- Import Is Where Two Contracts Are Read and Enforced
 
@@ -38,10 +38,10 @@ Scope: this skill owns reading spectra/search outputs into memory, deleting deco
 
 | Tool / method | Citation | Mechanism / role | When |
 |---|---|---|---|
-| pyOpenMS `MzMLFile().load` | Rost 2014 | Loads mzML/mzXML into an MSExperiment in memory; iterate spectra by MS level | Programmatic access to raw peaks, precursor m/z, isolation windows |
+| pyOpenMS `MzMLFile` / `MzXMLFile` | Rost 2014 | Loads the matching mzML/mzXML format into an MSExperiment; iterate spectra by MS level | Programmatic access to raw peaks, precursor m/z, isolation windows |
 | pandas `read_csv`/`read_parquet` | -- | Tabular ingest of MaxQuant TSV and DIA-NN parquet | All search-engine output tables |
 | DIA-NN report | Demichev 2020 | Long-format precursor table; `report.parquet` is the default (1.9+) and the only default (2.0) | DIA quant; pivot on `PG.MaxLFQ` after q-filtering |
-| MaxQuant `txt/` outputs | Cox 2014 (MaxLFQ) | `proteinGroups.txt` (group level), `evidence.txt` (per-PSM) | DDA label-free / TMT search results |
+| MaxQuant `txt/` outputs | Cox 2014 (MaxLFQ) | `proteinGroups.txt` (group level), `evidence.txt` (per-PSM) | DDA label-free; corrected TMT reporter columns can be imported but reporter computation routes out |
 | Spectra + QFeatures (R) | -- | Current Bioconductor raw + quantified-feature containers; `readQFeatures`, `aggregateFeatures` | R pipelines; preferred over MSnbase going forward |
 | MSnbase `readMSData` (R) | -- | On-disk raw reading; maintenance mode (route OUT to Spectra/QFeatures) | Legacy R code only |
 | ThermoRawFileParser / msconvert | Hulstaert 2020 / Chambers 2012 | RAW -> mzML conversion (route OUT) | File conversion is peptide-identification |
@@ -53,13 +53,14 @@ Scope: this skill owns reading spectra/search outputs into memory, deleting deco
 | MaxQuant DDA label-free, between-sample comparison | Read `LFQ intensity` columns from proteinGroups.txt | MaxLFQ-normalized; the only MaxQuant column valid for cross-sample ratios |
 | MaxQuant, absolute/molar abundance within one sample | Read `iBAQ` columns | iBAQ is a within-sample molar proxy; do not use across samples |
 | Need raw uncorrected signal for a custom normalization | Read `Intensity` columns, normalize yourself | `Intensity` is raw summed precursor area, not comparable as-is |
+| MaxQuant TMT proteinGroups.txt, already reporter-corrected | Read `Reporter intensity corrected <channel>` columns; map channels to samples from the experimental design | The lone `Intensity` column is a group total, not a per-channel matrix. Reporter correction/computation and channel-normalization choices -> quantification |
 | DIA-NN output (1.9 or 2.0) | `pd.read_parquet('report.parquet')`, filter run-level and `Global.PG.Q.Value` q-values, pivot `PG.MaxLFQ`, 0 -> NaN, log2 | 2.0 dropped the TSV default; without the global protein q-value filter, groups that pass only within single runs leak into the cross-run matrix |
-| Raw spectra, need peaks/precursor/isolation window | pyOpenMS `MzMLFile().load` | Programmatic peak and isolation-window access for QC and co-isolation reasoning |
-| R-based pipeline, quantified features | QFeatures `readQFeatures` + `aggregateFeatures` | Current Bioconductor; MSnbase is maintenance-only |
+| Raw spectra, need peaks/precursor/isolation window | `MzMLFile` for `.mzML`, `MzXMLFile` for `.mzXML` | Programmatic peak and isolation-window access for QC and co-isolation reasoning |
+| R-based MaxQuant proteinGroups import | `readQFeatures`, then `make.names()` before `filterFeatures`, `zeroIsNA`, `logTransform` | QFeatures makes row-data names syntactic; use the runnable block below. `aggregateFeatures` is for peptide-to-protein aggregation, not proteinGroups |
 | Data came from DDA, planning imputation | Diagnose missingness as MNAR -> route to left-censored imputation | DDA top-N sampling makes missingness abundance-dependent |
 | Data came from DIA, planning imputation | Run the same diagnostic; a negative abundance-missingness correlation means left-censored handling, as for DDA | DIA has fewer missing values, but they are still mostly intensity-dependent (Hediyeh-zadeh 2023) |
 
-Default when uncertain: read `LFQ intensity` (MaxQuant) or `PG.MaxLFQ` after q-filtering (DIA-NN), strip Reverse/contaminant/site-only rows, set 0 -> NaN, then diagnose missingness before choosing an imputer.
+Default when uncertain: read `LFQ intensity` (label-free MaxQuant) or `PG.MaxLFQ` after q-filtering (DIA-NN), strip Reverse/contaminant/site-only rows, set 0 -> NaN, then diagnose missingness before choosing an imputer. For TMT, do not substitute the single `Intensity` total: use already-corrected reporter channels and route reporter processing to quantification.
 
 ## Loading mzML/mzXML with pyOpenMS
 
@@ -68,10 +69,19 @@ Default when uncertain: read `LFQ intensity` (MaxQuant) or `PG.MaxLFQ` after q-f
 **Approach:** Load into an MSExperiment (filled in place), iterate by MS level; `get_peaks()` returns a tuple of (mz, intensity) numpy arrays, and `getPrecursors()` returns a list that is empty for all-ion (AIF/MSE/bbCID) MS2 scans. An isolation width of 0 means the offsets were not written, not a 0-Th window.
 
 ```python
-from pyopenms import MSExperiment, MzMLFile
+from pathlib import Path
+from pyopenms import MSExperiment, MzMLFile, MzXMLFile
 
 exp = MSExperiment()
-MzMLFile().load('sample.mzML', exp)  # fills exp in place; returns None
+path = 'sample.mzML'
+suffix = Path(path).suffix.lower()
+if suffix == '.mzml':
+    loader = MzMLFile()
+elif suffix == '.mzxml':
+    loader = MzXMLFile()
+else:
+    raise ValueError('Expected an .mzML or .mzXML file')
+loader.load(path, exp)  # fills exp in place; returns None
 
 for spectrum in exp:
     if spectrum.getMSLevel() == 1:
@@ -91,7 +101,7 @@ for spectrum in exp:
 
 **Goal:** Get a trustworthy log2 intensity matrix with bookkeeping rows removed and missing values represented as NaN.
 
-**Approach:** Strip Reverse/contaminant/site-only rows, resolve the semicolon protein-ID list to a leading ID, pick `LFQ intensity` columns, set 0 -> NaN, then log2-transform.
+**Approach:** Require the MaxQuant `Protein IDs` field, construct a row-indexed flag mask (so a table with all flag columns absent gets a useful error instead of `KeyError: True`), strip Reverse/contaminant/site-only rows, resolve semicolon IDs, pick `LFQ intensity` columns, set 0 -> NaN, and log2-transform. The counts are retained for the methods record.
 
 ```python
 import pandas as pd
@@ -99,21 +109,78 @@ import numpy as np
 
 pg = pd.read_csv('proteinGroups.txt', sep='\t', low_memory=False)  # mixed-type cols
 
-# Flag columns hold '+' or empty string; all three are proteinGroups-only bookkeeping
-mask = (pg.get('Reverse', '') != '+') & (pg.get('Potential contaminant', '') != '+') & (pg.get('Only identified by site', '') != '+')
-pg = pg[mask].copy()
+if 'Protein IDs' not in pg:
+    raise ValueError("Expected MaxQuant proteinGroups.txt with a 'Protein IDs' column; this is not that table")
+
+# Keep a Series even if a bookkeeping field is absent. All three absent means this
+# is not a MaxQuant proteinGroups table, so fail before selecting the quant family.
+flag_cols = ('Reverse', 'Potential contaminant', 'Only identified by site')
+if not any(c in pg for c in flag_cols):
+    raise ValueError("Expected MaxQuant proteinGroups.txt bookkeeping columns; received none of Reverse, Potential contaminant, Only identified by site")
+keep = pd.Series(True, index=pg.index)
+for col in flag_cols:
+    if col in pg:
+        keep &= pg[col].fillna('').ne('+')
+rows_read, rows_kept = len(pg), int(keep.sum())
+pg = pg.loc[keep].copy()
 
 # Protein IDs / Majority protein IDs / Gene names are SEMICOLON lists; take the first (leading/razor) entry
 pg['leading_protein'] = pg['Protein IDs'].str.split(';').str[0]
-pg['leading_gene'] = pg['Gene names'].where(pg['Gene names'].notna(), '').str.split(';').str[0]
+pg['leading_gene'] = pg.get('Gene names', pd.Series('', index=pg.index)).fillna('').str.split(';').str[0]
 
 lfq_cols = [c for c in pg.columns if c.startswith('LFQ intensity ')]  # MaxLFQ-normalized, between-sample comparable
 if not lfq_cols:
-    raise ValueError('No LFQ intensity columns: LFQ was not enabled in MaxQuant; use Intensity and normalize explicitly')
+    tmt_cols = [c for c in pg.columns if c.startswith('Reporter intensity corrected ')]
+    if tmt_cols:
+        raise ValueError("No LFQ intensity columns: this looks like MaxQuant TMT. Use 'Reporter intensity corrected <channel>' columns; reporter processing -> quantification")
+    raise ValueError("No LFQ intensity columns: use a label-free MaxQuant proteinGroups.txt, or verify the supported quant family")
 matrix = pg[['leading_protein', 'leading_gene'] + lfq_cols].copy()
 matrix[lfq_cols] = matrix[lfq_cols].replace(0, np.nan)  # MaxQuant writes 0 for missing; log2(0) = -inf
 matrix[lfq_cols] = np.log2(matrix[lfq_cols])
 matrix = matrix[matrix[lfq_cols].notna().any(axis=1)]  # groups with no valid LFQ value carry no quant
+print(f'MaxQuant rows: read={rows_read}, after bookkeeping={rows_kept}, quantified={len(matrix)}')
+```
+
+### Importing already-corrected MaxQuant TMT channels
+
+Do not feed a TMT table to the LFQ block: its one `Intensity` field is a group total. This import uses only MaxQuant's already-corrected channel values; choose the reporter correction and channel normalization upstream in **quantification**, and supply the channel-to-sample mapping separately.
+
+```python
+import numpy as np
+import pandas as pd
+
+pg = pd.read_csv('proteinGroups.txt', sep='\t', low_memory=False)
+flag_cols = ('Reverse', 'Potential contaminant', 'Only identified by site')
+if 'Protein IDs' not in pg or not any(c in pg for c in flag_cols):
+    raise ValueError('Expected MaxQuant proteinGroups.txt with Protein IDs and at least one bookkeeping column')
+keep = pd.Series(True, index=pg.index)
+for col in flag_cols:
+    if col in pg:
+        keep &= pg[col].fillna('').ne('+')
+pg = pg.loc[keep].copy()
+pg['leading_protein'] = pg['Protein IDs'].str.split(';').str[0]
+pg['leading_gene'] = pg.get('Gene names', pd.Series('', index=pg.index)).fillna('').str.split(';').str[0]
+reporter_cols = [c for c in pg.columns if c.startswith('Reporter intensity corrected ')]
+if not reporter_cols:
+    raise ValueError("No 'Reporter intensity corrected <channel>' columns; this is not a corrected MaxQuant TMT proteinGroups table")
+tmt = pg[['leading_protein', 'leading_gene'] + reporter_cols].copy()
+tmt[reporter_cols] = np.log2(tmt[reporter_cols].replace(0, np.nan))
+tmt = tmt[tmt[reporter_cols].notna().any(axis=1)]
+```
+
+### MaxQuant proteinGroups.txt in R / QFeatures
+
+`readQFeatures()` turns spaces in row-data columns into dots. Rename before filtering; `aggregateFeatures()` is not needed because the input is already protein-group level.
+
+```r
+library(QFeatures)
+pg <- read.delim('proteinGroups.txt', quote = '', check.names = FALSE)
+lfq <- grep('^LFQ intensity ', names(pg), value = TRUE)
+stopifnot(length(lfq) > 0)
+qf <- readQFeatures(pg, quantCols = lfq, name = 'proteinGroups')
+rd <- rowData(qf[[1]]); colnames(rd) <- make.names(colnames(rd)); rowData(qf[[1]]) <- rd
+qf <- filterFeatures(qf, ~ !(Reverse %in% '+') & !(Potential.contaminant %in% '+') & !(Only.identified.by.site %in% '+'))
+qf <- zeroIsNA(qf, 1); qf <- logTransform(qf, i = 1, name = 'log2LFQ')
 ```
 
 ## Loading DIA-NN report.parquet
@@ -160,6 +227,13 @@ def assess_missingness(matrix, sample_cols):
 **Mechanism:** `Intensity` is un-normalized summed precursor signal; `iBAQ` is a within-sample molar proxy. Neither is comparable across samples the way `LFQ intensity` is.
 **Symptom:** Ratios track total loaded protein / sample depth rather than biology; fold changes shift when one sample's loading changes.
 **Fix:** Use `LFQ intensity` for cross-sample comparison; if computing custom normalization use `Intensity` and normalize explicitly (expression-matrix/normalization).
+
+### TMT table sent to the LFQ route
+
+**Trigger:** Passing a MaxQuant TMT `proteinGroups.txt` to code that expects `LFQ intensity <sample>` columns.
+**Mechanism:** TMT stores per-channel values in `Reporter intensity corrected <channel>`; its lone `Intensity` is a group total and cannot replace a sample matrix.
+**Symptom:** An ID-only matrix, or a suggestion to use non-existent `Intensity <sample>` columns.
+**Fix:** Use the corrected reporter columns shown above, retain the channel-to-sample map, and route reporter correction/normalization to quantification.
 
 ### Zero treated as a measurement
 
@@ -214,7 +288,8 @@ def assess_missingness(matrix, sample_cols):
 | `-inf` values after log2 | Zeros not converted to NaN (MaxQuant LFQ or DIA-NN PG.MaxLFQ) | `df.replace(0, np.nan)` before `np.log2` |
 | `IndexError: list index out of range` at `getPrecursors()[0]` | All-ion (AIF/MSE) MS2 scan without a precursor | Check `if not spectrum.getPrecursors()` before indexing |
 | `FileNotFoundError: report.tsv` (DIA-NN 2.0) | TSV no longer the default output | `pd.read_parquet('report.parquet')` |
-| `KeyError: 'Only identified by site'` | That column exists ONLY in proteinGroups.txt | Use `df.get('Only identified by site', '')` or guard the column lookup |
+| `KeyError: True` / bookkeeping fields absent | A non-MaxQuant table was passed to the proteinGroups reader; scalar `.get(..., '')` masks are unsafe when every flag is absent | Build a row-indexed mask; fail clearly if all three MaxQuant bookkeeping fields are absent |
+| No `LFQ intensity` but `Reporter intensity corrected` exists | This is a MaxQuant TMT table, not label-free data | Import corrected reporter channels; do not use the single `Intensity` total; reporter processing -> quantification |
 | Mixed-type / DtypeWarning on MaxQuant load | Wide TSV with mixed column types | `pd.read_csv(..., low_memory=False)` |
 | NaN gene labels break a merge | `Gene names` is a semicolon list, sometimes blank | `.where(notna(), '').str.split(';').str[0]` |
 | Ratios track loading not biology | Read `Intensity` (raw) instead of `LFQ intensity` | Use `LFQ intensity` for between-sample comparison |

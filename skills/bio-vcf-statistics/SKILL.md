@@ -123,9 +123,10 @@ The threshold 54.69 is GATK's default ExcessHet cutoff (phred-scaled p ~= 3.4e-6
 Cross-sample contamination is visible in VCF statistics before any dedicated test: the het allele-balance distribution shifts away from 0.5 (foreign reads add minor-allele support at true hom sites and skew true hets), the het count and het/hom ratio rise, and the novel-fraction Ti/Tv drops. These are SIGNALS, not the measurement. The real test runs on the BAM/CRAM: VerifyBamID2 (Zhang et al. 2020) estimates the contamination fraction alpha ancestry-agnostically by modeling observed allele fractions against population frequencies, and CHARR estimates alpha directly from VCF-level reference-read counts at hom-alt sites. An alpha above ~0.02-0.03 is a red flag; somatic pipelines are sensitive to even 1%. GATK pipelines feed `--contamination alpha` from VerifyBamID2. See variant-calling/gatk-variant-calling for wiring contamination estimates into calling.
 
 ```bash
-# quick het allele-balance sanity check from AD: one line per sample, het genotypes only (all phasing orientations)
+# quick biallelic-het allele-balance sanity check from AD: one line per sample
+# (all 0/1 and 1/0 phasing/orientation forms; use a multiallelic-aware parser for other genotypes)
 bcftools query -f '[%SAMPLE\t%GT\t%AD\n]' input.vcf.gz | \
-    awk -F'\t' '($2 ~ /^(0[\/|]1|1\|0)$/) {split($3,a,","); d=a[1]+a[2]; if (d>0) {s[$1]+=a[2]/d; n[$1]++}}
+    awk -F'\t' '($2 ~ /^(0[\/|]1|1[\/|]0)$/) {split($3,a,","); d=a[1]+a[2]; if (d>0) {s[$1]+=a[2]/d; n[$1]++}}
         END {for (k in s) printf "%s\tmean het AB: %.3f (n=%d)\n", k, s[k]/n[k], n[k]}'   # expect ~0.5 per sample
 ```
 

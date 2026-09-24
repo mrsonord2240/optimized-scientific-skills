@@ -47,7 +47,7 @@ Predict whether a DNA variant alters mRNA splicing. **Distinct from "variant pat
 | SpliceVault | Empirical mis-splicing outcome | Top-N events at the affected splice site | Predicting consequence (skip vs cryptic) of canonical-disrupting variants | Variants not at catalogued splice sites |
 | CADD-Splice | Single composite score | Scaled C-score (PHRED) | Clinical pipelines wanting one number | When knowing which sub-component drove the score is needed |
 
-Methodology evolves; verify benchmarks (Smith & Kitzman 2023 *Genome Biol* 24:294; You et al 2024 *Nat Commun*) and ClinGen SVI splicing recommendations before reporting any interpretation. Concordance across SpliceAI + Pangolin + MMSplice is the strongest computational evidence; discordance flags need RNA validation.
+Methodology evolves; verify benchmarks (Smith & Kitzman 2023 *Genome Biol* 24:294; You et al 2024 *Nat Commun*) and ClinGen SVI splicing recommendations before reporting any interpretation. Concordance is a prioritization signal, not proof: even three concordant predictors gave a false-positive splice-disruption signal for ClinVar likely-benign CFTR c.2909-10T>G in the checked panel. Check ClinVar/gnomAD, disease mechanism and RNA evidence; discordance also flags RNA-validation candidates.
 
 ## Decision Tree by Use Case
 
@@ -91,6 +91,8 @@ git clone https://github.com/tkzeng/Pangolin && pip install ./Pangolin     # als
 pip install mmsplice       # needs setuptools<81 and a cyvcf2 built for the installed numpy (else: pip install --force-reinstall --no-deps cyvcf2)
 ```
 
+`pip install torch` may select a large CUDA wheel. On a CPU-only machine, select the matching CPU wheel from the official PyTorch installer before running the Pangolin/SpliceTransformer commands. Record the Git commit for GitHub-installed tools in the analysis provenance; their moving `main` branches are not reproducible pins.
+
 Reference: an **upper-case** FASTA of the same build as the VCF (GENCODE `GRCh38.primary_assembly.genome.fa` is upper-case; UCSC/Ensembl soft-masked FASTAs are not, see Common Errors) and a GENCODE **GTF** (not GFF3) for Pangolin/MMSplice. SpliceVault, SpliceTransformer, CI-SpliceAI and CADD installs are in their sections.
 
 **Data handling.** SpliceVault (remote tabix), CADD (API) and VariantValidator/Mutalyzer send variant coordinates to third-party servers; use local files or skip them for identifiable patient data.
@@ -111,9 +113,9 @@ spliceai \
     -M 0
 ```
 
-`-D` = **maximum distance between the variant and the gained/lost splice site** (default 50). `-M 0` (default) returns raw scores; `-M 1` masks splice gains at annotated sites and losses at unannotated sites (annotation = SpliceAI's canonical GENCODE table). Output INFO format: `SpliceAI=ALLELE|SYMBOL|DS_AG|DS_AL|DS_DG|DS_DL|DP_AG|DP_AL|DP_DG|DP_DL`. Delta score = max(DS_AG, DS_AL, DS_DG, DS_DL). DS labels: AG = acceptor gain, AL = acceptor loss, DG = donor gain, DL = donor loss; DP = position of that site relative to the variant. One record can carry several annotations (readthrough/overlapping genes such as RPL36A-HNRNPH2 add rows): reduce per variant, and choose the MANE gene when genes disagree.
+`-D` = **maximum distance between the variant and the gained/lost splice site** (default 50). `-M 0` (default) returns raw scores; `-M 1` masks splice gains at annotated sites and losses at unannotated sites (annotation = SpliceAI's canonical GENCODE table). Output INFO format: `SpliceAI=ALLELE|SYMBOL|DS_AG|DS_AL|DS_DG|DS_DL|DP_AG|DP_AL|DP_DG|DP_DL`. Delta score = max(DS_AG, DS_AL, DS_DG, DS_DL). DS labels: AG = acceptor gain, AL = acceptor loss, DG = donor gain, DL = donor loss; DP = position of that site relative to the variant. One record can carry several annotations (readthrough/overlapping genes such as RPL36A-HNRNPH2 add rows): `spliceai_clingen_classify.py` reports both `top_score_gene` and `annotated_genes`; neither selects the disease-relevant transcript. Resolve the MANE/clinical transcript independently.
 
-**SpliceAI exits 0 on records it cannot score.** REF mismatch, a deletion longer than 2*D, or no overlapping gene give a record with **no `SpliceAI=` tag** (stderr warning only); N-containing sequence gives `SpliceAI=...|.|.|.|.|.|.|.|.` (all dots). A `<DEL>` symbolic ALT crashes it. Assert REF against the FASTA first and compare output to input: a failed variant must not read as benign or vanish.
+**SpliceAI exits 0 on records it cannot score.** REF mismatch, a deletion longer than 2*D, or no overlapping gene give a record with **no `SpliceAI=` tag** (stderr warning only); N-containing sequence gives `SpliceAI=...|.|.|.|.|.|.|.|.` (all dots). A `<DEL>` symbolic ALT crashes it. The shipped classifier pre-filters `*` and symbolic ALT alleles so they appear as `not_scored` warnings while supported alleles in the same batch still run. Assert REF against the FASTA first and compare output to input: a failed variant must not read as benign or vanish.
 
 Parse, label and check with `examples/splice_parsers.py` (`.` -> NaN -> `not_scored`, boundaries inclusive, unmatched records reported):
 
@@ -270,7 +272,7 @@ For unsolved cases run `-D 500` on every intronic candidate that scores below 0.
 spliceai -I candidates.vcf -O output_D500.vcf -R genome.fa -A grch38 -D 500 -M 0
 ```
 
-Pseudoexon creation in deep introns explains a substantial fraction of unsolved Mendelian disease alleles in current cohorts (estimates 5-15% across studies; specific quantitative range will vary by cohort and panel — verify against current literature). Disease examples: CFTR 3849+10kbC>T, USH2A c.7595-2144A>G, CEP290 c.2991+1655A>G (LCA10), GLA c.639+919G>A (Fabry). CI-SpliceAI (see above) is a second opinion, not a rescue.
+Pseudoexon creation in deep introns explains a substantial fraction of unsolved Mendelian disease alleles in current cohorts (estimates 5-15% across studies; specific quantitative range will vary by cohort and panel — verify against current literature). Disease examples: CFTR 3849+10kbC>T, USH2A c.7595-2144A>G, CEP290 c.2991+1655A>G (LCA10), GLA c.639+919G>A (Fabry). Extended context is not a rescue: in the checked GRCh38 panel CFTR 3849+10kbC>T remained SpliceAI 0.16 at D50/D500/D2000, while Pangolin was +0.33 and MMSplice had no row. Treat this 0.10-0.20 pattern as discordant/inconclusive and seek RNA evidence. CI-SpliceAI (see above) is a second opinion, not a rescue.
 
 ## Concordance Across Predictors
 
@@ -287,17 +289,17 @@ Thresholds per tool: SpliceAI delta >= 0.2, Pangolin |score| >= 0.2, MMSplice |d
 
 | Concordance label | Meaning | Action |
 |-------------------|---------|--------|
-| `all_predict_disruption` | every tool that scored is above threshold | PP3 (supporting); strong candidate for RNA validation (PS3) |
-| `majority_predict_disruption` | more than half above (e.g. 2/3) | PP3 (supporting) |
+| `all_predict_disruption` | every tool that scored is above threshold | Report `n_above/n_scored` and score margins; candidate supporting evidence only after transcript, population and RNA review |
+| `majority_predict_disruption` | more than half above (e.g. 2/3) | Report `n_above/n_scored`; do not upgrade evidence strength from agreement alone |
 | `discordant` | some, but not most, above | Report inconclusive; flag for RNA validation |
 | `none_predict_disruption` | all below | BP4 (supporting) only if SpliceAI <= 0.10 |
 | `insufficient_tools` | fewer than 2 tools scored | Find out why (skipped records) before interpreting |
 
-Discordance is the most informative pattern — variants where one model sees impact and others don't are high priority for RNA validation. Check `n_scored`: on the test panel the GLA c.639+919G>A pseudoexon is `all_predict_disruption` from only two tools because MMSplice returned nothing.
+Discordance is the most informative pattern — variants where one model sees impact and others don't are high priority for RNA validation. Always show `n_scored`, `n_above`, and the underlying scores: on the test panel GLA c.639+919G>A is `all_predict_disruption` from only two tools because MMSplice returned nothing. Concordant false positives occur, so never infer pathogenicity or RNA outcome from this label.
 
 ## Branchpoint Variant Detection
 
-All current tools are **weak at branchpoint variants** because the BPS motif (yUnAy) has low information content; SpliceAI captures only some. Published branchpoint-specific methods: BPP (Zhang 2017 *Bioinformatics* 33:3166), LaBranchoR (Paggi & Bejerano 2018 *RNA* 24:1647), SVM-BPfinder (Corvelo 2010 *PLoS Comput Biol*), BPHunter (Zhang 2022 *PNAS*; web server + standalone). **None was run here**: BPHunter's reference datasets were announced at `hgidsoft.rockefeller.edu/BPHunter/standalone.html`, which redirects to a GitHub page that returns 404 (2026-09-20), so its standalone script cannot be run. Recommendation: when SpliceAI delta is borderline (0.1-0.3) for a variant in the BPS region (-18 to -40 from 3'ss), treat all predictors as uninformative and require RNA validation; BPHunter's web server can be tried as a supplement.
+All current tools are **weak at branchpoint variants** because the BPS motif (yUnAy) has low information content; SpliceAI captures only some. Published branchpoint-specific methods include BPP, LaBranchoR, SVM-BPfinder and BPHunter. **None was run here.** The BPHunter standalone reference URL redirected to a GitHub 404 when checked on 2026-09-20; do not present it as an available local workflow. For a borderline SpliceAI delta (0.1-0.3) in the BPS region (-18 to -40 from 3'ss), treat predictors as uninformative and require RNA validation; an available web service may be used only as a supplementary research check.
 
 ## Splice-Switching ASO Design
 

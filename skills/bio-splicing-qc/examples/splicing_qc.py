@@ -223,6 +223,52 @@ def summarize_junctions(stats, min_reads=10):
     }
 
 
+def junction_class_support(annotation_xls, stats):
+    '''Summarize support by RSeQC annotation class for a high-novel-rate follow-up.
+
+    ``annotation_xls`` is RSeQC's ``*.junction.xls`` and ``stats`` is the output of
+    :func:`junction_stats` from the same BAM.  The coordinates are both
+    ``(chrom, intron_start_0based, intron_end)``.  ``reads`` is the unique,
+    fragment-level support passing the overhang filter; an absent key is reported
+    as zero support rather than silently discarded.
+
+    This is a diagnostic, not a classifier: weak support/anchors point toward an
+    alignment artifact, while well-supported novel sites merit checking the
+    annotation and the biology.
+    '''
+    try:
+        junc = pd.read_csv(annotation_xls, sep='\t')
+    except (FileNotFoundError, pd.errors.EmptyDataError) as exc:
+        raise SplicingQCError(f'{annotation_xls}: cannot read an RSeQC junction table') from exc
+    # RSeQC 5.0.5 labels the coordinate columns with their coordinate convention.
+    # Accept the short aliases as well so a normalized table remains usable.
+    columns = {
+        'chrom': 'chrom',
+        'intron_st': 'intron_st(0-based)' if 'intron_st(0-based)' in junc.columns else 'intron_st',
+        'intron_end': 'intron_end(1-based)' if 'intron_end(1-based)' in junc.columns else 'intron_end',
+        'read_count': 'read_count',
+        'annotation': 'annotation',
+    }
+    missing = [logical for logical, actual in columns.items() if actual not in junc.columns]
+    if missing:
+        raise SplicingQCError(f'{annotation_xls}: missing RSeQC columns {sorted(missing)}')
+    if junc.empty:
+        raise NoSplicedReadsError(f'{annotation_xls}: RSeQC reported no junctions')
+    junc = junc.copy()
+    junc['annotation'] = junc[columns['annotation']].astype(str).str.strip()
+    keys = list(zip(junc[columns['chrom']], junc[columns['intron_st']], junc[columns['intron_end']]))
+    support = [stats.get((chrom, int(start), int(end)), {}) for chrom, start, end in keys]
+    junc['anchored_fragments'] = [item.get('reads', 0) for item in support]
+    junc['min_overhang'] = [item.get('min_overhang', math.nan) for item in support]
+    grouped = junc.groupby('annotation', sort=True)
+    return grouped.agg(
+        junctions=('annotation', 'size'),
+        median_rseqc_reads=(columns['read_count'], 'median'),
+        median_anchored_fragments=('anchored_fragments', 'median'),
+        median_min_overhang=('min_overhang', 'median'),
+    ).reset_index()
+
+
 def score_splice_sites(sequences_5ss, sequences_3ss):
     '''
     MaxEntScan scores, one output per input (NaN for invalid input, so indices stay aligned).
@@ -261,12 +307,15 @@ def generate_qc_report(bam_file, bed_file, output_prefix, plot=False):
     print(f"  known curve growth 80->100% of reads: {sat['growth_80_100']['known']:.1%} -> {sat['verdict']}")
 
     print('\n3. Junction read support (pysam, fragment-level, unique reads)')
-    summary = summarize_junctions(junction_stats(bam_file))
+    stats = junction_stats(bam_file)
+    summary = summarize_junctions(stats)
     for key, value in summary.items():
         print(f'  {key}: {value:.1f}' if isinstance(value, float) else f'  {key}: {value}')
     pct = summary['pct_ge_min_reads']
-    print('  Junction coverage:', 'GOOD (>=50% of junctions have >=10 reads)' if pct >= 50 else
-          'ACCEPTABLE (30-50%)' if pct >= 30 else 'POOR (<30%): consider deeper sequencing')
+    coverage = ('GOOD (>=50% of junctions have >=10 reads)' if pct >= 50 else
+                'ACCEPTABLE (30-50%)' if pct >= 30 else 'POOR (<30%): consider deeper sequencing')
+    print(f"  Junction coverage: {coverage}; based on {summary['reads_anchored']} anchored fragments "
+          f"across {summary['total_junctions']} junctions")
     return {'annotation': ann, 'saturation': sat, 'support': summary}
 
 
@@ -285,6 +334,10 @@ def main(argv=None):
     p = sub.add_parser('sites')
     p.add_argument('--donor', action='append', default=[])
     p.add_argument('--acceptor', action='append', default=[])
+    p = sub.add_parser('novel-qc', help='summarize support by RSeQC junction annotation class')
+    p.add_argument('bam')
+    p.add_argument('junction_xls', help='junction_annotation.py output (*.junction.xls)')
+    p.add_argument('--min-overhang', type=int, default=8)
     args = parser.parse_args(argv)
 
     if args.cmd == 'annotation':
@@ -295,6 +348,9 @@ def main(argv=None):
         generate_qc_report(args.bam, args.bed12, args.prefix, args.plot)
     elif args.cmd == 'junctions':
         print(summarize_junctions(junction_stats(args.bam, min_overhang=args.min_overhang)))
+    elif args.cmd == 'novel-qc':
+        print(junction_class_support(args.junction_xls,
+                                     junction_stats(args.bam, min_overhang=args.min_overhang)).to_string(index=False))
     else:
         s5, s3 = score_splice_sites(args.donor, args.acceptor)
         print("5'ss:", [round(v, 2) for v in s5], "3'ss:", [round(v, 2) for v in s3])

@@ -3,34 +3,10 @@
 # Checked on samtools 1.24, pysam 0.24.1 | Verify API if version differs
 # Without a fastafile pysam applies no BAQ, i.e. equals `samtools mpileup -B`; see SKILL.md for the full parameter table.
 
-import pysam
 import sys
-from collections import Counter
+import pysam
 
-def allele_counts(bam_path, chrom, pos, min_mapq=20, min_baseq=20):
-    '''Base counts (plus 'DEL') at 0-based pos. Reference skips (spliced reads) are not counted.'''
-    counts = Counter()
-
-    with pysam.AlignmentFile(bam_path, 'rb') as bam:
-        for pileup_column in bam.pileup(chrom, pos, pos + 1,
-                                         truncate=True,
-                                         min_mapping_quality=min_mapq,
-                                         min_base_quality=min_baseq):
-            if pileup_column.pos != pos:
-                continue
-
-            for pileup_read in pileup_column.pileups:
-                # pysam sets is_del on reference skips too, so test is_refskip first
-                if pileup_read.is_refskip:
-                    continue
-                elif pileup_read.is_del:
-                    counts['DEL'] += 1
-                else:
-                    qpos = pileup_read.query_position
-                    base = pileup_read.alignment.query_sequence[qpos].upper()
-                    counts[base] += 1
-
-    return dict(counts)
+from pileup_helpers import allele_counts
 
 def main():
     if len(sys.argv) < 3:
@@ -52,7 +28,8 @@ def main():
                 sys.exit(f'Error: contig {chrom!r} is not in the BAM header (see: samtools view -H {bam_path} | grep ^@SQ)')
             if not bam.has_index():
                 sys.exit(f'Error: {bam_path} has no index (run: samtools index {bam_path})')
-        counts = allele_counts(bam_path, chrom, pos)
+        counts = allele_counts(bam_path, chrom, pos, min_mapping_quality=20,
+                               min_base_quality=20)
     except (OSError, ValueError) as e:
         sys.exit(f'Error: cannot read {bam_path}: {e}')
     total = sum(counts.values())

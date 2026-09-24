@@ -20,7 +20,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from splice_parsers import PP3_MIN, classify_delta, parse_spliceai_vcf, read_input_vcf, variant_key
+from splice_parsers import (PP3_MIN, classify_delta, display_variant_key, parse_spliceai_vcf,
+                            read_input_vcf, variant_key)
 
 
 def run_spliceai(input_vcf, output_vcf, genome_fa, build, distance=50, mask=0):
@@ -30,11 +31,43 @@ def run_spliceai(input_vcf, output_vcf, genome_fa, build, distance=50, mask=0):
     subprocess.run(cmd, check=True)
 
 
+def prepare_spliceai_input(input_vcf, output_vcf):
+    '''Copy a VCF without unsupported ``*`` or symbolic ALT alleles.
+
+    SpliceAI aborts a whole batch on a symbolic ALT.  Retain supported alleles from a
+    mixed record, and return the skipped allele keys so they remain visible as
+    ``not_scored`` in the final table rather than discarding the batch.
+    '''
+    skipped = set()
+    with open(input_vcf) as fin, open(output_vcf, 'w') as fout:
+        for line in fin:
+            if line.startswith('#'):
+                fout.write(line)
+                continue
+            fields = line.rstrip('\n').split('\t')
+            supported = []
+            for alt in fields[4].split(','):
+                if alt == '*' or (alt.startswith('<') and alt.endswith('>')):
+                    skipped.add(variant_key(fields[0], fields[1], fields[3], alt))
+                else:
+                    supported.append(alt)
+            if supported:
+                fields[4] = ','.join(supported)
+                fout.write('\t'.join(fields) + '\n')
+    return skipped
+
+
 def per_variant(df):
-    '''One row per variant: highest delta over the genes SpliceAI annotated (readthrough genes such as
-    RPL36A-HNRNPH2 add rows). Choose the MANE gene yourself when the genes disagree.'''
+    '''One row per variant, retaining every SpliceAI gene annotation.
+
+    ``top_score_gene`` is only the annotation with the highest delta; it is not a
+    transcript selection. Resolve the disease-relevant/MANE transcript separately.
+    '''
     best = df.sort_values('delta_max', ascending=False, na_position='last').drop_duplicates('key')
-    return best.set_index('key')[['gene', 'DS_AG', 'DS_AL', 'DS_DG', 'DS_DL', 'delta_max']]
+    best = best.rename(columns={'gene': 'top_score_gene'})
+    genes = (df.dropna(subset=['gene']).groupby('key')['gene'].agg(
+        lambda names: ','.join(dict.fromkeys(names))).rename('annotated_genes'))
+    return best.set_index('key')[['top_score_gene', 'DS_AG', 'DS_AL', 'DS_DG', 'DS_DL', 'delta_max']].join(genes)
 
 
 def apply_clingen_svi(df):
@@ -63,8 +96,10 @@ def main(argv=None):
     a = ap.parse_args(argv)
     prefix = Path(a.out_prefix)
 
+    supported = prefix.with_name(prefix.name + '_supported.vcf')
+    skipped = prepare_spliceai_input(a.input_vcf, supported)
     narrow = prefix.with_name(prefix.name + f'_D{a.distance}.vcf')
-    run_spliceai(a.input_vcf, narrow, a.genome_fa, a.build, distance=a.distance)
+    run_spliceai(supported, narrow, a.genome_fa, a.build, distance=a.distance)
     parsed = parse_spliceai_vcf(narrow)
     df = per_variant(parsed)
     inputs = read_input_vcf(a.input_vcf).drop_duplicates('key').set_index('key')
@@ -73,10 +108,10 @@ def main(argv=None):
 
     cand = df[df['extend_window_candidate']]
     if not cand.empty:
-        # subset the ORIGINAL input VCF (keeps its header) to the candidate records
+        # subset the supported input VCF (keeps its header and cannot reintroduce symbolic ALTs)
         keys = set(cand.index)
         cand_vcf = prefix.with_name(prefix.name + '_extend_candidates.vcf')
-        with open(a.input_vcf) as fin, open(cand_vcf, 'w') as fout:
+        with open(supported) as fin, open(cand_vcf, 'w') as fout:
             for line in fin:
                 c = line.split('\t')
                 if line.startswith('#') or any(variant_key(c[0], c[1], c[3], alt) in keys for alt in c[4].split(',')):
@@ -90,7 +125,8 @@ def main(argv=None):
     df.to_csv(f'{prefix}_classified.tsv', sep='\t')
     print(df['acmg_evidence'].value_counts())
     for key, r in df[df['acmg_evidence'] == 'not_scored'].iterrows():   # no SpliceAI= tag, or "." scores
-        print(f'WARNING SpliceAI: no score for {r["id"]} ({key})', file=sys.stderr)
+        reason = ' (unsupported ALT pre-filtered)' if key in skipped else ''
+        print(f'WARNING SpliceAI: no score for {r["id"]} ({display_variant_key(key)}){reason}', file=sys.stderr)
     return df
 
 

@@ -30,6 +30,15 @@ def variant_key(chrom, pos, ref, alt):
     return f'{norm_chrom(str(chrom))}:{int(pos)}:{ref}>{alt}'
 
 
+def display_variant_key(key, allele_limit=24):
+    '''Keep machine keys lossless, but do not put an entire long REF allele in warnings.'''
+    chrom, pos, alleles = key.split(':', 2)
+    ref, alt = alleles.split('>', 1)
+    def shorten(allele):
+        return allele if len(allele) <= allele_limit else f'{allele[:allele_limit]}...({len(allele)} nt)'
+    return f'{chrom}:{pos}:{shorten(ref)}>{shorten(alt)}'
+
+
 def classify_delta(delta):
     '''ClinGen SVI PP3/BP4 label per SpliceAI delta_max. Boundaries are inclusive as published
     (0.10 -> BP4, 0.20 -> PP3, 0.50 and 0.80 -> their tiers). NaN (no score) -> not_scored, never BP4.'''
@@ -121,7 +130,7 @@ def parse_mmsplice_csv(csv_path):
 def unscored_report(input_vcf, tool_keys, tool):
     '''Input variants a tool returned nothing for (skipped records exit 0 with no INFO tag).'''
     missing = read_input_vcf(input_vcf).loc[lambda d: ~d['key'].isin(set(tool_keys))]
-    return [f'{tool}: no score for {r.id} ({r.key})' for r in missing.itertuples()]
+    return [f'{tool}: no score for {r.id} ({display_variant_key(r.key)})' for r in missing.itertuples()]
 
 
 def build_concordance(input_vcf, spliceai_vcf=None, pangolin_vcf=None, mmsplice_csv=None):

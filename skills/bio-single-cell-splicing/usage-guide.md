@@ -1,7 +1,7 @@
 # Single-Cell Splicing - Usage Guide
 
 ## Overview
-Analyze alternative splicing at single-cell resolution. The first decision is library chemistry, not tool: 10X 3' cannot support transcriptome-wide splicing, plate-based full-length and single-cell long-read data can. Tools covered: MARVEL, BRIE2, scQuint, SpliZ, Psix, Sierra (APA, not splicing) and pseudobulk leafcutter. Install notes, commands, thresholds and failure modes are in `SKILL.md`.
+Analyze alternative splicing at single-cell resolution. The first decision is library chemistry, not tool: 10X 3' cannot support transcriptome-wide splicing, plate-based full-length and single-cell long-read data can. Tools covered: MARVEL, BRIE2, scQuint, SpliZ, Psix, Sierra (APA, not splicing) and pseudobulk leafcutter. The chemistry gate, thresholds, and failure-mode index are in `SKILL.md`; runnable tool workflows are in `references/`.
 
 ## Example Prompts
 

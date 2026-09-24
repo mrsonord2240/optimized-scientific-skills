@@ -12,6 +12,8 @@ Annotation attaches functional consequences, population frequencies, and pathoge
 - For consequence prediction: reference FASTA and a MANE-aware transcript set (VEP cache) or GFF3 gene annotation (bcftools csq)
 - Python parsing: `cyvcf2` (`pip install cyvcf2`)
 
+Before using `bcftools annotate -a`, index both the target VCF and every annotation VCF (`bcftools index -f input.vcf.gz`, etc.). A compressed-but-unindexed target can fail only after an earlier annotation step; a chr-prefix/build mismatch can instead exit 0 with no matches, so compare contigs (`bcftools index -s input.vcf.gz` and `bcftools index -s gnomad.vcf.gz`) before treating a missing annotation as absence.
+
 ## Quick Start
 
 Tell your AI agent what you want to do:

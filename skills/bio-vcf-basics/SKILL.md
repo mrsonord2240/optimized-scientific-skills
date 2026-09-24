@@ -56,7 +56,7 @@ chr1    1000    rs123   A       G       30      PASS    DP=50   GT:DP   0/1:25
 
 ### The Header Contract
 
-Every INFO/FORMAT tag used in the body MUST be declared in a `##INFO`/`##FORMAT` line giving its ID, Number, and Type; parsers (bcftools, cyvcf2, pysam) read these declarations to know how many values a field holds and how to type it. An out-of-sync header -- a tag used but not declared, or declared with the wrong Number/Type -- silently breaks parsing: a `Number=1` declaration over data that holds a vector, or a missing `##contig`, makes tools drop, mistype, or mis-subset values with NO error thrown. After any hand-edit or annotation that adds a field, update the header to match (`bcftools +fill-tags` and `bcftools annotate` manage this automatically).
+For portable VCFs, declare every INFO/FORMAT tag used in the body in a `##INFO`/`##FORMAT` line giving its ID, Number, and Type. VCF permits absent meta-information, but BCF requires its dictionaries, and parsers (bcftools, cyvcf2, pysam) use these declarations to type and reshape fields. An out-of-sync header -- especially a wrong Number/Type such as `Number=1` over vector data -- can make a tool drop, mistype, or mis-subset values without a hard error. `##contig` declarations are recommended for VCF and required for BCF; include them for indexed/convertible files and known contig order. After any hand-edit or annotation that adds a field, update the header to match (`bcftools +fill-tags` and `bcftools annotate` manage this automatically).
 
 ### Data Columns
 
@@ -84,13 +84,15 @@ What each field actually measures -- and what it does not -- drives every filter
 | QUAL (col 6) | Site | Phred: `-10*log10 P(no variant)` | "Is there ANY variant at this site?" |
 | GQ (FORMAT) | Genotype | Phred, capped at 99 | "Is THIS sample's assigned genotype correct?" |
 | PL (FORMAT) | Genotype | Phred, rebased to min=0 | Relative likelihood of every possible genotype |
-| GL (FORMAT) | Genotype | log10, `<=0`, raw | Same info as PL, unscaled (`PL = -10*GL`, rebased) |
+| GL (FORMAT) | Genotype | log10 likelihoods, usually `<=0` | Same likelihood information as PL before relative phred scaling and integer rounding |
 
 QUAL is computed once across all samples and SCALES with total depth, so a high-coverage artifact can carry a large QUAL -- hence QD (QUAL normalized by depth) is preferred for filtering. GQ is per-sample and does not scale with cohort size. They are NOT interchangeable: QUAL can be high while an individual genotype is uncertain (low GQ), and a sample can have a confident genotype (high GQ) at a site with only moderate QUAL. Filter site-level junk on QUAL/QD; no-call untrustworthy genotypes on GQ.
 
 ### PL/GL, and how GQ is derived
 
-PL holds phred-scaled genotype likelihoods, rebased so the CALLED (most likely) genotype is exactly 0 and every other value is its phred penalty relative to that call. For a biallelic diploid site PL is ordered `[PL(0/0), PL(0/1), PL(1/1)]` -- the index of the 0 IS the genotype the caller assigned. GL is the same information as raw log10 likelihoods (`<=0`, larger is better). GQ = the difference between the two SMALLEST PL values, i.e. phred confidence in the call versus the next-best genotype; GQ=0 means the top two genotypes are tied (uninformative), GQ is capped at 99 by convention.
+PL holds phred-scaled genotype likelihoods, rebased so the best-supported genotype has 0 and every other value is its phred penalty relative to it. For a biallelic diploid site PL is ordered `[PL(0/0), PL(0/1), PL(1/1)]`; the minimum-PL index normally agrees with GT, but GT remains the caller's emitted genotype and is authoritative when they disagree. GL stores log10 likelihoods (larger is better). Given comparable GL values, PL is approximately `round(-10 * (GL - max(GL)))`; rounding means it is not simply `-10*GL`.
+
+Many callers derive GQ from the difference between the two smallest PL values, i.e. phred separation between the best and next-best genotype; GQ=0 means a tie after rounding and it is commonly capped at 99. Treat this as a useful validation check for the caller at hand, not a universal reconstruction rule: callers may compute or cap GQ differently, and missing/partial likelihood vectors cannot establish GQ.
 
 For a site with n alleles, diploid genotype `j/k` (j<=k) sits at PL index `k*(k+1)/2 + j` (this is the `Number=G` ordering). Getting this index formula wrong is the classic bug when re-parsing PL after a multiallelic split -- the vector must be re-subset by the formula, never sliced positionally.
 
@@ -333,7 +335,7 @@ vcf.close()
 
 | Error | Cause | Solution |
 |-------|-------|----------|
-| `not compressed with bgzip` / `not BGZF compressed, cannot index` (older htslib: `no BGZF EOF marker`) | Not bgzipped (plain gzip) | Recompress with `bgzip`, not `gzip` |
+| `not compressed with bgzip` / `not BGZF compressed, cannot index` / `in a format that cannot be usefully indexed` (older htslib: `no BGZF EOF marker`) | Not bgzipped (plain gzip) | Recompress with `bgzip`, not `gzip` |
 | `index required` / region query fails | Missing index | Run `bcftools index` (`-t` for tabix) |
 | `sample not found` | Wrong sample name | Check with `bcftools query -l` |
 | INFO/FORMAT field missing or mistyped | Header out of sync with body | Fix `##INFO`/`##FORMAT` Number/Type; use `bcftools +fill-tags` |

@@ -79,15 +79,6 @@ Changed in staging after their latest audit, so the score below describes earlie
 
 | skill | score at last audit | audited on |
 | --- | ---: | --- |
-| `bio-phylo-tree-manipulation` | 86 | 2026-09-15 |
-| `bio-pileup-generation` | 85 | 2026-09-20 |
-| `bio-splicing-qc` | 85 | 2026-09-20 |
-| `bio-variant-annotation` | 86 | 2026-09-15 |
-| `bio-variant-calling-filtering-best-practices` | 88 | 2026-09-15 |
-| `bio-variant-normalization` | 89 | 2026-09-15 |
-| `bio-vcf-basics` | 90 | 2026-09-11 |
-| `bio-vcf-manipulation` | 90 | 2026-09-15 |
-| `bio-vcf-statistics` | 88 | 2026-09-15 |
 
 ## Audited and excluded
 

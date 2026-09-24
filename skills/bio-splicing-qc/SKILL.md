@@ -13,7 +13,7 @@ Checked 2026-09-20 with: RSeQC 5.0.5, STAR 2.7.11b, samtools 1.24, pysam 0.24.1,
 
 ## Scope
 
-Research QC of RNA-seq datasets. Splice-site scores here describe sites in a dataset; classifying a patient's variant (ACMG/ClinGen evidence, PP3/BP4) is a clinical-laboratory decision and out of scope (see `splice-variant-prediction`).
+Research QC of RNA-seq datasets. Splice-site scores here describe sites in a dataset; clinical classification of an individual's variant is out of scope (see `splice-variant-prediction`).
 
 # Splicing-Specific Quality Control
 
@@ -169,7 +169,7 @@ print(f'known: {known:.1%}, novel: {novel:.1%}')
 
 Without the `str.strip()` the class names never match and the snippet prints `known: 0.0%, novel: 0.0%` on every library.
 
-**Definitions.** RSeQC calls a junction `annotated` when its donor AND acceptor are each in the gene model, so an unannotated skipping junction between two annotated exons counts as known; `partial_novel` has one known end, `complete_novel` none. The snippet above is **read-weighted**, which is what the table below uses; RSeQC's printed summary is **junction-level** and reads much lower on the same BAM (planted library: 93.4% of reads known, 34.6% of junctions).
+**Definitions.** RSeQC calls a junction `annotated` when its donor AND acceptor are each in the gene model, so an unannotated skipping junction between two annotated exons counts as known; `partial_novel` has one known end, `complete_novel` none. The snippet above is **read-weighted**, which is what the table below uses. RSeQC stdout prints both **Splicing Events** (read-weighted) and **Splicing Junctions** (distinct-junction) blocks; do not apply the read-weighted table to the latter. On one planted library they were 93.4% and 34.6% known, respectively.
 
 | Known fraction (reads) | Status | Interpretation |
 |------------------------|--------|----------------|
@@ -177,7 +177,15 @@ Without the `str.strip()` the class names never match and the snippet prints `kn
 | 60-80% | Acceptable | Check annotation completeness or organism |
 | <60% | Suspect or interesting | Mapping artifacts, contamination, OR biology |
 
-If novel% >40%, drill down. **High novel-junction rate may be biology, not artifact:**
+If novel% >40%, first summarize support by annotation class; weak novel support or anchors suggest mapping noise, while strongly anchored and repeatedly supported novel sites warrant an annotation and biology check. This does not prove either cause:
+
+```bash
+# Uses the matching BAM and junction_annotation.py table. `reads` is unique,
+# fragment-level support with >=8-nt anchors; zero-support rows are retained.
+python examples/splicing_qc.py novel-qc sample.bam sample_junc_annot.junction.xls --min-overhang 8
+```
+
+Then compare the candidate sites against the intended annotation release and inspect alignments. **High novel-junction rate may be biology, not artifact:**
 - **TDP-43 loss** (ALS/FTD post-mortem brain): cryptic exon de-repression in UNC13A, STMN2, ATG4B (Brown 2022 *Nature*; Klim 2019 *Nat Neurosci*)
 - **SF3B1-mutant** cancer (MDS, CLL, uveal melanoma): cryptic 3'ss ~10-30nt upstream of canonical (Darman 2015 *Cell Rep*)
 - **Non-model organism**: GENCODE-grade annotation unavailable; novel junctions reflect annotation gaps
@@ -221,7 +229,7 @@ print(s5, s3)                                     # [10.86, 2.68] [11.58]
 | 5'ss MaxEnt < 5 | Weak / cryptic |
 | 3'ss MaxEnt > 8 / < 5 | Strong / weak acceptor |
 
-MaxEntScan (Yeo & Burge 2004 *J Comput Biol*) defines the score; the cut-offs are conventions, supported on real data: of 8,549 annotated chrX GT donors 60.7% scored >8 and 11.6% <5 (median 8.6), 95.5% of 88 decoy GT donors scored <5 (AUC 0.97 donor, 0.96 acceptor), and all 399 non-GT annotated donors scored <5.
+MaxEntScan (Yeo & Burge 2004 *J Comput Biol*) defines the score; the cut-offs are conventions, supported on a chrX sample: 60.7% of 8,549 annotated GT donors scored >8 and 11.6% <5 (median 8.6), while 95.5% of 88 decoy GT donors scored <5 (AUC 0.97 donor, 0.96 acceptor), and all 399 non-GT annotated donors scored <5. Sampling and annotation release affect these descriptive figures; use them as rough context, not calibration. `score3` is comparatively slow (about 0.1 s/site in one checked environment), so scoring 10,000 acceptors can take roughly 20 minutes on one core; parallelize independent batches if needed.
 
 **SpliceAI** predicts in-vivo usage from the full pre-mRNA context. Score a VCF (the assembly must match the FASTA):
 
@@ -230,7 +238,7 @@ spliceai -I variants.vcf -O variants.spliceai.vcf -R genome.fa -A grch38 -D 50 -
 # INFO: SpliceAI=ALLELE|SYMBOL|DS_AG|DS_AL|DS_DG|DS_DL|DP_AG|DP_AL|DP_DG|DP_DL
 ```
 
-Checked on a canonical donor G>A (PLCXD1, GRCh37): `DS_DG 0.90, DS_DL 1.00`. Reference cut-offs on the maximum delta score: >=0.2 (ClinGen SVI, Walker 2023 *Am J Hum Genet*: PP3 at supporting strength) and <=0.1 (BP4); 0.5 and 0.8 are the recommended and high-precision tiers of Jaganathan 2019 *Cell*, not ClinGen strength upgrades. Use them to prioritise sites in a dataset (Scope).
+Checked on a canonical donor G>A (PLCXD1, GRCh37): `DS_DG 0.90, DS_DL 1.00`. Published reference cut-offs on the maximum delta score are >=0.2 and <=0.1; 0.5 and 0.8 are the recommended and high-precision tiers of Jaganathan 2019 *Cell*. These are research prioritization thresholds here, not a clinical classification rule (Scope).
 
 - **MaxEntScan** scores intrinsic sequence strength; **SpliceAI** scores contextual usage. High MaxEnt with low SpliceAI = intrinsically strong but contextually silenced; low MaxEnt with high SpliceAI = weak but contextually used (e.g. enhancer-driven). Report both; for variant impact see `splice-variant-prediction`.
 
@@ -270,10 +278,10 @@ On a planted dUTP library `SECOND_READ_TRANSCRIPTION_STRAND` gave `PCT_CORRECT_S
 | PCT_INTRONIC_BASES | <30% (poly(A)); <60% (rRNA-depleted) | >50% in poly(A): pre-mRNA contamination |
 | PCT_INTERGENIC_BASES | <10% | >20%: genomic DNA contamination |
 | PCT_RIBOSOMAL_BASES | see rRNA section | |
-| MEDIAN_5PRIME_TO_3PRIME_BIAS | 0.7-1.3 | **<0.5 = 3' bias** (degraded RNA or poly(A) capture); **>2 = 5' bias** |
+| MEDIAN_5PRIME_TO_3PRIME_BIAS | 0.7-1.3 | **<0.5 = possible 3' bias** (degraded RNA or poly(A) capture); **>2 = possible 5' bias** |
 | Gene-body coverage curve | Flat | Strong 3' skew = low RIN or library mis-prep |
 
-Checked on planted BAMs: a 3'-biased library gave `MEDIAN_5PRIME_TO_3PRIME_BIAS` 0.047 (uniform 1.009) and `geneBody_coverage` 5'/3' 0.04 vs 1.02. With 3' bias junction reads concentrate at the 3' end and miss internal junctions.
+Checked on planted BAMs: a 3'-biased library gave `MEDIAN_5PRIME_TO_3PRIME_BIAS` 0.047 (uniform 1.009) and `geneBody_coverage` 5'/3' 0.04 vs 1.02. With 3' bias junction reads concentrate at the 3' end and miss internal junctions. Treat the Picard ratio as a screen, not a standalone call: on a low-depth chrX subset it was 0.2745 while the gene-body 5'/3' ratio was 0.847. Confirm a flagged ratio with gene-body coverage and inspect the number of usable reads/expressed transcripts before declaring a bias.
 
 ## Strandedness Verification
 
@@ -393,9 +401,9 @@ Splice-site MaxEnt, rRNA and Picard cut-offs are in their own sections.
 
 - Yeo & Burge 2004 *J Comput Biol* - MaxEntScan
 - Jaganathan et al 2019 *Cell* - SpliceAI
-- Walker et al 2023 *Am J Hum Genet* - ClinGen SVI splicing thresholds
-- Veeneman et al 2016 *Bioinformatics* - STAR 2-pass benchmark
-- Brown et al 2022 *Nature* - cryptic exons in TDP-43 loss
+- Walker et al 2023 *Am J Hum Genet* - splicing-prediction thresholds
+- Veeneman et al 2016 *Bioinformatics*, Table 1, doi:10.1093/bioinformatics/btv642 - STAR 2-pass benchmark
+- Brown et al 2022 *Nature*, doi:10.1038/s41586-022-04436-3 - cryptic exons in TDP-43 loss
 - Klim et al 2019 *Nat Neurosci* - STMN2 cryptic splicing in ALS
 - Darman et al 2015 *Cell Rep* - SF3B1 cryptic 3'ss
 - Wang et al 2024 *Nat Protoc* - rMATS-turbo

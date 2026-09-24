@@ -78,7 +78,7 @@ Tell your AI agent what you want to do:
 - cyvcf2 is faster than PyVCF for large files
 - Filter status of `None` in cyvcf2 means the variant passed all filters
 - QUAL measures site-level variant existence; GQ measures per-sample genotype confidence -- they answer different questions and are not interchangeable, so filter on both
-- PL is phred-scaled and rebased so the called genotype is 0; GQ is the difference between the two smallest PL values (GL is the same info as raw log10 likelihoods)
+- PL is phred-scaled relative to the best likelihood; a caller's GQ is often the difference between the two smallest PL values, but verify that relationship for the caller and do not reconstruct GQ when likelihoods are missing or partial. GL retains log10 likelihoods before relative phred scaling and rounding.
 - The sum of AD values may be less than DP because DP includes uninformative reads -- this is expected, not an error; allele balance for a het is derived as alt_AD / (ref_AD + alt_AD)
 - QD (quality by depth) is generally preferred over raw QUAL for filtering because it normalizes for coverage
 - A field's header Number (A/R/G/.) controls how it re-subsets on a multiallelic split; a field mis-declared Number=. silently keeps the wrong allele's value

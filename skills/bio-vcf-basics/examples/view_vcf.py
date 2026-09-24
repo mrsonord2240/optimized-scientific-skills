@@ -17,7 +17,8 @@ def view_vcf(vcf_path, limit=10):
             break
 
         alt = ','.join(variant.ALT) if variant.ALT else '.'
-        qual = f'{variant.QUAL:.1f}' if variant.QUAL else '.'
+        # QUAL=0 is a valid score; only None represents a missing QUAL value.
+        qual = f'{variant.QUAL:.1f}' if variant.QUAL is not None else '.'
         filt = variant.FILTER if variant.FILTER else 'PASS'
 
         print(f'{variant.CHROM}:{variant.POS}\t{variant.REF}>{alt}\t'

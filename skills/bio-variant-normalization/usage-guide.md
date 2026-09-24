@@ -61,12 +61,26 @@ bcftools norm -m-any input.vcf.gz -Oz -o split.vcf.gz
 bcftools index split.vcf.gz
 ```
 
-### Combined (Recommended)
+### Full canonical form (recommended for comparison or database matching)
 
 ```bash
-bcftools norm -f reference.fa -m-any input.vcf.gz -Oz -o normalized.vcf.gz
+set -o pipefail
+# Stop before writing an unusable output if the VCF and FASTA disagree.
+bcftools norm -f reference.fa -c w input.vcf.gz -Ou 2>&1 >/dev/null | \
+  grep -q 'REF_MISMATCH\|does not match' && {
+    echo "REF allele mismatch: confirm the exact reference build and contig names." >&2
+    exit 1
+  }
+
+bcftools norm -m- input.vcf.gz | \
+  bcftools norm --atomize | \
+  bcftools norm -f reference.fa -Oz -o normalized.vcf.gz
 bcftools index normalized.vcf.gz
 ```
+
+Use `bcftools norm -f reference.fa -m-` without `--atomize` only when the
+consumer deliberately needs MNPs retained (for example, haplotype-aware
+functional consequence annotation).
 
 ## Understanding Multiallelic Splitting
 
@@ -96,7 +110,8 @@ bcftools norm -m-snps input.vcf.gz -Oz -o split_snps.vcf.gz
 # Split only indels (keep multiallelic SNPs)
 bcftools norm -m-indels input.vcf.gz -Oz -o split_indels.vcf.gz
 
-# Split SNPs and indels separately (don't mix)
+# When splitting, this is identical to -m-any; the type distinction matters
+# only when joining with -m+both.
 bcftools norm -m-both input.vcf.gz -Oz -o split_both.vcf.gz
 ```
 
@@ -200,8 +215,10 @@ bcftools norm -f reference.fa --atomize input.vcf.gz -Oz -o atomized.vcf.gz
 ### Standard Workflow
 
 ```bash
-# 1. Normalize (left-align + split)
-bcftools norm -f reference.fa -m-any input.vcf.gz -Oz -o step1.vcf.gz
+# 1. Split, atomize, and left-align against the exact downstream reference.
+bcftools norm -m- input.vcf.gz | \
+  bcftools norm --atomize | \
+  bcftools norm -f reference.fa -Oz -o step1.vcf.gz
 
 # 2. Remove duplicates
 bcftools norm -d exact step1.vcf.gz -Oz -o normalized.vcf.gz
@@ -216,7 +233,9 @@ rm step1.vcf.gz
 ### One-Step Pipeline
 
 ```bash
-bcftools norm -f reference.fa -m-any -d exact input.vcf.gz -Oz -o normalized.vcf.gz
+# Keep the explicit pipeline above when atomization is required. A one-pass
+# basic route (no MNP atomization) is:
+bcftools norm -f reference.fa -m- -d exact input.vcf.gz -Oz -o normalized.vcf.gz
 bcftools index normalized.vcf.gz
 ```
 
@@ -225,13 +244,18 @@ bcftools index normalized.vcf.gz
 Before comparing VCFs from different callers, normalize both:
 
 ```bash
-# Normalize GATK output
-bcftools norm -f reference.fa -m-any gatk.vcf.gz -Oz -o gatk.norm.vcf.gz
-bcftools index gatk.norm.vcf.gz
-
-# Normalize bcftools output
-bcftools norm -f reference.fa -m-any bcftools.vcf.gz -Oz -o bcftools.norm.vcf.gz
-bcftools index bcftools.norm.vcf.gz
+for vcf in gatk.vcf.gz bcftools.vcf.gz; do
+  base=${vcf%.vcf.gz}
+  bcftools norm -f reference.fa -c w "$vcf" -Ou 2>&1 >/dev/null | \
+    grep -q 'REF_MISMATCH\|does not match' && {
+      echo "REF allele mismatch in $vcf; stop and verify the reference." >&2
+      exit 1
+    }
+  bcftools norm -m- "$vcf" | \
+    bcftools norm --atomize | \
+    bcftools norm -f reference.fa -Oz -o "$base.norm.vcf.gz"
+  bcftools index "$base.norm.vcf.gz"
+done
 
 # Now compare
 bcftools isec -p comparison gatk.norm.vcf.gz bcftools.norm.vcf.gz
@@ -245,8 +269,17 @@ echo "Shared variants: $(bcftools view -H comparison/0002.vcf | wc -l)"
 Many annotation databases expect normalized variants:
 
 ```bash
-# Full normalization
-bcftools norm -f reference.fa -m-any -d exact variants.vcf.gz -Oz -o for_annotation.vcf.gz
+# Split and left-align before matching. Atomize only if the database/matcher
+# expects atomic alleles; retain an un-atomized copy for haplotype-aware
+# consequence calling.
+bcftools norm -f reference.fa -c w variants.vcf.gz -Ou 2>&1 >/dev/null | \
+  grep -q 'REF_MISMATCH\|does not match' && {
+    echo "REF allele mismatch; stop and verify the reference." >&2
+    exit 1
+  }
+bcftools norm -m- variants.vcf.gz | \
+  bcftools norm --atomize | \
+  bcftools norm -f reference.fa -Oz -o for_annotation.vcf.gz
 bcftools index for_annotation.vcf.gz
 
 # Now annotate with SnpEff, VEP, or database lookup

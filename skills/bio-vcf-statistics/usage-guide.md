@@ -92,9 +92,11 @@ bcftools query -f '%CHROM\t%POS\t%INFO/ExcessHet\n' input.vcf.gz | awk '$3>54.69
 
 Contamination shows up in VCF stats as a het allele-balance distribution shifted away from 0.5, an elevated het count and het/hom ratio, and a depressed novel-fraction Ti/Tv. These are signals, not the measurement. Run VerifyBamID2 or CHARR to estimate the contamination fraction alpha (alpha > ~0.02-0.03 is a red flag; somatic pipelines are sensitive to 1%).
 
+This quick check is deliberately for biallelic heterozygotes only. It includes both `0/1` and `1/0` in phased or unphased form; parse multi-allelic `AD` explicitly rather than treating its second element as a general alternate balance.
+
 ```bash
 bcftools query -f '[%SAMPLE\t%GT\t%AD\n]' input.vcf.gz | \
-    awk -F'\t' '($2 ~ /^(0[\/|]1|1\|0)$/) {split($3,a,","); d=a[1]+a[2]; if (d>0) {s[$1]+=a[2]/d; n[$1]++}}
+    awk -F'\t' '($2 ~ /^(0[\/|]1|1[\/|]0)$/) {split($3,a,","); d=a[1]+a[2]; if (d>0) {s[$1]+=a[2]/d; n[$1]++}}
         END {for (k in s) printf "%s\tmean het AB: %.3f (n=%d)\n", k, s[k]/n[k], n[k]}'   # expect ~0.5 per sample
 ```
 

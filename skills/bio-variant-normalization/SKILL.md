@@ -25,7 +25,7 @@ package and adapt the example to match the actual API rather than retrying.
 Left-align indels, decompose MNPs, and split multiallelic sites using bcftools norm.
 
 **"Put my VCF in canonical form before comparing, annotating, or merging"** -> Enforce one representation per biological event so tuple-keyed operations recognize the same variant across sources.
-- CLI: `bcftools norm -m-any -f ref.fa` (split multiallelic, then left-align + parsimony each biallelic)
+- CLI: `bcftools norm -m- in.vcf.gz | bcftools norm --atomize | bcftools norm -f ref.fa` (split, atomize, then left-align + parsimony each biallelic)
 - Alternatives: `vt normalize` + `vt decompose`; GATK `LeftAlignAndTrimVariants`
 
 ## The Normalized Form (governing principle)
@@ -57,12 +57,13 @@ Normalization is generally safe to skip only when a single caller produced all v
 
 ## Why Left-Alignment Matters in Repeats (the silent miss)
 
-The same variant can be written multiple ways:
+The same one-base deletion in a homopolymer can be written multiple ways:
 
 ```
-chr1  100  ATCG  A      (right-aligned)
-chr1  100  ATC   A      (left-aligned, parsimonious -- the canonical form)
-chr1  101  TCG   T      (shifted position, different anchor base)
+# reference around chr1:100 is AAAAAA
+chr1  100  AA  A      (leftmost, canonical)
+chr1  101  AA  A      (right-shifted representation of the same deletion)
+chr1  104  AA  A      (further right-shifted representation of the same deletion)
 ```
 
 The ambiguity is worst in homopolymers and tandem repeats. In reference `...AAAAAAA...`, a single-base `A` deletion is positionally ambiguous: deleting ANY one of the seven A's yields the identical alternate haplotype, so different callers/aligners emit it at different POS. Left-alignment defines the canonical (leftmost) position, giving the one biological event one representation.
@@ -248,7 +249,7 @@ chr1  102  .  G  A  30  PASS
 
 **Caveat -- decomposition destroys phase needed for functional annotation.** The original MNP record guarantees that its substitutions occur on the SAME haplotype. Atomization discards that guarantee. The concrete failure: two adjacent SNVs falling in one codon, annotated independently after decomposition, can each look **synonymous** while the true MNV (the haplotype) is **missense or nonsense** (or the reverse). VEP/SnpEff give the wrong amino-acid consequence on decomposed alleles because they no longer see the codon change.
 
-This is the unresolved decompose-vs-atomic tension: decompose for variant **matching** (dbSNP/ClinVar/gnomAD lookup, allele-frequency comparison), but compute **functional consequence** on the haplotype-resolved (undecomposed / phased) representation -- run `bcftools csq` on the un-atomized VCF, which is codon-aware. `csq` defaults to `-p r` (require phased genotypes) and exits with "Unphased heterozygous genotype" on ordinary unphased calls, so set `--phase`. Per `bcftools csq` help (checked on 1.24 and 1.21): `bcftools csq -p a -f ref.fa -g genes.gff3.gz in.vcf.gz` takes GTs as is, creating haplotypes regardless of phase (it will merge nearby hets into one haplotype consequence, including atomized SNVs); `-p m` merges *all* GTs into a single haplotype regardless of phase -- this merges a trans-phased pair too, not just where phase is known; `-p s` skips unphased hets entirely (no consequence emitted), it does not treat them as separate haplotypes. Recommend `-p a` for typically-unphased input. Keep the atomized copy for matching and the un-atomized copy for annotation; do not feed atomized alleles to a per-record consequence caller. See variant-calling/variant-annotation.
+This is the unresolved decompose-vs-atomic tension: decompose for variant **matching** (dbSNP/ClinVar/gnomAD lookup, allele-frequency comparison), but compute **functional consequence** on the haplotype-resolved (undecomposed / phased) representation -- run `bcftools csq` on the un-atomized VCF, which is codon-aware. `csq` defaults to `-p r` (require phased genotypes) and exits with "Unphased heterozygous genotype" on ordinary unphased calls, so set `--phase`. Per `bcftools csq` help (checked on 1.24): `bcftools csq -p a -f ref.fa -g genes.gff3.gz in.vcf.gz` takes GTs as is, creating haplotypes regardless of phase (it will merge nearby hets into one haplotype consequence, including atomized SNVs); `-p m` merges *all* GTs into a single haplotype regardless of phase -- this merges a trans-phased pair too, not just where phase is known; `-p s` skips unphased hets, so it must not be used to create separate haplotypes. Do not infer that `-p s` suppresses every per-record consequence: inspect the emitted BCSQ on the installed version. Recommend `-p a` for typically-unphased input. Keep the atomized copy for matching and the un-atomized copy for annotation; do not feed atomized alleles to a per-record consequence caller. See variant-calling/variant-annotation.
 
 ### Atomize with Old Record Tag
 

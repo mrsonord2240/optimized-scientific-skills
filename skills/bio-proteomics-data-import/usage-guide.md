@@ -17,6 +17,13 @@ Tell your AI agent what you want to do:
 - "Read the MS1 and MS2 spectra from my mzML and report precursor and isolation-window info"
 - "Tell me whether my missing values look MNAR or MCAR before I impute"
 
+Runnable entry points:
+
+- `examples/load_maxquant.py` creates and cleans a small label-free MaxQuant fixture.
+- `examples/load_maxquant_qfeatures.R proteinGroups.txt` loads label-free MaxQuant protein groups into QFeatures.
+- `examples/load_diann.py report.parquet` builds the q-filtered DIA-NN log2 matrix.
+- `examples/inspect_mzml.py sample.mzML-or-mzXML` selects the matching pyOpenMS reader and reports MS1/MS2, all-ion, and unknown-window counts.
+
 ## Example Prompts
 
 ### Loading Search Engine Output
@@ -41,6 +48,7 @@ Tell your AI agent what you want to do:
 2. Strip search-engine bookkeeping: Reverse/REV__ decoys, Potential contaminant/CON__, and Only-identified-by-site rows.
 3. Resolve semicolon protein-ID and gene-name lists to the leading (razor) entry, guarding blank gene names.
 4. Select the correct quant column for the question (LFQ intensity for between-sample, iBAQ within-sample, Intensity raw).
+   For MaxQuant TMT, it selects already-corrected `Reporter intensity corrected <channel>` columns, not the single group-total `Intensity` field; reporter correction and normalization route to quantification.
 5. Set MaxQuant zeros to NaN, then log2-transform.
 6. For DIA-NN, filter run-level precursor and protein-group q-values and the experiment-wide Global.PG.Q.Value to 1% before pivoting PG.MaxLFQ, then set zeros to NaN and log2-transform.
 7. Diagnose the missingness pattern on the log2 matrix (abundance-dependent or not) and flag which imputation class is legitimate downstream.
@@ -51,6 +59,7 @@ Tell your AI agent what you want to do:
 |--------|-------------|--------|
 | mzML / mzXML | Open standards for raw MS data | pyOpenMS, Spectra (R) |
 | proteinGroups.txt | MaxQuant protein-group output (LFQ/iBAQ/Intensity; flag columns) | pandas |
+| MaxQuant TMT proteinGroups.txt | Corrected reporter-ion channel values (`Reporter intensity corrected <channel>`) | pandas; channel map supplied by the experiment design |
 | evidence.txt | MaxQuant per-PSM output (MSstats input) | pandas |
 | report.parquet | DIA-NN main report (default 1.9+, only default 2.0) | pandas.read_parquet |
 | report.tsv | DIA-NN legacy report (pre-2.0) | pandas |
@@ -61,8 +70,10 @@ Tell your AI agent what you want to do:
 - `Only identified by site` exists ONLY in proteinGroups.txt; guard the lookup when parsing other tables.
 - A MaxQuant zero means "not quantified", not "zero abundance" -- convert to NaN before log2.
 - Use `LFQ intensity` for between-sample comparison, `iBAQ` for within-sample molar abundance, raw `Intensity` only for custom normalization.
+- MaxQuant TMT's per-channel matrix is `Reporter intensity corrected <channel>`; the lone `Intensity` field is a group total. Import corrected channels with a channel-to-sample map, then route reporter processing to quantification.
 - DIA-NN 2.0 dropped the TSV default; read `report.parquet` and q-filter (including `Global.PG.Q.Value`) before pivoting.
 - Diagnose missingness here: a negative correlation between abundance and missingness is the MNAR signature that forbids mean/KNN imputation.
+- For R/QFeatures, rename rowData with `make.names()` before filtering MaxQuant's space-containing flag fields; the bundled `examples/load_maxquant_qfeatures.R` is the runnable route.
 
 ## Related Skills
 - peptide-identification - search raw spectra and convert vendor RAW to mzML

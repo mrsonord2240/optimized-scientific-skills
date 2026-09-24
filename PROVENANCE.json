@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "58a18a1244cc415c3084f527a0b6a1452ae729fa"
+      "staging_commit": "9d9d66773e8d25145c2580c58423acc6cb238be4"
     }
   },
   "skills": [
@@ -1597,11 +1597,11 @@
     {
       "id": "bio-long-read-splicing",
       "upstream_path": "alternative-splicing/long-read-splicing",
-      "score": 83,
-      "grade": "Limited Release",
+      "score": 91,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-20",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-long-read-splicing.md",
       "fix_pass": "done",
       "reaudit": "not needed",
@@ -1609,9 +1609,10 @@
       "changed_files": [
         "SKILL.md",
         "longread_splicing_pipeline.sh",
+        "microexons.md",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-machine-learning-model-validation",
@@ -2318,14 +2319,14 @@
     {
       "id": "bio-phylo-tree-manipulation",
       "upstream_path": "phylogenetics/tree-manipulation",
-      "score": 86,
+      "score": 94,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-15",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-phylo-tree-manipulation.md",
       "fix_pass": "done",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -2335,7 +2336,7 @@
         "root_tree.py",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-phylo-tree-visualization",
@@ -2361,21 +2362,23 @@
     {
       "id": "bio-pileup-generation",
       "upstream_path": "alignment-files/pileup-generation",
-      "score": 85,
+      "score": 95,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-20",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-pileup-generation.md",
       "fix_pass": "done",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
         "allele_counts.py",
+        "pileup_helpers.py",
+        "self_test.py",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-population-genetics-rare-variant-association",
@@ -2443,30 +2446,33 @@
     {
       "id": "bio-proteomics-data-import",
       "upstream_path": "proteomics/data-import",
-      "score": 85.2,
-      "grade": "Limited Release",
+      "score": 95,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-15",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-proteomics-data-import.md",
       "fix_pass": "done",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
+        "inspect_mzml.py",
+        "load_diann.py",
         "load_maxquant.py",
+        "load_maxquant_qfeatures.R",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-proteomics-dia-analysis",
       "upstream_path": "proteomics/dia-analysis",
-      "score": 86.2,
-      "grade": "Limited Release",
+      "score": 92,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-15",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-proteomics-dia-analysis.md",
       "fix_pass": "done",
       "reaudit": "not needed",
@@ -2474,9 +2480,10 @@
       "changed_files": [
         "SKILL.md",
         "diann_analysis.sh",
+        "make_synthetic_report.py",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-proteomics-differential-abundance",
@@ -3181,21 +3188,28 @@
     {
       "id": "bio-single-cell-splicing",
       "upstream_path": "alternative-splicing/single-cell-splicing",
-      "score": 84,
-      "grade": "Limited Release",
+      "score": 94,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-20",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-single-cell-splicing.md",
       "fix_pass": "done",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
+        "brie2.md",
+        "marvel.md",
+        "pseudobulk.md",
+        "psix.md",
         "sc_splicing_brie2.py",
+        "scquint.md",
+        "sierra.md",
+        "spliz.md",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-single-cell-trajectory-inference",
@@ -3221,11 +3235,11 @@
     {
       "id": "bio-splice-variant-prediction",
       "upstream_path": "alternative-splicing/splice-variant-prediction",
-      "score": 84,
-      "grade": "Limited Release",
+      "score": 90,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-20",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-splice-variant-prediction.md",
       "fix_pass": "done",
       "reaudit": "not needed",
@@ -3246,19 +3260,19 @@
         "test_splice_parsers.py",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-splicing-qc",
       "upstream_path": "alternative-splicing/splicing-qc",
-      "score": 85,
+      "score": 90,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-20",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-splicing-qc.md",
       "fix_pass": "done",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -3266,7 +3280,7 @@
         "test_splicing_qc.py",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-sra-data",
@@ -3317,88 +3331,90 @@
     {
       "id": "bio-variant-annotation",
       "upstream_path": "variant-calling/variant-annotation",
-      "score": 86,
-      "grade": "Limited Release",
+      "score": 91,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-15",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-variant-annotation.md",
       "fix_pass": "done",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
         "annotate_vcf.sh",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-variant-calling-filtering-best-practices",
       "upstream_path": "variant-calling/filtering-best-practices",
-      "score": 88,
+      "score": 91,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-15",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-variant-calling-filtering-best-practices.md",
       "fix_pass": "done",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
         "filter_variants.sh",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-variant-normalization",
       "upstream_path": "variant-calling/variant-normalization",
-      "score": 89,
+      "score": 95,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-15",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-variant-normalization.md",
       "fix_pass": "done",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
-        "normalize_vcf.sh"
+        "normalize_vcf.sh",
+        "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-vcf-basics",
       "upstream_path": "variant-calling/vcf-basics",
-      "score": 90,
+      "score": 95,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-11",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-vcf-basics.md",
       "fix_pass": "done",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
-        "usage-guide.md"
+        "usage-guide.md",
+        "view_vcf.py"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-vcf-manipulation",
       "upstream_path": "variant-calling/vcf-manipulation",
-      "score": 90,
-      "grade": "Production Ready",
+      "score": 93,
+      "grade": "Production Ready (self-audited)",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-15",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-vcf-manipulation.md",
       "fix_pass": "done",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -3409,20 +3425,20 @@
     {
       "id": "bio-vcf-statistics",
       "upstream_path": "variant-calling/vcf-statistics",
-      "score": 88,
+      "score": 94,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-15",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-vcf-statistics.md",
       "fix_pass": "done",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-virtual-screening",

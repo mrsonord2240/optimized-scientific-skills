@@ -8,11 +8,13 @@ GENCODE v45 DB), MMSplice 2.4.0 (GENCODE v45 basic GTF); see SKILL.md for the co
 '''
 import math
 from pathlib import Path
+import tempfile
 
 import numpy as np
 
-from splice_parsers import (build_concordance, classify_delta, parse_mmsplice_csv, parse_pangolin_vcf,
-                            parse_spliceai_vcf, read_input_vcf, unscored_report)
+from splice_parsers import (build_concordance, classify_delta, display_variant_key, parse_mmsplice_csv,
+                            parse_pangolin_vcf, parse_spliceai_vcf, read_input_vcf, unscored_report)
+from spliceai_clingen_classify import prepare_spliceai_input
 
 D = Path(__file__).parent / 'test_data'
 
@@ -52,6 +54,18 @@ def test_edge_records_are_not_benign():
     assert len(inp) == 4                                                     # multi-allelic record split into 2 alleles
     ma = s[s.key.str.startswith('17:7674292:T>')]
     assert sorted(ma.key) == ['17:7674292:T>A', '17:7674292:T>C']
+    assert display_variant_key('X:1:' + 'A' * 30 + '>T') == 'X:1:' + 'A' * 24 + '...(30 nt)>T'
+
+
+def test_symbolic_alleles_are_preserved_as_unscored_before_spliceai():
+    with tempfile.TemporaryDirectory() as temp:
+        source = Path(temp) / 'input.vcf'
+        supported = Path(temp) / 'supported.vcf'
+        source.write_text('##fileformat=VCFv4.2\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n'
+                          '17\t1\tmixed\tA\tC,<DEL>,*\t.\t.\t.\n')
+        skipped = prepare_spliceai_input(source, supported)
+        assert skipped == {'17:1:A><DEL>', '17:1:A>*'}
+        assert '17\t1\tmixed\tA\tC\t.\t.\t.' in supported.read_text()
 
 
 def test_pangolin_and_mmsplice():
