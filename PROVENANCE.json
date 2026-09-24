@@ -513,7 +513,16 @@
         "cmaverse_4way.R",
         "usage-guide.md"
       ],
-      "marketplace_ready": true
+      "marketplace_ready": false,
+      "marketplace_hold": {
+        "id": "bio-causal-genomics-mediation-analysis",
+        "reason": "This ID collides with an existing marketplace skill. Hold pending maintainer decision.",
+        "scope": [
+          "marketplace_submission",
+          "marketplace_intake"
+        ],
+        "until": "marketplace maintainers decide how duplicate IDs are handled"
+      }
     },
     {
       "id": "bio-causal-genomics-mendelian-randomization",
@@ -552,7 +561,16 @@
         "simex_egger_correction.R",
         "usage-guide.md"
       ],
-      "marketplace_ready": true
+      "marketplace_ready": false,
+      "marketplace_hold": {
+        "id": "bio-causal-genomics-pleiotropy-detection",
+        "reason": "This ID collides with an existing marketplace skill. Hold pending maintainer decision.",
+        "scope": [
+          "marketplace_submission",
+          "marketplace_intake"
+        ],
+        "until": "marketplace maintainers decide how duplicate IDs are handled"
+      }
     },
     {
       "id": "bio-causal-genomics-proteome-mr-drug-target",
