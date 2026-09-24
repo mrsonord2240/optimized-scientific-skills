@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 161,
+    "refined": 160,
     "audited_and_excluded": 9,
     "out_of_scope": 1,
-    "remaining": 391
+    "remaining": 392
   },
   "remaining": [
     {
@@ -369,6 +369,10 @@
     {
       "id": "bio-data-visualization-genome-tracks",
       "upstream_path": "data-visualization/genome-tracks"
+    },
+    {
+      "id": "bio-data-visualization-heatmaps-clustering",
+      "upstream_path": "data-visualization/heatmaps-clustering"
     },
     {
       "id": "bio-data-visualization-interactive-visualization",

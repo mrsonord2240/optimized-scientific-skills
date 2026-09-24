@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "d4f4651b3cdca08afced50fa7f3c9ab36e43edd7"
+      "staging_commit": "5bfde8a9411f445ef9dad51fa4aea7dc1bf27ef8"
     }
   },
   "skills": [
@@ -1253,29 +1253,6 @@
         "SKILL.md"
       ],
       "marketplace_ready": false
-    },
-    {
-      "id": "bio-data-visualization-heatmaps-clustering",
-      "upstream_path": "data-visualization/heatmaps-clustering",
-      "score": 90,
-      "grade": "Production Ready",
-      "deployable": true,
-      "open_p0": 0,
-      "audited_on": "2026-09-24",
-      "fix_log": "fixes/bio-data-visualization-heatmaps-clustering.md",
-      "fix_pass": "done",
-      "reaudit": "not needed",
-      "relative_to_upstream": "modified",
-      "changed_files": [
-        "SKILL.md",
-        "advanced_heatmap_patterns.R",
-        "expression_heatmap.R",
-        "heatmap_phd.R",
-        "test_olo_row_annotation.R",
-        "test_seaborn_zscore_bounds.py",
-        "usage-guide.md"
-      ],
-      "marketplace_ready": true
     },
     {
       "id": "bio-data-visualization-lollipop-protein-maps",
