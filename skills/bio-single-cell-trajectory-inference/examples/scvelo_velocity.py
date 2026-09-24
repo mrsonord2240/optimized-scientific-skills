@@ -11,6 +11,7 @@
 import scvelo as scv
 import scanpy as sc
 import numpy as np
+import pandas as pd
 
 scv.settings.verbosity = 3
 scv.settings.set_figure_params('scvelo')
@@ -35,15 +36,17 @@ scv.pl.velocity_embedding_stream(adata, basis='umap', color='clusters',
                                   save='velocity_stream.png', dpi=150)
 
 scv.tl.velocity_pseudotime(adata)                   # ordering proxy in place of latent_time (needs recover_dynamics)
-scv.pl.scatter(adata, color='velocity_pseudotime', cmap='gnuplot', save='latent_time.png')
+sc.pl.umap(adata, color='velocity_pseudotime', cmap='gnuplot', save='_velocity_pseudotime.png')   # scv.pl.scatter raises KeyError: 0 on numeric .obs colors
+                                                                                                        # under pandas>=3 (scvelo 0.3.4); scanpy's plot is unaffected
 
 scv.tl.velocity_confidence(adata)
-scv.pl.scatter(adata, color=['velocity_confidence', 'velocity_length'],
-               save='velocity_confidence.png')
+sc.pl.umap(adata, color=['velocity_confidence', 'velocity_length'], save='_velocity_confidence.png')
 
 scv.tl.rank_velocity_genes(adata, groupby='clusters', min_corr=0.3)
-velocity_genes = adata.uns['rank_velocity_genes']['names'][:10]
-scv.pl.velocity(adata, var_names=list(velocity_genes.flatten()[:6]),
-                basis='umap', save='top_velocity_genes.png')
+velocity_genes = pd.DataFrame(adata.uns['rank_velocity_genes']['names']).head(10)   # ranks x groups (a recarray does not flatten to gene names)
+# scv.pl.velocity (and scv.pl.scatter with a list of genes) raise the pandas>=3 `unique requires a Series...` TypeError in scvelo 0.3.4;
+# per-gene spliced/unspliced phase portraits still work one gene at a time with explicit x/y
+for gene in list(dict.fromkeys(velocity_genes.to_numpy().ravel()))[:6]:
+    scv.pl.scatter(adata, gene, x='spliced', y='unspliced', color='clusters', save=f'phase_{gene}.png')
 
 adata.write('adata_with_velocity.h5ad')

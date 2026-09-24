@@ -1,6 +1,6 @@
 ---
 name: bio-experimental-design-batch-design
-description: Designs genomics experiments so technical nuisance variation (batch, lane, plate, flow cell, operator, reagent lot, processing day) is balanced against the biological variable of interest and therefore estimable rather than confounded, using constrained sample-to-batch assignment (designit, OSAT), the confounder/mediator/collider distinction, and the principle that no post-hoc correction recovers a fully confounded design. Covers detecting hidden batches with surrogate variable analysis, a decision table for downstream correction (ComBat-seq, RUVSeq, SVA) whose execution is deferred to differential-expression/batch-correction, and reproducibility metadata. Use when assigning samples to sequencing batches/lanes/plates, avoiding batch-condition confounding, deciding whether a design is salvageable by correction, choosing a correction method, or estimating the number of hidden batches. For the experimental unit, randomization, and blocking concepts see experimental-design/randomization-blocking.
+description: Designs genomics experiments so technical nuisance variation (batch, lane, plate, flow cell, operator, reagent lot, processing day) is balanced against the biological variable of interest and therefore estimable rather than confounded, using constrained sample-to-batch assignment (designit), the confounder/mediator/collider distinction, and the principle that no post-hoc correction recovers a fully confounded design. Covers detecting hidden batches with surrogate variable analysis, a decision table for downstream correction (ComBat-seq, RUVSeq, SVA) whose execution is deferred to differential-expression/batch-correction, and reproducibility metadata. Use when assigning samples to sequencing batches/lanes/plates, avoiding batch-condition confounding, deciding whether a design is salvageable by correction, choosing a correction method, or estimating the number of hidden batches. For the experimental unit, randomization, and blocking concepts see experimental-design/randomization-blocking.
 tool_type: r
 primary_tool: designit
 license: MIT
@@ -9,17 +9,19 @@ author: GPTomics
 
 ## Version Compatibility
 
-Reference examples tested with: designit 0.5+, OSAT 1.50+ (Bioconductor), sva 3.50+, RUVSeq 1.36+, limma 3.58+, edgeR 4.0+.
+Reference examples tested with: designit 0.5+ (CRAN), sva 3.50+, RUVSeq 1.36+, limma 3.58+, edgeR 4.0+.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - R: `packageVersion('<pkg>')` then `?function_name` to verify parameters
 
-If code throws an error, introspect the installed package and adapt to the actual API. Notes: OSAT uses `optimal.shuffle()` on a setup object (there is no bare `osat()` function); designit is R6 (`BatchContainer$new()`, `optimize_design()`, `*_score_generator()`) and its signatures drift between releases; `sva::ComBat_seq()` is for integer counts while `ComBat()` expects log-normalized values. Confirm each against the installed vignette before relying on it.
+If code throws an error, introspect the installed package and adapt to the actual API. Notes: designit is R6 (`BatchContainer$new()`, `optimize_design()`, `*_score_generator()`) and its signatures drift between releases; `sva::ComBat_seq()` is for integer counts while `ComBat()` expects log-normalized values. Confirm each against the installed vignette before relying on it.
+
+Install: `install.packages('designit')` (CRAN); `BiocManager::install(c('sva', 'RUVSeq', 'limma', 'edgeR'))`. Checked on designit 0.5.0, sva 3.54.0 (2026-09-21).
 
 # Batch Design
 
 **"Design my experiment so batch effects don't ruin it"** -> Assign samples to batches/lanes/plates so the biological variable is balanced against (orthogonal to) every technical nuisance factor, making batch estimable rather than confounded — because no post-hoc correction recovers a design where batch and condition are aliased.
-- R: `designit::optimize_design()`, `OSAT::optimal.shuffle()` — constrained assignment at design time
+- R: `designit::optimize_design()` — constrained assignment at design time
 - R: `sva::sva()`/`num.sv()` — detect hidden batches; `sva::ComBat_seq()`, `RUVSeq::RUVg()` — DOWNSTREAM correction (executed in differential-expression/batch-correction)
 
 ## The Single Most Important Modern Insight -- No Post-Hoc Method Recovers a Confounded Design
@@ -73,52 +75,29 @@ Batch is the genomics face of confounding, and not all metadata should be "adjus
 
 **Approach:** Use a block-randomization-with-optimization tool that scores assignments by how evenly the biological factors spread across batches and returns a near-optimal layout.
 
-```r
-library(designit)                              # verify API against installed vignette
-samples <- data.frame(id = sprintf('S%02d', 1:24),
-                      condition = rep(c('ctrl', 'treat'), each = 12),
-                      sex = rep(c('M', 'F'), 12))
-bc <- BatchContainer$new(dimensions = list(batch = 3, position = 8))
-bc <- assign_in_order(bc, samples = samples)
-bc <- optimize_design(
-  bc,
-  scoring = osat_score_generator(batch_vars = 'batch',
-                                 feature_vars = c('condition', 'sex')),   # balance both factors
-  max_iter = 10000)                            # raise if the verification below still looks uneven
-assignment <- bc$get_samples()                # R6 method on the container (no standalone get_samples())
-
-# OSAT alternative (Bioconductor): build a setup object, then optimal.shuffle() -- NOT a bare osat().
+```bash
+Rscript scripts/assign_batches.R samples.csv 3 8 condition,sex layout.csv   # n_batch n_position feature_vars out [max_iter] [seed]
 ```
+
+`samples.csv` needs an `id` column plus the `feature_vars` columns (24 samples, 3 batches of 8
+positions, balancing `condition` and `sex`, in the example). The script builds the `BatchContainer`,
+runs `optimize_design()` with `osat_score_generator()` and calls `check_balance()`; the layout is
+`bc$get_samples()` (an R6 method on the container, no standalone `get_samples()`).
 
 ### Verify the optimized layout before trusting it
 
 `optimize_design()` can converge to a local optimum that is still unbalanced (e.g. 9/6 instead of
 7/8 for a factor split across batches) -- always print and check the table, don't just inspect the
-achieved score:
+achieved score. `scripts/check_balance.R` defines the check:
 
 ```r
-tab <- table(assignment$condition, assignment$batch)
-print(tab)
-
-# Hard fail: a whole condition missing from a batch means condition and batch are confounded in
-# this layout, not merely unbalanced -- the design must not be used as-is.
-stopifnot(
-  "condition is confounded with batch in this layout (a batch has zero samples of some condition)" =
-    all(tab > 0)
-)
-
-# Soft check: flag an avoidable imbalance so the agent iterates instead of shipping a sub-optimal
-# split (see Input 2 above: 7/7/7/9 was accepted when 7/8/7/8 was achievable).
-imbalance <- max(tab) - min(tab)
-if (imbalance > 1) {
-  warning(sprintf(
-    'Largest cell minus smallest cell in condition x batch = %d; re-run optimize_design() with a
-higher max_iter or a different random seed before accepting this layout.', imbalance))
-}
+source('scripts/check_balance.R')
+check_balance(assignment, 'batch', c('condition', 'sex'))   # every balanced covariate, not only condition
 ```
 
-Repeat the same `table(feature, batch)` + `stopifnot(all(tab > 0))` check for every balanced
-covariate (e.g. `sex`), not only the primary condition.
+`check_balance()` stops when any covariate level is missing from a batch (confounded) and warns when
+the largest minus smallest cell exceeds 1 (avoidable imbalance: re-run with a higher `max_iter` or
+another seed). `assign_batches.R` and `bridge_layout.R` call it already.
 
 ## Reference / Bridge Channel Layout (TMT, multiplexed proteomics)
 
@@ -127,39 +106,18 @@ biological samples, so cross-plex normalization is possible without reusing a bi
 
 **Approach:** Exclude the reserved channel(s) from the `BatchContainer` at construction time with
 `exclude` (a data.frame naming every excluded dimension combination), then assign and optimize the
-*remaining* channels as usual. Randomize processing/injection order for the LC-MS run itself.
+*remaining* channels as usual.
 
-```r
-library(designit)
-samples <- data.frame(id = sprintf('S%02d', 1:60),
-                      condition = rep(c('case', 'ctrl'), each = 30),
-                      site = rep(c('A', 'B', 'C'), length.out = 60))
-
-# Reserve channel 16 of every plex (4 plexes) for the pooled bridge sample -- exclude needs one
-# row per excluded (plex, channel) combination, not just the channel column alone.
-bc <- BatchContainer$new(
-  dimensions = list(plex = 4, channel = 16),
-  exclude = data.frame(plex = 1:4, channel = 16))
-bc <- assign_in_order(bc, samples = samples)     # only fills the 60 non-reserved positions
-bc <- optimize_design(
-  bc,
-  scoring = osat_score_generator(batch_vars = 'plex', feature_vars = c('condition', 'site')),
-  max_iter = 10000)
-assignment <- bc$get_samples()
-
-# Verify: channel 16 must stay empty (holds the pooled reference, added outside this table) and
-# every plex must have exactly 15 biological positions.
-stopifnot(
-  "channel 16 was assigned a biological sample" = !16 %in% assignment$channel,
-  "a plex does not have exactly 15 biological positions" =
-    all(table(assignment$plex) == 15)
-)
-tab <- table(assignment$condition, assignment$plex); print(tab)
-stopifnot(all(tab > 0))                          # same confounding check as above
-
-# LC-MS run order: randomize injection sequence independently of plex/channel to avoid a
-# position/time gradient confound (see Algorithmic Taxonomy, "Run-order randomization").
+```bash
+Rscript scripts/bridge_layout.R samples.csv 4 16 16 condition,site layout.csv   # n_plex n_channel reserved_channel feature_vars out
 ```
+
+`samples.csv` needs an `id` column plus the `feature_vars` columns (60 samples, 4 plexes of 16
+channels, channel 16 reserved, in the example). The script reserves the channel with `exclude` (one
+row per excluded plex/channel pair), assigns and optimizes the remaining channels, asserts the
+reserved channel stays empty and no plex exceeds its non-reserved positions, then runs
+`check_balance()`. Randomize LC-MS injection order separately, independently of plex/channel, to
+avoid a position/time gradient confound (see Algorithmic Taxonomy, "Run-order randomization").
 
 ## Downstream Correction -- Choose by Design, Execute Elsewhere
 
@@ -179,32 +137,18 @@ Correction method selection is a design decision; the execution lives in differe
 
 **Goal:** Estimate unmodeled technical structure (hidden batches) so it can be included in the downstream model.
 
-**Approach:** Fit a model matrix for the biological variable and a null matrix, estimate the number of surrogate variables, then compute them for inclusion as covariates in the DE analysis. `sva()`/`num.sv()` require a **complete matrix** -- they stop with `infinite or missing values in 'x'` on any NA/NaN/Inf, which is the normal state of an LC-MS or LFQ intensity matrix before imputation. Decide explicitly how to handle that rather than letting the error surface unexplained or silently dropping rows without saying so:
+**Approach:** Fit a model matrix for the biological variable and a null matrix, estimate the number of surrogate variables, then compute them for inclusion as covariates in the DE analysis. `sva()`/`num.sv()` require a **complete matrix** -- they stop with `infinite or missing values in 'x'` on any NA/NaN/Inf, which is the normal state of an LC-MS or LFQ intensity matrix before imputation. Decide explicitly how to handle that rather than letting the error surface unexplained or silently dropping rows without saying so, and report how many cells were non-finite:
+
+- **Option A** -- keep only complete-observation features. Simple and defensible for SV estimation, but it biases the surrogate variables toward abundant, well-detected features; confirm that is acceptable before trusting the SVs for low-abundance biology.
+- **Option B** -- impute first (normalization-qc covers QRILC/missForest for left-censored proteomics/metabolomics intensities), then run `sva()` on the imputed matrix. The imputer shapes the estimated SVs, so record which one was used.
+
+`run_sva_safely()` in `examples/batch_design.R` implements Option A end to end (count and report the non-finite cells, restrict to complete features, assert finiteness, then `num.sv()` + `sva()`); copy it. The core calls, once the matrix is complete:
 
 ```r
 library(sva)
 mod  <- model.matrix(~ condition, data = colData)   # full model
 mod0 <- model.matrix(~ 1, data = colData)           # null model
-
-n_bad <- sum(!is.finite(expr_normalized))
-if (n_bad > 0) {
-  message(sprintf('%d/%d cells (%.0f%%) are missing/non-finite; sva() requires a complete matrix.',
-          n_bad, length(expr_normalized), 100 * n_bad / length(expr_normalized)))
-  # Option A (used here): keep only complete-observation features. Simple and defensible for SV
-  # estimation, but biases the surrogate variables toward abundant, well-detected features --
-  # confirm that bias is acceptable before trusting the SVs for low-abundance biology.
-  complete <- expr_normalized[stats::complete.cases(expr_normalized), , drop = FALSE]
-  message(sprintf('Restricting to %d/%d features with no missing values (Option A).',
-          nrow(complete), nrow(expr_normalized)))
-  expr_normalized <- complete
-  # Option B (alternative): impute first (normalization-qc covers QRILC/missForest for
-  # left-censored proteomics/metabolomics intensities), then re-run sva() on the imputed matrix --
-  # but the imputer choice then shapes the estimated SVs, so record which one was used.
-}
-stopifnot("expr_normalized still has non-finite values after handling missingness" =
-  all(is.finite(expr_normalized)))
-
-n_sv <- num.sv(expr_normalized, mod)                # estimate number of hidden batches
+n_sv <- num.sv(expr_normalized, mod)                # estimate number of hidden batches (complete matrix only)
 svobj <- sva(expr_normalized, mod, mod0, n.sv = n_sv)
 # Add svobj$sv to the design used by differential-expression/de-results; do NOT subtract them
 # from the data for the test (subtracting is for visualization only).
@@ -269,7 +213,6 @@ Record for every sample, because these become the batch/blocking variables: proc
 - Leek JT, Storey JD. 2007. Capturing heterogeneity in gene expression studies by surrogate variable analysis. *PLoS Genet* 3:e161.
 - Gagnon-Bartsch JA, Speed TP. 2012. Using control genes to correct for unwanted variation in microarray data. *Biostatistics* 13:539-552.
 - Kang HM, Subramaniam M, Targ S, et al. 2018. Multiplexed droplet single-cell RNA-sequencing using natural genetic variation. *Nat Biotechnol* 36:89-94.
-- Yan L, Ma C, Wang D, Hu Q, Qin M, Conroy JM, Sucheston LE, Ambrosone CB, Johnson CS, Wang J, Liu S. 2012. OSAT: a tool for sample-to-batch allocations in genomics experiments. *BMC Genomics* 13:689.
 
 ## Related Skills
 

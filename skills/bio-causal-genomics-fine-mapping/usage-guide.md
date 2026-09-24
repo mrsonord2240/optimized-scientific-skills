@@ -4,41 +4,7 @@
 
 Resolve GWAS lead SNPs to credible sets of likely causal variants by fitting sparse Bayesian regressions that propagate linkage disequilibrium (LD) into posterior inclusion probabilities (PIPs). Modern fine-mapping is dominated by SuSiE (Wang 2020) and its variants: susie_rss for summary statistics, SuSiE-inf for non-sparse loci, SuSiEx for cross-ancestry, and coloc.susie for downstream colocalization. FINEMAP, CAVIAR, DAP-G, PAINTOR, PolyFun, MultiSuSiE, and FOCUS cover specialized scenarios. The hardest practical problem is LD reference mismatch; this skill bakes in the `estimate_s_rss` and `kriging_rss` diagnostics as a mandatory step.
 
-## Prerequisites
-
-```r
-install.packages('susieR')                # CRAN; pin >= 0.12.27 for stable susie_rss API
-install.packages('coloc')                 # CRAN; >= 5.2.3 for coloc.susie
-install.packages(c('ggplot2', 'patchwork', 'dplyr', 'readr'))
-```
-
-```bash
-# FINEMAP (CLI binary; not an R package)
-# Download from http://www.christianbenner.com/
-
-# PolyFun (Python)
-git clone https://github.com/omerwe/polyfun
-pip install -r polyfun/requirements.txt
-# Pre-baked baseline-LF priors:
-#   https://data.broadinstitute.org/alkesgroup/UKBB_LD/baselineLF2.2.UKB.tar.gz
-
-# PAINTOR (C++ CLI)
-git clone https://github.com/bogdanlab/PAINTOR_V3.0
-make
-
-# SuSiEx (C++ CLI)
-git clone https://github.com/getian107/SuSiEx
-make -C src
-
-# DAP-G (CLI)
-git clone https://github.com/xqwen/dap
-
-# FOCUS (Python; for TWAS fine-mapping)
-pip install pyfocus
-
-# PLINK 1.9 / 2.0 for LD matrix generation
-conda install -c bioconda plink plink2
-```
+Install commands for every tool are in `SKILL.md` (Tool Install Notes).
 
 ## Quick Start
 
@@ -82,18 +48,9 @@ Tell the AI agent what to do in natural language:
 ### Reconciliation
 > "SuSiE finds 3 credible sets but FINEMAP finds 1 at the same locus. Diagnose: is it convergence, LD mismatch, or non-sparse architecture?"
 
-## What the Agent Will Do
+The workflow (locus window, LD source, LD diagnostic, method choice, credible-set reporting, coloc.susie hand-off) is the `SKILL.md` Decision Tree, Critical LD Diagnostic Block, Required Reporting Schema and Coloc.susie Integration.
 
-1. **Extract locus** - 1-3 Mb window around the lead SNP from harmonized GWAS summary statistics
-2. **Build / load LD matrix** - In-sample LD when available; otherwise ancestry-stratified reference panel (PLINK `--r square`)
-3. **Run LD diagnostic** - `estimate_s_rss()` to compute lambda; `kriging_rss()` for per-SNP flags
-4. **Choose method** - susie_rss for sparse loci, SuSiE-inf for polygenic shoulders, SuSiEx for cross-ancestry, FINEMAP for independent confirmation
-5. **Fit model** - L=10 default; L=20-30 for HLA or complex loci; optional `prior_weights` from PolyFun
-6. **Extract credible sets** - `fit$sets$cs`, `fit$sets$purity`, `fit$pip`; filter to purity >= 0.5
-7. **Report** - Number of credible sets, size of each, purity, top PIP variant per set, and the operational caveat that the credible set is the unit of inference
-8. **Optionally** - Feed into coloc.susie for colocalization; annotate variants with VEP / Ensembl
-
-Tips on LD reference choice, credible-set interpretation, L selection, purity filtering, PolyFun's `prior_weights` argument, non-sparse loci, HLA, PSD violations, and cross-ancestry gains are all covered in `SKILL.md` (Per-Tool Failure Modes, Quantitative Thresholds, Cross-Ancestry Fine-Mapping with SuSiEx, and Common Errors).
+Tips on LD reference choice, credible-set interpretation, L selection, purity filtering, PolyFun's `prior_weights` argument, non-sparse loci, HLA, PSD violations, and cross-ancestry gains are covered in `SKILL.md` (Per-Tool Failure Modes, Quantitative Thresholds, Cross-Ancestry Fine-Mapping with SuSiEx, and Common Errors).
 
 ## Related Skills
 

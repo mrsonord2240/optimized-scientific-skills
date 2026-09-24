@@ -79,8 +79,8 @@ Common configurations and their included checks are:
 | Config | Includes | When to use |
 |--------|----------|-------------|
 | `redock` | All checks + RMSD vs reference + protein vdW overlap | Self-docking benchmarks, retrospective validation |
-| `dock` | All non-reference checks; drops RMSD plus the four reference-dependent checks (molecular formula, molecular bonds, double-bond stereo, chirality) since those need `mol_true` | Blind docking, prospective virtual screening |
-| `mol` | Intra-ligand only (sanity, bonds, angles, rings, stereo, energy) | Conformer QC; no protein context |
+| `dock` | All checks that need no reference; drops RMSD and the reference-dependent checks listed under the check table | Blind docking, prospective virtual screening |
+| `mol` | Intra-ligand only (sanitization, bond lengths/angles, internal clash, ring and double-bond flatness, energy); no stereo or chirality checks, which need `mol_true` | Conformer QC; no protein context |
 
 PoseBusters also ships additional and faster configurations in some releases. Treat the table as a workflow guide, not an exhaustive registry, and inspect the configurations available in the installed version.
 
@@ -92,25 +92,7 @@ Output: a DataFrame with one row per pose, metadata columns, and boolean pass/fa
 
 **Approach:** Instantiate `PoseBusters(config='dock')`, call `bust()` on the SDF + PDB pair, and AND-aggregate all boolean check columns into a single `pb_valid` flag.
 
-```python
-from posebusters import PoseBusters
-import pandas as pd
-
-bust = PoseBusters(config='dock')
-
-results = bust.bust(
-    mol_pred='/path/to/docked_poses.sdf',
-    mol_cond='/path/to/receptor.pdb',
-)
-
-check_cols = [
-    col for col in results.select_dtypes(include='bool').columns
-    if not col.lower().startswith('rmsd')
-]
-results['pb_valid'] = results[check_cols].all(axis=1)
-valid = results[results['pb_valid']]
-print(f'{len(valid)} / {len(results)} poses are PB-valid')
-```
+Run `run_posebusters(pred_sdf, receptor_pdb)` from `examples/validate_poses.py` (it uses `dock`, or `redock` when a reference SDF is given, and adds the `pb_valid` column). Check columns are the boolean ones excluding `rmsd*`.
 
 ## Strain Energy Quantification
 
@@ -120,73 +102,7 @@ Beyond binary PB-valid, quantitative strain energy distinguishes "marginal" from
 
 **Approach:** Generate a reference conformer ensemble (ETKDGv3 + MMFF94), make the docked and reference molecules chemically consistent by adding explicit hydrogens to both, relax only the added docked-pose hydrogens while fixing all heavy atoms, take the lowest sampled reference energy as baseline, and report `docked_energy - min_ref_energy` as a relative strain diagnostic. This is not a rigorous solution-phase conformational free energy.
 
-```python
-from rdkit import Chem
-from rdkit.Chem import AllChem
-
-def ligand_strain(docked_sdf, n_ref=20):
-    suppl = Chem.SDMolSupplier(docked_sdf, removeHs=False)
-    strains = []
-    for docked in suppl:
-        if docked is None:
-            continue
-
-        smi = Chem.MolToSmiles(docked)
-        ref = Chem.MolFromSmiles(smi)
-        if ref is None:
-            strains.append({'strain': None, 'note': 'reference_parse_failed'})
-            continue
-        ref = Chem.AddHs(ref)
-        props_ref = AllChem.MMFFGetMoleculeProperties(ref)
-        if props_ref is None:
-            strains.append({'strain': None, 'note': 'no_reference_mmff_parameters'})
-            continue
-        conf_ids = list(AllChem.EmbedMultipleConfs(
-            ref, numConfs=n_ref, params=AllChem.ETKDGv3()
-        ))
-        if not conf_ids:
-            strains.append({'strain': None, 'note': 'reference_embedding_failed'})
-            continue
-        AllChem.MMFFOptimizeMoleculeConfs(ref)
-
-        ref_energies = []
-        for c in conf_ids:
-            ff = AllChem.MMFFGetMoleculeForceField(
-                ref, props_ref, confId=c
-            )
-            if ff is not None:
-                ref_energies.append(ff.CalcEnergy())
-        if not ref_energies:
-            strains.append({'strain': None, 'note': 'reference_force_field_failed'})
-            continue
-        min_ref = min(ref_energies)
-
-        # MMFF energies are comparable only for the same explicit atom system.
-        # Add any missing H coordinates, then relax H atoms while preserving the
-        # docked heavy-atom pose.
-        docked_h = Chem.AddHs(Chem.Mol(docked), addCoords=True)
-        if docked_h.GetNumAtoms() != ref.GetNumAtoms():
-            strains.append({'strain': None, 'note': 'atom_system_mismatch'})
-            continue
-        props_docked = AllChem.MMFFGetMoleculeProperties(docked_h)
-        docked_ff = AllChem.MMFFGetMoleculeForceField(
-            docked_h, props_docked
-        ) if props_docked is not None else None
-        if docked_ff is not None:
-            for atom in docked_h.GetAtoms():
-                if atom.GetAtomicNum() != 1:
-                    docked_ff.AddFixedPoint(atom.GetIdx())
-            docked_ff.Minimize(maxIts=200)
-        docked_e = docked_ff.CalcEnergy() if docked_ff else None
-
-        strains.append({
-            'min_ref_energy': min_ref,
-            'docked_energy': docked_e,
-            'strain': docked_e - min_ref if docked_e is not None else None,
-            'note': 'ok' if docked_e is not None else 'docked_force_field_failed',
-        })
-    return strains
-```
+Run `ligand_strain_mmff(docked_sdf, n_ref_conf=20)` from `examples/validate_poses.py`; it returns a DataFrame with `pose_idx`, `strain_kcal` and a `note` for poses it could not score.
 
 Interpret relative MMFF strain in the context of ligand chemistry, conformer-sampling coverage, and force-field support. Boström et al. (1998) found a conformational energy penalty of no more than 3 kcal/mol for about 70% of 33 protein-bound ligands; that result does not establish a universal acceptance cutoff. Treat unusually high values as a prompt for inspection or use a project-defined threshold validated for the series.
 
@@ -196,25 +112,7 @@ The 2024 benchmark criterion limits protein-ligand overlap to 7.5% of the ligand
 
 ## Aromatic Ring Planarity
 
-```python
-import numpy as np
-
-def aromatic_planarity(mol):
-    deviations = []
-    for ring in mol.GetRingInfo().AtomRings():
-        ring_atoms = [mol.GetAtomWithIdx(i) for i in ring]
-        if not all(a.GetIsAromatic() for a in ring_atoms):
-            continue
-        coords = np.array([mol.GetConformer().GetAtomPosition(i)
-                          for i in ring])
-        centroid = coords.mean(axis=0)
-        centered = coords - centroid
-        _, s, vh = np.linalg.svd(centered)
-        normal = vh[-1]
-        deviation = np.abs(centered @ normal).max()
-        deviations.append(deviation)
-    return max(deviations) if deviations else 0
-```
+Run `python scripts/aromatic_planarity.py poses.sdf` (or import `aromatic_planarity(mol)` from it); it prints the maximum out-of-plane deviation per pose.
 
 This reimplementation approximates PoseBusters' internal flatness computation; it does not reproduce it exactly. Verified against installed PoseBusters 0.6.5 (`aromatic_ring_flatness`) on a displacement series of the same pose: this formula's deviation reliably passes at 0.29 Å and reliably fails at 0.45 Å and above -- roughly double the 0.25 Å figure sometimes quoted for this check. Treat `bust()`'s own `aromatic_ring_flatness` column as authoritative for pass/fail; use this snippet only as a supplementary diagnostic, not a gate.
 
@@ -243,28 +141,7 @@ On the Astex Diverse Set reported by Buttenschoen et al. (2024), DiffDock's top-
 
 ## Integration into VS Pipeline
 
-```python
-import pandas as pd
-from posebusters import PoseBusters
-
-def pose_qc_pipeline(docked_sdfs, receptor_pdb):
-    bust = PoseBusters(config='dock')
-    all_results = []
-    for sdf in docked_sdfs:
-        r = bust.bust(mol_pred=sdf, mol_cond=receptor_pdb)
-        check_cols = [
-            col for col in r.select_dtypes(include='bool').columns
-            if not col.lower().startswith('rmsd')
-        ]
-        r['pb_valid'] = r[check_cols].all(axis=1)
-        r['source'] = sdf
-        all_results.append(r)
-    df = pd.concat(all_results)
-
-    df['rank'] = df.groupby('source')['pb_valid'].cumsum()
-    valid_top = df[df['pb_valid']].groupby('source').head(1)
-    return valid_top
-```
+Run `python scripts/pose_qc_batch.py receptor.pdb poses1.sdf poses2.sdf ...` (or import `pose_qc_pipeline(docked_sdfs, receptor_pdb)`); it runs `dock` on each file and keeps the first PB-valid pose per file. For one SDF with strain columns added, use `pose_qc_pipeline` in `examples/validate_poses.py`.
 
 ## Common Errors
 
@@ -274,7 +151,7 @@ def pose_qc_pipeline(docked_sdfs, receptor_pdb):
 | RMSD not computed | No reference provided | Pass `mol_true` parameter |
 | All checks pass for invalid pose | Wrong receptor file format | Use PDB with hydrogens; PDBQT may not work |
 | vdW overlap false positive on covalent | Covalent bond counted as clash | Use covalent docking-specific validation |
-| Strain calculation slow | Too many reference conformers | Reduce `n_ref` to 5-10 |
+| Strain calculation slow | Too many reference conformers | Reduce `n_ref_conf` to 5-10 |
 | PoseBusters config error | Wrong or version-incompatible config name | Inspect the installed configuration registry; `redock`, `dock`, and `mol` are common configurations |
 | posecheck unavailable | Different tool, similar purpose | `pip install posecheck` for alternative |
 | Otherwise-reasonable pose rejected on one borderline check | Binary PB-valid used as an absolute reject | Use PoseBusters as a filter, not an absolute reject; inspect which check failed and by how much before discarding the pose |

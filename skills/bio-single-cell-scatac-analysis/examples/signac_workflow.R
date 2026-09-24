@@ -25,7 +25,7 @@ annotations <- GetGRangesFromEnsDb(ensdb = EnsDb.Hsapiens.v86)
 seqlevelsStyle(annotations) <- 'UCSC'
 Annotation(obj) <- annotations
 
-# QC metrics
+# QC metrics (NucleosomeSignal/TSSEnrichment are deprecated in Signac 1.17.x in favor of ATACqc(), which needs the external fragtk binary; both still run with a warning)
 obj <- NucleosomeSignal(obj)
 obj <- TSSEnrichment(obj, fast = FALSE)
 obj$pct_reads_in_peaks <- obj$peak_region_fragments / obj$passed_filters * 100

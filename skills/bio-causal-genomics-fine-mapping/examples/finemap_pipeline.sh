@@ -24,10 +24,13 @@ awk -v chr="$CHR" -v start="$START" -v end="$END" \
 awk '{print $1}' locus_gwas.txt > locus_snps.txt
 
 # --- Step 2: Generate LD matrix from reference panel ---
+# 'spaces' is required: PLINK writes --r square tab-delimited by default, and
+# FINEMAP's parser rejects a tab-delimited .ld (confirmed on FINEMAP 1.4.2 /
+# PLINK 1.9: "Expected N SNPs in row 1 ... but encountered only 1 SNPs").
 plink --bfile "$REF_PANEL" \
   --chr "$CHR" --from-bp "$START" --to-bp "$END" \
   --extract locus_snps.txt \
-  --r square \
+  --r square spaces \
   --out locus_ld
 
 # --- Step 3: Create .z file for FINEMAP ---
@@ -58,7 +61,14 @@ sort -k11 -nr locus.snp | head -10
 
 echo ""
 echo "Credible sets:"
-cat locus.cred
+# FINEMAP writes one locus.cred<k> per causal-count model with nonzero
+# posterior, not a plain locus.cred (confirmed on FINEMAP 1.4.2). Each file's
+# header states "Post-Pr(# of causal SNPs is k)"; the run's own stdout above
+# ("Post-Pr(# of causal SNPs is k)" table) names which k to trust most.
+for f in locus.cred*; do
+  echo "--- $f ---"
+  cat "$f"
+done
 
 echo ""
 echo "Model configurations:"

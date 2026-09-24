@@ -4,16 +4,7 @@
 
 This guide covers designing genomics experiments so that technical nuisance variation (batch, lane, plate, flow cell, operator, reagent lot, processing day) is balanced against the biological variable of interest and therefore estimable rather than confounded. The governing principle is that no post-hoc correction recovers a design in which batch is aliased with the biological variable, and that even on unbalanced designs aggressive correction can inject false signal. The skill covers constrained sample-to-batch assignment, the causal-graph view of what to adjust for, detection of hidden batches with surrogate variable analysis, and a decision table for downstream correction whose execution is deferred to the differential-expression and single-cell categories.
 
-## Prerequisites
-
-```r
-# R/Bioconductor
-install.packages('BiocManager')
-BiocManager::install(c('sva', 'RUVSeq', 'limma', 'edgeR', 'OSAT'))
-
-# Design optimization (CRAN)
-install.packages('designit')
-```
+Install notes and package versions: see SKILL.md "Version Compatibility".
 
 ## Quick Start
 
@@ -43,23 +34,6 @@ Tell your AI agent what you want to do:
 > "Check my RNA-seq for hidden batch structure with SVA and tell me how to include it in the model."
 
 > "Should I use ComBat-seq, RUVSeq, or keep batch as a covariate for my balanced design?"
-
-## What the Agent Will Do
-
-1. Assess the design for confounding between batch and the biological variable.
-2. Produce a balanced, constrained sample-to-batch/lane/plate assignment.
-3. Estimate hidden batch structure with surrogate variable analysis when warranted.
-4. Recommend a correction strategy (preferring batch-in-the-model) and point to where it is executed.
-5. Specify the reproducibility metadata to record so technical factors remain modelable.
-
-## Tips
-
-- Never run all of one condition in a single batch; balance every condition across all batches.
-- Keep batch in the analysis model for inference; reserve a batch-"cleaned" matrix for visualization only.
-- On unbalanced designs, aggressive correction can inject false positives; redesign rather than rely on correction.
-- Adjust for confounders (common causes), not for mediators or colliders.
-- Record date, reagent lot, operator, lane, and plate position for every sample.
-- For scRNA-seq, pool donors per lane and demultiplex to remove the donor-versus-lane confound.
 
 ## Related Skills
 

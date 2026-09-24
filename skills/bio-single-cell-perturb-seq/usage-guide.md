@@ -8,7 +8,7 @@ Perturb-seq and CROP-seq read out a pooled CRISPR screen with single-cell transc
 
 See SKILL.md's Prerequisites section for exact install commands and version caveats
 (`pertpy[jax]` is required, not optional, for the default guide-assignment method; `sceptre`
-needs R >= 4.5).
+is installed from GitHub).
 
 ## Quick Start
 

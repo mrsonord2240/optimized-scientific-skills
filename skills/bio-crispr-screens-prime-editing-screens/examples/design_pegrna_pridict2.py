@@ -15,8 +15,10 @@ import re
 variants_df = pd.read_csv('intended_variants.csv')
 
 # === PRIDICT2 CLI invocation ===
-# Build the batch input CSV expected by PRIDICT2: sequence_name, sequence (with (REF/ALT) notation)
-# Then call: python pridict2_pegRNA_design.py batch --input-fname variants.csv --output-dir out/ --cores 8 --summarize
+# Build the batch input CSV expected by PRIDICT2: sequence_name, editseq (with (REF/ALT) notation)
+# Then call (CSV under ./input/, out/ must exist, and no .csv already in out/):
+#   mkdir -p input/ out/; mv variants.csv input/
+#   python pridict2_pegRNA_design.py batch --input-fname variants.csv --output-dir out/ --cores 3 --summarize K562
 # This example uses a placeholder predict_pridict2() that simulates the CLI output.
 
 # === STEP 1: GENERATE pegRNA CANDIDATES ===
@@ -104,9 +106,11 @@ def find_pegrna_candidates(chrom, pos, ref, alt, context_seq, edit_position_in_c
 
 # === STEP 2: PRIDICT2 PREDICTION ===
 # In production: write candidates to a CSV with PRIDICT2's batch format
-# (sequence_name, sequence with (REF/ALT) notation) and call:
+# (sequence_name, editseq with (REF/ALT) notation) and call:
+#   mkdir -p input/ predictions/; mv candidates.csv input/
 #   python pridict2_pegRNA_design.py batch --input-fname candidates.csv \
-#       --output-dir predictions/ --cores 8 --summarize
+#       --output-dir predictions/ --cores 3 --summarize K562
+# Note: --output-dir must be empty of .csv files before running with --summarize.
 # Then read predictions/<timestamp>_summary_K562_batch_summary.csv. The placeholder below simulates.
 def predict_pridict2(spacer, pbs, rtt, context):
     '''Placeholder for PRIDICT2 batch CLI output parsing.

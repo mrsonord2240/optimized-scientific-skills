@@ -1,4 +1,8 @@
 # Reference: monocle3 1.3+, Seurat 5.0+, SeuratWrappers 0.3+ | Verify API if version differs
+#
+# Platform: monocle3 and SeuratWrappers are GitHub-only R packages with no Windows binary and do not
+# install on Windows; this script has not been executed in the audit environment. On Windows use
+# PAGA/DPT or Slingshot + tradeSeq instead (see SKILL.md, Installation).
 library(Seurat)
 library(SeuratWrappers)
 library(monocle3)

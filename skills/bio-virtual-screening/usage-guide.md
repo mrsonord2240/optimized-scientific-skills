@@ -41,7 +41,7 @@ Tell your AI agent what you want to do:
 5. Collect and rank results by affinity
 
 ## Tips
-See SKILL.md's "Exhaustiveness", "Box too small" (Common Pitfalls/Per-Tool Failure Modes), "Receptor Preparation", "Version Compatibility", and "Common Errors" sections for box sizing, exhaustiveness, receptor-prep, and version-drift guidance -- kept in one place there.
+See SKILL.md's "Exhaustiveness", "Box too small" (`references/failure-modes.md`), "Receptor Preparation", "Version Compatibility", and "Common Errors" sections for box sizing, exhaustiveness, receptor-prep, and version-drift guidance -- kept in one place there.
 
 ## Related Skills
 - molecular-io - Load and convert molecules

@@ -11,7 +11,7 @@ conda install -c bioconda samtools
 # pysam
 pip install pysam
 ```
-UMI libraries also need `umi_tools` and `fgbio`; see "UMI-Aware Deduplication" in `SKILL.md`.
+UMI libraries also need `umi_tools` and `fgbio`; see `references/umi-dedup.md`.
 
 ## Quick Start
 Tell your AI agent what you want to do:

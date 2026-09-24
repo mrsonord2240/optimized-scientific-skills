@@ -9,7 +9,7 @@ author: GPTomics
 
 ## Version Compatibility
 
-Reference examples tested with: phyloseq 1.46+, vegan 2.6+, picante 1.8+, GUniFrac 1.8+, scikit-bio 0.6+, QIIME2 2024.2+.
+Reference examples tested with: phyloseq 1.46+, vegan 2.6+, picante 1.8+, GUniFrac 1.8+, scikit-bio 0.6+, QIIME2 2024.2+. R snippets and `scripts/` re-run on phyloseq 1.50.0, vegan 2.7.3, picante 1.8.2, GUniFrac 1.9 (R 4.4.3).
 
 Before using code patterns, verify installed versions match. If versions differ:
 - R: `packageVersion('<pkg>')` then `?function_name` to verify parameters
@@ -81,7 +81,7 @@ An alpha or beta diversity value is not a measurement of the community; it is th
 | Change is a bloom of dominant taxa | weighted UniFrac, Bray-Curtis | abundance-weighted metrics see dominant shifts |
 | Do not want to metric-shop | generalized UniFrac alpha=0.5 + report both un/weighted | Chen 2012 compromise; single-metric hit is tentative |
 | Richness vs evenness question | observed/Faith (q0) AND Shannon-exp (q1) / InvSimpson (q2) | span the richness-evenness spectrum |
-| Compositional, want axis-driving taxa | RPCA (DEICODE/gemelli) | CLR ordination with interpretable loadings |
+| Compositional, want axis-driving taxa | rclr PCA / robust.aitchison (R); full RPCA (DEICODE/gemelli) in its own env | CLR ordination with interpretable loadings; see NMDS and compositional ordination |
 | Picking a rarefaction depth | feature-table summarize + alpha-rarefaction plateau | depth must retain samples AND saturate richness |
 | Per-taxon "which bug changed" | -> differential-abundance | diversity is whole-community; DA is per-feature |
 | Shotgun profiler table, not amplicon | -> metagenomics/metagenome-visualization | no per-feature tree; different idiom |
@@ -104,6 +104,12 @@ qiime diversity core-metrics-phylogenetic \
     --i-phylogeny rooted-tree.qza --i-table table.qza \
     --p-sampling-depth 10000 \   # on the observed-features plateau; SILENTLY DROPS samples below this
     --m-metadata-file metadata.tsv --output-dir core-metrics-results
+```
+
+No plot to read (or an agent that cannot read one)? `scripts/pick_sampling_depth.R` does the plateau call numerically: it rarefies each sample analytically (`vegan::rarefy`, no RNG) over a depth grid, and picks the smallest depth where 1000 more reads add less than `tol` (default 1%) to mean richness, among depths that keep at least `min_keep` (default 85%) of the samples, then lists the survivors and the dropped samples. If no depth in the allowed range plateaus it says so and returns the deepest allowed depth - report that, do not call it a plateau. The gain is measured on samples that survive both depths, so samples dropping out do not bias the curve. Input is a feature x sample count TSV (from QIIME2: `qiime tools export --input-path table.qza --output-path e` then `biom convert -i e/feature-table.biom -o counts.tsv --to-tsv`, then `sed -i 1d counts.tsv`). The chosen depth feeds `--p-sampling-depth` or `rarefy_even_depth(sample.size=)`; still confirm at +/-20%.
+
+```bash
+Rscript scripts/pick_sampling_depth.R counts.tsv 0.01 0.85   # args: counts.tsv [tol] [min_keep] [n_steps]; writes depth_curve.tsv
 ```
 
 core-metrics-phylogenetic rarefies the table, computes the four alpha vectors (`faith_pd_vector`, `observed_features_vector`, `shannon_vector`, `evenness_vector`) and four beta matrices (`unweighted_unifrac_`, `weighted_unifrac_`, `jaccard_`, `bray_curtis_distance_matrix`), and produces a PCoA + Emperor plot for each beta metric. The non-phylogenetic twin `qiime diversity core-metrics` drops Faith PD and both UniFracs and needs no tree.
@@ -145,7 +151,7 @@ alpha$Shannon_eff <- exp(alpha$Shannon)   # effective species; base-invariant in
 kruskal.test(Shannon ~ Group, data = alpha)   # non-parametric; escalate to lme4/nlme for covariates or repeated measures
 ```
 
-Faith PD in R uses `picante::pd(otu_matrix, tree, include.root = TRUE)`. The Shannon from `estimate_richness` is in natural log (nats); QIIME2 reports log2 (bits) - report `exp(Shannon)` to compare across the two.
+Faith PD in R uses `picante::pd(otu_matrix, tree, include.root = TRUE)`.
 
 ## Beta Diversity in R (report weighted AND unweighted)
 
@@ -173,7 +179,26 @@ fixture, the naive pooled test gave R2=0.053, p=0.098 while the `strata=SubjectI
 gave the same R2 but p=1 - the naive p-value overstated the evidence. Any design with subjects sampled
 more than once (longitudinal visits, technical replicates, matched pairs) needs `strata=`.
 
-If betadisper is significant the adonis2 result is ambiguous (location vs spread) - state it. The PERMANOVA-dispersion theory is shared; see metagenomics/metagenome-visualization. For a compositionally coherent ordination with feature loadings use RPCA (DEICODE `qiime deicode rpca` / gemelli). The Python engine is scikit-bio (`skbio.diversity.beta_diversity`, `skbio.stats.ordination.pcoa`, `skbio.stats.distance.permanova`).
+If betadisper is significant the adonis2 result is ambiguous (location vs spread) - state it. The PERMANOVA-dispersion theory is shared; see metagenomics/metagenome-visualization. The Python engine is scikit-bio (`skbio.diversity.beta_diversity`, `skbio.stats.ordination.pcoa`, `skbio.stats.distance.permanova`).
+
+### NMDS and compositional (Aitchison) ordination in R
+
+```r
+library(vegan)
+bc <- phyloseq::distance(ps_rare, method = 'bray')
+set.seed(1)                                                        # metaMDS starts are random
+nmds <- metaMDS(bc, k = 2, trymax = 50, autotransform = FALSE, trace = 0)   # takes a dist; no re-transform
+nmds$stress                                                        # < 0.2 usable, < 0.1 good; ~0 means the data collapse to a few points, not a great fit
+scores(nmds, display = 'sites')
+
+x  <- as(otu_table(ps), 'matrix'); if (taxa_are_rows(ps)) x <- t(x)   # UNrarefied counts, samples x features
+ra <- vegdist(x, method = 'robust.aitchison')                      # rclr-based Aitchison distance: no pseudocount, zeros tolerated
+meta_all <- data.frame(sample_data(ps))                            # ps, not ps_rare: same samples as x
+adonis2(ra ~ Group, data = meta_all, permutations = 999)          # pair with permutest(betadisper(ra, meta_all$Group)) as above
+pc <- prcomp(decostand(x, method = 'rclr'))                        # rclr PCA: axes (pc$x) and feature loadings (pc$rotation)
+```
+
+NMDS is rank-based: its axes have no variance-explained, so use PCoA when percent-variance matters and NMDS when the goal is a low-distortion 2-D picture; always report the stress. The rclr PCA above (checked on vegan 2.7.3) is the runnable compositional ordination with feature loadings, but it is not DEICODE's RPCA, which adds OptSpace matrix completion on the observed entries before the SVD. For the full RPCA (`qiime deicode rpca`, or gemelli) use its own conda env: its dependency pins downgrade scipy/scikit-bio from what QIIME2 2024.x pins, so do not install it into the QIIME2 env; that command is documented but not run here.
 
 ## Per-Method Failure Modes
 
@@ -193,7 +218,7 @@ If betadisper is significant the adonis2 result is ambiguous (location vs spread
 **Trigger:** comparing raw ASV counts across runs/studies as "richness". **Mechanism:** ASV count tracks DADA2 truncation/maxEE/pooling and intragenomic 16S copy variants, not just biology. **Symptom:** richness shifts with denoising settings. **Fix:** prefer Hill q1/q2; report observed features with the denoising parameters stated.
 
 ### Shannon base mismatch
-**Trigger:** comparing a QIIME2 Shannon to an R Shannon. **Mechanism:** QIIME2 uses log2 (bits), R `diversity`/`estimate_richness` natural log (nats). **Symptom:** numbers differ by a constant factor and look like a real effect. **Fix:** state the base, convert, or report `exp(H')`.
+**Trigger:** comparing a QIIME2 Shannon to an R Shannon. **Mechanism:** QIIME2 uses log2 (bits), R `diversity`/`estimate_richness` natural log (nats). **Symptom:** numbers differ by a constant factor and look like a real effect. **Fix:** state the base, convert by `log2(e)`, or report `exp(H')`.
 
 ### PERMANOVA dispersion
 **Trigger:** a significant adonis2 read as a composition shift. **Mechanism:** pseudo-F responds to within-group spread, not only centroid location (shared theory; metagenomics/metagenome-visualization). **Symptom:** significant adonis2 with significant betadisper. **Fix:** always run betadisper/permutest alongside; report both.
@@ -212,13 +237,11 @@ If betadisper is significant the adonis2 result is ambiguous (location vs spread
 
 ## Common Errors
 
+The symptoms covered by Per-Method Failure Modes above (PCoA with fewer points than samples, unweighted-vs-weighted disagreement, R vs QIIME2 Shannon mismatch, significant adonis2 with overlapping groups) are not repeated here.
+
 | Error / symptom | Cause | Solution |
 |-----------------|-------|----------|
-| PCoA has fewer points than samples | `--p-sampling-depth` dropped low-count samples | lower the depth or report the loss; never assume zero drops |
 | `UniFrac` errors / Faith PD missing | no `phy_tree` slot in the phyloseq object | attach a SEPP/GG2 (preferred) or de novo tree |
-| Unweighted UniFrac significant, weighted not | change is in rare lineages, or de novo tree noise | report both; verify the tree; treat single-metric hit as tentative |
-| R and QIIME2 Shannon disagree | log base differs (nats vs bits) | report `exp(H')`; convert by `log2(e)` |
-| adonis2 p<0.001 but groups visually overlap | dispersion difference, not location | run betadisper; report it |
 | scikit-bio `otu_ids=` deprecation warning | 0.6 renamed OTU to taxon; `otu_ids=` kept as a deprecated alias | `get_beta_diversity_metrics()` and `help()` to find current kwargs |
 | Diversity tracks host/plant content | host mitochondria/chloroplast 16S not removed | filter Mitochondria/Chloroplast features (see taxonomy-assignment) before computing diversity |
 | "Community" in a near-sterile/low-biomass sample | reagent kitome not removed | sequence controls + run decontam upstream (amplicon-processing; metagenomics/contamination-controls) |

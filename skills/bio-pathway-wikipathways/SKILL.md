@@ -63,6 +63,7 @@ WikiPathways is a wiki: anyone can create or edit a pathway, content is CC0, and
 | License | CC0 (fully open) | Restrictive (commercial bulk/API) | CC-BY / CC0 |
 | Curation | Community wiki, no formal peer review | Largely automated KO reconstruction | Expert-curated and reviewed |
 | Species | ~30+ | 4000+ (genome-derived) | ~15 (deep human) |
+| Human pathways | ~1,100 (`listPathways('Homo sapiens')`, 2026-09) | ~370 (KEGG REST `list/pathway/hsa`, 2026-09) | see reactome-pathways |
 | Focus | Disease/drug + general | Metabolic/signaling | Reaction-level mechanism |
 | Reproducibility | Pin a dated monthly GMT (live `current/` otherwise) | Live REST API (date-dependent) | Local reactome.db (version-pinned) |
 
@@ -76,7 +77,7 @@ WikiPathways is a wiki: anyone can create or edit a pathway, content is CC0, and
 | Pre-selected list (module, screen hits, GWAS loci) | `enrichWP` ORA | no ranking available |
 | Disease / drug pathways missing from KEGG/Reactome | WP as a complement, run alongside KEGG/Reactome | community content is genuinely additive where it exists |
 | Maximum gene/process coverage, noise tolerable | PFOCR (separate resource), not `enrichWP` | figure-OCR sets are higher-recall, lower-precision |
-| Non-model but WP-supported species (zebrafish, fly, worm, Arabidopsis) | `enrichWP(entrez, '<scientific name>')`, verify via `get_wp_organisms()` | WP covers ~30+ species |
+| Non-model but WP-supported species (zebrafish, fly, worm, Arabidopsis) | `enrichWP(entrez, '<scientific name>')`, verify via `rWikiPathways::listOrganisms()` | WP covers ~30+ species |
 | Compare up- vs down-regulated | `compareCluster(geneClusters=list(up=..,down=..), fun='enrichWP', organism=)` | one model, faceted dotplot |
 | Genes are SYMBOL/ENSEMBL | convert to Entrez first (`bitr`) | the WP GMT is Entrez-keyed; other types overlap nothing |
 
@@ -126,22 +127,14 @@ as.data.frame(wp_gsea)   # NES, p.adjust, core_enrichment (the leading edge)
 
 **Goal:** Make a WP analysis reproducible across re-runs by pinning a dated release instead of pulling `current/`.
 
-**Approach:** Download a dated GMT (pass `format='gmt'` - the default is `gpml`), split the compound `name%version%wpid%org` term field into TERM2GENE/TERM2NAME, run `enricher`/`GSEA` on the pinned sets, and report the date in methods. The live archive retains only the last ~12 months of monthly releases (10th of each month) - compute a recent date rather than hardcoding one that will 404 as time passes; for a fixed historical date beyond the window, use the Zenodo GMT/GPML archive instead (https://zenodo.org/communities/wikipathways).
+**Approach:** Download a dated GMT (pass `format='gmt'` - the default is `gpml`), split the compound `name%version%wpid%org` term field into TERM2GENE/TERM2NAME, run `enricher`/`GSEA` on the pinned sets, and report the date in methods. The live archive retains only the last ~12 months of monthly releases (10th of each month) - compute a recent date rather than hardcoding one that will 404 as time passes, and loop over successive months (`Sys.Date() - 60, -90, -120, ...`) with `tryCatch` so a single missing release does not stop the run - `scripts/wikipathways_pinned_enrich.R` does this and prints the date that succeeded. If every in-window date fails, or for a fixed historical date beyond the window, use the Zenodo GMT/GPML archive instead (https://zenodo.org/communities/wikipathways).
 
-```r
-library(rWikiPathways)
-library(tidyr)
-
-archive_date <- format(Sys.Date() - 60, '%Y%m10')   # e.g. '20260710'; report this date in methods
-# downloadPathwayArchive needs an organism to actually download a file (organism=NULL opens the index)
-gmt <- downloadPathwayArchive(date=archive_date, organism='Homo sapiens', format='gmt', destpath=tempdir())
-wp2gene <- read.gmt(file.path(tempdir(), gmt))
-wp2gene <- separate(wp2gene, term, c('name','version','wpid','org'), sep='%')   # term is a %-joined compound
-t2g <- wp2gene[, c('wpid','gene')]   # TERM2GENE
-t2n <- wp2gene[, c('wpid','name')]   # TERM2NAME
-
-wp_pinned <- enricher(sig, universe=all_entrez, TERM2GENE=t2g, TERM2NAME=t2n)   # report date=archive_date
+```bash
+# sig_entrez.txt / universe_entrez.txt: one Entrez ID per line (tested genes as universe); prints the release date used
+Rscript scripts/wikipathways_pinned_enrich.R sig_entrez.txt universe_entrez.txt 'Homo sapiens' wp_pinned.csv
 ```
+
+For GSEA, build the same `t2g` (`wpid`, `gene`) / `t2n` (`wpid`, `name`) tables and call `GSEA(geneList, TERM2GENE=t2g, TERM2NAME=t2n)`; `examples/wikipathways_explore.R` shows the pattern inline.
 
 `gson_WP(organism)` returns a GSON snapshot object, but it still pulls `current/` - it freezes a session, NOT a chosen historical date. Only the dated `downloadPathwayArchive` GMT survives a re-run months later.
 
@@ -150,7 +143,8 @@ wp_pinned <- enricher(sig, universe=all_entrez, TERM2GENE=t2g, TERM2NAME=t2n)   
 ```r
 library(rWikiPathways)
 
-listOrganisms()                          # supported species (full scientific names; ~30+)
+organisms <- rWikiPathways::listOrganisms()  # supported species (full scientific names; ~30+)
+organisms
 listPathways('Homo sapiens')             # all WPIDs + names for a species
 getPathwayInfo('WP554')                  # metadata incl. last-edit; check before trusting a single hit
 getXrefList('WP554', 'L')                # genes by BridgeDb system code: 'L'=Entrez, 'H'=HGNC, 'En'=Ensembl
@@ -163,7 +157,7 @@ findPathwaysByText('cancer')             # text search (searchPathways() is NOT 
 wp_mouse <- enrichWP(gene=mouse_entrez, organism='Mus musculus')
 wp_zfish <- enrichWP(gene=zfish_entrez, organism='Danio rerio')
 # verify the exact organism string before running:
-get_wp_organisms()                       # plural accessor; the string must match exactly
+rWikiPathways::listOrganisms()
 ```
 
 ## Understanding Results
@@ -227,9 +221,10 @@ For GSEA results read `NES` (sign = direction along the ranking) and `core_enric
 | `searchPathways` error | function removed | use `findPathwaysByText()` |
 | `read.gmt` term column is a `%`-compound | term field not split | `separate(., term, c('name','version','wpid','org'), sep='%')` |
 | `downloadPathwayArchive` opens a browser / downloads nothing | `organism=NULL` | name the organism to actually download a file |
+| `downloadPathwayArchive` warns `cannot open URL ... 404` then errors | that month's release is outside the ~12-month window or was not published | step back one release (`Sys.Date() - 90, -120, ...`, 10th of the month); for an older fixed date use the Zenodo archive |
 | GPML where a GMT was expected | `format` defaulted to `gpml` | pass `format='gmt'` |
 | `gseWP` error about vector names | geneList not named or not sorted decreasing | build a named Entrez vector, `sort(decreasing=TRUE)` |
-| `enrichWP`/`gseWP` returns NULL with no terms | wrong/non-canonical organism string (e.g. a common name like `'zebrafish'`) | verify with `listOrganisms()`/`get_wp_organisms()` first; the string must match exactly |
+| `enrichWP`/`gseWP` returns NULL with no terms | wrong/non-canonical organism string (e.g. a common name like `'zebrafish'`) | verify with `rWikiPathways::listOrganisms()` first; the string must match exactly |
 
 ## References
 

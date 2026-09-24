@@ -10,24 +10,43 @@
 suppressPackageStartupMessages(library(ssizeRNA))
 set.seed(20260528)
 
+# ssizeRNA 1.3.3 returns NA when a normal search reaches maxN, but its
+# very-low-maxN path can instead throw `argument is of length zero`.  Treat
+# that package edge case as the same "not reachable within maxN" outcome while
+# preserving every other package error.
+safe_ssize <- function(call) {
+  tryCatch(call(), error = function(e) {
+    if (identical(conditionMessage(e), "argument is of length zero")) return(NULL)
+    stop(e)
+  })
+}
+require_reachable_n <- function(res, maxN) {
+  n <- if (is.null(res)) NA_real_ else res$ssize[, "ssize"]
+  if (length(n) != 1L || is.na(n)) {
+    stop(sprintf("no n <= %d reaches the target; raise maxN or revise fc/dispersion", maxN))
+  }
+  n
+}
+
 # ---------------------------------------------------------------------------
 # 1. FDR-aware sample size (single mean/dispersion for all genes)
 # ---------------------------------------------------------------------------
 # nGenes: total genes; pi0: proportion NON-DE; m: pseudo sample size for simulation (default 200);
 # mu: mean NORMALIZED count -- use a realistic value (order 100-500 for typical bulk RNA-seq
 #     depth), not a small toy number, or the search can run past maxN and come back NA.
-res <- ssizeRNA_single(nGenes = 20000, pi0 = 0.95, m = 200,
-                       mu = 200, disp = 0.2, fc = 1.5, fdr = 0.05, power = 0.80, maxN = 200)
-n <- res$ssize[, "ssize"]
-if (is.na(n)) stop("no n <= maxN reaches the target; raise maxN or revise fc/dispersion")
+res <- safe_ssize(function() ssizeRNA_single(nGenes = 20000, pi0 = 0.95, m = 200,
+                                              mu = 200, disp = 0.2, fc = 1.5, fdr = 0.05,
+                                              power = 0.80, maxN = 200))
+n <- require_reachable_n(res, maxN = 200)
 cat(sprintf('Minimum n per group (1.5-fold, mu=200, disp=0.2, FDR 0.05, 80%% power): %d (achieved power %.3f)\n',
             n, res$ssize[, "power"]))
 
 # Sensitivity to fold change (the dominant lever)
 for (fc in c(1.5, 2, 3)) {
-  r <- ssizeRNA_single(nGenes = 20000, pi0 = 0.95, m = 200, mu = 200, disp = 0.2,
-                       fc = fc, fdr = 0.05, power = 0.80, maxN = 200)
-  n_fc <- r$ssize[, "ssize"]
+  r <- safe_ssize(function() ssizeRNA_single(nGenes = 20000, pi0 = 0.95, m = 200,
+                                              mu = 200, disp = 0.2, fc = fc, fdr = 0.05,
+                                              power = 0.80, maxN = 200))
+  n_fc <- if (is.null(r)) NA_real_ else r$ssize[, "ssize"]
   cat(sprintf('fc=%.1f -> n=%s per group\n', fc, if (is.na(n_fc)) "NA (raise maxN)" else n_fc))
 }
 

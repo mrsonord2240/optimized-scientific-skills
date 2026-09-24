@@ -1,5 +1,5 @@
 '''Download by known ID list: direct EFetch for <200 IDs, chained EPost+history for larger lists, with integrity verification.'''
-# Reference: biopython 1.83+, entrez direct 21.0+ | Verify API if version differs
+# Verified: biopython 1.88, entrez direct 26.0 (2026-09-22) | Verify API if version differs
 from Bio import Entrez, SeqIO
 import time
 
@@ -12,7 +12,9 @@ def direct_efetch(db, ids, out_path, rettype='fasta'):
     '''For <200 IDs: comma-joined EFetch in one call.'''
     assert len(ids) <= EPOST_LIMIT, f'Use chained EPost for >{EPOST_LIMIT} IDs'
     h = Entrez.efetch(db=db, id=','.join(ids), rettype=rettype, retmode='text')
-    with open(out_path, 'w') as out:
+    # newline='' disables newline translation: text mode would otherwise turn
+    # NCBI's LF endings into CRLF on Windows, changing the payload's bytes.
+    with open(out_path, 'w', newline='') as out:
         out.write(h.read())
     h.close()
 
@@ -35,7 +37,7 @@ def chained_epost_fetch(db, ids, out_path, rettype='fasta', batch_size=500):
         time.sleep(delay)
         print(f'  Posted {min(i + EPOST_LIMIT, len(ids))}/{len(ids)} IDs')
 
-    with open(out_path, 'w') as out:
+    with open(out_path, 'w', newline='') as out:
         for query_key, chunk_total in posts:
             for start in range(0, chunk_total, batch_size):
                 h = Entrez.efetch(db=db, rettype=rettype, retmode='text',

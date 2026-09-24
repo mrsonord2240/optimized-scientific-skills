@@ -11,7 +11,8 @@ TMP_DIR="${3:-foldseek_tmp}"
 mkdir -p "${DB_DIR}" "${TMP_DIR}"
 
 # Download AFDB Swiss-Prot subset (smaller, faster than full AlphaFoldDB).
-if [ ! -d "${DB_DIR}/afdb_sp" ]; then
+# foldseek databases writes files (afdb_sp, afdb_sp.dbtype, ...), not a directory: test the .dbtype file.
+if [ ! -f "${DB_DIR}/afdb_sp.dbtype" ]; then
     echo "Downloading AlphaFoldDB Swiss-Prot subset..."
     foldseek databases Alphafold/Swiss-Prot "${DB_DIR}/afdb_sp" "${TMP_DIR}"
 fi
@@ -24,7 +25,8 @@ if [[ "${QUERY}" == *.pdb ]] || [[ "${QUERY}" == *.cif ]]; then
 else
     # Sequence-only path via ProstT5: predict 3Di alphabet directly from sequence, skip AF2.
     echo "=== Sequence-only search via ProstT5 ==="
-    if [ ! -d "${DB_DIR}/prostt5" ]; then
+    # foldseek databases writes a file-prefix database, not a directory.
+    if [ ! -f "${DB_DIR}/prostt5.dbtype" ]; then
         echo "Downloading ProstT5 weights..."
         foldseek databases ProstT5 "${DB_DIR}/prostt5" "${TMP_DIR}"
     fi

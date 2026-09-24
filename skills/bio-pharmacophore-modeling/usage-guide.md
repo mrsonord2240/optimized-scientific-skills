@@ -38,17 +38,12 @@ Tell the AI agent what to do:
 
 1. Identify pharmacophore features (donor, acceptor, hydrophobe, aromatic) from input.
 2. For a co-crystal: use PLIP or PoseView to map ligand-residue contacts; for an apo pocket, use the documented apo2ph4 workflow and retain its PML output.
-3. For ligand-based: align defensible active conformers, derive conserved feature correspondences and distance bounds with a documented workflow, then use RDKit or another search engine to apply the resulting model. RDKit `EmbedPharmacophore` embeds against an existing model; it does not derive the consensus.
-4. Set geometric tolerances from aligned-feature variability, coordinate uncertainty, and retrospective validation.
-5. Convert the model to the search engine's documented query format, then search by feature-distance constraints.
-6. Output: ranked hits + retrospective enrichment.
+3. Follow SKILL.md for the ligand-based, receptor-based and search steps (tolerances, query-format conversion, retrospective validation).
+4. Output: ranked hits + retrospective enrichment.
 
 ## Tips
 
-- Compare ligand- and receptor-based models on target-relevant validation; neither is universally more reliable.
-- Use bioactive conformer when possible; not first-generated conformer.
 - Geometric-tolerance and retrospective-enrichment calibration rules live in SKILL.md's "Pharmacophore Feature Types" and "Pharmacophore Quality Validation" sections -- do not treat the tabulated ranges or the 5x heuristic as fixed.
-- Measure specificity and recall on the project dataset; they depend on feature count, tolerances, conformers, and the fingerprint baseline.
 - Combine pharmacophore + 2D fingerprint for hybrid search.
 
 ## Related Skills

@@ -11,7 +11,8 @@ library(graphite)
 library(clusterProfiler)
 library(org.Hs.eg.db)
 
-n_boot   <- 2000   # SPIA default; bootstrap replicates for the pPERT null
+n_boot   <- 2000   # SPIA default; bootstrap replicates for the pPERT null. For interactive exploration
+                   # lower to 200-500 (much faster); use 2000+ for the final reported result.
 padj_cut <- 0.05   # DESeq2 adjusted-p gate for selecting DE genes
 
 de <- read.csv('de_results.csv')

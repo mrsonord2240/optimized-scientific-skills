@@ -6,8 +6,8 @@ library(rWikiPathways)
 library(clusterProfiler)
 library(tidyr)
 
-listOrganisms()                       # supported species; ~30+ full scientific names
-get_wp_organisms()                    # plural accessor; the organism string must match exactly
+organisms <- rWikiPathways::listOrganisms()  # supported species; choose its exact scientific-name string
+head(organisms)
 
 human_pathways <- listPathways('Homo sapiens')
 head(human_pathways, 20)
@@ -29,9 +29,17 @@ pathway_entrez
 # data.wikipathways.org's own landing page) -- compute a recent date instead of hardcoding one
 # that will 404 later; for a fixed historical date beyond the window, use the Zenodo GMT/GPML
 # archive instead (https://zenodo.org/communities/wikipathways).
-archive_date <- format(Sys.Date() - 60, '%Y%m10')   # e.g. '20260710'; report this date in methods
-gmt <- downloadPathwayArchive(date = archive_date, organism = 'Homo sapiens',
-                              format = 'gmt', destpath = tempdir())
+# Try newest-first in-window dates; one missing release 404s, so step back a month and retry.
+candidates <- unique(format(Sys.Date() - seq(60, 330, by = 30), '%Y%m10'))
+gmt <- NULL
+for (archive_date in candidates) {   # report the date that succeeds in methods
+  gmt <- tryCatch(suppressWarnings(downloadPathwayArchive(date = archive_date, organism = 'Homo sapiens',
+                                                          format = 'gmt', destpath = tempdir())),
+                  error = function(e) NULL)
+  if (!is.null(gmt) && file.exists(file.path(tempdir(), gmt))) break
+  gmt <- NULL
+}
+if (is.null(gmt)) stop('no release in the last ~12 months; use the Zenodo GMT archive')
 wp2gene <- read.gmt(file.path(tempdir(), gmt))
 wp2gene <- separate(wp2gene, term, c('name', 'version', 'wpid', 'org'), sep = '%')
 t2g <- wp2gene[, c('wpid', 'gene')]

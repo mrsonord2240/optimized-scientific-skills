@@ -43,6 +43,8 @@ This pipeline is only as honest as its weakest stage: a flawless feature table f
 If code throws ImportError, AttributeError, or TypeError, introspect the installed
 package and adapt the example to match the actual API rather than retrying.
 
+Install: `BiocManager::install(c('xcms', 'CAMERA', 'MetaboAnalystR', 'ropls', 'pmp', 'imputeLCMD'))`
+
 # Metabolomics Pipeline
 
 **"Process my LC-MS metabolomics data end-to-end"** -> Chain xcms feature extraction, QC/normalization, confidence-stratified annotation, validated statistics, and background-aware pathway mapping, treating each stage's output as a hypothesis its component skill scrutinizes.
@@ -62,11 +64,25 @@ This skill is an orchestrator: it sequences the five component skills and enforc
 
 | Stage | The decision it owns | The trap it must not paper over | Defers to |
 |---|---|---|---|
-| 1. Feature extraction | centWave/grouping/alignment parameters that set the detection floor | A feature table is a parameterized hypothesis; `fillChromPeaks` fabricates intensities; 1 compound = 5-15 features | metabolomics/xcms-preprocessing |
+| 1. Feature extraction | centWave/grouping/alignment parameters that set the detection floor | A feature table is a parameterized hypothesis; `fillChromPeaks` fabricates intensities; 1 compound = 5-15 features | metabolomics/xcms-preprocessing (code: `references/stage1-xcms-extraction.md`) |
 | 2. QC + normalization | drift correction, RSD/D-ratio filtering, dilution normalization, mechanism-aware imputation | Over-correction is invisible to QC RSD; half-min-impute-then-test inflates significance; confounded design is unrescuable | metabolomics/normalization-qc |
 | 3. Annotation | the MSI/Schymanski confidence level of every name | A database hit is Level 4-5, not an identification; ambiguous m/z inflates downstream pathways | metabolomics/metabolite-annotation |
 | 4. Statistics | univariate FDR + permutation-validated multivariate, reconciled | A clean PLS-DA score plot is the generic output of p>>n; R2 is no evidence; scaling changes conclusions | metabolomics/statistical-analysis |
-| 5. Pathway mapping | ORA on IDs vs mummichog on m/z, with an explicit background | The background IS the null; enrichment launders annotation uncertainty into confident biology | metabolomics/pathway-mapping |
+| 5. Pathway mapping | ORA on IDs vs mummichog on m/z, with an explicit background | The background IS the null; enrichment launders annotation uncertainty into confident biology | metabolomics/pathway-mapping (code: `references/stage5-pathway-mapping.md`) |
+
+## Required Inputs
+
+1. Raw MS data: centroided mzML/mzXML (convert vendor formats with ProteoWizard msConvert, centroiding during conversion).
+2. Sample metadata: one row per file with sample, condition, batch, injection_order and a `sample_group` column marking QCs (`QC`/`Control`/`Treatment`); biological groups randomized across batches.
+3. Pooled QC injections bracketing the run and about one per 5-10 samples: drift correction, RSD/D-ratio filtering and the PQN reference all depend on them, so without QCs there is no honest pipeline.
+
+```csv
+sample,sample_group,condition,batch,injection_order
+QC1.mzML,QC,QC,1,1
+Sample1.mzML,Control,Control,1,2
+Sample2.mzML,Treatment,Treatment,1,3
+QC2.mzML,QC,QC,1,4
+```
 
 ## Pipeline Flow
 
@@ -94,31 +110,7 @@ Stable-isotope tracing (flux) is a SEPARATE branch off labeled raw data, not a s
 
 ## Stage 1 -- Feature Extraction (modern xcms 4.x)
 
-**Goal:** Turn centroided mzML into a features-by-samples table, carrying the parameters as part of the result.
-
-**Approach:** Use the `MsExperiment`/`XcmsExperiment` containers with `*Param` objects; align to pooled QC, group AFTER alignment (obiwarp aligns the raw profile directly, so no pre-grouping is needed; the PeakGroups method instead needs group -> align -> regroup because it uses grouped anchor peaks), and treat filled values as imputations. Full parameter rationale (ppm, peakwidth, bw, prefilter) lives in metabolomics/xcms-preprocessing.
-
-```r
-library(xcms)
-# pd: data.frame, one row per file, with a sample_group column ('QC'/'Control'/'Treatment')
-# ionization_mode: 'positive' or 'negative', set from the acquisition method -- carried through
-# to Stage 3/5 as defs$mode below (commitment #1, the mode-lock). A mixed-mode study runs this
-# whole stage twice, once per mode, and merges the resulting feature tables afterward.
-raw <- readMsExperiment(spectraFiles = mzml_files, sampleData = pd)
-
-cwp <- CentWaveParam(ppm = 10, peakwidth = c(2, 20), snthresh = 10,
-                     prefilter = c(3, 1000), noise = 1000)   # set from instrument; see xcms-preprocessing
-xdata <- findChromPeaks(raw, param = cwp)
-xdata <- adjustRtime(xdata, param = ObiwarpParam(binSize = 0.6,
-    subset = which(sampleData(xdata)$sample_group == 'QC'), subsetAdjust = 'average'))   # anchor RT alignment on pooled QCs
-pdp <- PeakDensityParam(sampleGroups = sampleData(xdata)$sample_group,
-                        bw = 5, minFraction = 0.5, binSize = 0.025)
-xdata <- groupChromPeaks(xdata, param = pdp)        # group on corrected RT (obiwarp needs no pre-grouping)
-xdata <- fillChromPeaks(xdata, param = ChromPeakAreaParam())
-
-feat <- featureValues(xdata, value = 'into')        # features x samples; filled cells are imputations
-defs <- featureDefinitions(xdata)                   # mzmed / rtmed per feature, for annotation + mummichog
-```
+Read `references/stage1-xcms-extraction.md` for `scripts/stage1_xcms_extract.R` and the extraction (`readMsExperiment` -> `findChromPeaks` -> `adjustRtime` -> `groupChromPeaks` -> `fillChromPeaks` -> `featureValues`) that produces `feat` and `defs`.
 
 ## Stage 2 -- QC, Drift, Normalization (not naive median + half-min)
 
@@ -127,44 +119,10 @@ defs <- featureDefinitions(xdata)                   # mzmed / rtmed per feature,
 **Approach:** Follow the normalization-qc pipeline order: blank/detection filter -> within-batch drift correction (QCRSC) -> RSD/D-ratio filter -> PQN -> mechanism-aware imputation. Do NOT silently half-min-impute and feed limma; validate drift correction on held-out QCs, not on QC clustering.
 
 ```r
-library(pmp)
-library(imputeLCMD)
-# feat (Stage 1 featureValues() output) is already features x samples -- the pmp convention.
-# No transpose needed; assert it instead of assuming, so an API change is caught, not silently
-# masked (pmp's own check_peak_matrix re-transposes with no warning when it can, which is what
-# hid this exact bug before: a wrong `t(feat)` here still "worked").
-fm <- feat
-stopifnot(nrow(fm) == nrow(defs), ncol(fm) == length(sample_class))
-
-filtered <- filter_peaks_by_fraction(fm, classes = sample_class, min_frac = 0.5, qc_label = 'QC')
-corrected <- QCRSC(df = filtered, order = injection_order, batch = batch_id,
-                   classes = sample_class, spar = 0, minQC = 5, qc_label = 'QC')  # CV-selected spline
-rsd_filtered <- filter_peaks_by_rsd(corrected, max_rsd = 30, classes = sample_class, qc_label = 'QC')
-normalized <- pqn_normalisation(rsd_filtered, classes = sample_class, qc_label = 'QC')
-
-# QCRSC silently returns an ENTIRE batch as all-NA when that batch has fewer QCs than minQC (see
-# normalization-qc's Common Errors) -- verified on real MTBLS79 data: 5 of 8 batches had only 4
-# QCs (< minQC=5), wiping 90 of 172 samples. A wholly-missing sample carries NO measured
-# information to impute -- report and drop it; do not fabricate a profile for it.
-nm <- as.matrix(normalized)
-wiped <- colMeans(is.na(nm)) == 1
-if (any(wiped)) {
-  cat(sum(wiped), 'of', ncol(nm), 'samples came back all-NA (QCRSC: their batch had < minQC QCs)',
-      '-- dropping, not imputing:\n')
-  print(table(batch_id[wiped]))
-  nm <- nm[, !wiped, drop = FALSE]
-  sample_class <- sample_class[!wiped]   # keep every per-sample vector in sync for Stage 4
-}
-
-# The remaining holes are the sparse, mechanism-driven kind imputation is actually valid for.
-# QRILC (MNAR / left-censored) is only valid on log-scale intensities; on raw intensities it
-# silently draws negative (impossible) values. Round-trip through log2/2^x, per normalization-qc.
-log_mat <- log2(nm)
-imputed <- 2^(impute.QRILC(log_mat, tune.sigma = 1)[[1]])
-stopifnot(min(imputed, na.rm = TRUE) >= 0, !anyNA(imputed))  # no NAs may reach Stage 4 (opls() cannot tolerate them)
+source('scripts/stage2_qc_impute.R')   # feat, defs, sample_class, injection_order, batch_id in -> imputed (NA-free) and re-synced sample_class out
 ```
 
-Drift correction should lower QC RSD AND leave biological-sample RSD unchanged; if biological RSD rises, the spline absorbed signal. Mechanism-aware imputation (QRILC/GSimp for left-censored zeros) replaces the old half-min step, which collapses imputed-subset variance and inflates false significance. `imputed` (not `normalized`) is what Stage 4 receives -- feeding `normalized` directly, unimputed and still carrying any wiped samples, is exactly the bug that crashes real multi-batch data (see Stage 4 below). Verified end to end on real MTBLS79 data (2433 features, 172 samples, 8 batches): 90 wiped samples dropped, 82 survive with only sparse residual NAs (max 18% per sample), QRILC imputes cleanly, and the Stage 4 OPLS-DA below fits successfully (`pR2Y = pQ2 = 0.001`).
+`QCRSC` returns a whole batch as all-NA when it has fewer QCs than `minQC`; the script reports and drops those samples instead of imputing them (see Common Errors). Drift correction should lower QC RSD AND leave biological-sample RSD unchanged; if biological RSD rises, the spline absorbed signal. `imputed` (not `normalized`) is what Stage 4 receives. Verified end to end on real MTBLS79 data (2433 features, 172 samples, 8 batches): 90 wiped samples dropped, 82 survive with only sparse residual NAs (max 18% per sample), QRILC imputes cleanly, and the Stage 4 OPLS-DA below fits successfully (`pR2Y = pQ2 = 0.001`).
 
 ## Stage 3 -- Annotation Before Claiming IDs
 
@@ -217,45 +175,29 @@ Univariate Welch + BH (`p.adjust(method='BH')` in R, `multipletests(method='fdr_
 
 ## Stage 5 -- Pathway Mapping (the background is the null)
 
-**Goal:** Interpret the differential result in pathway context without laundering annotation uncertainty into confident biology.
-
-**Approach:** Two disjoint entry points. Confidently identified compounds -> ORA/MSEA with an assay-coverage background (NOT all of KEGG). Raw m/z with no IDs -> mummichog/PSEA whose permutation null is sampled from the FULL feature table. Either way, report mapping coverage and the MSI levels of the driving compounds; downgrade claims to "consistent with perturbation." Full method choice and background construction in metabolomics/pathway-mapping.
-
-```r
-# MSI/Schymanski gate (commitment #2): only Level 1-2 (1, 2a, 2b) may enter identified-ORA as an
-# "identification" -- Level 3-5 is a database-name hypothesis, not a name (see
-# metabolite-annotation). This filter is the one place the principle is enforced as code, not
-# just stated in a QC-checkpoint row.
-# annotated: Stage 3's per-feature output (feature_id, name, msi_level -- msi_level values like
-# 1, '2a', '2b', 3, 4, 5 per metabolite-annotation's assign_level()), joined to feature_id.
-identified_compounds <- unique(annotated$name[grepl('^[12]', as.character(annotated$msi_level))])
-stopifnot(length(identified_compounds) > 0)   # all Level 3-5? use Path B (mummichog) instead, not a forced ORA
-
-current.msg <- character(0); err.vec <- character(0)  # required outside the Shiny app; see pathway-mapping
-library(MetaboAnalystR)
-# Path A: identified compounds (MSI level 1-2) -> ORA
-mSet <- InitDataObjects('conc', 'pathora', FALSE)
-mSet <- SetOrganism(mSet, 'hsa')
-mSet <- Setup.MapData(mSet, identified_compounds)
-mSet <- CrossReferencing(mSet, 'name')
-mSet <- CreateMappingResultTable(mSet)              # inspect coverage before trusting any p-value
-mSet <- SetKEGG.PathLib(mSet, 'hsa', 'current')
-mSet <- SetMetabolomeFilter(mSet, TRUE)             # TRUE alone does not restrict the background --
-mSet <- Setup.KEGGReferenceMetabolome(mSet, 'reference_metabolome.txt')  # this call does (see pathway-mapping)
-mSet <- CalculateOraScore(mSet, 'rbc', 'hyperg')
-# Sends the mapped compound list to xialab.ca and can reject a filtered request outright on this
-# version; if so, use pathway-mapping's Local-Only ORA (KEGGREST + local phyper, no remote call).
-
-# Path B: no IDs -> mummichog on the FULL peak table (m/z + p-value + t-score)
-# mSet <- InitDataObjects('mass_all', 'mummichog', FALSE)
-# mSet <- UpdateInstrumentParameters(mSet, 5.0, 'negative')   # ppm + ionization mode are mandatory
-# mSet <- Read.PeakListData(mSet, 'peaks_full.txt')           # ENTIRE table, not significant-only
-# mSet <- PerformPSEA(mSet, 'hsa_mfn', 'current', permNum = 1000)
-```
+Two disjoint entry points: confidently identified compounds (MSI Level 1-2 only) -> ORA/MSEA with an assay-coverage background; raw m/z with no IDs -> mummichog/PSEA on the FULL feature table. Read `references/stage5-pathway-mapping.md` for the MSI gate and the MetaboAnalystR code for both paths.
 
 ## Alternative Front End -- MS-DIAL
 
-When peak detection happens in the MS-DIAL GUI/console (MS2Dec deconvolution, GC-EI, DIA/SWATH), import the alignment-result table and enter the pipeline at Stage 2. The framing is unchanged: the imported table is still a parameterized hypothesis. See metabolomics/msdial-preprocessing for the export-parsing details, then continue with normalization-qc onward.
+When peak detection happens in MS-DIAL (MS2Dec deconvolution, GC-EI, DIA/SWATH), enter the pipeline at Stage 2 with the imported alignment table; read `references/msdial-front-end.md` and run `scripts/msdial_import.R`, which builds `feat`, `defs`, `sample_class`, `injection_order` and `batch_id`.
+
+## Reference Files
+
+| File | Read it when |
+|---|---|
+| `references/stage1-xcms-extraction.md` | Starting from raw centroided mzML: the xcms 4.x extraction block (Stage 1) |
+| `references/stage5-pathway-mapping.md` | Reaching Stage 5: the Level 1-2 gate, MetaboAnalystR ORA (identified compounds) and mummichog (no IDs) |
+| `references/msdial-front-end.md` | Peak detection was done in MS-DIAL: importing its alignment export and entering at Stage 2 |
+
+## Scripts
+
+Paths are relative to this Skill's directory; each script is `source()`d and leaves its outputs in the calling environment (inputs and outputs are listed in its header).
+
+| Script | Does |
+|---|---|
+| `scripts/stage1_xcms_extract.R` | Stage 1: mzML -> `xdata`, `feat`, `defs` |
+| `scripts/msdial_import.R` | MS-DIAL alignment export -> `feat`, `defs`, `sample_class`, `injection_order`, `batch_id` |
+| `scripts/stage2_qc_impute.R` | Stage 2: filter, QCRSC drift correction, PQN, drop wiped samples, seeded QRILC -> `imputed` |
 
 ## QC Checkpoints
 

@@ -94,7 +94,7 @@ HMMER 3 (Eddy 2011 *PLoS Comput Biol* 7:e1002195) is profile HMM search. Two mai
 - **`hmmsearch profile.hmm seqdb`**: search a database with a known HMM (Pfam, custom).
 - **`jackhmmer query.fa seqdb`**: iterative search like PSI-BLAST but with full HMM math. Typically higher sensitivity than PSI-BLAST at the same number of iterations.
 
-For domain assignment, `hmmscan query.fa Pfam-A.hmm` is the canonical pipeline. Pfam HMMs come with calibrated gathering thresholds (`-gathering`) -- use them instead of arbitrary E-value cutoffs.
+For domain assignment, `hmmscan query.fa Pfam-A.hmm` is the canonical pipeline. Pfam HMMs come with calibrated gathering thresholds (`--cut_ga`) -- use them instead of arbitrary E-value cutoffs.
 
 ```bash
 # Build domain database once
@@ -136,7 +136,7 @@ mmseqs easy-search query.fa targetDB results.m8 tmp -s 7.5 --num-iterations 3
 mmseqs easy-cluster all_proteins.fa cluster tmp --min-seq-id 0.5 -c 0.8
 ```
 
-The `-s` parameter trades sensitivity for speed: 1.0 (fast), 4.0 (default), 7.5 (HMMER-like sensitivity).
+The `-s` parameter trades sensitivity for speed: 1.0 (faster), 4.0 (fast), 5.7 (the `easy-search`/`search` default, checked on MMseqs2 18.8cc5c), 7.5 (HMMER-like sensitivity).
 
 ## DIAMOND (the modern blastp replacement)
 
@@ -169,47 +169,18 @@ For protein remote homology in 2026, DIAMOND `--ultra-sensitive` or MMseqs2 `-s 
 
 ```bash
 # 3 iterations, save checkpoint HMM at each iteration
-jackhmmer -N 3 --chkhmm iter.hmm --tblout hits.tbl query.fa uniref90.fa
+jackhmmer -N 3 --chkhmm iter --tblout hits.tbl query.fa uniref90.fa
 
-# After convergence (no new hits below threshold) use the final HMM for downstream searches
-hmmsearch iter-3.hmm target.fa > hits.txt
+# Use the last checkpoint HMM for downstream searches. --chkhmm writes iter-<round>.hmm, and
+# a search that converges early stops before round 3, so pick the highest-numbered file.
+hmmsearch "$(ls iter-*.hmm | sort -V | tail -1)" target.fa > hits.txt
 ```
 
 ## Code patterns
 
-### Foldseek search against AlphaFoldDB
+### Foldseek search (structure or sequence-only via ProstT5)
 
-**Goal:** Find structural homologs of a protein structure (or sequence via ProstT5) in AlphaFold's predicted structure database.
-
-**Approach:** Download AlphaFoldDB structure DB (or ProstT5 for sequence-only); search with foldseek `easy-search`; parse m8 tabular output.
-
-**Reference (Foldseek 9+):**
-```bash
-#!/bin/bash
-# Reference: foldseek 9+ | Verify API if version differs
-
-mkdir -p foldseek_dbs tmp
-# Download the AlphaFoldDB Swiss-Prot subset (~few GB; full AFDB is much larger)
-foldseek databases Alphafold/Swiss-Prot afdb_sp foldseek_dbs/tmp
-
-# Structure-vs-structure search
-foldseek easy-search query.pdb foldseek_dbs/afdb_sp results.m8 tmp \
-         --format-output query,target,fident,alnlen,evalue,bits,prob,qtmscore,ttmscore
-
-head -5 results.m8
-# qtmscore/ttmscore are TM-score equivalents from local Foldseek alignment.
-# Hits with prob > 0.9 are confidently structurally homologous.
-```
-
-### Sequence-only Foldseek via ProstT5
-
-```bash
-foldseek databases ProstT5 prostt5_model tmp
-foldseek easy-search query.fa foldseek_dbs/afdb_sp seq_results.m8 tmp \
-         --prostt5-model prostt5_model --threads 8
-```
-
-This is the path to take when only a protein sequence is available -- ProstT5 (a protein language model) predicts the 3Di alphabet directly from sequence.
+Run `examples/foldseek_search.sh <query.pdb|query.fa> [db_dir] [tmp_dir]` (Foldseek 9+). It downloads the AlphaFoldDB Swiss-Prot subset (~few GB; full AFDB is much larger), runs `easy-search` with `--format-output query,target,fident,alnlen,evalue,bits,prob,qtmscore,ttmscore,lddt`, and for a sequence query fetches ProstT5 and passes `--prostt5-model`. `qtmscore`/`ttmscore` are TM-score equivalents from the local Foldseek alignment; hits with `prob > 0.9` are confidently structurally homologous.
 
 ### PSI-BLAST with saved PSSM
 
@@ -233,43 +204,11 @@ psiblast -in_pssm distant.pssm.asn -db swissprot \
          -out swissprot_via_pssm.txt
 ```
 
-### MMseqs2 sensitive iterative search
+### Iterative profile search and Pfam annotation (scripts)
 
-**Goal:** PSI-BLAST-equivalent iterative profile search, but 100x faster.
-
-**Approach:** `mmseqs search --num-iterations 3 -s 7.5`.
-
-**Reference (MMseqs2 15+):**
-```bash
-mmseqs createdb query.fa queryDB
-mmseqs createdb uniref90.fa uniref90DB
-mmseqs createindex uniref90DB tmp
-
-mmseqs search queryDB uniref90DB resultDB tmp \
-       --num-iterations 3 \
-       -s 7.5 \
-       -e 1e-5 \
-       --threads 16
-
-mmseqs convertalis queryDB uniref90DB resultDB results.m8 \
-       --format-output query,target,fident,alnlen,evalue,bits
-```
-
-### Pfam domain annotation (canonical)
-
-```bash
-# One-time prep
-hmmpress Pfam-A.hmm
-
-# Annotate
-hmmscan --cut_ga --domtblout query.domtbl --cpu 8 Pfam-A.hmm query.fa
-
-# Filter: gathering threshold passes are already significance-validated
-awk '!/^#/ {print $1, $2, $4, $5, $7, $8, $13}' query.domtbl | head
-# columns: target_name, accession, query_name, accession, full_evalue, full_score, i_evalue
-```
-
-For a fast, no-download sanity check of this pipeline (one bundled Pfam family instead of the full ~1.7 GB Pfam-A.hmm), run `examples/pfam_annotation_toy.sh`.
+- `examples/iterative_profile.sh <query.fa> <db.fasta>` runs psiblast, jackhmmer and MMseqs2 (`search --num-iterations 3 -s 7.5`, then `convertalis`) with the same iteration count and compares hit counts.
+- `examples/pfam_annotation.sh <query.fa> [pfam_dir]` downloads and presses Pfam-A, runs `hmmscan --cut_ga --domtblout`, and prints `query_name | pfam_name | pfam_acc | full_evalue | full_score` (domtbl columns 4, 1, 2, 7, 8), or a "No Pfam-A domains found" line on a zero-hit query. `--cut_ga` gathering passes are already significance-validated.
+- `examples/pfam_annotation_toy.sh` is a fast, no-download sanity check of the same pipeline (one bundled Pfam family instead of the full ~1.7 GB Pfam-A.hmm).
 
 ### HHsearch against PDB70 (deepest homology to PDB)
 
@@ -283,19 +222,10 @@ hhsearch -i query.a3m -d pdb70 -o query.hhr -cpu 8
 head -30 query.hhr   # Top hits with probability + alignment statistics
 ```
 
-### DIAMOND ultra-sensitive on a metagenome
-
-```bash
-diamond makedb --in uniref90.fa -d uniref90
-diamond blastp -d uniref90 -q metagenome_proteins.fa -o hits.tsv \
-        --ultra-sensitive -e 1e-5 -p 32 \
-        --outfmt 6 qseqid sseqid pident length qcovhsp evalue bitscore stitle
-```
-
 ## Failure modes
 
 ### PSI-BLAST profile drift
-- **Trigger:** Iterating to convergence (5+ iterations).
+- **Trigger:** Iterating past 3 rounds, or to convergence.
 - **Mechanism:** Each iteration includes hits below threshold; eventually paralogs and divergent family members contaminate the PSSM.
 - **Symptom:** Later iterations return many implausible hits; functional inference goes wrong.
 - **Fix:** Cap at 3 iterations; inspect the saved PSSM and the included sequence set; use stricter `-inclusion_ethresh 0.001`.
@@ -307,16 +237,16 @@ diamond blastp -d uniref90 -q metagenome_proteins.fa -o hits.tsv \
 - **Fix:** Combine Foldseek hits with sequence-based evidence; check shared catalytic residues; consider that fold-level similarity is necessary but not sufficient for homology.
 
 ### MMseqs2 default sensitivity
-- **Trigger:** `mmseqs easy-search` without `-s`.
-- **Mechanism:** Default `-s 4.0` is fast but misses remote homologs.
-- **Symptom:** Equivalent to a fast BLAST; misses what HMMER would find.
-- **Fix:** Set `-s 7.5` for distant homology; `-s 5.7` is a middle ground.
+- **Trigger:** `mmseqs easy-search` or `search` without `-s`.
+- **Mechanism:** The default `-s 5.7` is a speed/sensitivity compromise and misses remote homologs.
+- **Symptom:** Equivalent to a fast BLAST; misses what HMMER would find. On a real ~25%-identity kinase pair (human PRKACA vs a viral kinase in a 300-sequence Swiss-Prot sample) the default returned 0 hits and `-s 7.5` recovered it (E=1.4e-13).
+- **Fix:** Set `-s 7.5` for distant homology.
 
 ### DIAMOND default mode lossy
 - **Trigger:** `diamond blastp` without `--more-sensitive` or `--ultra-sensitive`.
 - **Mechanism:** Default mode trades ~5% sensitivity for speed vs blastp.
 - **Symptom:** Hits BLAST would find are missing.
-- **Fix:** Use `--more-sensitive` for general work, `--ultra-sensitive` for remote homology.
+- **Fix:** Use `--more-sensitive` for general work, `--ultra-sensitive` for remote homology. On the same ~25%-identity pair as above (DIAMOND 2.2.6), default and `--more-sensitive` both returned 0 hits, even at `-e 1`; only `--ultra-sensitive` recovered it (E=5.4e-12).
 
 ### Profile method on a low-complexity query
 - **Trigger:** Query has signal peptide, coiled-coil, or repeat region.
@@ -340,10 +270,6 @@ diamond blastp -d uniref90 -q metagenome_proteins.fa -o hits.tsv \
 
 | Error / symptom | Cause | Solution |
 |---|---|---|
-| PSI-BLAST returns implausible hits | Profile drift (too many iterations) | Cap at 3 iterations; tighter `-inclusion_ethresh` |
-| MMseqs2 hits all unrelated | Default sensitivity too low | `-s 7.5` |
-| DIAMOND misses BLAST hits | Default mode lossy | `--more-sensitive` |
-| Foldseek hits structurally unrelated proteins | Common fold, no homology | Cross-check with sequence and functional residues |
 | HHblits prefilter no hits | Query MSA too sparse | Add `-n 4` iterations; check input |
 | jackhmmer ConvergenceError | Loop bug pre-v3.4 | Upgrade HMMER |
 

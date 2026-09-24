@@ -61,8 +61,9 @@ scan_one_outcome <- function(outcome_id) {
     }, error = function(e) NULL)
 }
 
-# Sequential loop kept simple; for production parallelise via future.apply::future_lapply
-results <- lapply(outcomes_filt$id[1:200], scan_one_outcome)
+# Sequential loop kept simple; for production parallelise via future.apply::future_lapply.
+# Scans every filtered outcome; scanning only the first few hundred ids is a debug shortcut, not a pheWAS.
+results <- lapply(outcomes_filt$id, scan_one_outcome)
 results_df <- do.call(rbind, Filter(Negate(is.null), results))
 
 n_tests <- nrow(results_df)

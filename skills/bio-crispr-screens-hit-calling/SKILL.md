@@ -21,55 +21,21 @@ If code throws ImportError, AttributeError, or TypeError, introspect the install
 
 **"Identify significant hits in my CRISPR screen"** -> Choose the analysis method that matches the experimental design, statistical assumptions, and quality grade of the screen. Reconcile across methods when high-stakes hits must be validated.
 
-The primary hit-calling methods cover non-overlapping niches; the decision is not "which is best" but "which matches the design."
+The primary hit-calling methods cover non-overlapping niches; the decision is not "which is best" but "which matches the design." Model comparison and design rationale: [references/method-catalog.md](references/method-catalog.md).
 
 | Design / question | Primary method | Why | Secondary check |
 |--------------------|----------------|-----|------------------|
 | Two-condition essentiality, one cell line, no CN concerns | MAGeCK RRA | Robust, fast, gold-standard for ranked analysis | BAGEL2 (Bayes factor on same data) |
 | Time course (3+ timepoints) | MAGeCK MLE | RRA cannot model multi-condition | JACKS (efficacy-aware) |
-| Multi-cell-line panel (cancer dependency) | Chronos | Models CN bias + screen quality jointly | MAGeCK MLE per line + meta-analysis |
+| Multi-cell-line panel (cancer dependency) | Chronos | Models CN bias + screen quality jointly | MAGeCK MLE per line + meta-analysis (run per line first, pool downstream; a joint MLE without per-line indicator covariates dilutes per-line signal) |
 | Drug screen (vehicle vs drug) | drugZ | Bidirectional Z; vehicle-anchored | MAGeCK MLE with dose covariate |
 | Multi-screen joint, same library | JACKS | Shared efficacy; enables ~2.5x smaller screens | MAGeCK MLE; results should converge |
 | Essentiality classification with reference sets | BAGEL2 | Bayes factor with CEGv2/NEGv1 calibration | MAGeCK RRA |
 | Combinatorial / paired guide | MAGeCK MLE with GI scoring | Models interaction term; see [[combinatorial-screens]] | Custom GI scoring |
 | Single-cell perturbation (Perturb-seq) | SCEPTRE | NB GLM + permutation; see [[perturb-seq-analysis]] | Mixscape pre-filter |
 | Cancer-line copy-number screen | Chronos (preferred) or CERES | Joint CN-bias + gene-effect modeling; see [[copy-number-correction]] | CRISPRcleanR pre-hoc + MAGeCK |
-
-## Statistical Models Compared
-
-| Method | Year | Statistical model | Tests | Best for | Fails when |
-|--------|------|-------------------|-------|----------|------------|
-| MAGeCK RRA | 2014 | NB per-sgRNA -> alpha-RRA per gene | Two-sided | General two-condition | >40% guides change (median norm breaks); time course; cancer-line CN |
-| MAGeCK MLE | 2015 | NB GLM with design matrix; per-gene beta | Wald per condition | Multi-condition / time course | Cell-line specific essentiality; CN bias |
-| BAGEL2 | 2021 | Bayes factor from log-likelihood ratio | Essential vs non-essential | Essentiality classification | Non-essentiality screens; drug screens |
-| drugZ | 2019 | Bidirectional Z-score on guide-level LFC | Sensitizer vs suppressor | Drug-modifier / chemogenomic | Essentiality (no biological prior); time-course |
-| JACKS | 2019 | Variational Bayes: LFC = gene * efficacy | Per-gene posterior | Multi-screen joint, library calibration | Single screen; cross-chemistry |
-| Chronos | 2021 | Cell-population dynamics ODE + NB | Gene effect adjusted for screen quality | Cancer-line panels, longitudinal | Single screen; non-cancer applications |
-| CERES | 2017 | Nonlinear model decoupling CN-bias from gene effect | Per-gene effect | Cancer-line panel with CN profile | Superseded by Chronos at DepMap |
-
-## RRA vs MLE Within MAGeCK
-
-| Property | RRA (`mageck test`) | MLE (`mageck mle`) |
-|----------|----------------------|---------------------|
-| Conditions supported | 2 | Multiple (design matrix) |
-| Statistical test | Robust rank aggregation | Wald on beta from NB GLM |
-| Output | neg/pos score, FDR per direction | beta per condition |
-| sgRNA efficiency | Not modeled (optional fixed input) | Modeled via `--sgrna-efficiency` |
-| Outlier robustness | High (rank-based) | Lower (likelihood-based) |
-| Best for | Standard 2-condition screen | Time course, drug screen, multi-cell-line, paired |
-| Speed | Fast | Slow (per-gene optimization) |
-
-## Algorithmic Taxonomy: Why Each Was Built
-
-| Method | Designed to solve |
-|--------|--------------------|
-| MAGeCK RRA | First robust statistical framework for CRISPR-screen ranking; alpha-RRA borrowed from RRA in microarray meta-analysis |
-| MAGeCK MLE | Extend MAGeCK to multi-condition; explicit beta scores allow direct LFC interpretation |
-| BAGEL2 | Reference-set-anchored Bayesian classification; precision-recall calibrated; tumor-suppressor sensitivity (BAGEL1 was uni-directional) |
-| drugZ | Drug-modifier screens have low effect sizes and need bidirectional sensitivity; STARS/MAGeCK miss synthetic-lethal hits |
-| JACKS | Sample-size reduction via library-shared efficacy; library calibration as side product |
-| Chronos | DepMap-scale (1000+ cell lines, billions of cell-divisions) needs population-dynamics model; CN bias + screen quality first-class |
-| CERES | First to formally decouple CN from gene effect at DepMap scale; superseded but historically important |
+| Cancer line + multi-batch | Chronos | Models CN and batch jointly | MAGeCK MLE with batch covariate |
+| Variant function (base / prime editing) | Custom + CRISPResso2 | Editing outcomes, not guide dropout; see [[base-editing-analysis]] | -- |
 
 ## Run All Five on the Same Data (Consensus Strategy)
 
@@ -77,53 +43,11 @@ The primary hit-calling methods cover non-overlapping niches; the decision is no
 
 **Approach:** Run MAGeCK + BAGEL2 + (drugZ or JACKS) on the same count matrix; rank by each; classify hits as called by 1, 2, or 3 methods.
 
-```python
-import pandas as pd
-from scipy.stats import hypergeom
-
-def _check_comparable(merged, hit_cols):
-    '''Warn if any pair of method hit-sets shows no statistical enrichment for
-    overlap -- the signature of merging results that answer different questions
-    (e.g. a real essentiality MAGeCK+BAGEL2 pair merged against a drugZ table from
-    an unrelated drug-vs-vehicle screen) rather than genuine method disagreement on
-    the same comparison. Verified on real data: matched MAGeCK/BAGEL2 hit sets give
-    p=0 (highly enriched overlap); a mismatched drugZ table against either gives
-    p=1.0 (no enrichment) -- see the Failure Modes entry below.'''
-    n = len(merged)
-    warnings = []
-    for i, col_a in enumerate(hit_cols):
-        for col_b in hit_cols[i + 1:]:
-            a, b = merged[col_a].fillna(False), merged[col_b].fillna(False)
-            k, K, N = int((a & b).sum()), int(a.sum()), int(b.sum())
-            if K == 0 or N == 0:
-                continue
-            p = hypergeom.sf(k - 1, n, K, N)
-            if p > 0.05:
-                warnings.append(f'{col_a} vs {col_b}: overlap not enriched above chance '
-                                 f'(observed={k}, expected~{K * N / n:.1f}, p={p:.3f}) -- '
-                                 'check these came from the SAME experimental comparison '
-                                 'before trusting consensus.')
-    for w in warnings:
-        print(f'WARNING: {w}')
-    return warnings
-
-def consensus_hits(mageck_path, bagel_path, drugz_path,
-                   mageck_fdr_thresh=0.05, bagel_bf_thresh=6, drugz_fdr_thresh=0.05):
-    '''Build consensus across MAGeCK / BAGEL2 / drugZ on the same screen.
-    Each hit gets a count of supporting methods. Defaults match the Quantitative
-    Thresholds table below -- keep this function and examples/consensus_hits.py in
-    sync with that table, not with each other.'''
-    mageck = pd.read_csv(mageck_path, sep='\t')[['id', 'neg|fdr']].rename(columns={'id': 'gene', 'neg|fdr': 'mageck_neg_fdr'})
-    bagel = pd.read_csv(bagel_path, sep='\t')[['GENE', 'BF']].rename(columns={'GENE': 'gene', 'BF': 'bagel_bf'})
-    drugz = pd.read_csv(drugz_path, sep='\t')[['GENE', 'fdr_synth']].rename(columns={'GENE': 'gene', 'fdr_synth': 'drugz_synth_fdr'})
-    merged = mageck.merge(bagel, on='gene', how='outer').merge(drugz, on='gene', how='outer')
-    merged['mageck_hit'] = merged['mageck_neg_fdr'] < mageck_fdr_thresh
-    merged['bagel_hit'] = merged['bagel_bf'] > bagel_bf_thresh
-    merged['drugz_hit'] = merged['drugz_synth_fdr'] < drugz_fdr_thresh
-    _check_comparable(merged, ['mageck_hit', 'bagel_hit', 'drugz_hit'])
-    merged['consensus_count'] = (merged[['mageck_hit', 'bagel_hit', 'drugz_hit']].astype(int)).sum(axis=1)
-    return merged.sort_values('consensus_count', ascending=False)
+```bash
+python scripts/consensus_hits.py mageck.gene_summary.txt bagel.bf.txt drugz.txt -o consensus.tsv
 ```
+
+`scripts/consensus_hits.py` also exposes `consensus_hits()` and `_check_comparable()` for import. It merges the three tables on gene, applies the thresholds below (FDR<0.05, BF>6, drugZ `fdr_synth`<0.05), adds `consensus_count`, and warns when a pair of hit sets is not enriched for overlap (the mismatched-comparison signature; see [references/failure-modes.md](references/failure-modes.md)). The two-method MAGeCK + BAGEL2 version is `examples/consensus_hits.py`.
 
 **Confidence tiers:**
 
@@ -145,36 +69,6 @@ def consensus_hits(mageck_path, bagel_path, drugz_path,
 | MAGeCK MLE significant, MAGeCK RRA not in 2-condition | Beta-score effect size is significant but rank-based not | Trust MLE if guides consistent; RRA may be over-conservative |
 | All methods disagree | Either no real biology or all methods are mis-applied | Stop. Re-audit QC; check chemistry / library / design matrix |
 | BAGEL2 BF changes between reruns on identical input -- not a real method disagreement, but easy to mistake for one | BAGEL2's `bf` step defaults to a clock-derived random seed; two unseeded runs on the same real HAP1 TKOv3 data differed by up to 26.7 BF and flipped 33/18,053 genes across BF>6 | Always pass a fixed `-s <int>` seed to `fc`/`bf`/`pr` and verify two reruns are byte-identical before trusting any single BF table or treating a rerun difference as new biology -- see [[bagel-essentiality]]'s "Reproducibility: Fixing the Random Seed" section |
-
-## Second-Best sgRNA Conservative Rule
-
-**Goal:** Reduce false positives from single outlier sgRNAs by requiring the second-most-extreme guide per gene to also be a hit.
-
-**Approach:** For each gene, sort sgRNAs by LFC; require the second-best LFC to exceed a threshold. Rejects genes that depend on one extreme guide.
-
-```python
-def second_best_lfc(sgrna_lfc_df, genes_series, direction='neg'):
-    '''Return per-gene LFC of the second-best sgRNA in the direction of interest,
-    and flag genes with fewer than 2 sgRNAs. For dropout (direction="neg"),
-    second-most-negative LFC. A gene with only one sgRNA has no second guide to
-    check at all -- return NaN and single_guide=True for it rather than silently
-    falling back to the lone guide's own LFC, which would read as "passing" the
-    rule with no corroborating guide involved.'''
-    results = []
-    for gene in genes_series.unique():
-        gene_lfc = sgrna_lfc_df[genes_series == gene].sort_values()
-        n = len(gene_lfc)
-        if n >= 2:
-            second = gene_lfc.iloc[1] if direction == 'neg' else gene_lfc.iloc[-2]
-            single = False
-        else:
-            second = float('nan')
-            single = True
-        results.append({'gene': gene, 'second_best_lfc': second, 'single_guide': single})
-    return pd.DataFrame(results)
-```
-
-**Rule:** A high-confidence hit has second-best LFC also passing the threshold. A guide-of-one hit has only one extreme guide and should be flagged for orthogonal validation. This rule predates JACKS and is implicit in MAGeCK RRA but explicit elsewhere. Genes with `single_guide=True` (fewer than 2 sgRNAs in the library) have no second guide to check by construction -- always send these to orthogonal validation rather than treating a NaN second-best LFC as a pass.
 
 ## Multiple-Testing Correction Conventions
 
@@ -218,96 +112,15 @@ to make both statistics increase with essentiality").
 3. Run screen at MOI 0.3, 500x coverage
 4. Sequence endpoint
 5. Run mageck count                            <- generates raw + normalized counts
-6. Screen QC (see screen-qc)                   <- gates downstream method choice
+6. Screen QC (see screen-qc)                   <- gates downstream method choice; run the CEGv2/NEGv1 PR-AUC first
+                                                  (PR-AUC <0.5 = no signal however many hits MAGeCK calls; >0.7 to interpret)
 7. Copy-number correction if cancer line       <- CRISPRcleanR or Chronos; see copy-number-correction
-8. Batch correction if multi-batch             <- see batch-correction
+8. Batch correction if multi-batch             <- see batch-correction; batch covariates in MAGeCK MLE, or Chronos
 9. Hit calling (this skill)                    <- choose method by design
 10. Consensus across 2-3 methods               <- for high-stakes hits
 11. Orthogonal validation                      <- arrayed; different chemistry
 12. Pathway analysis                           <- see pathway-analysis/gsea
 ```
-
-## Custom z-score Hit Calling (when standard tools don't fit)
-
-**Goal:** Compute gene-level z-scores when neither MAGeCK nor BAGEL2 fits the experimental design.
-
-**Approach:** RPM-normalize, compute per-sgRNA log2 fold-changes, aggregate to gene level, derive z-score from the null distribution of non-targeting controls (cleanest) or all genes (assumes <40% changing), apply BH correction.
-
-```python
-import pandas as pd
-import numpy as np
-from scipy import stats
-from statsmodels.stats.multitest import multipletests
-
-def custom_zscore_hit_calling(counts_df, ctrl_cols, treat_cols, genes_series, ntc_genes=None):
-    '''Z-score gene-level hit calling. If ntc_genes provided, null derived from NTCs only;
-    otherwise from all genes (assumes <40% changing).'''
-    def rpm(df):
-        return df.div(df.sum(axis=0), axis=1) * 1e6
-    ctrl_rpm = rpm(counts_df[ctrl_cols])
-    treat_rpm = rpm(counts_df[treat_cols])
-    lfc_per_sgrna = np.log2((treat_rpm.mean(axis=1) + 1) / (ctrl_rpm.mean(axis=1) + 1))
-    gene_lfc = pd.DataFrame({'gene': genes_series, 'lfc': lfc_per_sgrna}).groupby('gene')['lfc'].agg(['mean', 'std', 'count'])
-    gene_lfc.columns = ['mean_lfc', 'std_lfc', 'n_sgrnas']
-    if ntc_genes is not None:
-        null = gene_lfc.loc[gene_lfc.index.isin(ntc_genes), 'mean_lfc']
-        null_mean, null_std = null.median(), null.std()
-    else:
-        null_mean = gene_lfc['mean_lfc'].median()
-        null_std = gene_lfc['mean_lfc'].std()
-    gene_lfc['z'] = (gene_lfc['mean_lfc'] - null_mean) / null_std
-    gene_lfc['p'] = 2 * stats.norm.sf(np.abs(gene_lfc['z']))
-    gene_lfc['fdr'] = multipletests(gene_lfc['p'], method='fdr_bh')[1]
-    return gene_lfc.sort_values('z')
-```
-
-## Failure Modes
-
-### MAGeCK and BAGEL2 disagree by 200+ hits at FDR 0.05
-
-**Trigger:** Heavy-selection screen (>40% guides change) or cancer-line CN bias.
-**Mechanism:** MAGeCK median normalization breaks; BAGEL2 is robust due to reference-set anchoring.
-**Symptom:** MAGeCK hit list inflated; BAGEL2 list closer to expected size.
-**Fix:** Run MAGeCK with `--norm-method control`; apply CN correction; trust BAGEL2 for essentiality.
-
-### Chronos and MAGeCK disagree at the top 10 in a cancer line
-
-**Trigger:** Top hits are at amplified loci.
-**Mechanism:** Chronos models CN bias; MAGeCK does not.
-**Symptom:** ERBB2 in HER2+, MYC in MYC-amplified, etc. are top hits in MAGeCK but not Chronos.
-**Fix:** Apply [[copy-number-correction]] before MAGeCK or switch to Chronos.
-
-### drugZ and MAGeCK disagree on small-effect drug-modifier screen
-
-**Trigger:** Effect size is small; MAGeCK rank-based test is less sensitive than drugZ bidirectional Z.
-**Mechanism:** drugZ specifically optimized for small effects in drug screens (Colic et al. 2019); MAGeCK RRA loses sensitivity at small effects.
-**Symptom:** At matched FDR, drugZ calls small-effect chemogenomic interactions (e.g. DDR genes) that MAGeCK RRA misses, with stronger expected-pathway enrichment.
-**Fix:** Use drugZ as primary for chemogenomic; MAGeCK as confirmatory. See [[drugz-chemogenomic]].
-
-### JACKS down-weights efficiency, MAGeCK doesn't, disagreement
-
-**Trigger:** A gene has one or two strong sgRNAs and 2-3 weak ones; MAGeCK averages them, JACKS down-weights the weak.
-**Mechanism:** JACKS variational Bayes correctly identifies low-efficacy guides; MAGeCK aggregates without this prior.
-**Symptom:** Gene is JACKS hit but not MAGeCK.
-**Fix:** Inspect per-sgRNA LFC; if strong guides are consistent, JACKS is correct. Validate gene orthogonally.
-
-### Consensus across 3 methods is empty (no hits)
-
-**Trigger:** Either no real biology, each method hits a different failure mode, or -- easy to
-overlook -- the merged files are not from the same experimental comparison.
-**Mechanism:** Screen quality is low and signal-to-noise across all methods is poor; OR each
-input file is individually valid but answers a different question (e.g. a real essentiality
-MAGeCK+BAGEL2 pair merged against a drugZ table from an unrelated drug-vs-vehicle screen run on
-the same library). `consensus_hits()` merges without error either way -- verified on real data:
-merging matched MAGeCK/BAGEL2 essentiality output with a real but unrelated drugZ drug-screen
-table produced a 0-gene Tier-1 consensus even though the underlying essentiality screen has
-100% precision against CEGv2/NEGv1 (see Input 1's numbers).
-**Symptom:** Tier 1 consensus list is empty.
-**Fix:** Check each input file's own QC first (screen-qc PR-AUC, precision/recall against
-CEGv2/NEGv1) -- a high-precision screen with an empty 3-method consensus points to a mismatched
-file, not a bad screen. `consensus_hits()`'s `_check_comparable()` warning (above) also fires
-when a pair's hit-set overlap is no better than chance, the statistical signature of a
-mismatched comparison. Only re-audit QC once a same-comparison mismatch has been ruled out.
 
 ## Quantitative Thresholds
 
@@ -324,8 +137,8 @@ mismatched comparison. Only re-audit QC once a same-comparison mismatch has been
 | Tier 3 (1 method only) | Hypothesis; flag for follow-up | Multiple screens or arrayed required |
 | Second-best sgRNA rule | Second-best LFC also passes threshold | Reduces single-guide outliers |
 
-This table is the canonical source for MAGeCK-FDR/BAGEL-BF defaults: `consensus_hits()` in this
-file and `examples/consensus_hits.py` must both use FDR<0.05/BF>6 to match it. On real HAP1
+This table is the canonical source for MAGeCK-FDR/BAGEL-BF defaults: `scripts/consensus_hits.py` and
+`examples/consensus_hits.py` must both use FDR<0.05/BF>6 to match it. On real HAP1
 TKOv3 data, FDR<0.05/BF>6 gives 844 Tier-1 consensus genes; the looser FDR<0.1/BF>5 pairing gives
 1131 (+34%) -- pick one number, not whichever default a given script happens to hardcode.
 
@@ -339,8 +152,16 @@ TKOv3 data, FDR<0.05/BF>6 gives 844 Tier-1 consensus genes; the looser FDR<0.1/B
 | Chronos errors out | Missing CN profile for cell line | Use CRISPRcleanR (unsupervised) instead |
 | Methods disagree by orders of magnitude | Quality issue or design mismatch | Re-audit QC; reconcile via tier consensus |
 | Empty tier 1 consensus | No real biology, QC failure, OR merged files are not from the same experimental comparison | Check per-method QC (screen-qc) and `_check_comparable()`'s overlap-enrichment warning first; verify all inputs are the same comparison; only then re-audit QC |
-| Single-guide-driven hits, or genes with only 1 sgRNA in the library | Outlier sgRNA, or library design has no second guide to check | Apply second-best rule; treat `single_guide=True` the same as a failed check; orthogonal validate |
+| Single-guide-driven hits, or genes with only 1 sgRNA in the library | Outlier sgRNA, or library design has no second guide to check | Apply second-best rule ([references/second-best-and-custom-zscore.md](references/second-best-and-custom-zscore.md)); treat `single_guide=True` the same as a failed check; orthogonal validate |
 | BAGEL2 BF differs between two runs on the same input | `bf` step unseeded by default (clock-derived) | Always pass `-s <fixed-int>`; see [[bagel-essentiality]] Reproducibility section |
+
+## Reference Files
+
+| File | Read when |
+|------|-----------|
+| [references/method-catalog.md](references/method-catalog.md) | Comparing the seven methods' models, RRA vs MLE, or why each was built |
+| [references/second-best-and-custom-zscore.md](references/second-best-and-custom-zscore.md) | Filtering hits for single-guide outliers, or calling hits with a custom z-score |
+| [references/failure-modes.md](references/failure-modes.md) | Methods disagree by 200+ hits, or the consensus is empty |
 
 ## References
 

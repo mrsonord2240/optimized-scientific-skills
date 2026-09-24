@@ -18,6 +18,20 @@ Before using code patterns, verify installed versions match. If versions differ:
 If code throws ImportError, AttributeError, or TypeError, introspect the installed
 package and adapt the example to match the actual API rather than retrying.
 
+## Install
+
+```r
+# inferCNV (Bioconductor)
+BiocManager::install('infercnv')
+
+# copyKAT and SCEVAN (GitHub)
+remotes::install_github('navinlabcode/copykat')
+remotes::install_github('AntonioDeFalco/SCEVAN')
+
+# Numbat (CRAN); preprocessing also needs cellsnp-lite and Eagle2 on the PATH
+install.packages('numbat')
+```
+
 # Copy-Number Inference from Single-Cell RNA-seq
 
 **"Which cells are tumor, and what CNVs and subclones do they carry?"** -> Estimate large-scale copy-number from smoothed expression across genomic windows, compare against a normal reference, and cluster cells into malignant vs normal and into subclones.
@@ -166,7 +180,7 @@ out <- run_numbat(
 nb <- Numbat$new(out_dir = 'numbat_out')
 ```
 
-`df_allele` is the allele dataframe written by `pileup_and_phase.R`, with one row per SNP per cell. `run_numbat()`'s own input check (`check_allele_df()`) hard-requires ten columns: `cell`, `snp_id`, `CHROM`, `POS`, `cM`, `REF`, `ALT`, `AD`, `DP`, `GT` - a `df_allele` missing `cM`, `REF`, or `ALT` is rejected before any computation runs (checked on numbat 1.5.2). `cM` (genetic-map position) comes from the genetic-map file passed to `pileup_and_phase.R` via `--gmap`; `REF`/`ALT` are the reference/alternate alleles at each SNP. `lambdas_ref` is a gene-by-cell-type expression reference from `aggregate_counts(count_mat, cell_annot)` where `cell_annot` has `cell` and `group` columns, or the package-shipped `ref_hca`. `t` is the HMM transition probability. The loaded `Numbat` object exposes `clone_post` (clone assignments) and per-cell copy-number posteriors. Numbat needs no paired-normal DNA but does need a BAM and phasing reference.
+`df_allele` is the allele dataframe written by `pileup_and_phase.R`, with one row per SNP per cell. `run_numbat()` hard-requires ten input columns: `cell`, `snp_id`, `CHROM`, `POS`, `cM`, `REF`, `ALT`, `AD`, `DP`, `GT` - a `df_allele` missing `cM`, `REF`, or `ALT` is rejected before any computation runs. `check_allele_df()` itself lists an eleventh, `gene`, but `run_numbat()` calls `annotate_genes(df_allele, gtf)` first, which adds `gene` from the SNP position and the genome's gene table (and overwrites any `gene` you pass), so do not build it by hand; only a direct call to `numbat:::check_allele_df()` on an unannotated frame fails on `gene` (checked on numbat 1.5.2: a ten-column frame passes `check_allele_df(annotate_genes(df, gtf_hg38))`, and fails on `gene` without the annotate step). `cM` (genetic-map position) comes from the genetic-map file passed to `pileup_and_phase.R` via `--gmap`; `REF`/`ALT` are the reference/alternate alleles at each SNP. `lambdas_ref` is a gene-by-cell-type expression reference from `aggregate_counts(count_mat, cell_annot)` where `cell_annot` has `cell` and `group` columns, or the package-shipped `ref_hca`. `t` is the HMM transition probability. The loaded `Numbat` object exposes `clone_post` (clone assignments) and per-cell copy-number posteriors. Numbat needs no paired-normal DNA but does need a BAM and phasing reference.
 
 ## Turning the inferCNV heatmap into per-cell malignant calls
 
@@ -205,7 +219,7 @@ malignant <- cnv_score > quantile(cnv_score, 0.5)
 | genome | copyKAT | hg20 | Must match the assembly the gene coordinates came from (hg20 or mm10) |
 | min.gene.per.cell | copyKAT | 200 | Minimum genes detected per cell to keep it; lower for small/custom gene panels (default drops every cell on a panel under ~200 genes) |
 | t | Numbat | 1e-5 | HMM transition probability; lower favors longer segments |
-| df_allele columns | Numbat | required | `check_allele_df()` hard-requires `cell, snp_id, CHROM, POS, cM, REF, ALT, AD, DP, GT`; a hand-built `df_allele` missing `cM`/`REF`/`ALT` is rejected before any computation runs |
+| df_allele columns | Numbat | required | `run_numbat()` requires `cell, snp_id, CHROM, POS, cM, REF, ALT, AD, DP, GT`; `gene` is added internally by `annotate_genes()` (see the Numbat section); a hand-built `df_allele` missing `cM`/`REF`/`ALT` is rejected before any computation runs |
 | ngenes_chr | SCEVAN | 5 | Minimum genes per chromosome per cell, same role as copyKAT's `ngene.chr` |
 | resolution (~5 Mb) | all expression methods | ~5 Mb | The floor of expression-based CNV; focal events below this are invisible |
 

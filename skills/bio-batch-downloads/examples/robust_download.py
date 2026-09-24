@@ -1,5 +1,5 @@
 '''Production-grade batch download: history server + disk checkpoint + WebEnv-expiry detection + jittered backoff.'''
-# Reference: biopython 1.83+, entrez direct 21.0+ | Verify API if version differs
+# Verified: biopython 1.88, entrez direct 26.0 (2026-09-22) | Verify API if version differs
 from Bio import Entrez
 from urllib.error import HTTPError
 import json
@@ -11,8 +11,28 @@ Entrez.email = 'your.email@example.com'
 # Entrez.api_key = 'your_api_key'
 
 
+def truncate_to_offset(path, offset):
+    '''Roll the output back to the last committed chunk boundary.
+
+    The checkpoint records the output file's byte length at the moment the chunk
+    was committed, so resuming is a byte-exact truncation -- no guessing where the
+    previous process stopped.
+    '''
+    p = Path(path)
+    if not p.exists():
+        return
+    with open(p, 'rb+') as f:
+        f.truncate(min(offset, p.stat().st_size))
+
+
 def truncate_to_last_newline(path):
-    '''If a previous run crashed mid-chunk, truncate the trailing partial record.'''
+    '''Fallback for checkpoints written before byte offsets were recorded.
+
+    Drops the trailing partial line only. This is strictly weaker than
+    truncate_to_offset: a crash after a chunk's records were written but before
+    the checkpoint update leaves complete records past the committed boundary,
+    and this cannot detect them.
+    '''
     p = Path(path)
     if not p.exists() or p.stat().st_size == 0:
         return
@@ -29,7 +49,9 @@ def checkpointed_download(db, term, out_path, ckpt_path, rettype='fasta',
                            batch_size=500, max_retries=5):
     delay = 0.1 if Entrez.api_key else 0.34
     ckpt = Path(ckpt_path)
-    start = json.loads(ckpt.read_text())['start'] if ckpt.exists() else 0
+    state = json.loads(ckpt.read_text()) if ckpt.exists() else {}
+    start = state.get('start', 0)
+    offset = state.get('offset')
 
     def refresh_session():
         h = Entrez.esearch(db=db, term=term, usehistory='y', retmax=0)
@@ -43,11 +65,16 @@ def checkpointed_download(db, term, out_path, ckpt_path, rettype='fasta',
         return
 
     if start == 0:
-        Path(out_path).write_text('')
-    else:
+        Path(out_path).write_bytes(b'')
+        offset = 0
+    elif offset is None:
+        print('  Checkpoint has no byte offset; falling back to last-newline truncation')
         truncate_to_last_newline(out_path)
+        offset = Path(out_path).stat().st_size if Path(out_path).exists() else 0
+    else:
+        truncate_to_offset(out_path, offset)
 
-    with open(out_path, 'a') as out:
+    with open(out_path, 'ab') as out:
         while start < total:
             success = False
             for attempt in range(max_retries):
@@ -56,13 +83,13 @@ def checkpointed_download(db, term, out_path, ckpt_path, rettype='fasta',
                                       retstart=start, retmax=batch_size,
                                       webenv=webenv, query_key=query_key)
                     body = h.read(); h.close()
-                    if isinstance(body, bytes):
-                        body = body.decode('utf-8', errors='replace')
-                    if not body.strip():
+                    raw = body if isinstance(body, bytes) else body.encode('utf-8')
+                    text = raw.decode('utf-8', errors='replace')
+                    if not text.strip():
                         raise RuntimeError('Empty body')
-                    if '<ERROR>' in body[:500]:
-                        raise RuntimeError(f'WebEnv expired or server error: {body[:200]}')
-                    out.write(body); out.flush()
+                    if '<ERROR>' in text[:500]:
+                        raise RuntimeError(f'WebEnv expired or server error: {text[:200]}')
+                    out.write(raw); out.flush()
                     success = True
                     break
                 except HTTPError as e:
@@ -84,7 +111,12 @@ def checkpointed_download(db, term, out_path, ckpt_path, rettype='fasta',
                 raise RuntimeError(f'Failed after {max_retries} retries at start={start}')
 
             start += batch_size
-            ckpt.write_text(json.dumps({'start': start, 'total': total}))
+            # Byte offset of the committed output, written together with the cursor.
+            # Both are flushed to disk before the checkpoint lands, so a crash can
+            # only ever leave *extra* bytes past `offset` -- never a checkpoint
+            # pointing past what was actually written.
+            offset = out.tell()
+            ckpt.write_text(json.dumps({'start': start, 'total': total, 'offset': offset}))
             time.sleep(delay)
             if (start // batch_size) % 10 == 0 or start >= total:
                 print(f'  {min(start, total):,}/{total:,}')

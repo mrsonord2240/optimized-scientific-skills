@@ -6,19 +6,7 @@ Pathway mapping places metabolomics results in biochemical context through over-
 
 ## Prerequisites
 
-```bash
-# R packages
-# MetaboAnalystR (GitHub): see https://github.com/xia-lab/MetaboAnalystR
-BiocManager::install("FELLA")
-BiocManager::install("KEGGREST")
-
-# Required for mummichog/PSEA (PerformPSEA): declared only under MetaboAnalystR's Suggests,
-# so a dependencies=FALSE GitHub install omits them -- install explicitly or PerformPSEA
-# throws "there is no package called 'RJSONIO'". Checked on MetaboAnalystR 4.3.0.
-install.packages(c("fitdistrplus", "RJSONIO"))
-```
-
-Conceptual prerequisites: know whether the metabolites are confidently identified (KEGG/HMDB IDs -> ORA/MSEA) or are raw m/z features with no IDs (-> mummichog/PSEA); know the MSI confidence level (Schymanski 5-level scale) of the driving compounds; be able to state the background set (the assay-coverage metabolome) in one sentence; know the ionization mode and ppm of the run; know whether the compound list may leave the machine -- ORA/MSEA against a KEGG library sends it to a remote API by default (see SKILL.md's Version Compatibility section for the disclosed call and the local-only alternative).
+Install steps, the required local-session setup and the remote-call disclosures are in SKILL.md's Version Compatibility section. Know before starting: whether your metabolites are identified (IDs -> ORA/MSEA) or raw m/z features (-> mummichog/PSEA), the ionization mode and ppm of the run, and whether the compound list may leave the machine.
 
 ## Quick Start
 
@@ -41,24 +29,6 @@ Tell your AI agent what you want to do:
 ### Mechanism and Sanity-Checking
 > "Use FELLA diffusion to return the intermediate enzymes and reactions linking my KEGG compounds, and list which compounds did not map."
 > "Check whether my top pathway is significant only because of L-alanine centrality, and re-run the enrichment across KEGG and SMPDB to see if it is robust."
-
-## What the Agent Will Do
-
-1. Determine the input type (identified IDs vs raw m/z) and pick ORA/MSEA vs mummichog/PSEA accordingly.
-2. Construct an explicit background: the assay-coverage metabolome for ORA, or the full feature table (R_all) for mummichog.
-3. Map IDs / features, declare ionization mode and ppm, and report mapping coverage before trusting any p-value.
-4. Run the enrichment, treating topology "impact" only as a secondary tiebreaker.
-5. Check whether a single hub/cofactor drives the result and whether the call is robust across databases.
-6. State the regime ("predicted activity" vs "measured enrichment") and the MSI level of the driving compounds, and refuse flux/activity language from concentrations.
-
-## Tips
-
-- The background set is the null hypothesis made concrete; with the correct assay-specific background, many "significant" pathways disappear after FDR.
-- Mummichog's #1 user error is supplying only significant features; its permutation null must draw from the entire feature table.
-- The mummichog query p-cutoff defaults looser than 0.05 (often ~0.2) so the query is large enough to score; document the value.
-- "TCA cycle / amino-acid metabolism enriched" is closer to a null result than a finding -- it is what the database can map; always report coverage.
-- Pathway granularity moves p-values more than multiple-testing correction does; prefer cross-database consensus over one library.
-- Pool size is not flux; downgrade "pathway activated" to "members co-varied with phenotype" and reserve activity claims for stable-isotope tracing (SIRM/13C-MFA).
 
 ## Related Skills
 

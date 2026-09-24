@@ -16,6 +16,8 @@ def find_conserved_positions(alignment, threshold=0.8, weights=None):
     weights = np.ones(len(alignment)) if weights is None else np.asarray(weights, dtype=float)
     if len(weights) != len(alignment):
         raise ValueError('weights must have one value per sequence')
+    if not weights.sum() > 0:
+        raise ValueError('weights must sum to a positive value')
     total = weights.sum()
     conserved = []
     for col_idx in range(alignment.get_alignment_length()):

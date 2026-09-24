@@ -8,16 +8,11 @@ Decision-grade design and analysis of in vivo CRISPR screens. Covers the bottlen
 
 **Requires prior IACUC (or equivalent institutional) approval before any animal work** — see SKILL.md's "Ethical & Regulatory Requirements" section; this Skill does not itself provide ethical review.
 
-```bash
-conda install -c bioconda mageck   # not on PyPI
-pip install pandas numpy scipy
-# Optional: focused library annotations from Manguso 2017
-# Tumor genomic DNA extraction kit (proteinase K + column purification)
-```
+Install notes and versions: SKILL.md "Version Compatibility".
 
 Required inputs:
-- Animal cohorts (n=10+ per condition for hit calling)
-- Focused library (3,000-15,000 sgRNAs covering 500-3,000 genes)
+- Animal cohorts per condition (size: SKILL.md "Quantitative Thresholds")
+- Focused library sized to the bottleneck (SKILL.md "Focused Library Design for In Vivo")
 - Cas9+ cell line (selected by FACS before infection)
 - Plasmid pool sequencing as baseline
 - Per-animal tumor DNA + sgRNA amplification primers
@@ -63,64 +58,7 @@ Tell the AI agent what to do:
 
 ## What the Agent Will Do
 
-1. Determine model: syngeneic vs xenograft vs PDX
-2. Calculate bottleneck-adjusted library size: max cells implantable × target coverage = total sgRNAs
-3. Design focused library following Manguso 2017 conventions
-4. Plan animal cohort: n=10+ per condition for hit calling
-5. Use CRISPR-StAR if genome-scale library needed (CreERT2 sgRNA activation in half of each clone + post-engraftment induction)
-6. Verify Cas9+ cell selection before infection (FACS or selection marker)
-7. Sequence plasmid pool as baseline
-8. Implant cells; allow tumor growth 12-21 days
-9. Harvest tumors; extract DNA via proteinase K + column purification
-10. PCR amplify sgRNA cassette + sequence
-11. Run MAGeCK count + MLE with animal as batch covariate (or RRA per animal + meta-analysis)
-12. QC: in vivo-adjusted thresholds (CEGv2 PR-AUC >0.4 acceptable; lower than in vitro)
-13. Per-condition hit calling; cross-validate with in vitro
-14. Output: per-condition gene effects, per-animal consistency, arrayed validation plan
-
-## Tips
-
-- The single most common failure: trying to use a genome-wide library (70k+ sgRNAs) in vivo. Even at 10M cells implanted, this gives 140x coverage which collapses to 20-50x at endpoint after bottleneck. Use focused libraries unless implementing CRISPR-StAR.
-- For immune-targeting screens, syngeneic models are mandatory; xenografts have impaired immunity.
-- Per-animal clonal dynamics drive enormous inter-animal variability. Use n=10+ animals per condition; meta-analyze across animals rather than treating as single experiment.
-- Cas9 selection before implantation is non-negotiable. Cas9-negative cells persist with their sgRNA but no editing, diluting all signal.
-- In vivo CEGv2 calibration is poor because in vitro essentialome doesn't capture tumor-microenvironment biology. Use cell-type-and-context-specific reference essentialome (a matched in vitro screen in the same cell type).
-- CRISPR-StAR is the modern approach for genome-scale in vivo: hold sgRNAs inactive until after engraftment, then activate (tamoxifen/CreERT2) in half of each clone for paired internal controls. Uijttewaal 2025 (Nat Biotechnol 43:1848) reports intrinsic per-clone control and outperforms conventional screens in therapy-resistant melanoma models.
-- Multiple animals per condition is more important than depth per animal. n=10 mice at 100x coverage is better than n=3 at 500x.
-- Tumor heterogeneity arises during growth; sample multiple regions or pool whole-tumor DNA.
-- For metastasis screens, each metastatic site is a separate selection event; analyze per-site.
-
-## Decision Cheat Sheet
-
-| Model | Use case |
-|-------|----------|
-| Syngeneic | Tumor-immune interaction, checkpoint biology |
-| Xenograft | Human cancer cell-intrinsic biology |
-| PDX | Patient-specific drug testing |
-| Humanized mouse | Tumor-immune in human context |
-
-## Thresholds
-
-| Threshold | Value | Rationale |
-|-----------|-------|-----------|
-| Cells per animal (syngeneic) | 1-5M typical | Tumor model dependent |
-| Library size for focused in vivo | 3,000-15,000 sgRNAs | Maintainable coverage |
-| sgRNAs per gene in library | 4-6 | Standard |
-| Coverage at endpoint | >50x; ideally 100-200x | Bottleneck-adjusted |
-| Animals per condition for hit calling | 10+ | Inter-animal variability |
-| In vivo CEGv2 PR-AUC | >0.4 acceptable | Lower than in vitro |
-| Days to harvest | 12-21 days post-implant | Time for selection |
-
-## Validation Checklist
-
-- [ ] Library size matches bottleneck math
-- [ ] Cas9+ cells selected before infection
-- [ ] Plasmid pool sequenced as baseline
-- [ ] n ≥10 animals per condition
-- [ ] Per-animal sequencing depth ≥100 reads/sgRNA
-- [ ] MAGeCK MLE with animal-as-batch covariate
-- [ ] Cross-validation with in vitro screen
-- [ ] Arrayed validation of top hits in matched cohort
+Follows SKILL.md end to end: model choice, bottleneck-adjusted library size, cohort plan, CRISPR-StAR when genome-scale is needed, tumor DNA recovery, MAGeCK MLE or per-animal RRA + meta-analysis, and the Validation Checklist.
 
 ## Related Skills
 

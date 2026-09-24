@@ -8,7 +8,7 @@ Decision-grade design and analysis of combinatorial CRISPR screens. Covers paire
 
 ```bash
 conda install -c bioconda mageck   # not on PyPI
-pip install pandas numpy scipy matplotlib
+pip install pandas numpy scipy matplotlib statsmodels   # statsmodels for GI BH-FDR correction
 # Inzolia library annotation: bioconductor or hart-lab
 # Inzolia annotation: Nat Commun 15:3577 supplement, or Addgene #209551-2
 

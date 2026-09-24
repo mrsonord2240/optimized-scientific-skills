@@ -24,30 +24,33 @@ fi
 
 EXT=$(echo "${OUTPUT##*.}" | tr '[:upper:]' '[:lower:]')
 
+case "$EXT" in
+    sam|bam) ;;
+    cram)
+        if [ -z "$REFERENCE" ]; then
+            echo "Error: CRAM conversion requires reference.fa"
+            exit 1
+        fi
+        ;;
+    *)
+        echo "Unknown output format: $EXT"
+        exit 1
+        ;;
+esac
+
 # -T is needed for CRAM output and for CRAM input, and is ignored for SAM/BAM
 REF_ARGS=()
 if [ -n "$REFERENCE" ]; then
     REF_ARGS=(-T "$REFERENCE")
 fi
 
+# From here on samtools writes OUTPUT: a failed run must not leave a header-only or partial file behind
+trap 'rc=$?; if [ "$rc" -ne 0 ]; then rm -f "$OUTPUT"; fi' EXIT
+
 case "$EXT" in
-    sam)
-        samtools view -h "${REF_ARGS[@]}" -o "$OUTPUT" "$INPUT"
-        ;;
-    bam)
-        samtools view -b "${REF_ARGS[@]}" -o "$OUTPUT" "$INPUT"
-        ;;
-    cram)
-        if [ -z "$REFERENCE" ]; then
-            echo "Error: CRAM conversion requires reference.fa"
-            exit 1
-        fi
-        samtools view -C "${REF_ARGS[@]}" -o "$OUTPUT" "$INPUT"
-        ;;
-    *)
-        echo "Unknown output format: $EXT"
-        exit 1
-        ;;
+    sam) samtools view -h "${REF_ARGS[@]}" -o "$OUTPUT" "$INPUT" ;;
+    bam) samtools view -b "${REF_ARGS[@]}" -o "$OUTPUT" "$INPUT" ;;
+    cram) samtools view -C "${REF_ARGS[@]}" -o "$OUTPUT" "$INPUT" ;;
 esac
 
 echo "Converted $INPUT -> $OUTPUT"

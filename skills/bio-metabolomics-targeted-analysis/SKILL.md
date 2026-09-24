@@ -148,33 +148,36 @@ within-day variance = MSwithin (mean square error from `aov(conc ~ factor(day))`
 variance = max(0, (MSbetween - MSwithin) / replicates_per_day), total variance = within +
 between, inter-day CV% = sqrt(total variance) / grand mean * 100.
 
-```r
-# LLOQ-level QC, 2 days x 3 replicates, nominal 2 ng/mL -- planted a low rep-3
-# outlier both days (real within-day imprecision, not a day-to-day shift).
-qc <- data.frame(
-  day = rep(1:2, each = 3),
-  measured_conc = c(2.35, 2.30, 1.55, 2.40, 2.28, 1.60)
-)
-
-intra <- aggregate(measured_conc ~ day, qc, function(x) sd(x) / mean(x) * 100)
-# day 1: 21.7% | day 2: 20.6% -- both FAIL the 20% LLOQ tolerance
-
-naive_pooled_cv <- sd(qc$measured_conc) / mean(qc$measured_conc) * 100
-# 18.9% -- WRONG for inter-day: ignores the day structure and PASSES, masking the failure
-
-fit <- aov(measured_conc ~ factor(day), data = qc)
-ms <- summary(fit)[[1]][["Mean Sq"]]
-n_per_day <- nrow(qc) / length(unique(qc$day))
-var_within <- ms[2]
-var_between <- max(0, (ms[1] - ms[2]) / n_per_day)
-inter_day_cv <- sqrt(var_within + var_between) / mean(qc$measured_conc) * 100
-# 21.1% -- correct nested-ANOVA inter-day (total) precision, correctly FAILS
+```bash
+Rscript scripts/precision_nested_anova.R file=qc.csv            # cols: qc_level, day, measured_conc (one row per replicate)
+Rscript scripts/precision_nested_anova.R file=qc.csv level=LLOQ # one level; tolerance 20% at LLOQ, else tol= (default 15)
 ```
 
+The script prints intra-day CV per day, the naive pooled CV (for contrast only) and the nested-ANOVA inter-day CV per level, and exits 1 if any exceeds its tolerance.
+
 Both tiers must independently pass. A naive pooled-SD "inter-day" number is not a validated
-inter-day precision estimate -- on this synthetic LLOQ data it reads 18.9% (PASS) against a true
-nested-ANOVA inter-day CV of 21.1% (FAIL), because pooling raw replicates across days into one
+inter-day precision estimate. Worked case: LLOQ QCs at nominal 2 ng/mL, 2 days x 3 replicates
+(2.35, 2.30, 1.55 and 2.40, 2.28, 1.60) with a low rep-3 outlier each day give intra-day CV 21.7% and
+20.6% (both FAIL the 20% LLOQ tolerance), a naive pooled CV of 18.9% (PASS, wrong) and a nested-ANOVA
+inter-day CV of 21.1% (FAIL), because pooling raw replicates across days into one
 SD/mean uses the wrong degrees of freedom and can dilute a real within-day outlier's leverage.
+
+### Matrix Factor, Recovery, and Carryover
+
+**Goal:** Prove the IS cancels the matrix effect, characterize extraction recovery, and quantify carryover with numbers instead of judgement.
+
+**Approach:** `scripts/matrix_recovery_carryover.R` (base R; checked on R 4.4.3) takes key=value arguments and exits 1 when a check fails. Definitions (Matuszewski 2003):
+- Matrix factor per lot: MF = post-extraction-spiked response / neat-solvent response at the same concentration, for the analyte and for the IS; IS-normalized MF = MF_analyte / MF_IS. Pass = CV of the IS-normalized MF <= 15% across >= 6 lots (Quantitative Thresholds).
+- Recovery % = pre-extraction-spike response / post-extraction-spike response x 100, per level. ICH M10 sets no numeric limit: recovery need not be 100%, but it must be consistent and reproducible across levels.
+- Carryover % of LLOQ = analyte response in the blank injected after the ULOQ / LLOQ response x 100 (limit 20%), with the LLOQ response = intercept + slope x LLOQ from the response-ratio calibration; IS carryover (limit 5%) needs a blank injected without IS.
+
+```bash
+Rscript scripts/matrix_recovery_carryover.R matrix_factor file=lots.csv   # cols: lot, analyte_area, istd_area, neat_analyte_area, neat_istd_area
+Rscript scripts/matrix_recovery_carryover.R recovery file=recovery.csv    # cols: level, pre_area, post_area
+Rscript scripts/matrix_recovery_carryover.R carryover blank_ratio=0.0085 slope=0.00100 intercept=-0.00004 lloq=2
+```
+
+Optional arguments (column names, `filter=<col>:<value>` to keep one sample type, `blank_istd=`/`ref_istd=`) are listed in the script header.
 
 ## Per-Method Failure Modes
 
@@ -214,8 +217,8 @@ SD/mean uses the wrong degrees of freedom and can dilute a real within-day outli
 |---|---|---|
 | Calibrator back-calc within +/-15% (+/-20% at LLOQ), >=75% of >=6 levels pass | ICH M10 (Step 4, 2022) | Per-level accuracy, not correlation, defines a usable curve |
 | QC accuracy +/-15% (+/-20% at LLOQ); precision CV <=15% (<=20% at LLOQ) | ICH M10 | Intra- and inter-day acceptance at >=4 levels -- compute inter-day by nested ANOVA, not pooled SD (see Precision subsection) |
-| IS-normalized matrix factor CV <=15% across >=6 lots | ICH M10 / Matuszewski 2003 | Proof the IS cancels matrix effect; raw MF may be poor while IS-normalized MF ~1 |
-| Carryover <=20% of LLOQ (analyte), <=5% (IS) | ICH M10 | Measured in a blank after the ULOQ; concentration-dependent, must be quantified not eyeballed |
+| IS-normalized matrix factor CV <=15% across >=6 lots | ICH M10 / Matuszewski 2003 | Proof the IS cancels matrix effect; raw MF may be poor while IS-normalized MF ~1 (see Matrix Factor, Recovery, and Carryover) |
+| Carryover <=20% of LLOQ (analyte), <=5% (IS) | ICH M10 | Measured in a blank after the ULOQ; concentration-dependent, must be quantified not eyeballed (see Matrix Factor, Recovery, and Carryover) |
 | Selectivity: interference at LLOQ <=20% of analyte, <=5% of IS response | ICH M10 | Across >=6 individual matrix lots |
 | ISR: >=2/3 of reanalyzed study samples within +/-20% | ICH M10 | Only test that catches incurred-sample-specific problems spiked QCs cannot |
 | Ion-ratio tolerance +/-30% relative (LC-MS/MS) | SANTE/2020/12830 | Illustrative codified window; enforce only above a few times the LLOQ |

@@ -27,7 +27,7 @@ p_fold <- dotplot(ego_simple, x = 'FoldEnrichment', showCategory = show_n) + ggt
 # SHOW the redundancy as structure: term-similarity matrix is mandatory before emapplot/treeplot.
 ego_ts <- pairwise_termsim(ego)        # JC (Jaccard on gene overlap), the default; any gene-set type
 p_emap <- emapplot(ego_ts, showCategory = 30)                   # edges = overlap >= min_edge (0.2 default)
-p_tree <- treeplot(ego_ts, showCategory = 20, cluster.params = list(n = 5))     # deterministic Ward clusters; nCluster= is deprecated
+p_tree <- treeplot(ego_ts, showCategory = 20, nCluster = 5)                     # deterministic Ward clusters
 
 out <- file.path(tempdir(), 'ora_visualization.pdf')
 pdf(out, width = 11, height = 9)

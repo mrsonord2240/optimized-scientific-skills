@@ -22,7 +22,7 @@ package and adapt the example to match the actual API rather than retrying.
 
 **"Find records linked to this record in another NCBI database"** -> ELink walks the curated, weekly-maintained link tables between Entrez databases. A link is an asserted relationship (e.g. "this PubMed article describes this nucleotide sequence"), not a similarity hit.
 
-ELink is the navigation layer of Entrez. The decision that matters most is **which `linkname` to use** — not which databases. A single (`dbfrom`, `db`) pair can have a dozen `linkname` variants distinguishing curation level, evidence type, and direction. Picking the wrong one is the difference between 5 high-confidence matches and 500 noisy automated assertions.
+ELink is the navigation layer of Entrez. The decision that matters most is **which `linkname` to use** — not which databases. A single (`dbfrom`, `db`) pair can have a dozen `linkname` variants distinguishing curation level, evidence type, and direction. Picking the wrong one changes the result set by a multiple (BRCA1, live 2026-09-21: 368 `gene_protein_refseq` proteins vs 1087 `gene_protein`).
 
 - Python: `Entrez.elink(dbfrom=..., db=..., id=..., linkname=...)` (BioPython)
 - CLI: `elink -db pubmed -target gene -name pubmed_gene_rif` (Entrez Direct)
@@ -43,12 +43,13 @@ Entrez.api_key = 'optional_api_key'  # raises rate to 10 req/sec
 ## Workflow
 
 1. Set `Entrez.email` and `Entrez.api_key`.
-2. For unfamiliar (`dbfrom`, `db`) pairs, run `cmd='acheck'` first to enumerate linknames.
-3. Pick a `linkname` deliberately — prefer curated variants (`*_refseq`, `*_rif`, `*_swissprot`) for analyses; use the umbrella `gene_protein` only for exploration.
-4. For >200 source IDs, EPost first and ELink with `cmd='neighbor_history'`.
-5. Iterate the response as one LinkSet per input UID — never assume a single LinkSetDb covers all inputs.
-6. Guard for empty `LinkSetDb` before indexing.
-7. Document the asymmetry of round-trip queries when results matter for publication.
+2. Confirm each source UID resolves in `dbfrom` and is the record you meant: `python scripts/check_source_ids.py <dbfrom> <uid> ...` (see Failure modes, "Mismatched dbfrom and id namespace").
+3. For unfamiliar (`dbfrom`, `db`) pairs, run `cmd='acheck'` first to enumerate linknames.
+4. Pick a `linkname` deliberately — prefer curated variants (`*_refseq`, `*_rif`, `*_swissprot`) for analyses; use the umbrella `gene_protein` only for exploration. Per-pair linknames for other databases: `references/link_catalog.md`.
+5. For >200 source IDs, EPost first and ELink with `cmd='neighbor_history'` (code: `references/code_patterns.md`, or `examples/chain_links.py`).
+6. Pass source IDs as a Python **list** to get one LinkSet per input UID (a comma-joined string returns a single merged LinkSet, the union), and iterate the response — never assume a single LinkSetDb covers all inputs.
+7. Guard for empty `LinkSetDb` before indexing.
+8. Document the asymmetry of round-trip queries when results matter for publication.
 
 ## The `linkname` decision (most important)
 
@@ -58,8 +59,8 @@ For most (`dbfrom`, `db`) pairs NCBI exposes multiple link tables. The qualifier
 
 | linkname | Returns | When to use |
 |---|---|---|
-| `gene_protein` | All linked proteins (curated + automated) | Exploration; expect 10-1000x more hits |
-| `gene_protein_refseq` | RefSeq proteins only | Reference-quality analyses; orthology |
+| `gene_protein` | All linked proteins (curated + automated) | Exploration; expect several times more hits (BRCA1: 1087 vs 368 RefSeq, TP53: RefSeq 25) |
+| `gene_protein_refseq` | RefSeq proteins only (every RefSeq isoform, not one canonical protein) | Reference-quality analyses; orthology |
 | `gene_protein_swissprot` | Reviewed UniProt entries with NCBI cross-ref | Functional annotation; literature support |
 
 ### pubmed -> gene
@@ -110,214 +111,26 @@ ELink relationships are **not guaranteed symmetric**. `pubmed_gene` and `gene_pu
 - Cutoffs: some link tables truncate at N best links in one direction but not the other.
 - Index lag asymmetry: when one db updates faster than the other.
 
-If round-trip consistency matters (e.g. "every gene mentioned in this paper, then every paper mentioning each gene"), expect the round-trip set to be larger than the input — and never assume `A -> B -> A` returns the original ID alone.
+If round-trip consistency matters (e.g. "every gene mentioned in this paper, then every paper mentioning each gene"), expect the round-trip set to be larger than the input — and never assume `A -> B -> A` returns the original ID alone. The original PMID may be missing from the round-trip set while new PMIDs appear. Document the directional asymmetry, and use the more-curated linkname (`*_rif` variants) when fidelity matters.
 
 ## Clinically-actionable link tables
 
 `gene_clinvar`, `gene_omim`, `gene_gtr`, and `gene_medgen_diseases` return real, curated clinical-variant and disease data — not a toy example (e.g. `gene_clinvar` on BRCA1 alone returns 16,000+ linked ClinVar records). When one of these link types is surfaced in response to a request framed around a specific patient or personal diagnosis, do not make a diagnostic or prescriptive claim from the link count or record set — include a clinician/genetic-counselor referral instead. This applies regardless of general safety training: the caveat is part of correct output for these linknames specifically.
 
-## Per-database link catalog (curated subset)
+## Reference Files
 
-### gene
-
-| Target | Common linknames | Notes |
-|---|---|---|
-| protein | `gene_protein`, `gene_protein_refseq`, `gene_protein_swissprot` | RefSeq is the safe default |
-| nuccore | `gene_nuccore`, `gene_nuccore_refseqrna`, `gene_nuccore_refseqgene` | `refseqrna` for mRNA, `refseqgene` for the curated gene region |
-| pubmed | `gene_pubmed`, `gene_pubmed_rif` | RIF is curated and high-quality |
-| homologene | `gene_homologene` | Deprecated 2014, data still queryable but new entries stopped -- prefer Ensembl Compara or OrthoFinder for current orthology |
-| snp | `gene_snp` | dbSNP entries in gene region |
-| clinvar | `gene_clinvar` | Clinical variants |
-| omim | `gene_omim` | Disease associations |
-
-### nuccore / nucleotide
-
-| Target | Common linknames |
+| File | Read when |
 |---|---|
-| protein | `nuccore_protein`, `nuccore_protein_refseq` |
-| gene | `nuccore_gene` |
-| taxonomy | `nuccore_taxonomy` |
-| biosample | `nuccore_biosample` |
-| sra | `nuccore_sra` |
-| pubmed | `nuccore_pubmed`, `nuccore_pubmed_refseq` |
-
-### protein
-
-| Target | Common linknames |
-|---|---|
-| nuccore | `protein_nuccore`, `protein_nuccore_cds`, `protein_nuccore_mrna` |
-| gene | `protein_gene` |
-| structure | `protein_structure` |
-| cdd | `protein_cdd` (conserved domains) |
-| pubmed | `protein_pubmed` |
-
-### pubmed
-
-| Target | Common linknames |
-|---|---|
-| pubmed | `pubmed_pubmed`, `pubmed_pubmed_citedin`, `pubmed_pubmed_refs` |
-| gene | `pubmed_gene`, `pubmed_gene_rif` |
-| protein | `pubmed_protein` |
-| nuccore | `pubmed_nuccore` |
-| gds | `pubmed_gds` (GEO datasets cited in paper) |
-| sra | `pubmed_sra` |
-
-### bioproject
-
-| Target | Common linknames |
-|---|---|
-| biosample | `bioproject_biosample` |
-| sra | `bioproject_sra` |
-| pubmed | `bioproject_pubmed` |
-
-## Code patterns
-
-### Single source -> single target
-
-**Goal:** Get RefSeq proteins for a single gene.
-
-**Approach:** ELink with explicit `linkname` to restrict to curated set.
-
-**Reference (BioPython 1.83+):**
-```python
-def gene_to_refseq_proteins(gene_id):
-    h = Entrez.elink(dbfrom='gene', db='protein', id=gene_id, linkname='gene_protein_refseq')
-    r = Entrez.read(h); h.close()
-    if not r[0]['LinkSetDb']:
-        return []
-    return [link['Id'] for link in r[0]['LinkSetDb'][0]['Link']]
-
-print(gene_to_refseq_proteins('672'))  # BRCA1
-```
-
-### Batch source -> target (small batch)
-
-**Goal:** Get linked proteins for a list of <200 gene IDs in one call.
-
-**Approach:** Comma-join IDs; one linkset per input in the response.
-
-**Reference (BioPython 1.83+):**
-```python
-def batch_gene_protein(gene_ids):
-    h = Entrez.elink(dbfrom='gene', db='protein', id=','.join(gene_ids), linkname='gene_protein_refseq')
-    r = Entrez.read(h); h.close()
-    out = {}
-    for linkset in r:
-        src = linkset['IdList'][0]
-        out[src] = [link['Id'] for link in linkset['LinkSetDb'][0]['Link']] if linkset['LinkSetDb'] else []
-    return out
-```
-
-### Large batch via history server
-
-**Goal:** Link 5,000 gene IDs to proteins without hitting URL-length limits.
-
-**Approach:** EPost the IDs first (chunked at 200), then ELink with `cmd='neighbor_history'` referencing the WebEnv. Downstream EFetch picks up linked IDs from the history server.
-
-**Reference (BioPython 1.83+):**
-```python
-def post_then_link(gene_ids, target='protein', linkname='gene_protein_refseq'):
-    # EPost in chunks of 200
-    webenv = None
-    for i in range(0, len(gene_ids), 200):
-        chunk = gene_ids[i:i+200]
-        kwargs = {'db': 'gene', 'id': ','.join(chunk)}
-        if webenv:
-            kwargs['WebEnv'] = webenv
-        h = Entrez.epost(**kwargs)
-        r = Entrez.read(h); h.close()
-        webenv = r['WebEnv']
-        query_key = r['QueryKey']
-        time.sleep(0.1 if Entrez.api_key else 0.34)
-
-    # Link with neighbor_history
-    h = Entrez.elink(dbfrom='gene', db=target, linkname=linkname,
-                     cmd='neighbor_history', WebEnv=webenv, query_key=query_key)
-    r = Entrez.read(h); h.close()
-    # WebEnv is at the top level of the response; QueryKey is per-LinkSetDbHistory entry.
-    return r[0]['WebEnv'], r[0]['LinkSetDbHistory'][0]['QueryKey']
-
-we, qk = post_then_link(['672', '675', '7157'] * 1000)
-# Downstream: Entrez.efetch(db='protein', WebEnv=we, query_key=qk, retstart=..., retmax=500)
-```
-
-### Discover all available links
-
-**Goal:** Before writing a pipeline, enumerate what link tables NCBI exposes for a (dbfrom, source-id) pair.
-
-**Approach:** `cmd='acheck'` returns the full LinkInfo list per source.
-
-**Reference (BioPython 1.83+):**
-```python
-def list_link_names(dbfrom, id):
-    h = Entrez.elink(dbfrom=dbfrom, id=id, cmd='acheck')
-    r = Entrez.read(h); h.close()
-    info = r[0]['IdCheckList']['IdLinkSet'][0]['LinkInfo']
-    return [(i['LinkName'], i['DbTo'], i.get('MenuTag', '<none>')) for i in info]
-
-for name, target, label in list_link_names('gene', '672'):
-    print(f'{name:<40} -> {target:<15} ({label})')
-```
-
-### Chain links (gene -> protein -> structure)
-
-```python
-def gene_to_structures(gene_id):
-    h = Entrez.elink(dbfrom='gene', db='protein', id=gene_id, linkname='gene_protein_refseq')
-    r = Entrez.read(h); h.close()
-    if not r[0]['LinkSetDb']:
-        return []
-    prot_ids = [l['Id'] for l in r[0]['LinkSetDb'][0]['Link'][:10]]
-    time.sleep(0.1 if Entrez.api_key else 0.34)
-    h = Entrez.elink(dbfrom='protein', db='structure', id=','.join(prot_ids))
-    r = Entrez.read(h); h.close()
-    out = []
-    for ls in r:
-        if ls['LinkSetDb']:
-            out.extend(l['Id'] for l in ls['LinkSetDb'][0]['Link'])
-    return out
-```
-
-### Get neighbor_score for related PubMed articles
-
-```python
-def related_pubmed(pmid, top=10):
-    h = Entrez.elink(dbfrom='pubmed', db='pubmed', id=pmid,
-                     linkname='pubmed_pubmed', cmd='neighbor_score')
-    r = Entrez.read(h); h.close()
-    if not r[0]['LinkSetDb']:
-        return []
-    return [(l['Id'], int(l['Score'])) for l in r[0]['LinkSetDb'][0]['Link'][:top]]
-```
-
-`Score` is a large raw integer (NCBI's internal relevance magnitude, often in the tens of millions, e.g. `29748057`), not a normalized 0-100 value — never present it as a percentage or small rank.
-
-### BioProject -> SRA runs
-
-For SRA discovery, `pysradb.SRAweb().sra_metadata(prjna, detailed=True)` (see `sra-data`) is the higher-fidelity path — returns SRR accessions directly with run-level metadata in one call. Use ELink only when staying inside Bio.Entrez:
-
-```python
-def bioproject_to_sra(prjna):
-    # Convert PRJNA to UID first
-    h = Entrez.esearch(db='bioproject', term=f'{prjna}[BioProject]')
-    r = Entrez.read(h); h.close()
-    if not r['IdList']:
-        return []
-    bp_uid = r['IdList'][0]
-    time.sleep(0.1 if Entrez.api_key else 0.34)
-    # Link to SRA
-    h = Entrez.elink(dbfrom='bioproject', db='sra', id=bp_uid)
-    r = Entrez.read(h); h.close()
-    return [l['Id'] for l in r[0]['LinkSetDb'][0]['Link']] if r[0]['LinkSetDb'] else []
-```
+| `references/link_catalog.md` | You need the linknames for a specific (`dbfrom`, `db`) pair (gene, nuccore, protein, pubmed, bioproject), beyond the gene/pubmed/nucleotide tables above or `cmd='acheck'` |
+| `references/code_patterns.md` | You are writing ELink code: single/batch/history-server linking, chaining, `neighbor_score`, BioProject -> SRA |
 
 ## Failure modes
 
-### Wrong linkname gives wrong order of magnitude
+### Wrong linkname multiplies the result set
 - **Trigger:** Using `gene_protein` when `gene_protein_refseq` was intended.
 - **Mechanism:** `gene_protein` includes all automated and predicted entries (XP_* RefSeq plus all GenBank submissions).
-- **Symptom:** 500 proteins returned per gene instead of the expected 1-5 canonical isoforms.
-- **Fix:** Pick the curated linkname; verify counts on a known gene.
+- **Symptom:** Several times more proteins than intended (BRCA1: 1087 instead of 368 RefSeq isoforms), including GenBank-submission and predicted entries.
+- **Fix:** Pick the curated linkname; verify counts on a known gene. `_refseq` still returns every RefSeq isoform (368 for BRCA1), so filter to one isoform (e.g. MANE Select) if a single canonical protein is wanted.
 
 ### Empty LinkSetDb on valid input
 - **Trigger:** Gene with no linked records in the requested target.
@@ -325,39 +138,34 @@ def bioproject_to_sra(prjna):
 - **Symptom:** `KeyError` if code assumes `record[0]['LinkSetDb'][0]` always exists.
 - **Fix:** Always guard `if not record[0]['LinkSetDb']: return []`.
 
-### Asymmetric round-trip
-- **Trigger:** Pipeline does `genes_for_paper(pmid) -> papers_for_each_gene -> set of PMIDs`.
-- **Mechanism:** `pubmed_gene` (text-mined + curated) is larger than `gene_pubmed` (curated only); the round-trip set is not closed.
-- **Symptom:** Original PMID may not appear in the round-trip set; new PMIDs do.
-- **Fix:** Document the directional asymmetry; use the more-curated linkname (`*_rif` variants) when fidelity matters.
-
 ### URL length limit on large batches
 - **Trigger:** Comma-joined `id=` with 200+ IDs.
 - **Mechanism:** HTTP GET URL exceeds NCBI's parsing limit (~2000 chars).
 - **Symptom:** HTTP 414 URI Too Long, or silent truncation.
 - **Fix:** EPost the IDs first, then ELink with `cmd='neighbor_history'`.
 
-### One linkset per input ID, indexing confusion
-- **Trigger:** Sending 5 IDs, then accessing `record[0]['LinkSetDb'][0]['Link']` expecting the union.
-- **Mechanism:** ELink returns one `LinkSet` per input UID, indexed by position.
-- **Symptom:** Only the first input's links are processed; rest are dropped.
-- **Fix:** Iterate `for linkset in record:` and map by `linkset['IdList'][0]`.
+### Chunked EPost links only the last chunk
+- **Trigger:** EPosting >200 IDs in several calls into one WebEnv, then ELinking with the last `QueryKey`.
+- **Mechanism:** Each EPost creates its own QueryKey holding only that chunk; posting into an existing WebEnv does not merge. Live 2026-09-21: 250 gene UIDs posted as 200 + 50, ELink from the last key returned 197 proteins, from the union 1374.
+- **Symptom:** A valid WebEnv/QueryKey and no error, but the linked set covers only the final chunk.
+- **Fix:** Union the chunk keys before linking: `Entrez.esearch(db=dbfrom, term='#1 OR #2', WebEnv=webenv, usehistory='y', retmax=0)` and link from the returned `QueryKey` (implemented in `examples/chain_links.py`, `link_batch_via_history`). Check the set size with `esearch(db=target, term='#<key>', WebEnv=..., retmax=0)['Count']`.
+
+### Comma-joined vs list `id`, indexing confusion
+- **Trigger:** Sending several IDs, then reading `record[0]['LinkSetDb'][0]['Link']` as if it covered all of them, or mapping results back to inputs after a comma-joined call.
+- **Mechanism:** `id=['672','7157']` (list) sends one `id=` per UID and returns one `LinkSet` per input, in input order. `id='672,7157'` (comma-joined string) returns a single `LinkSet` whose `IdList` holds both UIDs and whose links are the union. Live 2026-09-21: list -> 2 linksets (368 and 25 proteins); comma-joined -> 1 linkset (393).
+- **Symptom:** List form read as one set: only the first input's links are processed, the rest are dropped. Comma-joined form read per input: `linkset['IdList'][0]` is only the first UID and the others' links are attributed to it.
+- **Fix:** For per-input results pass a list, iterate `for linkset in record:` and map by `linkset['IdList'][0]`. Use the comma-joined form only when the union is what you want.
+
+### Invalid linkname (HTTP 400)
+- **Trigger:** A `linkname` that does not exist for the (`dbfrom`, `db`) pair.
+- **Symptom:** `HTTPError 400`.
+- **Fix:** Enumerate valid linknames with `cmd='acheck'`.
 
 ### Mismatched dbfrom and id namespace
-- **Trigger:** Passing a PMID into `dbfrom='nucleotide'`.
-- **Mechanism:** ELink returns no error — it just looks up the PMID as a nucleotide UID, finds nothing.
-- **Symptom:** Empty LinkSetDb on a "valid" ID.
-- **Fix:** Validate that the ID matches the source db namespace (PMIDs are db=pubmed, GeneIDs are db=gene).
-
-## Common errors
-
-| Error / symptom | Cause | Solution |
-|---|---|---|
-| `KeyError: 'LinkSetDb'` | Empty result not guarded | `if not record[0]['LinkSetDb']: return []` |
-| `HTTPError 414` | Comma-joined id too long | Use EPost + `neighbor_history` |
-| `HTTPError 400` | Invalid linkname or wrong db namespace | Use `cmd='acheck'` to enumerate valid links |
-| 500 hits instead of 5 | Wrong linkname (e.g. `gene_protein` vs `_refseq`) | Pick curated variant |
-| Round-trip set differs from input | Asymmetric link tables | Document; use curated variants |
+- **Trigger:** Passing a PMID into `dbfrom='nucleotide'`, or a nucleotide UID into `dbfrom='pubmed'` (a common slip when chaining UIDs across steps).
+- **Mechanism:** ELink returns no error (`ERROR: []`) — it looks the number up in `dbfrom`, finds nothing, and returns the same empty `LinkSetDb` as a genuine "no links" answer. Numeric UIDs also collide across databases (PubMed 31322957 and nucleotide 31322957 are unrelated records), so a wrong `dbfrom` can silently link the wrong record.
+- **Symptom:** Empty LinkSetDb on a "valid" ID, or links for a record you did not mean.
+- **Fix:** Before linking, run `python scripts/check_source_ids.py <dbfrom> <uid> ...` (or `checked_elink()` from the same file): it ESummary-resolves every UID in `dbfrom`, prints its title/caption for you to compare with the record you meant, and exits non-zero on a UID that does not resolve (PMIDs are db=pubmed, GeneIDs are db=gene; accessions and symbols are not UIDs — resolve them with entrez-search first).
 
 ## References
 

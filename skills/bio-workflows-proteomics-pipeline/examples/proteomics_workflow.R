@@ -134,28 +134,38 @@ if (nrow(complete) >= 3) {
 
 # === 6. DIFFERENTIAL ANALYSIS ===
 cat('\n=== Differential Analysis ===\n')
-sample_info <- data.frame(sample = colnames(filtered), condition = factor(sample_groups, levels = c('Control', 'Treatment')))
+# Reference level = first level of `condition`; sample_groups order sets it (Control first below).
+sample_info <- data.frame(sample = colnames(filtered), condition = factor(sample_groups, levels = unique(sample_groups)))
 design <- model.matrix(~ 0 + condition, data = sample_info)
-colnames(design) <- levels(sample_info$condition)
+colnames(design) <- make.names(levels(sample_info$condition))
 
 fit <- lmFit(as.matrix(filtered), design)
-# This demo is deliberately TWO conditions, so the contrast is written out. For three or more
-# (dose series, time course) do NOT edit sample_groups and keep this line: it will fail with
-# `object 'Treatment' not found`. Use the Complete R Workflow block in SKILL.md, which builds the
-# contrasts from the condition levels and adjusts across them with decideTests(method='global').
-contrast <- makeContrasts(Treatment - Control, levels = design)
+# Contrasts are built FROM the condition levels against the reference (first) level, exactly as in
+# the Complete R Workflow of SKILL.md, so a dose series or time course works by editing sample_groups
+# alone. Two conditions give the single Treatment_vs_Control contrast.
+ref <- levels(sample_info$condition)[1]
+others <- setdiff(levels(sample_info$condition), ref)
+contrast <- makeContrasts(contrasts = paste(make.names(others), '-', make.names(ref)), levels = design)
+colnames(contrast) <- paste0(others, '_vs_', ref)
 # treat() folds the minimum fold-change INTO the test (a proper hypothesis against |lfc| > threshold),
 # instead of a post-hoc logFC AND adj.P double filter -- the double filter is a collider/selection
-# effect whose realized FDR can exceed the nominal rate (SKILL.md). Significance is then adj.P alone.
+# effect whose realized FDR can exceed the nominal rate (SKILL.md). Note lfc_threshold is a floor on
+# EVERY contrast: on a dose series it can zero the smaller intermediate-dose effects (SKILL.md).
 fit2 <- treat(contrasts.fit(fit, contrast), lfc = lfc_threshold, trend = TRUE, robust = TRUE)
 
-results <- topTreat(fit2, coef = 1, number = Inf, adjust.method = 'BH')
-results$protein <- rownames(results)
+# One BH over every protein x contrast cell (decideTests 'global'); identical to per-contrast BH
+# for a single contrast. unclass(): decideTests returns an S4 TestResults whose `[` rejects
+# two-column indexing.
+results <- do.call(rbind, lapply(colnames(contrast), function(cn) {
+    tt <- topTreat(fit2, coef = cn, number = Inf, sort.by = 'none')
+    data.frame(protein = rownames(tt), contrast = cn, tt, row.names = NULL)
+}))
+dt <- unclass(decideTests(fit2, method = 'global', adjust.method = 'BH', p.value = fdr_threshold))
 # A protein observed in only one group has no estimable contrast: limma returns NA, and a bare
 # `adj.P.Val < t` would poison every downstream sum(). Report those as undetected-in-group.
-results$significant <- !is.na(results$adj.P.Val) & results$adj.P.Val < fdr_threshold
+results$significant <- !is.na(results$adj.P.Val) & dt[cbind(results$protein, results$contrast)] != 0
 
-cat('Total proteins tested:', nrow(results), '\n')
+cat('Total protein x contrast tests:', nrow(results), '\n')
 cat('Contrast not estimable (undetected in one group):', sum(is.na(results$logFC)), '\n')
 cat('Significant:', sum(results$significant), '\n')
 cat('  Up-regulated:', sum(results$significant & results$logFC > 0), '\n')
@@ -172,7 +182,7 @@ ggsave(paste0(output_prefix, '_volcano.pdf'), p_volcano, width = 8, height = 6)
 
 # Heatmap of significant proteins
 if (sum(results$significant) > 1) {
-    sig_proteins <- rownames(results)[results$significant]
+    sig_proteins <- unique(results$protein[results$significant])
     mat <- as.matrix(filtered[sig_proteins, ])
     mat <- mat[complete.cases(mat), , drop = FALSE]   # pheatmap cannot cluster rows with NA
     mat_scaled <- t(scale(t(mat)))

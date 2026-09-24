@@ -8,7 +8,7 @@ set -e
 REF=$1
 
 if [ -z "$REF" ]; then
-    echo "Usage: prepare_reference.sh <reference.fa|.fasta|.fna[.gz]>"
+    echo "Usage: prepare_reference.sh <reference.fa|.fasta|.fna[.gz]>  (.gz must be bgzip, not plain gzip)"
     exit 1
 fi
 
@@ -17,8 +17,8 @@ if [ ! -f "$REF" ]; then
     exit 1
 fi
 
-# GATK and Picard look for <name>.dict: drop .gz, then the last extension (genome.fasta -> genome.dict)
-# A genome.fasta.dict is silently ignored ("Fasta dict file genome.dict ... does not exist")
+# GATK requires <name>.dict: drop .gz, then the last extension (genome.fasta -> genome.dict)
+# GATK ignores genome.fasta.dict ("Fasta dict file genome.dict ... does not exist"); Picard accepts both names
 NAME=$(basename "$REF")
 NAME="${NAME%.gz}"
 case "$NAME" in *.*) NAME="${NAME%.*}" ;; esac

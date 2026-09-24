@@ -2,7 +2,8 @@
 
 Kimura's protein distance corrects observed pairwise identity for multiple substitutions
 at the same site: d = -log(1 - p - 0.2 * p^2). Valid up to ~85% divergence; saturates
-beyond. Use Bio.Phylo.TreeConstruction.DistanceCalculator('blosum62') for matrix-based
+beyond. The function returns inf for p >= 0.85 by convention (the formula itself stays finite up to
+p ~ 0.854, where 1 - p - 0.2 p^2 reaches 0): treat inf as "saturated", not as a computed value. Use Bio.Phylo.TreeConstruction.DistanceCalculator('blosum62') for matrix-based
 alternatives or IQ-TREE for full ML distance estimation.
 '''
 # Reference: biopython 1.83+ (checked on 1.88), numpy 1.26+ | Verify API if version differs

@@ -11,6 +11,11 @@ author: GPTomics
 
 Reference examples tested with: MetaboAnalystR 4.0+, FELLA 1.22+
 
+Install: MetaboAnalystR from GitHub (https://github.com/xia-lab/MetaboAnalystR); `BiocManager::install(c("FELLA", "KEGGREST"))`.
+`PerformPSEA` also needs `install.packages(c("fitdistrplus", "RJSONIO"))` -- declared only under
+MetaboAnalystR's Suggests, so a `dependencies=FALSE` GitHub install omits them and PSEA throws
+`there is no package called 'RJSONIO'` (checked on MetaboAnalystR 4.3.0).
+
 Before using code patterns, verify installed versions match. If versions differ:
 - R: `packageVersion('<pkg>')` then `?function_name` to verify parameters
 
@@ -36,9 +41,19 @@ mapped compound list and POSTs it (`httr::POST`, multipart, serialized `mSet`) t
 `https://www.xialab.ca/api/pathwayora` (or `/pathwayqea`) for every call, filtered or not -- confirmed
 by inspecting `my.ora.kegg`/`.do.api.call`'s source. A user running "locally installed" MetaboAnalystR
 on unpublished compound names/IDs should know they are leaving the machine before running this. If
-that is not acceptable, use the **Local-Only ORA** function below instead, which never leaves the
+that is not acceptable, use the **Local-Only ORA** function (`references/ora-local-and-api.md`) instead, which never leaves the
 machine (it only downloads the public, organism-agnostic KEGG pathway-to-compound reference table --
 no user data is sent).
+
+**Reference-library downloads (not user data).** `SetKEGG.PathLib()`, `CrossReferencing()`,
+`Setup.KEGGReferenceMetabolome()` and the mummichog/`PerformPSEA` path load their libraries through
+MetaboAnalystR's internal `.get.my.lib(filenm, sub.dir)`. Outside the web app it runs
+`download.file("https://www.metaboanalyst.ca/resources/libs/...")` into the *working directory*
+whenever the cached copy is missing or older than 30 days (printing `"Loaded files from MetaboAnalyst
+web-server."`). Only generic compound/pathway/adduct libraries are fetched -- the function never
+receives the compound list or `mSet` (checked by reading its source on 4.3.0) -- but the first run
+needs internet, results can shift when a stale cache refreshes, and an offline machine must pre-seed
+those files.
 
 # Metabolomics Pathway Mapping
 
@@ -57,10 +72,10 @@ The field's most common category error is conflating identified-compound enrichm
 
 | Input | Goal / situation | Method | Tool | Key constraint |
 |---|---|---|---|---|
-| Identified compounds + cutoff | Discrete "significant" hit list | ORA (hypergeometric) | MetaboAnalystR `CalculateOraScore` | Background = compounds the assay could detect, NOT all of KEGG |
+| Identified compounds + cutoff | Discrete "significant" hit list | ORA (hypergeometric) | MetaboAnalystR `CalculateOraScore` | Background = compounds the assay could detect, NOT all of KEGG; code in `references/ora-local-and-api.md` |
 | Identified compounds + ranked stat | No natural cutoff; keep magnitude | MSEA / QEA (rank-aware) | MetaboAnalystR `CalculateQeaScore` | Needs a meaningful, complete ranking |
-| Raw m/z + RT + per-feature stat, NO IDs | Predict pathway activity, bypass ID | mummichog / GSEA-PSEA | MetaboAnalystR `PerformPSEA` | Background = the FULL feature table (R_all); declare ionization mode |
-| Identified compounds | Mechanism: which enzymes/reactions link hits | Network diffusion | FELLA `runDiffusion` | KEGG IDs only; check `getExcluded()` for unmapped |
+| Raw m/z + RT + per-feature stat, NO IDs | Predict pathway activity, bypass ID | mummichog / GSEA-PSEA | MetaboAnalystR `PerformPSEA` | Background = the FULL feature table (R_all); declare ionization mode; code in `references/mummichog-psea.md` |
+| Identified compounds | Mechanism: which enzymes/reactions link hits | Network diffusion | FELLA `runDiffusion` | KEGG IDs only; check `getExcluded()` for unmapped; code in `references/fella-diffusion.md` |
 | Identified compounds | Database coverage is the bottleneck | Chemical-structure clustering | ChemRICH (background-independent) | Sidesteps pathway dark matter |
 | Any | Secondary lens only | Topology / "impact" | MetaboAnalystR (MetPA) | Hub artifact; never sole evidence |
 
@@ -81,145 +96,24 @@ Mummichog exists because identification is the rate-limiter: only ~2-10% of unta
 
 **Goal:** Test whether a list of confidently identified metabolites is over-represented in KEGG/SMPDB pathways, with a defensible background.
 
-**Approach:** Map names/IDs to the internal library, set the pathway library and metabolome filter (the background), then run the hypergeometric score; report mapping coverage alongside p-values.
+**Approach:** Map names/IDs to KEGG compounds and report mapping coverage; then run the hypergeometric test against an explicit assay-coverage background. Default to the **Local-Only ORA** function (no user data leaves the machine, background correction verified end to end); the MetaboAnalystR API path is the alternative.
 
-```r
-current.msg <- character(0); err.vec <- character(0)  # required -- see Version Compatibility
-library(MetaboAnalystR)
-
-# 'pathora' = pathway ORA; 'conc' = concentration-style input
-mSet <- InitDataObjects('conc', 'pathora', FALSE)
-mSet <- SetOrganism(mSet, 'hsa')
-
-# Confidently identified compounds (MSI level 1-2); names, HMDB, or KEGG IDs
-compounds <- c('Pyruvate', 'L-Lactate', 'Citrate', 'Succinate', 'Fumarate', 'L-Alanine')
-mSet <- Setup.MapData(mSet, compounds)
-mSet <- CrossReferencing(mSet, 'name')          # 'name' | 'hmdb' | 'kegg' | 'pubchem'
-mSet <- CreateMappingResultTable(mSet)          # inspect mapping coverage before trusting any p-value
-
-mSet <- SetKEGG.PathLib(mSet, 'hsa', 'current')
-
-# SetMetabolomeFilter(mSet, TRUE) alone does NOT restrict the background --
-# Setup.KEGGReferenceMetabolome() must be called first to load the reference file into
-# mSet$dataSet$metabo.filter.kegg, or the filter silently has no effect. FALSE uses the
-# whole library (all of KEGG) -- the inflated default that manufactures false positives.
-mSet <- SetMetabolomeFilter(mSet, TRUE)
-mSet <- Setup.KEGGReferenceMetabolome(mSet, 'reference_metabolome.txt')  # one KEGG ID per line
-
-mSet <- CalculateOraScore(mSet, 'rbc', 'hyperg') # node-importance 'rbc'|'dgr'; test 'hyperg'|'fisher'
-# This sends the mapped compound list to https://www.xialab.ca/api/pathwayora (see above).
-# Checked on MetaboAnalystR 4.3.0: the server has been observed to reject the FILTERED
-# request outright (CalculateOraScore returns 0; current.msg == "Failed to connect to
-# the API Server!"), even with a correctly-matched reference file, while the unfiltered
-# (FALSE) call to the same endpoint succeeds. If this happens, use Local-Only ORA below --
-# it is the only background-corrected KEGG ORA path verified to run end to end.
-if (is.numeric(mSet)) {
-  cat('ORA failed:', paste(current.msg, collapse = ' | '), '\n')
-} else {
-  ora <- as.data.frame(mSet$analSet$ora.mat)   # columns include Raw p, FDR, Impact, Hits, Total
-}
+```bash
+# compounds.txt: one name/HMDB/KEGG ID per line (MSI level 1-2); writes kegg_ids.txt and prints mapping coverage
+Rscript scripts/map_compounds.R compounds.txt hsa name kegg_ids.txt   # ID type: name | hmdb | kegg | pubchem
 ```
 
-### Local-Only ORA (no remote calls, verified background correction)
+### Enrichment test
 
-When the compound list must not leave the machine, or when the filtered call above is rejected,
-compute the same hypergeometric ORA locally using KEGGREST's public pathway-to-compound table
-(generic reference data, not user data) instead of MetaboAnalystR's KEGG-library proxy. Checked on
-KEGGREST 1.46.0 -- runs end to end (~3s to fetch/build the table) and reproduces the direction of the
-Skill's own background-inflation claim: on the audit's synthetic 12-compound TCA-cycle input, the
-Citrate cycle (hsa00020) p-value went from 6.2e-19 (all-of-KEGG background, n=6701) to 4.8e-10 (a
-261-compound assay-coverage background) -- less significant with the correct, smaller background, as
-the theory predicts.
+Run the hypergeometric test with the **Local-Only ORA** function (default) or the MetaboAnalystR API path; both are in `references/ora-local-and-api.md`.
 
-```r
-library(KEGGREST)
+## Reference Files
 
-local_kegg_ora <- function(hit_kegg_ids, universe_kegg_ids, min_hits = 2) {
-  links <- keggLink('pathway', 'compound')             # public reference table; no user data sent
-  cpd_ids  <- sub('^cpd:', '', names(links))
-  path_ids <- sub('^path:map', 'hsa', unname(links))    # generic map#### -> organism-specific hsa####
-  pw2cpd <- lapply(split(cpd_ids, path_ids), unique)
-
-  universe_kegg_ids <- unique(universe_kegg_ids)
-  pw2cpd <- lapply(pw2cpd, function(x) intersect(x, universe_kegg_ids))
-  pw2cpd <- pw2cpd[lengths(pw2cpd) > 0]
-  hits <- intersect(hit_kegg_ids, universe_kegg_ids)
-  N <- length(universe_kegg_ids); k <- length(hits)
-
-  out <- data.frame(
-    pathway = names(pw2cpd),
-    total   = lengths(pw2cpd),
-    hits    = vapply(pw2cpd, function(s) length(intersect(s, hits)), integer(1))
-  )
-  out <- out[out$hits >= min_hits, ]
-  out$p.value <- mapply(function(m, h) phyper(h - 1, m, N - m, k, lower.tail = FALSE), out$total, out$hits)
-  out$fdr <- p.adjust(out$p.value, method = 'BH')
-  out[order(out$p.value), ]
-}
-
-# kegg_ids: from CreateMappingResultTable/GetFinalNameMap above.
-# reference_ids: KEGG IDs from the assay-coverage reference file, restricted to compounds
-# KEGGREST actually links to a pathway (intersect with names(links) first if checking coverage).
-ora_local <- local_kegg_ora(kegg_ids, reference_ids)
-```
-
-## Mummichog / PSEA on a Raw m/z Peak Table
-
-**Goal:** Predict perturbed pathway activity from an untargeted LC-MS feature table when no compound identities exist.
-
-**Approach:** Declare instrument ppm and ionization mode, load the FULL feature table (m/z + p-value + t-score, optionally RT), set the query-defining p-cutoff, and run PSEA whose permutation null is sampled from R_all.
-
-```r
-current.msg <- character(0); err.vec <- character(0)  # required -- see Version Compatibility
-library(MetaboAnalystR)
-set.seed(123)  # PerformPSEA's permNum resampling is not reproducible run-to-run otherwise
-
-mSet <- InitDataObjects('mass_all', 'mummichog', FALSE)
-mSet <- SetPeakFormat(mSet, 'mpt')               # 'mpt' = m/z, p-value, t-score; 'mprt' adds RT (use with 'v2')
-
-# ppm and ionization mode are chemistry-specific and mandatory; pos and neg use
-# entirely different adduct tables. Mixed data needs a per-feature mode column.
-mSet <- UpdateInstrumentParameters(mSet, 5.0, 'negative')
-
-# CRITICAL: peaks.txt must be the ENTIRE feature table, not just significant peaks.
-# The permutation null draws random feature lists from this file (R_all); supplying
-# only significant features pre-enriches the pool and makes everything significant.
-mSet <- Read.PeakListData(mSet, 'peaks.txt')
-mSet <- SanityCheckMummichogData(mSet)
-
-mSet <- SetPeakEnrichMethod(mSet, 'mum', 'v2')   # 'mum'|'gsea'|'integ'; 'v2' uses RT/empirical compounds
-mSet <- SetMummichogPval(mSet, 0.2)              # query-defining cutoff; default is NOT 0.05 -- document it
-mSet <- PerformPSEA(mSet, 'hsa_mfn', 'current', permNum = 1000) # library string encodes organism+network
-
-psea <- mSet$mummi.resmat                         # predicted-active pathways; NOT a metabolite ID list
-```
-
-## Network-Diffusion Enrichment (FELLA)
-
-**Goal:** Return the intermediate enzymes, reactions, and modules that mechanistically link the affected metabolites, not just a ranked pathway list.
-
-**Approach:** Build the KEGG knowledge graph once, then per-analysis map KEGG IDs and run heat diffusion; inspect excluded (unmapped) compounds explicitly.
-
-```r
-library(FELLA)
-
-# Build once, reuse. buildGraphFromKEGGREST hits the live KEGG API (slow); cache the DB.
-graph <- buildGraphFromKEGGREST(organism = 'hsa')
-buildDataFromGraph(keggdata.graph = graph, databaseDir = 'fella_hsa', internalDir = FALSE)
-fella.data <- loadKEGGdata(databaseDir = 'fella_hsa', internalDir = FALSE)
-
-cpd_ids <- c('C00022', 'C00186', 'C00158', 'C00042', 'C00122', 'C00041') # KEGG compound IDs only
-analysis <- defineCompounds(compounds = cpd_ids, data = fella.data)
-getExcluded(analysis)                              # compounds that did not map -- report this
-
-# 'diffusion' is the recommended default; runHypergeom = plain ORA over the graph,
-# runPagerank (lowercase r) = directed random walks. The method string is lowercase.
-# approx = 'normality' (shown here) is analytic/deterministic, no seed needed. If using
-# approx = 'simulation' instead, call set.seed() first -- it resamples niter times and is
-# not reproducible run-to-run otherwise.
-analysis <- runDiffusion(object = analysis, data = fella.data, approx = 'normality')
-results <- generateResultsTable(object = analysis, data = fella.data, method = 'diffusion', threshold = 0.05)
-```
+| File | Read when |
+|---|---|
+| `references/ora-local-and-api.md` | Running the ORA test on the mapped `kegg_ids`: Local-Only ORA (default, verified background correction) or the MetaboAnalystR API path (sends the list off-machine) |
+| `references/mummichog-psea.md` | The input is a raw m/z peak table with no IDs: mummichog/PSEA code, ppm/ionization/p-cutoff setup |
+| `references/fella-diffusion.md` | The goal is mechanism (enzymes/reactions linking the hits): FELLA graph build and `runDiffusion` |
 
 ## Per-Method Failure Modes
 
@@ -227,7 +121,7 @@ results <- generateResultsTable(object = analysis, data = fella.data, method = '
 - **Trigger:** ORA run with the full library ("all of KEGG"); mummichog run with only significant features as input.
 - **Mechanism:** The background IS the null hypothesis made concrete. The KEGG-human library held ~3,373 compounds vs 286-1,110 actually measurable in real datasets; padding the denominator with undetectable compounds inflates every p-value. For mummichog, the permutation null samples from the input table, so a significant-only input pre-enriches the pool.
 - **Symptom:** Many "significant" pathways; few survive once the background is the assay-specific metabolome (Wieder 2021: two of five datasets dropped to ZERO after FDR with the correct background).
-- **Fix:** ORA -> `SetMetabolomeFilter(mSet, TRUE)` with the measured-metabolome reference. Mummichog -> supply the entire feature table as `peaks.txt`. State the background in one sentence or the p-values are uninterpretable.
+- **Fix:** ORA -> Local-Only ORA (`references/ora-local-and-api.md`) with the measured-metabolome reference as `universe_kegg_ids` (or `SetMetabolomeFilter(mSet, TRUE)` after `Setup.KEGGReferenceMetabolome()` on the API path). Mummichog -> supply the entire feature table as `peaks.txt`. State the background in one sentence or the p-values are uninterpretable.
 
 ### Annotation laundering
 - **Trigger:** ORA/MSEA run on MSI level-3 ("grey zone") tentative annotations as if they were level-1 confirmed.

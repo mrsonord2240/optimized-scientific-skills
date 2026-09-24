@@ -1,6 +1,6 @@
 #!/bin/bash
 # Reference: NCBI Datasets CLI 18.37.0 (checked 2026-09-19) | Verify API if version differs
-# Single-assembly download with auto MD5 + multiple file types.
+# Single-assembly download with zip checksum validation + multiple file types.
 
 set -euo pipefail
 
@@ -31,4 +31,4 @@ if [ -f "${JSONL}" ]; then
 fi
 
 echo
-echo "Datasets auto-verifies MD5 -- no manual checksum step needed."
+echo "datasets download validates the zip checksum -- no manual md5sum step needed."

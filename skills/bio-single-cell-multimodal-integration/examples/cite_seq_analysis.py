@@ -23,8 +23,17 @@ mu.pp.intersect_obs(mdata)
 # nFeature_RNA > 200: minimum gene complexity
 # nFeature_RNA < 5000: remove potential doublets
 # percent.mt < 20: remove dying cells
-rna_mask = (rna.obs['n_genes_by_counts'] > 200) & (rna.obs['n_genes_by_counts'] < 5000) & (rna.obs['pct_counts_mt'] < 20)
+rna_mask = (
+    rna.obs['n_genes_by_counts'] > 200
+    ) & (
+        rna.obs['n_genes_by_counts'] < 5000
+        ) & (
+            rna.obs['pct_counts_mt'] < 20
+            )
 mdata = mdata[rna_mask].copy()
+# Slicing returns a new MuData object, so rebind modalities before modifying them.
+rna = mdata.mod['rna']
+adt = mdata.mod['prot']
 
 # RNA preprocessing
 sc.pp.normalize_total(rna, target_sum=1e4)
@@ -32,28 +41,44 @@ sc.pp.log1p(rna)
 sc.pp.highly_variable_genes(rna, n_top_genes=2000)
 sc.pp.scale(rna, max_value=10)
 sc.tl.pca(rna, n_comps=30)
+# Muon WNN combines existing modality-local graphs; it does not create them.
+sc.pp.neighbors(rna, n_neighbors=15, n_pcs=min(30, rna.obsm['X_pca'].shape[1]))
 
 # ADT preprocessing: CLR rescales but does NOT remove background. This is a CLR-only
-# fallback path -- muon/Python has no first-party DSB equivalent (dsb is R-only). When
-# empty droplets are available, prefer SKILL.md's "CITE-seq: totalVI" section instead,
-# which models the ADT background explicitly (or run DSB in R and re-import the result).
-# axis is genuinely ambiguous across versions (axis=0 ~ per-feature ~ Seurat margin=2); verify with the muon docs
+# fallback path: muon/Python has no first-party DSB equivalent (dsb is R-only).
+# "CITE-seq: totalVI" section instead, which models the ADT background explicitly
+# (or run DSB in R and re-import the result).
+# axis is genuinely ambiguous across versions
+# (axis=0 ~ per-feature ~ Seurat margin=2); verify with the muon docs
 mu.prot.pp.clr(adt, axis=0)
 sc.pp.scale(adt, max_value=10)
 # Use all ADT features for PCA (typically 10-200 markers)
 sc.tl.pca(adt, n_comps=min(18, adt.n_vars - 1))
+sc.pp.neighbors(adt, n_neighbors=15, n_pcs=min(18, adt.obsm['X_pca'].shape[1]))
 
 # Weighted nearest neighbors (WNN) for multimodal integration
-mu.pp.neighbors(mdata, key_added='wnn')
+# Muon's default candidate count is 200, which exceeds a small valid CITE-seq
+# experiment; cap both joint-neighbor settings at the available cells.
+joint_candidates = min(200, mdata.n_obs - 1)
+mu.pp.neighbors(
+    mdata,
+    n_neighbors=min(15, joint_candidates),
+    n_bandwidth_neighbors=min(20, joint_candidates),
+    n_multineighbors=joint_candidates,
+    key_added='wnn',
+)
 
 # Clustering on WNN graph
 sc.tl.leiden(mdata, resolution=0.5, key_added='wnn_clusters', neighbors_key='wnn')
 
 # UMAP on WNN
-sc.tl.umap(mdata, neighbors_key='wnn')
+# Muon's WNN metadata contains multimodal per-modality dictionaries; use its
+# MuData-aware UMAP implementation rather than Scanpy's AnnData-only one.
+mu.tl.umap(mdata, neighbors_key='wnn', random_state=0)
 
 # Save UMAP plot
 sc.settings.figdir = './'
+sc.settings.autoshow = False
 sc.pl.umap(mdata, color='wnn_clusters', save='_cite_seq_wnn.pdf')
 
 # Save processed data

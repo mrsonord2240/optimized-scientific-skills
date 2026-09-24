@@ -12,6 +12,13 @@
 suppressPackageStartupMessages(library(edgeR))
 set.seed(123)
 
+# A donor-count configuration is usable only if its realized pseudobulk FDR passes.
+assess_realized_fdr <- function(actual_fdr, target_fdr = 0.05, tolerance = 0) {
+  actual_fdr <- unname(as.numeric(actual_fdr))
+  accepted <- is.finite(actual_fdr) & actual_fdr <= target_fdr + tolerance
+  c(actual_fdr = actual_fdr, accepted = accepted)
+}
+
 ngenes <- 200
 n_de <- 20        # 10% truly DE
 true_lfc <- 1.0   # log2 fold change for DE genes
@@ -77,8 +84,11 @@ run_grid <- function(n_donors, cells_per_donor, nsim = 5) {
 cfgs <- list(c(n_donors = 4, cpd = 200), c(n_donors = 12, cpd = 200))
 for (cfg in cfgs) {
   r <- run_grid(cfg[["n_donors"]], cfg[["cpd"]])
-  cat(sprintf("donors=%2d cells/donor=%3d | pseudobulk power=%.3f FDR=%.3f | cell-level power=%.3f FDR=%.3f\n",
-              cfg[["n_donors"]], cfg[["cpd"]], r["pb_power"], r["pb_fdr"], r["cell_power"], r["cell_fdr"]))
+  gate <- assess_realized_fdr(r["pb_fdr"])
+  decision <- if (gate[["accepted"]]) "ACCEPT" else "REJECT"
+  cat(sprintf("donors=%2d cells/donor=%3d | pseudobulk power=%.3f FDR=%.3f decision=%s | cell-level power=%.3f FDR=%.3f\n",
+              cfg[["n_donors"]], cfg[["cpd"]], r["pb_power"], r["pb_fdr"], decision, r["cell_power"], r["cell_fdr"]))
+  if (decision == "REJECT") cat('# Do not select this donor-count power estimate: increase nsim, then refit/revise the model.\n')
 }
 cat('# Pseudobulk power tracks donor count; cell-level "power" is inflated by treating\n')
 cat('# pseudoreplicates as replicates -- its FDR stays far above the nominal 0.05.\n')

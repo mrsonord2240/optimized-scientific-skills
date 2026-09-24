@@ -163,7 +163,12 @@ sce <- as.SingleCellExperiment(seurat_obj)   # counts -> counts, data -> logcoun
 writeH5AD(sce, 'out.h5ad')
 ```
 
-`scale.data` is silently dropped by `as.SingleCellExperiment()`: a Seurat object with `counts`/`data`/`scale.data` layers keeps only `counts`/`logcounts` (`assayNames(sce)`), and the resulting h5ad has no trace of `scale.data` after reload in Python. Reductions (e.g. PCA) survive into `obsm`. Save `scale.data` separately first if it is needed downstream: `as.matrix(LayerData(seurat_obj, layer='scale.data'))`.
+`scale.data` is silently dropped by `as.SingleCellExperiment()`: a Seurat object with `counts`/`data`/`scale.data` layers keeps only `counts`/`logcounts` (`assayNames(sce)`), and the resulting h5ad has no trace of `scale.data` after reload in Python. Reductions (e.g. PCA) survive into `obsm`. Save `scale.data` to its own file before converting if it is needed downstream (it is HVG genes x cells, dense):
+
+```r
+scale_data <- as.matrix(LayerData(seurat_obj, layer = 'scale.data'))
+saveRDS(scale_data, 'scale_data.rds')   # reload later with readRDS(); or write.csv(scale_data, 'scale_data.csv')
+```
 
 zellkonverter maps asymmetrically: `obsm`->`reducedDims`, `varm`->a `rowData` matrix column (NOT reducedDims), `obsp`/`varp`->`colPairs`/`rowPairs`, `uns`->`metadata()` (lossy). sceasy's `drop_single_values=TRUE` silently deletes every obs/var column with one unique value (a one-sample object loses its constant batch/condition label), so set `FALSE`.
 

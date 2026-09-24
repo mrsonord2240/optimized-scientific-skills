@@ -10,7 +10,7 @@ Self-contained: builds a synthetic table so no input files are needed.'''
 import numpy as np
 import pandas as pd
 
-DECOY_PREFIXES = ('decoy_', 'rev_', 'xxx_')   # compared lower-cased; Sage and FragPipe write rev_
+DECOY_PREFIXES = ('decoy_', 'rev_', 'xxx_')   # compared lower-cased; Sage writes rev_
 TARGET_FDR = 0.01   # 1% list-level FDR, the community standard for peptide IDs
 
 

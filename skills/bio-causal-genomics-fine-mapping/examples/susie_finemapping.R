@@ -1,4 +1,4 @@
-# Reference: ggplot2 3.5+ | Verify API if version differs
+# Reference: susieR 0.14.2 | Verify API if version differs
 ## SuSiE fine-mapping from GWAS summary statistics
 ##
 ## Demonstrates susie_rss with a simulated locus: computes PIPs,
@@ -21,16 +21,28 @@ for (i in 1:n_snps) {
   }
 }
 
+# Truncating the exponential-decay band outside the window breaks positive
+# semi-definiteness (checked: chol() fails at the leading minor of order 12).
+# Same ridge fix as SKILL.md's "Negative eigenvalues in LD matrix" Common Errors row.
+eig_min <- min(eigen(ld_matrix, only.values = TRUE)$values)
+if (eig_min < 1e-6) {
+  ld_matrix <- ld_matrix + diag(abs(eig_min) + 1e-4, n_snps)
+}
+
 # Two causal variants
 causal1 <- 100
 causal2 <- 350
 
-# Generate Z-scores: large Z at causal variants, small elsewhere
-z_scores <- rnorm(n_snps, 0, 1)
-z_scores[causal1] <- 6.5
-z_scores[(causal1 - 3):(causal1 + 3)] <- z_scores[(causal1 - 3):(causal1 + 3)] + c(3, 4, 5.5, 6.5, 5.2, 3.8, 2.5)
-z_scores[causal2] <- 5.0
-z_scores[(causal2 - 2):(causal2 + 2)] <- z_scores[(causal2 - 2):(causal2 + 2)] + c(2.5, 4.0, 5.0, 3.5, 2.0)
+# Generate Z-scores consistent with the LD matrix: z ~ N(R %*% true_z, R). Two
+# independent hand-picked bump vectors (checked on susieR 0.14.2) crashed with
+# "the estimated prior variance is unreasonably large" because they were not
+# generated from the LD structure -- susie_rss enforces z' R^{-1} z consistency,
+# so a locus-wide implied signal must be constructed through R, not overwritten
+# in a small window afterward.
+true_z <- rep(0, n_snps)
+true_z[causal1] <- 6.5
+true_z[causal2] <- 5.0
+z_scores <- as.numeric(ld_matrix %*% true_z) + as.numeric(t(chol(ld_matrix)) %*% rnorm(n_snps))
 
 snp_ids <- paste0('rs', 1:n_snps)
 

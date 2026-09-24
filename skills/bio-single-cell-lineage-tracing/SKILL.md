@@ -147,19 +147,28 @@ char_matrix, priors, state_map = cas.pp.convert_alleletable_to_character_matrix(
 **Approach:** Fit a transition map jointly from clonal observations and transcriptomic similarity, then read fate bias and fate maps.
 
 ```python
-import cospar as cs
-adata = cs.hf.read('lineage_traced.h5ad')
-adata = cs.pp.initialize_adata_object(adata, X_clone=adata.obsm['X_clone'], time_info=adata.obs['time_info'])
+import cospar as cs, scanpy as sc
+adata = cs.hf.read('lineage_traced.h5ad')   # X = raw counts; obsm['X_clone'] = cells x clones; obs['time_info']
+# CoSpar needs a precomputed PCA and 2-D embedding. initialize_adata_object only WARNS when they are
+# missing, and the crash comes later as KeyError: 'X_emb'. Compute them on a log-normalized copy so
+# adata.X stays raw counts (CoSpar warns on log-transformed X).
+emb = adata.copy()
+sc.pp.normalize_total(emb); sc.pp.log1p(emb); sc.pp.pca(emb); sc.pp.neighbors(emb); sc.tl.umap(emb)
+# data_des must be unique per dataset: CoSpar caches similarity matrices on disk under it
+adata = cs.pp.initialize_adata_object(adata, X_clone=adata.obsm['X_clone'], time_info=adata.obs['time_info'],
+                                      X_pca=emb.obsm['X_pca'], X_emb=emb.obsm['X_umap'], data_des='my_dataset')
 adata = cs.tmap.infer_Tmap_from_multitime_clones(adata, smooth_array=[15, 10, 5], sparsity_threshold=0.1)
 cs.tl.fate_bias(adata, selected_fates=['Monocyte', 'Neutrophil'])
 cs.pl.fate_bias(adata, selected_fates=['Monocyte', 'Neutrophil'])
 ```
 
+`infer_Tmap_from_multitime_clones` was run here with 2 and with 3 time points in `time_info`. If a second dataset raises `ValueError: The pre-computed similarity matrix does not have the right dimension`, it reused the cached matrices of an earlier dataset with the same `data_des` (the default is `'cospar'`). Give each dataset its own `data_des`, or pass `compute_new=True` to the inference call.
+
 CoSpar operationalizes Weinreb 2020: it propagates fate probabilities onto cells lacking clonal labels and is robust to severe downsampling of lineage data, but it needs paired clone + state and does NOT build a phylogenetic tree (clones are flat). CoSpar needs MULTIPLE independent clones to be lineage-informed; with effectively one clone the constraint is vacuous and the transition map degenerates to transcriptomic similarity, the state-only answer CoSpar exists to correct. For tree topology from scars, use Cassiopeia or Startle.
 
-`infer_Tmap_from_multitime_clones` scales poorly: ~10 minutes for a 200-cell toy dataset
-with the default `smooth_array=[15, 10, 5]`. Expect substantially longer on real datasets;
-use a smaller `smooth_array` for a first exploratory pass.
+`infer_Tmap_from_multitime_clones` took ~15 s on a 200-cell toy dataset with the default
+`smooth_array=[15, 10, 5]` (2026-09-21); cost grows with cell number, so expect much longer on real
+datasets and use a smaller `smooth_array` for a first exploratory pass.
 
 ### Group Clones from mtDNA Heteroplasmy
 
@@ -198,7 +207,7 @@ clones = pd.Series(best_labels, index=het.index, name='mtdna_clone')
 Verified on a synthetic 40-cell/10-variant heteroplasmy matrix with 4 planted clones plus
 one recurrent hotspot variant: the blacklist step drops exactly the hotspot, and
 clustering recovers the 4 planted clones exactly (adjusted Rand index 1.0). Report this
-as a clonal grouping only — never branch order or divergence times.
+as a clonal grouping only — never branch order or divergence times. mtDNA heteroplasmy from primary human tissue is human genomic data: handle it under the same consent and privacy requirements as any other.
 
 ### Refine a Tree Under Severe Homoplasy with Startle
 

@@ -9,7 +9,7 @@ author: GPTomics
 
 ## Version Compatibility
 
-Reference examples tested with: susieR 0.12.27+, coloc 5.2.3+, FINEMAP 1.4.2+, PolyFun (head of `omerwe/polyfun` 2024), PAINTOR V3.0, SuSiEx (head of `getian107/SuSiEx`), DAP-G (head of `xqwen/dap`), pyfocus 0.8+, R 4.3+, PLINK 1.9 / 2.0.
+Reference examples tested with: susieR 0.14.2, coloc 5.2.3, FINEMAP 1.4.2 (bioconda), PolyFun (head of `omerwe/polyfun` 2024), PAINTOR V3.0, SuSiEx 1.1.2 (bioconda), DAP-G (`xqwen/dap` @ `875ba40`), pyfocus 0.8+, R 4.4.3, PLINK 1.9.0-b.8 / 2.0 alpha 7.6.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - R: `packageVersion('susieR')` then `?susie_rss` to confirm argument names (e.g., `prior_weights` vs `prior_variance` semantics)
@@ -24,8 +24,8 @@ If a call throws an error about an argument that no longer exists, introspect th
 
 - R (summary statistics + LD): `susieR::susie_rss(z, R, n, L=10)` + `estimate_s_rss` LD diagnostic
 - R (individual-level genotypes): `susieR::susie(X, y, L=10)`
-- CLI (shotgun stochastic search): `finemap --sss --in-files master.z --n-causal-snps 5 --prob-tol 0.001`
-- CLI (cross-ancestry joint): `SuSiEx --sst_file=eur.sst,eas.sst --n_gwas=N1,N2 --ref_file=eur.bim,eas.bim --ld_file=eur_ld,eas_ld --chr_col=1,1 --snp_col=2,2 --bp_col=3,3 --a1_col=4,4 --a2_col=5,5 --eff_col=6,6 --se_col=7,7 --pval_col=8,8 --chr=<chr> --bp=<start,end> --out_dir=<dir> --out_name=<name>` (column-number flags and `--ld_file` are required; populations are assigned by the ORDER of the comma-separated `--sst_file`/`--n_gwas`/`--ref_file`/`--ld_file` lists, not a `--pop` flag; see `SuSiEx --help`)
+- CLI (shotgun stochastic search): `finemap --sss --in-files master.z --n-causal-snps 5 --prob-conv-sss-tol 0.001` (checked on FINEMAP 1.4.2 — flag names differ from older docs; see `references/finemap-cli.md`)
+- CLI (cross-ancestry joint): `SuSiEx --sst_file=eur.sst,eas.sst --n_gwas=N1,N2 --ref_file=eur.bim,eas.bim --ld_file=eur_ld,eas_ld --chr_col=1,1 --snp_col=2,2 --bp_col=3,3 --a1_col=4,4 --a2_col=5,5 --eff_col=6,6 --se_col=7,7 --pval_col=8,8 --chr=<chr> --bp=<start,end> --out_dir=<dir> --out_name=<name> --plink=<path/to/plink>` (checked on SuSiEx 1.1.2 — `--plink` is required and `--ld_file` is an output prefix, not a pre-built matrix; see `references/susiex-cross-ancestry.md`)
 - Python (functional priors): `polyfun.py --compute-h2-L2` -> per-SNP priors -> susie_rss with `prior_weights=`
 - Python (TWAS fine-mapping): `focus finemap` on gene-level Z-scores
 
@@ -33,39 +33,75 @@ If a call throws an error about an argument that no longer exists, introspect th
 
 Fine-mapping is a Bayesian model selection problem; LD is not noise but structured prior information. Most failure modes trace back to one of three issues: (a) LD reference mismatched to the GWAS sample; (b) the sparse-effects prior being wrong for the locus (polygenic background); or (c) too small an L cap. The `estimate_s_rss()` lambda and `kriging_rss()` per-SNP diagnostic catch (a) before downstream credible sets are reported.
 
-## Algorithmic Taxonomy
+## Tool Install Notes
 
-| Tool | Model | Input | Strength | Fails when |
-|------|-------|-------|----------|------------|
-| SuSiE / susie_rss (Wang 2020 JRSSB 82:1273; Zou 2022 PLoS Genet) | Iterative Bayesian sum-of-single-effects (IBSS), variational | Individual-level (X, y) or (z, R, n) | Fast; native PIP + credible sets; pluggable priors; default in modern pipelines | Reference LD mismatched to GWAS sample; locus dominated by polygenic background; >L true effects |
-| SuSiE-inf / FINEMAP-inf (Cui 2024 Nat Genet 56:162) | SuSiE + infinitesimal random-effect component | (z, R, n) | Calibrated credible sets when locus is non-sparse (polygenic shoulder around a sparse causal); recommended for biobank-scale GWAS | Very small loci with truly sparse architecture (over-conservative); slower convergence |
-| FINEMAP (Benner 2016 Bioinformatics 32:1493) | Shotgun stochastic search over causal configurations | .z + .ld + .master files | Exact Bayes factors at small k; widely cited | Slow at L > 5; binary install only (christianbenner.com); same LD-mismatch fragility as SuSiE |
-| CAVIAR (Hormozdiari 2014 Genetics 198:497) | Exhaustive enumeration up to k causals | (z, R) | Exact posterior at small k | Combinatorial explosion beyond k=6; legacy method largely superseded by SuSiE |
-| DAP-G (Wen 2016 AJHG 98:1114) | Deterministic posterior approximation with adaptive scan | SBAMS format; TORUS for enrichment priors | Fast at QTL scale (whole-transcriptome); pairs with TORUS hierarchical priors | SBAMS format is awkward; less ubiquitous tooling |
-| PAINTOR (Kichaev 2014 PLoS Genet 10:e1004722) | EM with binary functional annotations | (z, R, A) per locus | Locus-level functional priors; multi-trait variant | Single-trait mode often matched by PolyFun + SuSiE; slower than SuSiE |
-| PolyFun + SuSiE/FINEMAP (Weissbrod 2020 Nat Genet 52:1355) | Stratified LDSC genome-wide -> per-SNP prior_weights | GWAS sumstats + pre-baked baseline-LF | Most powerful single-trait functional prior; >20% more high-PIP (PIP>0.95) variants in simulations, >32% in real UK Biobank traits (Weissbrod 2020) | Requires matched-ancestry baseline-LF; runs in two stages |
-| SuSiEx (Yuan 2024 Nat Genet 56:1841) | Joint cross-ancestry SuSiE; shared causal, population-specific LD | Per-pop sumstats + per-pop LD reference | Smaller credible sets than per-ancestry meta or marginal fine-mapping; principled when causal variants are shared | Trans-ethnic heterogeneity violated (population-specific causals); ancestry must be cleanly assigned |
-| MultiSuSiE (Rossen 2025 Nat Genet) | Cross-ancestry SuSiE variant; flexible heterogeneity | Per-pop sumstats + per-pop LD | Similar to SuSiEx; alternative implementation | Same as SuSiEx; newer, less battle-tested |
-| FOCUS / MA-FOCUS (Mancuso 2019 Nat Genet 51:675) | Probabilistic TWAS fine-mapping over gene models | TWAS Z-scores + gene LD (predicted expression) | Identifies likely causal gene among co-regulated TWAS hits; cross-ancestry MA-FOCUS variant | Requires pre-computed expression weights (e.g., FUSION/PrediXcan); gene-level rather than variant-level inference |
+```r
+install.packages('susieR')                # CRAN; pin >= 0.12.27 for stable susie_rss API
+install.packages('coloc')                 # CRAN; >= 5.2.3 for coloc.susie
+install.packages(c('ggplot2', 'patchwork', 'dplyr', 'readr'))
+```
 
-Methodology evolves; verify the latest susieR vignette and the SuSiE-inf paper before locking on a single method. Wang Lab maintains susieR; the IBSS algorithm is stable but argument semantics (e.g., `prior_weights` vs `prior_variance`) have changed across versions.
+```bash
+# FINEMAP (CLI binary, not an R package). christianbenner.com/finemap.me have no working
+# static download link on this platform -- bioconda mirrors the real binary (verified: 1.4.2):
+conda install -c bioconda finemap
+
+# PolyFun (Python)
+git clone https://github.com/omerwe/polyfun
+pip install -r polyfun/requirements.txt
+# Pre-baked baseline-LF priors: https://data.broadinstitute.org/alkesgroup/UKBB_LD/baselineLF2.2.UKB.tar.gz
+# polyfun.py's pd.read_csv(..., delim_whitespace=True) calls need pandas<3 (kwarg removed in 3.0).
+
+# PAINTOR (C++ CLI; needs NLopt + Eigen)
+git clone https://github.com/bogdanlab/PAINTOR_V3.0
+make
+
+# SuSiEx (C++ CLI); bioconda has a working prebuilt binary (verified: 1.1.2):
+conda install -c bioconda susiex
+# or from source: git clone https://github.com/getian107/SuSiEx && make -C src
+
+# DAP-G (CLI; needs GSL + OpenMP)
+git clone https://github.com/xqwen/dap && cd dap/dap_src && make    # verified: builds clean
+
+# FOCUS (Python; for TWAS fine-mapping)
+pip install pyfocus
+
+# PLINK 1.9 / 2.0 for LD matrix generation
+conda install -c bioconda plink plink2
+```
 
 ## Decision Tree by Experimental Scenario
 
 | Scenario | Recommended workflow | Why |
 |----------|---------------------|-----|
 | Individual-level genotypes available (UKB, in-house cohort) | `susie(X, y, L=10)` | In-sample LD is exact; no mismatch fragility |
-| Summary statistics only, ancestry matches reference panel | `susie_rss(z, R, n, L=10)` + `estimate_s_rss` diagnostic | Standard external-LD pattern; verify lambda < 0.05 |
-| Single-locus EUR GWAS, sparse architecture | susie_rss with L=10, baseline functional priors optional | Most-common setting; SuSiE default works |
+| Summary statistics only, ancestry matches reference panel | `susie_rss(z, R, n, L=10)` + `estimate_s_rss` diagnostic; harmonize alleles first (`references/allele-harmonization.md`) | Standard external-LD pattern; verify lambda < 0.05 |
+| Single-locus EUR GWAS, sparse architecture | susie_rss with L=10, baseline functional priors optional; independent confirmation with FINEMAP (`references/finemap-cli.md`) | Most-common setting; SuSiE default works |
 | Locus with strong polygenic shoulder (biobank scale) | SuSiE-inf (Cui 2024) | Adds infinitesimal component; calibrates non-sparse PIPs |
-| Multi-ancestry GWAS (EUR + EAS + AFR) | SuSiEx with per-pop sumstats and LD | Joint inference shrinks credible sets; per-ancestry meta loses LD information |
+| Multi-ancestry GWAS (EUR + EAS + AFR) | SuSiEx with per-pop sumstats and LD (`references/susiex-cross-ancestry.md`) | Joint inference shrinks credible sets; per-ancestry meta loses LD information |
 | Locus with > 5 expected independent signals (HLA, lipid loci) | susie_rss with L=20-30 | Default L=10 caps signal count; HLA needs extension |
 | TWAS hits with co-regulated genes | FOCUS / MA-FOCUS | Variant-level fine-mapping cannot distinguish co-regulated gene candidates |
-| Want functional priors (coding, conserved, regulatory) | PolyFun -> susie_rss with `prior_weights` | Genome-wide SLDSC priors sharpen PIPs more than locus-level annotations |
-| QTL fine-mapping (eQTL, sQTL, caQTL) at transcriptome scale | DAP-G + TORUS OR susie_rss per gene | DAP-G is built for QTL throughput; SuSiE works per gene |
+| Want functional priors (coding, conserved, regulatory) | PolyFun -> susie_rss with `prior_weights` (`references/polyfun-functional-priors.md`) | Genome-wide SLDSC priors sharpen PIPs more than locus-level annotations |
+| QTL fine-mapping (eQTL, sQTL, caQTL) at transcriptome scale | DAP-G + TORUS OR susie_rss per gene (DAP-G command: `references/dap-g-cli.md`; tool comparison: `references/method-comparison.md`) | DAP-G is built for QTL throughput; SuSiE works per gene |
 | Low-N QTL (GTEx tissue panel, N < 1000) | susie_rss with `coverage = 0.9` (or 0.8); document choice | Default 0.95 returns very wide credible sets at low power; report the relaxed coverage explicitly in methods |
-| HLA region (chr6:28-34 Mb) or chr8 inversion | Specialized workflow: stratify haplotypes; consider HLA-specific imputation; or exclude | LD structure is too complex; standard methods unreliable |
-| Cross-feed into colocalization | susie_rss -> coloc.susie() | Modern coloc operates on credible sets, not single SNPs |
+| HLA region (chr6:28-34 Mb) or chr8 inversion | Specialized workflow: stratify haplotypes; consider HLA-specific imputation; or exclude (`references/hla-long-range-ld.md`) | LD structure is too complex; standard methods unreliable |
+| Cross-feed into colocalization | susie_rss -> coloc.susie() (`references/coloc-susie.md`) | Modern coloc operates on credible sets, not single SNPs |
+
+## Reference Files
+
+Read only the file the request needs.
+
+| File | Read when |
+|------|-----------|
+| `references/method-comparison.md` | Choosing between SuSiE, FINEMAP, CAVIAR, DAP-G, PAINTOR, PolyFun, SuSiEx, MultiSuSiE, FOCUS (Algorithmic Taxonomy), or two methods disagree (Reconciliation table) |
+| `references/allele-harmonization.md` | Sumstats and LD reference come from different sources, or `estimate_s_rss` / `kriging_rss` flag many SNPs with allele-swap symptoms |
+| `references/polyfun-functional-priors.md` | Functional priors: PolyFun commands, `SNPVAR` -> `prior_weights`, manual coding-variant priors |
+| `references/susiex-cross-ancestry.md` | Multi-ancestry GWAS; `SuSiEx` command and population-order rule |
+| `references/finemap-cli.md` | Independent FINEMAP confirmation: master file and `--sss` run |
+| `references/dap-g-cli.md` | QTL-scale fine-mapping or an independent DAP-G confirmation: `-d_z`/`-d_ld` command and output format |
+| `references/coloc-susie.md` | Passing credible sets to `coloc.susie` (SNP-name precondition and guard) |
+| `references/hla-long-range-ld.md` | HLA, chr8 inversion or other long-range LD locus |
+| `references/reviewer-pushback.md` | Writing methods or a rebuttal: standard responses to fine-mapping reviewer questions |
 
 ## Critical LD Diagnostic Block (susie_rss)
 
@@ -81,7 +117,7 @@ s_hat <- estimate_s_rss(z = z_scores, R = ld_matrix, n = N)
 # Rule of thumb: s_hat < 0.05 acceptable; 0.05-0.10 marginal; > 0.10 refit or change LD reference.
 
 cond_z <- kriging_rss(z = z_scores, R = ld_matrix, n = N)
-# cond_z$conditional_dist returns per-SNP expected vs observed z; flag |z_obs - z_exp| > 3
+# cond_z$conditional_dist is a data.frame (z, condmean, condvar, z_std_diff, logLR); flag abs(z_std_diff) > 3
 # Common cause: strand flip, allele coding mismatch, or single-SNP imputation error.
 
 # If diagnostic fails: refit with explicit scale parameter to absorb LD mismatch
@@ -100,7 +136,7 @@ Skipping this block is the dominant cause of irreproducible fine-mapping. Always
 
 **Symptom:** `estimate_s_rss()` lambda > 0.05; `kriging_rss()` flags many SNPs with `|z_obs - z_exp| > 3`; credible sets contain physically distant SNPs (anti-correlated in LD with the lead) or include all SNPs at the locus.
 
-**Fix:** Use in-sample LD whenever the cohort genotypes are accessible (compute with `plink --r2 square` on the GWAS samples themselves). When only summary statistics are available, ancestry-stratify the LD reference exactly (e.g., 1000G EUR FIN+CEU+GBR+IBS+TSI for a Northern European GWAS, not full EUR). For mixed-ancestry GWAS, fine-map per ancestry then meta-analyze, or move to SuSiEx.
+**Fix:** Use in-sample LD whenever the cohort genotypes are accessible (compute with `plink --r square spaces` on the GWAS samples themselves — signed r, NOT `--r2`; the `spaces` modifier is required by FINEMAP, see `references/finemap-cli.md`). When only summary statistics are available, ancestry-stratify the LD reference exactly (e.g., 1000G EUR FIN+CEU+GBR+IBS+TSI for a Northern European GWAS, not full EUR). For mixed-ancestry GWAS, fine-map per ancestry then meta-analyze, or move to SuSiEx.
 
 ### Non-sparse architecture (biobank scale)
 
@@ -160,38 +196,9 @@ Skipping this block is the dominant cause of irreproducible fine-mapping. Always
 
 **Fix:** `Neff = 4 / (1/Ncase + 1/Ncontrol)`. Example: Ncase=5000, Ncontrol=495000 -> Neff ~= 19,800 (NOT 500,000). For quantitative traits from linear regression, `n = N_total` is correct. Reference: Privé F et al 2022 HGG Adv 3:100136 (`bigsnpr` documents Neff handling); Willer 2010 Bioinformatics (METAL Neff convention).
 
-### Allele Harmonization with the LD Reference
-
-**Trigger:** Effect allele in GWAS sumstats differs from the coding/A1 allele in the LD reference panel; or palindromic SNPs (A/T, C/G) carried without strand resolution.
-
-**Mechanism:** susie_rss treats `z` and `R` as defined on the same allele coding. If the effect allele is swapped relative to the LD-reference A1, the sign of z is wrong and the LD row/column for that SNP is implicitly flipped. SNPs matching by rsID can silently swap alleles between sumstats and reference, breaking the `z' R z` consistency the model relies on.
-
-**Symptom:** `estimate_s_rss` lambda inflated despite ancestry-matched panel; `kriging_rss` flags many SNPs with `|z_obs - z_exp| > 3` clustered at SNPs where reference A1 != GWAS effect allele; credible sets pick up tag-only SNPs anti-correlated with the lead.
-
-**Fix:** Harmonize before fitting:
-
-```r
-harmonize_z_to_ref <- function(z, gwas_a1, gwas_a2, ref_a1, ref_a2) {
-    palindromic <- (gwas_a1 == 'A' & gwas_a2 == 'T') | (gwas_a1 == 'T' & gwas_a2 == 'A') |
-                   (gwas_a1 == 'C' & gwas_a2 == 'G') | (gwas_a1 == 'G' & gwas_a2 == 'C')
-    flip <- (gwas_a1 == ref_a2) & (gwas_a2 == ref_a1)
-    z[flip] <- -z[flip]
-    drop <- palindromic | !((gwas_a1 == ref_a1 & gwas_a2 == ref_a2) | flip)
-    list(z = z, keep = !drop)
-}
-```
-
-Drop palindromic SNPs at MAF > 0.42 (ambiguous strand); or resolve via external strand info (TopMed, 1000G strand files). `TwoSampleMR::harmonise_data()` offers an alternative implementation. See causal-genomics/colocalization-analysis for an equivalent harmonize helper used downstream.
-
 ## Reconciliation: When Methods Disagree
 
-| Pattern | Likely cause | Action |
-|---------|--------------|--------|
-| SuSiE finds 3 credible sets, FINEMAP finds 1 | FINEMAP's stochastic search did not converge OR SuSiE absorbed background into spurious sets | Increase FINEMAP `--n-iterations`; check SuSiE purity (sets with purity < 0.5 are spurious) |
-| SuSiE PIPs much sharper than FINEMAP | susie_rss assumes single residual variance; FINEMAP marginalizes over noise | Both can be correct; report the intersection of high-PIP variants from both as primary candidates |
-| PolyFun + SuSiE collapses 10-variant credible set to 1 | Functional priors are doing real work (coding variant in set) | Verify with `prior_weights` plot; if priors are coding-specific the result is interpretable |
-| SuSiEx credible set excludes the EUR top-PIP variant | EUR signal is tag, true causal shared across ancestries lies elsewhere | Trust SuSiEx if both populations have well-powered GWAS; verify with conditional analysis |
-| HLA gives 50-variant credible set in every method | HLA LD structure cannot be fine-mapped by linear methods | Use HLA-specific imputation (HIBAG, SNP2HLA) and haplotype-level analysis |
+The table of disagreement patterns (likely cause and action) is in `references/method-comparison.md`.
 
 **Operational rule:** For high-confidence reporting, require that (a) `estimate_s_rss()` lambda < 0.05; (b) at least one credible set has purity > 0.5 (`min_abs_corr >= 0.5`, equivalent to r2 >= 0.25); (c) the lead PIP variant within that set is reproduced by an independent method (FINEMAP, SuSiEx, or in-sample SuSiE if reference-LD was used). Anything failing these three is exploratory.
 
@@ -211,152 +218,12 @@ Drop palindromic SNPs at MAF > 0.42 (ambiguous strand); or resolve via external 
 | L (HLA / complex loci) | 20-30 | Empirical; HLA hosts > 10 independent signals for many traits |
 | `n` for case-control susie_rss | Neff = 4/(1/Ncase + 1/Ncontrol), NOT Ntotal | Privé F et al 2022 HGG Adv 3:100136; matches the SE scale of logistic-regression sumstats |
 | `estimate_s_rss` lambda acceptable | < 0.05 | susieR vignette; > 0.10 indicates serious LD mismatch |
-| `kriging_rss` per-SNP flag | |z_obs - z_exp| > 3 | susieR vignette; flag for manual review |
+| `kriging_rss` per-SNP flag | abs(`z_std_diff`) > 3 (`|z_obs - z_exp|` elsewhere in this file) | susieR vignette; flag for manual review |
 | Locus window (default) | +/- 500 kb from sentinel | Conventional; covers most LD blocks |
 | Locus window (conditional-p floor) | Extend until conditional -log10(p) < 4 | Avoids truncating a secondary signal whose conditional evidence leaks into the window edge |
 | Locus window (long-range LD) | 5+ Mb or stratify | HLA chr6:25-35Mb, chr8 inversion chr8:8.1-11.9Mb hg38, chr17 H1/H2 inversion |
 | FINEMAP `--n-causal-snps` | 5 | Default; raise for HLA |
-| FINEMAP `--prob-tol` | 0.001 | Convergence tolerance; rarely needs change |
-
-## Functional Priors with PolyFun
-
-**Goal:** Use genome-wide stratified LDSC heritability to weight per-SNP causal priors, sharpening PIPs at coding, conserved, and regulatory variants.
-
-**Approach:** Run PolyFun once genome-wide to estimate per-SNP h2 from the baseline-LF annotation set; extract per-SNP causal prior; pass to susie_rss as `prior_weights`.
-
-```bash
-# Parametric route: L2-regularized S-LDSC writes per-SNP priors directly (--no-partitions)
-polyfun.py --compute-h2-L2 --no-partitions \
-    --output-prefix polyfun_h2 \
-    --sumstats gwas_munged.sumstats \
-    --ref-ld-chr UKB_baseline_LF/baselineLF2.2.UKB. \
-    --w-ld-chr UKB_baseline_LF/weights.UKB.
-# Per-SNP priors written to polyfun_h2.<CHR>.snpvar_ridge_constrained.gz
-
-# Non-parametric route (finer, optional): drop --no-partitions above, then add an
-# intermediate LD-score step before re-estimating binned per-SNP h2:
-#   polyfun.py --compute-ldscores --output-prefix polyfun_h2 ...
-#   polyfun.py --compute-h2-bins --output-prefix polyfun_h2 --sumstats gwas_munged.sumstats --w-ld-chr UKB_baseline_LF/weights.UKB.
-```
-
-```r
-library(susieR)
-priors <- read.table('polyfun_h2.6.snpvar_ridge_constrained.gz', header = TRUE)
-priors <- priors[match(gwas_df$SNP, priors$SNP), ]
-prior_w <- priors$SNPVAR / sum(priors$SNPVAR, na.rm = TRUE)
-
-fit <- susie_rss(z = z_scores, R = ld_matrix, n = N, L = 10,
-                 prior_weights = prior_w)
-```
-
-UKB baseline-LF priors are pre-computed EUR-only at `data.broadinstitute.org/alkesgroup/UKBB_LD/` for hg19 and hg38. For EAS, AFR, or SAS GWAS, the EUR weights are NOT valid: functional-prior fine-mapping in a non-EUR ancestry requires baseline-LF annotations matched to that ancestry. For ancestries lacking matched baseline-LF (admixed, under-represented), accept reduced power and run uniform-prior susie_rss; applying EUR weights to non-EUR sumstats produces miscalibrated PIPs that look sharper than reality.
-
-### Manual Coding-Variant Priors Without PolyFun
-
-For postdocs without PolyFun infrastructure or with single-locus inputs, manual annotation-based priors are a reasonable approximation (Hutchinson 2020 Hum Mol Genet 29:R81). As a stated convention, coding variants get ~10x uniform weight; broadly conserved variants ~5x (binned by CADD-PHRED quantile).
-
-```r
-build_manual_priors <- function(vep_df, cadd) {
-    w <- rep(1, nrow(vep_df))
-    w[vep_df$Consequence %in% c('missense_variant', 'stop_gained', 'splice_donor_variant',
-                                'splice_acceptor_variant', 'frameshift_variant')] <- 10
-    w[cadd >= quantile(cadd, 0.95, na.rm = TRUE)] <- pmax(w[cadd >= quantile(cadd, 0.95, na.rm = TRUE)], 5)
-    w / sum(w)
-}
-fit <- susie_rss(z = z_scores, R = ld_matrix, n = Neff, L = 10, prior_weights = build_manual_priors(vep, cadd))
-```
-
-Report the prior construction explicitly; reviewers will ask whether the prior was tuned post hoc.
-
-## Cross-Ancestry Fine-Mapping with SuSiEx
-
-**Goal:** Jointly fine-map a locus across multiple ancestries assuming shared causal variants but population-specific LD.
-
-**Approach:** Per-ancestry summary statistics + per-ancestry LD reference; SuSiEx runs a joint SuSiE model with population-specific R matrices. SuSiEx assigns populations by the ORDER of the comma-separated `--sst_file`/`--n_gwas`/`--ref_file`/`--ld_file` lists (there is no `--pop` flag); keep all four lists in the same population order.
-
-```bash
-SuSiEx \
-    --sst_file=eur_sumstats.txt,eas_sumstats.txt,afr_sumstats.txt \
-    --n_gwas=500000,200000,80000 \
-    --ref_file=1000G_EUR,1000G_EAS,1000G_AFR \
-    --ld_file=eur_ld,eas_ld,afr_ld \
-    --out_dir=susiex_out \
-    --out_name=locus1 \
-    --chr=6 --bp=30000000,31000000 \
-    --chr_col=1,1,1 --snp_col=2,2,2 --bp_col=3,3,3 \
-    --a1_col=4,4,4 --a2_col=5,5,5 --eff_col=6,6,6 \
-    --se_col=7,7,7 --pval_col=8,8,8 \
-    --level=0.95
-```
-
-The output includes per-population PIPs and a joint credible set. Credible sets from SuSiEx are typically 2-5x smaller than EUR-only susie_rss when AFR is included, because AFR shorter LD blocks resolve EUR-tagged regions.
-
-## FINEMAP CLI Pattern
-
-**Goal:** Independent confirmation via shotgun stochastic search.
-
-**Approach:** Build .z, .ld, and master files; run FINEMAP with `--sss` and parse the .snp and .cred outputs.
-
-```bash
-# .z file format: snp chromosome position allele1 allele2 maf beta se
-# .ld file: square LD matrix, space-separated, no header
-
-cat > locus.master <<'EOF'
-z;ld;snp;config;cred;log;n_samples
-locus.z;locus.ld;locus.snp;locus.config;locus.cred;locus.log;500000
-EOF
-
-finemap --sss \
-    --in-files locus.master \
-    --n-causal-snps 5 \
-    --prob-tol 0.001 \
-    --n-iterations 100000 \
-    --n-convergence 5000
-
-# Parse:
-# locus.snp -> per-variant prob (PIP), log10bf
-# locus.cred -> credible sets at increasing causal counts
-# locus.config -> top configurations
-```
-
-FINEMAP and SuSiE agree when sparsity holds; disagreement often reveals non-sparse loci that need SuSiE-inf.
-
-## Coloc.susie Integration
-
-**Goal:** Test colocalization between two traits using credible sets, not single SNPs.
-
-**Approach:** Fit susie_rss separately per trait; pass both `susie` objects to `coloc.susie`; per-credible-set colocalization probabilities are returned.
-
-**Precondition:** `coloc.susie` matches SNPs between the two fits' `lbf_variable` matrices via `intersect(colnames(...))`. If `z`/`R` are unnamed, that intersect is empty and `coloc.susie` fails with a cryptic, unrelated `data.table` error (`Check that is.data.table(DT) == TRUE ... := is defined for use in j`) instead of a clear message. Name `z1`/`z2` and set matching `ld_matrix` dimnames to the same SNP IDs before fitting.
-
-```r
-library(coloc)
-
-names(z1) <- names(z2) <- colnames(ld_matrix) <- rownames(ld_matrix) <- snp_ids
-
-fit_trait1 <- susie_rss(z = z1, R = ld_matrix, n = N1, L = 10)
-fit_trait2 <- susie_rss(z = z2, R = ld_matrix, n = N2, L = 10)
-
-coloc_res <- coloc.susie(fit_trait1, fit_trait2)
-# coloc_res$summary: per-credible-set PP.H4 (shared causal probability)
-print(coloc_res$summary)
-```
-
-PP.H4 > 0.8 per credible set is the conventional shared-causal threshold; weaker thresholds suggest distinct or conditional signals. See causal-genomics/colocalization-analysis.
-
-## HLA and Long-Range LD: When to Stop
-
-The HLA region (chr6:28-34 Mb), chromosome 8 inversion (chr8:8-12 Mb), and a handful of other extended LD blocks violate the assumptions of every fine-mapping method.
-
-**Symptoms of irrecoverable LD structure:** Credible sets contain 30+ SNPs at low purity even with L=30; SuSiE-inf credible sets remain wide; `kriging_rss` flags hundreds of SNPs.
-
-**Options:**
-- Stratify by classical HLA allele (HIBAG, SNP2HLA imputation) and test allelic series
-- Conditional analysis on the lead variant before fine-mapping the residual
-- Exclude the region from genome-wide fine-mapping summaries and report separately
-- For chr8 inversion: stratify by inversion genotype if known
-
-Document the caveat in any methods section; standard PIPs at HLA are not interpretable as causality estimates.
+| FINEMAP `--prob-conv-sss-tol` | 0.001 | Convergence tolerance; rarely needs change (checked on FINEMAP 1.4.2) |
 
 ## TWAS Fine-Mapping (FOCUS) -- delegated
 
@@ -370,7 +237,7 @@ Every locus reported should carry these columns; missing fields are the most com
 |--------|-------------|
 | locus_id | Locus identifier (chr:start-end or sentinel rsID) |
 | method | susie_rss / FINEMAP / PAINTOR / SuSiEx / SuSiE-inf |
-| L_used | `sum(!fit$sets$pruned)` (effective L; not just the cap passed in) |
+| L_used | `sum(fit$V > 0)` (effective L; not just the cap passed in; susieR sets pruned effects' prior variance to 0) |
 | n_credible_sets | Number of returned credible sets at the chosen coverage |
 | cs_size | Variants per credible set |
 | cs_purity_min / cs_purity_mean | min and mean `fit$sets$purity[,'min.abs.corr']` per set |
@@ -383,19 +250,6 @@ Every locus reported should carry these columns; missing fields are the most com
 | coverage | 0.95 default; 0.9 or 0.8 documented for low-N |
 | n_effective | Sample size passed to susie_rss (Neff for case-control) |
 
-## Anticipated Reviewer Pushback
-
-| Pushback | Standard response |
-|----------|-------------------|
-| "In-sample vs reference LD?" | In-sample preferred when cohort genotypes available; if reference, report `estimate_s_rss` lambda < 0.05 plus `kriging_rss` outlier count |
-| "Credible-set purity?" | `min_abs_corr >= 0.5` (r2 >= 0.25) default; reported per set; relaxed only with explicit rationale for rare-variant fine-mapping |
-| "Is L set high enough?" | If returned CS count < L cap: OK (susieR auto-prunes); otherwise raise L. HLA needs L=20-30 |
-| "Why not SuSiE-inf?" | Polygenic-shoulder test: count SNPs with marginal -log10(p) > 4 outside the lead credible set; > 50 indicates a polygenic shoulder and SuSiE-inf (Cui 2024) should be used |
-| "Why no functional priors?" | PolyFun applied (or manual coding-variant prior used) and reported; if uniform, justify (low-N, mismatched-ancestry baseline-LF) |
-| "Credible set has 50 SNPs -- is that fine-mapping?" | Acknowledged as imprecise; reported alongside diagnostics; cross-trait colocalization or functional fine-mapping (PolyFun, MPRA, allelic series) recommended for resolution |
-| "Was Neff used for case-control?" | Yes: `Neff = 4/(1/Ncase + 1/Ncontrol)`; report the value used |
-| "Allele harmonization?" | Yes: flipped z when GWAS effect allele differs from reference A1; palindromic SNPs at MAF > 0.42 dropped |
-
 ## Common Errors
 
 | Error / symptom | Cause | Solution |
@@ -407,8 +261,10 @@ Every locus reported should carry these columns; missing fields are the most com
 | `pip` all ~ 1/p (uniform) | Convergence failure OR all effects pruned | Check `fit$converged`; raise L; check Z scale |
 | FINEMAP `Error: SNP names do not match` | .z and .ld SNP order differ | Ensure both are sorted identically; pass matched .snp file |
 | Coloc.susie returns NULL | One trait has zero credible sets | Verify both fits succeeded; lower coverage to 0.9 if signal is weak |
-| Coloc.susie crashes with `data.table` error (`:= is defined for use in j`) | `z`/`R` passed to `susie_rss` without SNP-ID names, so `coloc.susie`'s internal SNP match is empty | Name `z1`/`z2` and set matching `ld_matrix` dimnames before fitting; see Coloc.susie Integration precondition |
-| SuSiEx output empty | Per-population lists misaligned with reference panels | Verify `--sst_file`/`--ref_file`/`--ld_file` are in the same population order; check `--bp` window |
+| Coloc.susie crashes with `data.table` error (`:= is defined for use in j`) | `z`/`R` passed to `susie_rss` without SNP-ID names, so `coloc.susie`'s internal SNP match is empty | Name `z1`/`z2` and set matching `ld_matrix` dimnames before fitting; see the precondition in `references/coloc-susie.md` |
+| SuSiEx output empty, or fails inside its own internal PLINK calls (`Error: No variants remaining after --extract`) | Per-population lists misaligned with reference panels, or `--plink=<path>` omitted (required on SuSiEx 1.1.2, not caught at argument-parse time) | Verify `--sst_file`/`--ref_file`/`--ld_file` share the same population order and `--bp` window; pass `--plink=$(command -v plink)` — see `references/susiex-cross-ancestry.md` |
+| FINEMAP `Cannot recognize flag` (`--prob-tol`/`--n-iterations`/`--n-convergence`); `.ld` "Expected N SNPs ... encountered only 1"; or no plain `locus.cred` written | Flags renamed in FINEMAP 1.4.2; `plink --r square` defaults to tab-delimited (FINEMAP needs spaces); output is `<prefix>.cred<k>` per causal-count model, not a plain `.cred` | Use `--prob-conv-sss-tol`/`--n-iter`/`--n-conv-sss`; add `--r square spaces`; read `locus.cred1`, `locus.cred2`, ...; see `references/finemap-cli.md` |
+| `dap-g` exits with status 1 | Normal — DAP-G returns 1 even on a fully successful run | Judge success by stdout (`Independent association signal clusters`), never the exit code |
 | PolyFun priors do not change PIPs | Passed to `prior_variance` instead of `prior_weights` | Read susieR docs; use `prior_weights=` |
 
 ## References

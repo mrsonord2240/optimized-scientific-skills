@@ -121,7 +121,9 @@ fractional_enrichment = np.sum(np.arange(len(mid)) * mid) / (len(mid) - 1)
 (e.g. consecutive deltas of 0.08, 0.06, 0.01) yet pass a last-pair-only `<2%` check, because the
 final step alone happened to be small. Require the last several consecutive deltas to all be
 below threshold before calling plateau -- or, for a stronger check, fit a saturating-exponential
-curve to the full time course and read its asymptote (Cheah & Young 2018).
+curve to the full time course and read its asymptote (Cheah & Young 2018). The check needs at
+least 4 timepoints (3 consecutive deltas); with fewer, report "insufficient timepoints to assess
+steady state", not "not yet at steady state".
 
 ```python
 import numpy as np
@@ -130,8 +132,12 @@ import numpy as np
 t = np.array([0, 5, 15, 30, 60, 120])
 fe = np.array([0.00, 0.18, 0.35, 0.365, 0.378, 0.39])
 deltas = np.abs(np.diff(fe))                              # change between EVERY consecutive pair
-reached_plateau = len(deltas) >= 3 and np.all(deltas[-3:] < 0.02)  # last 3 deltas, not just the final one
-# if not reached_plateau: the pool is still labeling -> use the full time course (INST-MFA), not one point
+if len(deltas) < 3:
+    status = 'insufficient timepoints to assess steady state'   # need >= 4 timepoints
+elif np.all(deltas[-3:] < 0.02):                                # last 3 deltas, not just the final one
+    status = 'plateau'
+else:
+    status = 'still labeling'   # use the full time course (INST-MFA), not one point
 ```
 
 ## Per-Method Failure Modes

@@ -25,6 +25,19 @@ package and adapt the example to match the actual API rather than retrying.
 - Python: `scanpy.external.pp.hashsolo` (Bayesian), `pegasus.demultiplex` / demuxEM (background from empty droplets)
 - CLI: `GMM-Demux` (Gaussian mixture with explicit multiplet accounting)
 
+## Install
+
+```r
+# Seurat and demuxmix (R)
+install.packages('Seurat')
+BiocManager::install('demuxmix')
+```
+
+```bash
+# hashsolo via scanpy/solo, and demuxEM via pegasus (Python)
+pip install scanpy solo-sc pegasuspy demuxEM
+```
+
 ## Governing principle
 
 In cell or nucleus hashing, each sample is labeled before pooling with a unique oligo-tagged reagent: a barcoded antibody (CITE-seq HTO), a lipid- or cholesterol-modified oligo (MULTI-seq), or a CellPlex CMO. A true singlet's HTO count vector is dominated by ONE tag standing well above a background of ambient and spillover counts, so sample assignment reduces to one question per cell: which tag, if any, exceeds that cell's background. Cross-sample doublets fall out directly - two tags both high - which is the decisive advantage of hashing over expression-only doublet detection.
@@ -108,20 +121,11 @@ table(hto$MULTI_ID)                          # sample / Doublet / Negative
 **With exactly 2 or 3 hashtags, `number_of_noise_barcodes` must be set explicitly.** It defaults to `len(cell_hashing_columns) - 2`, which is **0** at 2 tags and **1** at 3 tags; at 0 the noise-distribution fit degenerates and hashsolo silently classifies every cell `Negative` (confirmed: 5.4% agreement vs. ground truth on a 2-tag test set, with `number_of_noise_barcodes=1` recovering 100%). No exception is raised - the only symptom is an unrelated numpy `RuntimeWarning: Mean of empty slice`. Always pass `number_of_noise_barcodes` explicitly at 2-3 tags, and check the Negative fraction before trusting the result (see Common Errors).
 
 ```python
-import scanpy as sc
-import scanpy.external as sce
-
-hto_cols = ['HTO_A', 'HTO_B', 'HTO_C', 'HTO_D']
-adata.obs[hto_cols] = hto_counts_df[hto_cols]
 sce.pp.hashsolo(adata, cell_hashing_columns=hto_cols, priors=(0.01, 0.8, 0.19),
                  number_of_noise_barcodes=1 if len(hto_cols) <= 3 else None)
-
-classification = adata.obs['Classification'].value_counts()   # barcode name / 'Negative' / 'Doublet'
-if classification.get('Negative', 0) / len(adata) > 0.9:
-    raise RuntimeError('hashsolo classified >90% of cells Negative - check number_of_noise_barcodes '
-                        'and priors before trusting this run')
-singlets = adata[~adata.obs['Classification'].isin(['Negative', 'Doublet'])].copy()
 ```
+
+The full runnable pattern (load HTO counts into `adata.obs`, run hashsolo, raise if more than 90% of cells are `Negative`, subset to singlets) is `examples/hashsolo_scanpy.py`. Beyond the 90% guard, stop and diagnose parameters and staining whenever the Negative fraction is roughly 50% or more, rather than reporting the result as-is.
 
 `priors` are ordered [negative, singlet, doublet]; raise the doublet prior for higher loading. Output columns include `Classification`, `most_likely_hypothesis`, and the per-hypothesis probabilities.
 
@@ -172,7 +176,7 @@ calls <- dmmClassify(dmm)   # check for a "did not converge" warning before trus
 GMM-demux -c hto_counts.csv HTO_A,HTO_B,HTO_C,HTO_D -f gmm_out
 ```
 
-`-c` reads CSV (cells x HTO columns, first column the cell barcode) instead of the default mtx format; `-f gmm_out` writes `GMM_full.csv` (`Cluster_id`, `Confidence` per cell) and `GMM_full.config` (the `Cluster_id` -> tag-combination legend) into `gmm_out/`. Two caveats found by running it: input HTO columns must be a float dtype in the CSV, not integer, or GMM-Demux's internal CLR step throws `LossySetitemError` on recent pandas - cast with `df[hto_cols] = df[hto_cols].astype(float)` before writing the CSV if you hit that. Separately, GMM-Demux always attempts to write a same-sample-droplet mtx file after classification and that step throws `ValueError: unsupported data types in input` on this environment's scipy even though the `-f` report above was already written correctly and the run's actual result is valid - **check that `GMM_full.csv` exists and is non-empty rather than trusting the exit code.**
+`-c` reads CSV (cells x HTO columns, first column the cell barcode) instead of the default mtx format; `-f gmm_out` writes `GMM_full.csv` (`Cluster_id`, `Confidence` per cell) and `GMM_full.config` (the `Cluster_id` -> tag-combination legend) into `gmm_out/`. Two caveats found by running it: input HTO columns must be a float dtype in the CSV, not integer, or GMM-Demux's internal CLR step throws `LossySetitemError` on recent pandas - cast with `df[hto_cols] = df[hto_cols].astype(float)` before writing the CSV if you hit that. Separately, after classification GMM-Demux writes a same-sample-droplet mtx folder (`SSD_mtx/` in the working directory unless `-o <dir>` is given), and on some inputs or scipy versions that step has thrown `ValueError: unsupported data types in input` even though the `-f` report was already written correctly and the run's actual result was valid. It is not deterministic: on GMM-Demux 0.2.2.3 with scipy 1.13.1 it exited 0 on 3 of 3 synthetic datasets (1600-cell 4-tag, unequal-pooling 4-tag, weak-staining 3-tag). **Check that `GMM_full.csv` exists and is non-empty rather than trusting the exit code.**
 
 ## Threshold and parameter reference
 
@@ -204,7 +208,7 @@ GMM-demux -c hto_counts.csv HTO_A,HTO_B,HTO_C,HTO_D -f gmm_out
 | Many cells flagged generic "Doublet" | Cells positive for 3+ tags collapsed to one label, hiding over-loading or heavy ambient | Inspect the multiplet tag-count distribution (GMM-Demux MSM); 3+ tags high is a run-quality diagnostic, not an ordinary 2-cell doublet |
 | hashsolo classifies (almost) every cell "Negative" with 2-3 hashtags, no error raised | `number_of_noise_barcodes` defaults to `len(cell_hashing_columns) - 2` = 0 at 2 tags, degenerating the noise fit; only an unrelated numpy "Mean of empty slice" warning appears | Pass `number_of_noise_barcodes=1` explicitly at 2-3 tags; check the Negative fraction is not near 100% before trusting the result |
 | demuxmix throws an uncaught `glm.nb` error (`missing value where TRUE/FALSE needed`) | HTO background counts are underdispersed for the per-tag negative-binomial fit; demuxmix's own warning names it before crashing | Retry with `model='naive'` (verified to complete on the same data that crashed) or a manual `clusterInit`; check `dmmClassify()`'s convergence warning either way |
-| GMM-Demux exits non-zero but `GMM_full.csv` looks populated | Its SSD-mtx writer step always runs after classification and fails on newer scipy, after the classification report was already written correctly | Judge by the presence/contents of `GMM_full.csv`, not the exit code |
+| GMM-Demux exits non-zero but `GMM_full.csv` looks populated | Its SSD-mtx writer step runs after classification and can fail on some inputs/scipy versions, after the classification report was already written correctly | Judge by the presence/contents of `GMM_full.csv`, not the exit code |
 
 ## Related Skills
 

@@ -31,16 +31,31 @@ case "${ASSAY:-}" in
         exit 2 ;;
 esac
 
+# Step 0b: ASSAY is the caller's word, so also check the BAM. A splice-aware aligner in @PG, or N in the CIGARs
+# of the first 100000 records, means RNA-seq: refuse. ALLOW_SPLICED=1 overrides (e.g. a DNA BAM realigned by STAR).
+if [ "${ALLOW_SPLICED:-0}" != 1 ]; then
+    n_pg=$(samtools view -H "$INPUT" | grep -Eic '^@PG.*(ID|PN):(STAR|HISAT2)' || true)
+    read -r n_spliced n_sampled < <(samtools view "$INPUT" 2>/dev/null | awk 'NR>100000{exit} $6 ~ /N/{n++} END{print n+0, NR+0}' || true)
+    if [ "$n_pg" -gt 0 ] || [ $((n_spliced * 100)) -gt "$n_sampled" ]; then
+        echo "ERROR: $INPUT looks like RNA-seq (splice-aware aligner in @PG: $n_pg; spliced CIGARs: $n_spliced of $n_sampled records)." >&2
+        echo "       samtools markdup is the wrong tool for it (SKILL.md 'When to Mark Duplicates'). Set ALLOW_SPLICED=1 to override." >&2
+        exit 2
+    fi
+fi
+
 echo "Marking duplicates in $INPUT (assay $ASSAY, $THREADS threads, -d $OPTICAL_DIST)..."
 
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 STATS="${OUTPUT%.bam}.markdup_stats.txt"
 
+# Stats go to a temp path first: markdup opens -f for writing as soon as the pipe starts, before an
+# upstream failure (e.g. a missing input) reaches it, so writing straight to $STATS left an empty file
+# behind on a failed run. Move it beside $OUTPUT only once the whole pipeline has actually succeeded.
 samtools collate -O -u -@ "$THREADS" "$INPUT" "$TMP/collate" | \
     samtools fixmate -m -u -@ "$THREADS" - - | \
     samtools sort -u -@ "$THREADS" -T "$TMP/sort" - | \
-    samtools markdup -@ "$THREADS" -d "$OPTICAL_DIST" --use-read-groups -f "$STATS" - "$TMP/marked.bam"
+    samtools markdup -@ "$THREADS" -d "$OPTICAL_DIST" --use-read-groups -f "$TMP/markdup_stats.txt" - "$TMP/marked.bam"
 
 # markdup never drops records (no -r): the output must have exactly as many as the input.
 n_in=$(samtools view -c "$INPUT")
@@ -51,6 +66,7 @@ if [ "$n_in" -eq 0 ] || [ "$n_in" -ne "$n_out" ]; then
 fi
 
 mv "$TMP/marked.bam" "$OUTPUT"
+mv "$TMP/markdup_stats.txt" "$STATS"
 echo "Indexing..."
 samtools index "$OUTPUT"
 
@@ -61,6 +77,7 @@ samtools flagstat "$OUTPUT" | grep -E "(total|duplicates)"
 
 n_dup=$(samtools view -c -f 1024 -F 2304 "$OUTPUT")
 n_pri=$(samtools view -c -F 2304 "$OUTPUT")
+awk -v d="$n_dup" -v t="$n_pri" 'BEGIN{printf "Flagged as duplicates: %d of %d primary reads (%.2f%%)\n", d, t, (t ? d * 100 / t : 0)}'
 if [ $((n_dup * 2)) -gt "$n_pri" ]; then
     echo "WARNING: over 50% of primary reads flagged as duplicates; confirm ASSAY=$ASSAY is right (SKILL.md 'When to Mark Duplicates')." >&2
 fi

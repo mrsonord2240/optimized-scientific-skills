@@ -41,16 +41,43 @@ fi
 
 aria2c \
     --input-file="${DEST}/aria2_input.txt" \
-    --dir="${DEST}/ncbi_dataset/data/" \
+    --dir="${DEST}/ncbi_dataset/" \
     --max-concurrent-downloads="${THREADS}" \
     --max-connection-per-server="${THREADS}" \
     --retry-wait=5 \
     --quiet=true
 
 echo
-echo "=== Step 3: verify with datasets rehydrate ==="
-# datasets rehydrate validates checksums of all files
-datasets rehydrate --directory "${DEST}/" --max-workers "${THREADS}"
+echo "=== Step 3: verify sizes, re-fetch bad files with datasets rehydrate ==="
+# `datasets rehydrate` does NOT verify files already on disk (checked on 18.37.0): a blocked or
+# truncated aria2c transfer that wrote a file at the right path is reported "already rehydrated".
+# So compare every file with the byte length the CLI recorded in dataset_catalog.json, delete
+# mismatches, and let rehydrate fetch just those.
+bad_files() {
+python3 - "${DEST}/ncbi_dataset/data" <<'PY'
+import json, os, sys
+root = sys.argv[1]
+for asm in json.load(open(os.path.join(root, 'dataset_catalog.json')))['assemblies']:
+    for f in asm['files']:
+        p = root + '/' + f['filePath']
+        if not os.path.exists(p) or os.path.getsize(p) != int(f['uncompressedLengthBytes']):
+            print(p)
+PY
+}
+
+BAD="$(bad_files | tr -d '\r')"
+if [ -n "${BAD}" ]; then
+    echo "  $(echo "${BAD}" | wc -l) file(s) missing or wrong size; deleting and rehydrating"
+    echo "${BAD}" | while IFS= read -r f; do rm -f "$f"; done
+    datasets rehydrate --directory "${DEST}/" --max-workers "${THREADS}" --no-progressbar
+    BAD="$(bad_files | tr -d '\r')"
+fi
+if [ -n "${BAD}" ]; then
+    echo "ERROR: still wrong after rehydrate:" >&2
+    echo "${BAD}" >&2
+    exit 1
+fi
+echo "  all files match dataset_catalog.json sizes"
 
 echo
 echo "=== Done ==="

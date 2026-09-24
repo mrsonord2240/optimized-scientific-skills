@@ -4,14 +4,6 @@
 
 This skill covers differential expression analysis using DESeq2, the most widely-used Bioconductor package for analyzing RNA-seq count data. DESeq2 uses a negative binomial model to test for differential expression between experimental conditions.
 
-## Prerequisites
-
-```r
-if (!require('BiocManager', quietly = TRUE))
-    install.packages('BiocManager')
-BiocManager::install(c('DESeq2', 'apeglm'))
-```
-
 ## Quick Start
 
 Tell your AI agent what you want to do:
@@ -44,12 +36,7 @@ Tell your AI agent what you want to do:
 
 ## What the Agent Will Do
 
-1. Create DESeqDataSet from counts and metadata
-2. Pre-filter low-count genes
-3. Set reference level for comparisons
-4. Run DESeq() pipeline
-5. Apply lfcShrink() for fold change shrinkage
-6. Extract and filter significant results
+It follows the Standard Workflow in `SKILL.md`; install notes are under Version Compatibility there.
 
 ## Input Requirements
 
@@ -59,18 +46,7 @@ Tell your AI agent what you want to do:
 | Sample metadata | Data frame | Rownames matching count column names |
 | Design formula | R formula | Variables from metadata (~condition) |
 
-## Tips
-
-- Always use biological replicates (minimum 3 per condition)
-- Pre-filter genes with very low counts before analysis (speed only; independent filtering handles statistics at `results()`)
-- Use `lfcShrink()` with type='apeglm' for better fold change estimates -- but note `apeglm` requires `coef=` and cannot use `contrast=`; rebuild design as `~ 0 + group` for interaction contrasts, or use `type='ashr'`
-- Use `vst()` instead of `rlog()` for large datasets (>100 samples)
-- Set the reference level BEFORE calling `DESeq()` -- alphabetical default silently inverts fold-change direction
-- Check `resultsNames(dds)` to see available coefficients and ALWAYS pass `name=` or `contrast=` explicitly; `results(dds)` with no argument returns the last coefficient and depends on design order
-- With LRT (`test='LRT'`), use padj only as an omnibus screen -- the reported LFC is for the last coefficient, NOT an omnibus summary
-- The shrunken LFC and the Wald p-value come from different models -- shrinking does not recompute p-values
-- For prokaryotic data, verify normalization assumptions (majority-DE experiments violate median-of-ratios)
-- Use PyDESeq2 for Python-only environments; results closely match R DESeq2
+The tips (reference level, explicit `name=`/`contrast=`, shrinkage, LRT, pseudobulk, prokaryotic caveats) live in `SKILL.md`.
 
 ## Related Skills
 

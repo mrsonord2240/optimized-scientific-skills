@@ -17,6 +17,7 @@ WARHEAD_SMARTS = {
     'methacrylamide': '[CX3](=[OX1])([NX3])[CX3]([#6])=[CX3]',
     'chloroacetamide': '[CX3](=[OX1])([NX3])[CH2][Cl]',
     'bromoacetamide': '[CX3](=[OX1])([NX3])[CH2][Br]',
+    'iodoacetamide': '[CX3](=[OX1])([NX3])[CH2][I]',
     'alpha_haloketone': '[#6][CX3](=[OX1])[CH2][F,Cl,Br]',
     'alpha_beta_unsaturated_ketone': '[#6][CX3](=[OX1])[CX3]=[CX3]',
     'vinyl_sulfone': '[SX4](=O)(=O)[CX3]=[CX3]',
@@ -36,6 +37,7 @@ WARHEAD_SMARTS = {
 REACTIVITY_TIER = {
     'chloroacetamide': 'high',
     'bromoacetamide': 'high',
+    'iodoacetamide': 'high',
     'alpha_haloketone': 'very_high',
     'alpha_beta_unsaturated_ketone': 'moderate',
     'maleimide': 'very_high',
@@ -58,6 +60,7 @@ REACTIVITY_TIER = {
 RESIDUE_SELECTIVITY = {
     'chloroacetamide': ['Cys'],
     'bromoacetamide': ['Cys'],
+    'iodoacetamide': ['Cys'],
     'alpha_haloketone': ['Cys'],
     'alpha_beta_unsaturated_ketone': ['Cys'],
     'acrylamide': ['Cys'],
@@ -124,10 +127,19 @@ if __name__ == '__main__':
         'acrylamide', 'chloroacetamide', 'alpha_haloketone', 'vinyl_sulfone',
         'sulfonyl_fluoride', 'fluorosulfate_sufex', 'aldehyde', 'boronate', 'nitrile',
         'epoxide', 'alpha_beta_unsaturated_ketone', 'isothiocyanate', 'maleimide',
+        'iodoacetamide',
     }
-    assert _skill_md_table_rows <= set(WARHEAD_SMARTS), (
-        _skill_md_table_rows - set(WARHEAD_SMARTS)
+    # Classes named only in SKILL.md's Decision Tree table (ABPP row) must be catalogued too.
+    _skill_md_decision_tree_classes = {'iodoacetamide', 'chloroacetamide'}
+    assert (_skill_md_table_rows | _skill_md_decision_tree_classes) <= set(WARHEAD_SMARTS), (
+        (_skill_md_table_rows | _skill_md_decision_tree_classes) - set(WARHEAD_SMARTS)
     )
+
+    # Iodoacetamide ABPP probe (Decision Tree: "Iodoacetamide / chloroacetamide")
+    iodoacetamide_example = 'NC(=O)CI'
+    print(classify_warheads(iodoacetamide_example))
+    assert 'iodoacetamide' in classify_warheads(iodoacetamide_example)
+    assert 'chloroacetamide' not in classify_warheads(iodoacetamide_example)
 
     # Phenacyl chloride: real Cys-reactive alpha-haloketone test compound
     phenacyl_chloride = 'ClCC(=O)c1ccccc1'

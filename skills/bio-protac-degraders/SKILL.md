@@ -9,7 +9,7 @@ author: GPTomics
 
 ## Version Compatibility
 
-The two shipped scripts (`examples/protac_enumerate.py`, `examples/ternary_geometry_screen.py`,
+The three shipped scripts (`examples/protac_enumerate.py`, `examples/ternary_geometry_screen.py`,
 `examples/cooperativity_dc50.py`) need only RDKit, numpy, and scipy -- checked on RDKit 2026.03.6,
 numpy 2.x, scipy 1.18. RDKit 2024.09+ should also work via the introspect-and-adapt pattern below.
 
@@ -89,15 +89,8 @@ Linkers tune ternary complex geometry and stability. The ranges below are explor
 local installs -- this Skill's only local, runnable content for ternary hypotheses is
 `examples/ternary_geometry_screen.py`, a linker-reach pre-filter (see "Ternary Complex Modeling
 Workflow" below); it does not predict a structure or an interface score. To actually run one of
-the methods above:
-
-| Tool | How to invoke | Turnaround | What you get back |
-|------|----------------|------------|--------------------|
-| PRosettaC | Web submission at prosettac.weizmann.ac.il (free registration); upload target PDB + target-ligand pose, E3 PDB + E3-ligand pose, and the PROTAC SMILES | Hours to ~1 day (queued Rosetta job) | Ranked/clustered ternary poses + interface scores; download the top pose's exit-vector distance to sanity-check candidate linkers against `ternary_geometry_screen.py` |
-| AlphaFold3 | AlphaFold Server (web, request access) for a quick check, or a licensed local install (request model weights from Google DeepMind) for batch/automated use; submit full protein sequences + PROTAC SMILES as one unrestrained complex | Minutes (server) to GPU-hours (local) | A single predicted complex + per-residue confidence (pLDDT/PAE); no arbitrary distance restraint, so compare the predicted interface against known ternary structures rather than trusting confidence alone |
-| Boltz-1 / Boltz-2 | Open-source, pip-installable (`pip install boltz`), but needs a local CUDA GPU and a multi-GB weights download on first run; `boltz predict input.yaml` per the project's README | GPU-minutes locally | A predicted complex structure, same caveats as AlphaFold3 (limited PROTAC-specific validation) |
-| DeepTernary | Clone the research repo from GitHub and follow its own install/checkpoint instructions; no hosted API, no pip package | GPU-minutes locally, plus one-time setup | SE(3)-equivariant ternary pose; validate against known structures before using it to rank |
-| HADDOCK | HADDOCK3 local install (compiles against CNS, which is itself registration-gated academically), or the HADDOCK web portal at bonvinlab.org (free academic account, upload structures + manual restraints) | Local: setup-heavy. Web: minutes to hours queued | Restraint-guided docking poses; you must supply the restraints yourself |
+the methods above, read `references/ternary-prediction-tools.md` (per-tool URL, account, turnaround, output;
+also a PRosettaC vs AlphaFold3 comparison).
 
 Do not fabricate a numeric score from any of these tools when they have not actually been run --
 state plainly that the step requires the external submission above.
@@ -139,8 +132,11 @@ In cellular assays:
 Runnable: `examples/cooperativity_dc50.py` fits DC50/Dmax with a 3-parameter Hill curve, flags a
 hook effect from a >15-percentage-point downturn after the peak, and -- when a hook is flagged --
 restricts the DC50/Dmax fit to the ascending arm rather than fitting a monotonic sigmoid to
-non-monotonic data. It ships a seeded synthetic dose-response curve and checks the fit recovers
-the curve's own planted DC50/Dmax within tolerance.
+non-monotonic data. When the peak sits under 10x the fitted DC50 (hook onset close to DC50), the
+ascending arm never reaches its plateau and Dmax is underestimated (15 pp on a noise-free
+synthetic curve); `fit_dc50()` then returns `plateau_reached=False` and a `caveat` -- report Dmax as
+a lower bound. It ships a seeded synthetic dose-response curve and checks the fit recovers
+the curve's own planted DC50/Dmax within tolerance, and that a narrow-separation hook is caveated.
 
 ## Ternary Complex Modeling Workflow
 
@@ -155,7 +151,7 @@ the curve's own planted DC50/Dmax within tolerance.
    embeds 3D conformers of each linker and reports whether its sampled reach range can plausibly
    span the requirement, as a cheap filter before spending an external ternary submission
 4. **Structure prediction/refinement itself is external** -- submit the surviving candidates to
-   PRosettaC, AlphaFold3, Boltz, DeepTernary, or HADDOCK per the invocation table above; none of
+   PRosettaC, AlphaFold3, Boltz, DeepTernary, or HADDOCK per `references/ternary-prediction-tools.md`; none of
    that happens locally
 
 For a production workflow, use PRosettaC or provide both proteins and the complete PROTAC as components of an unrestrained AlphaFold3 input. AlphaFold3 does not expose arbitrary chain-chain distance restraints; compare predicted interfaces and confidence with known complexes or a PROTAC-specific method.
@@ -251,18 +247,6 @@ REINVENT 4 can generate linkers, but it does not provide the `ternary_score` / `
 
 **Fix:** For targets without known ligand, consider molecular glue discovery instead.
 
-## Reconciliation: PRosettaC vs AlphaFold3
-
-| Aspect | PRosettaC | AlphaFold3 |
-|--------|-----------|------------|
-| Approach | PROTAC-specific Rosetta sampling | Unrestrained foundation-model prediction |
-| Accuracy | Higher average DockQ in one 36-structure comparison, but only 25 complexes were modeled and most predictions were low quality | Limited PROTAC-specific validation |
-| Speed | Measure for the installed workflow and hardware | Measure for the selected service or local hardware |
-| Access | Web service | AlphaFold Server or local installation, subject to their terms and limits |
-| Restraints | Method-specific setup | No arbitrary user distance restraints |
-| Decision | Use as a PROTAC-specific structural hypothesis | Use as an independently benchmarked structural hypothesis |
-
-Use PRosettaC or another benchmarked structural method to generate hypotheses, then measure ternary binding/cooperativity and cellular degradation experimentally. Do not treat any one modeling method as a validated universal ranker.
 
 ## Common Errors
 
@@ -276,6 +260,12 @@ Use PRosettaC or another benchmarked structural method to generate hypotheses, t
 | Synthesis is impractical | Proposed connectivity lacks a credible route | Obtain medicinal-chemistry review and redesign attachment chemistry or linker |
 | Poor permeability or intracellular exposure | Size, exposed polarity, conformation, or efflux | Measure the bottleneck and optimize the series; avoid a universal size cutoff |
 | `protac_enumerate.build_protac()` raises "Attachment dummy bonds must be single bonds" | An explicit `[*]` exit-vector dummy is attached via a double bond or other non-single bond | Use a single-bond attachment point; only relax this if the intended connection chemistry has its own, separately validated bond-order rule |
+
+## Reference Files
+
+| File | Read when |
+|------|-----------|
+| `references/ternary-prediction-tools.md` | Submitting a ternary-complex job (PRosettaC, AlphaFold3, Boltz, DeepTernary, HADDOCK), or choosing between PRosettaC and AlphaFold3 |
 
 ## References
 

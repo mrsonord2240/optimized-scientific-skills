@@ -33,9 +33,11 @@ def select_columns(alignment, keep, upper=None):
     (upper-case when True, unchanged when False); upper=None leaves the sequences untouched.
     '''
     keep = list(keep)
+    full = keep == list(range(alignment.get_alignment_length()))
     records = []
     for record in alignment:
-        seq = ''.join(str(record.seq)[i] for i in keep)
+        text = str(record.seq)  # once per record: str(record.seq) inside the join would be quadratic
+        seq = text if full else ''.join(text[i] for i in keep)
         if upper is not None:
             seq = (seq.upper() if upper else seq).replace('.', '-')
         new = SeqRecord(Seq(seq), id=record.id, name=record.name, description=record.description,

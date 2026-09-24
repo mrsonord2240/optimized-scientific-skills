@@ -9,7 +9,7 @@ author: GPTomics
 
 ## Version Compatibility
 
-Reference examples tested with: pertpy 1.3+, scanpy 1.12+, anndata 0.13+, sceptre 0.10+ (checked 2026-09-19).
+Reference examples tested with: pertpy 1.3+, scanpy 1.12+, anndata 0.13+, sceptre 0.99.0 from GitHub (checked 2026-09-21, R 4.4.3).
 
 Before using code patterns, verify installed versions match. If versions differ:
 - Python: `pip show <package>` then `help(module.function)` to check signatures
@@ -26,7 +26,19 @@ pip install pydeseq2 decoupler             # pseudobulk DE
 ```
 
 ```r
-install.packages('sceptre')                # conditional-resampling test; requires R >= 4.5 (see caveat below)
+# Keep SCEPTRE out of the shared analysis library. In a fresh R session set
+# SCEPTRE_R_LIB to a new, writable directory, then run this pinned install.
+sceptre_lib <- Sys.getenv('SCEPTRE_R_LIB')
+stopifnot(nzchar(sceptre_lib))
+dir.create(sceptre_lib, recursive = TRUE, showWarnings = FALSE)
+.libPaths(c(sceptre_lib, .libPaths()))
+if (!requireNamespace('remotes', quietly = TRUE)) {
+  install.packages('remotes', lib = sceptre_lib, repos = 'https://cloud.r-project.org')
+}
+remotes::install_github('Katsevich-Lab/sceptre@21f9ea098b69c444a884a49bc254de711968e3b5',
+                        lib = sceptre_lib, dependencies = NA, upgrade = 'never')
+stopifnot(requireNamespace('sceptre', quietly = TRUE),
+          as.character(packageVersion('sceptre')) == '0.99.0')
 install.packages('Seurat')                 # Mixscape (Seurat v5)
 ```
 
@@ -37,12 +49,14 @@ install.packages('Seurat')                 # Mixscape (Seurat v5)
   `assign_by_threshold(data, assignment_threshold=<float>, output_layer='assigned_guides')`
   (positional `assignment_threshold` is required, and it writes a binary cell x guide layer,
   not a single obs column like the mixture model's `assigned_guides_key` does).
-- `sceptre` requires **R >= 4.5**. Under an older R, `install.packages('sceptre')` /
-  `BiocManager::install('sceptre')` exits 0 and installs nothing — `available.packages()`
-  silently filters version-gated packages rather than erroring. Check
-  `packageVersion('sceptre')` after installing, never the exit code; if it errors
-  ("there is no package called 'sceptre'"), the install silently no-op'd and R needs
-  upgrading.
+- `sceptre` is **GitHub-only** (`Katsevich-Lab/sceptre`; its `DESCRIPTION` says `R (>= 4.1)`, checked
+  2026-09-23). It is not on CRAN (404) or Bioconductor, so `install.packages('sceptre')` /
+  `BiocManager::install('sceptre')` cannot find it and exits 0 having installed nothing. The install
+  above pins commit `21f9ea098b69c444a884a49bc254de711968e3b5` (package 0.99.0) and installs only into
+  `SCEPTRE_R_LIB`; it never upgrades or writes to the shared analysis library. Check
+  `packageVersion('sceptre')` after installing, never the exit code. The GitHub install compiles C++
+  (needs Rtools on Windows). Run `examples/sceptre_calibration_discovery.R` after installation; it uses
+  SCEPTRE's bundled low-MOI data and proves calibration before discovery.
 
 # Perturb-seq Analysis
 
@@ -82,9 +96,9 @@ Cell Ranger and Replogle's `guide_calling` fit mixtures on log counts; require a
 | Pseudobulk DE (DESeq2/edgeR) | Average within-state program change | >=2-3 biological replicates per condition | One replicate per guide -> no valid inference; sum raw counts, not means |
 | Milo / scCODA / Augur | Differential abundance / composition | "Does the perturbation move cells across states?" | Conflated with within-state DE if reported alone |
 
-scMAGeCK has no bundled worked example in this Skill: it is not on the CRAN or Bioconductor
-release repos (only Bioconductor's unreleased staging index as of 2026-09-19, `weili-lab/scMAGeCK`
-on GitHub/Bitbucket), needs a compiled C++ component, and was not present in this Skill's tested
+scMAGeCK has no bundled worked example in this Skill: it is not on the current CRAN or Bioconductor
+repos (released through Bioconductor 3.16, removed at 3.17; source at `weili-lab/scMAGeCK`
+on GitHub/Bitbucket, checked 2026-09-21), needs a compiled C++ component, and was not present in this Skill's tested
 environment — so no runnable code here has been verified against it. Install per the upstream
 repo's own instructions (`https://github.com/weili-lab/scMAGeCK`, or
 `https://bitbucket.org/weililab/scmageck` for the maintained source); its two entry points are
@@ -137,12 +151,21 @@ In a MuData loaded per-modality (e.g. `pt.dt.papalexi_2021()`), the perturbation
 ```python
 mdata.push_obs(columns=['perturbation', 'gene_target', 'replicate'], mods=['rna'])
 
+adata.X = adata.X.toarray()                # see the memory note below; needed for batch_size
 ms = pt.tl.Mixscape()
-ms.perturbation_signature(adata, pert_key='perturbation', control='NT', n_neighbors=20)   # pert_key here = the broad perturbed-vs-control column
+ms.perturbation_signature(adata, pert_key='perturbation', control='NT', n_neighbors=20, batch_size=1000)   # pert_key here = the broad perturbed-vs-control column
 ms.mixscape(adata, pert_key='gene_target', control='NT', layer='X_pert')   # pert_key here = the per-target column (intentionally different, same name used consistently below); renamed from labels; writes adata.obs['mixscape_class_global'] KO/NP/NT
 # An all-NP target is confounded with low guide efficiency: report perturbed fraction, do not call the gene non-functional
 adata.obs['mixscape_class_global'].value_counts()
 ```
+
+**Memory.** With the default `batch_size=None` (and sparse `X`), `perturbation_signature` grew past 20 GB
+on the 20,729-cell `papalexi_2021` and was killed (two audit attempts). `batch_size=1000` on a dense `X`
+finished in ~2 min at ~7 GB peak with the same KO/NP/NT split to within a few cells (~13645 NP / 4698 KO / 2386 NT;
+pertpy 1.3.0, checked 2026-09-21). `batch_size` on sparse `X` raises
+`ValueError: shape must have length in (2,)`, so densify first; the dense matrix is ~1.5 GB at this size,
+so on much larger data subsample cells or set `ref_selection_mode='split_by', split_by='replicate'`
+(control mean per replicate, no neighbor search; a different reference, so not comparable to the default).
 
 ## E-distance and the E-test (pertpy)
 
@@ -158,7 +181,7 @@ dist = pt.tl.Distance(metric='edistance', obsm_key='X_pca')   # pin obsm; sqeucl
 pairwise = dist.pairwise(adata, groupby='gene_target')
 
 np.random.seed(0)                                             # DistanceTest exposes no seed/random_state of its own; seed the global RNG for reproducible permutations
-etest = pt.tl.DistanceTest('edistance', n_perms=1000)         # smallest p ~ 1/(n_perms+1); crushed by multiple testing
+etest = pt.tl.DistanceTest('edistance', n_perms=1000)         # smallest p ~ 1/(n_perms+1); crushed by multiple testing; ~24 min for all targets at 20k cells
 results = etest(adata, groupby='gene_target', contrast='NT')
 ```
 
@@ -166,7 +189,7 @@ results = etest(adata, groupby='gene_target', contrast='NT')
 
 **Goal:** Test perturbation-gene associations with calibration verified on the data itself.
 
-Requires **R >= 4.5** (see Prerequisites); on an older R, the install silently no-ops.
+Install from GitHub (see Prerequisites); it is not on CRAN.
 
 **Approach:** Import counts and guide matrices, set parameters, assign guides by mixture, then run the calibration check (negative controls) before the discovery analysis.
 
@@ -174,13 +197,16 @@ Requires **R >= 4.5** (see Prerequisites); on an older R, the install silently n
 library(sceptre)
 
 obj <- import_data(response_matrix = rna_counts, grna_matrix = grna_counts,
-                   grna_target_data_frame = grna_targets, moi = 'low')
+                   grna_target_data_frame = grna_targets, moi = 'low',
+                   extra_covariates = extra_covariates)
 obj <- set_analysis_parameters(obj, discovery_pairs = pairs)
 obj <- assign_grnas(obj, method = 'mixture')        # mixture | thresholding | maximum
 obj <- run_qc(obj)
 obj <- run_calibration_check(obj)                   # negative-control pairs must be well-calibrated FIRST
+calibration <- get_result(obj, analysis = 'run_calibration_check')
+stopifnot(nrow(calibration) > 0)                     # do not proceed if calibration produced no control results
 obj <- run_discovery_analysis(obj)
-results <- get_result(obj, analysis = 'discovery_analysis')
+results <- get_result(obj, analysis = 'run_discovery_analysis')   # analysis= takes the function name: run_calibration_check | run_power_check | run_discovery_analysis
 ```
 
 ## Pseudobulk DE (Within-State Change)

@@ -89,85 +89,13 @@ Methodology evolves; verify against the Burgess & Thompson textbook (2nd ed 2021
 | Scenario | Primary estimator | Sensitivity / triangulation |
 |----------|-------------------|----------------------------|
 | Many strong IVs, no biological shared trait suspected | IVW + Egger + weighted median + weighted mode + PRESSO | Cochran Q; leave-one-out; F-stat; Steiger filtering |
-| LDSC rg(exposure, outcome) `>= 0.3` or strong shared-factor biology | CAUSE (if sig SNPs `>= 100`) OR LHC-MR | LCV gcp; cross-check IVW after Steiger filter |
-| Many weak IVs (mean F < 20) | MR-RAPS with overdispersion + robust Huber loss | MR-Mix or contamination mixture; report F-stat range |
-| Suspected heterogeneous causal mechanisms (e.g. LDL on CHD via multiple lipoprotein pathways) | MR-Clust; report per-cluster IVW | Pathway annotation of cluster instruments; Bayesian mixture |
+| LDSC rg(exposure, outcome) `>= 0.3` or strong shared-factor biology | CAUSE (if sig SNPs `>= 100`; references/cause.md) OR LHC-MR (references/lhc-mr.md) | LCV gcp (references/lcv.md); cross-check IVW after Steiger filter |
+| Many weak IVs (mean F < 20) | MR-RAPS with overdispersion + robust Huber loss (references/mr-raps-mr-clust.md) | MR-Mix or contamination mixture; report F-stat range |
+| Suspected heterogeneous causal mechanisms (e.g. LDL on CHD via multiple lipoprotein pathways) | MR-Clust; report per-cluster IVW (references/mr-raps-mr-clust.md) | Pathway annotation of cluster instruments; Bayesian mixture |
 | Cis-MR drug target (single locus, few SNPs in LD) | Colocalization (causal-genomics/colocalization-analysis) + Steiger | PWCoCo; conditional analysis; not Egger (low SNP count) |
-| Polygenic exposure (heritability spread genome-wide; few significant loci) | LHC-MR (uses all SNPs) | LDSC rg; genome-wide IVW with weak-IV-aware methods (RAPS) |
+| Polygenic exposure (heritability spread genome-wide; few significant loci) | LHC-MR (uses all SNPs; references/lhc-mr.md) | LDSC rg; genome-wide IVW with weak-IV-aware methods (RAPS) |
 | Reverse causation suspected | Bidirectional MR with Steiger filter; LHC-MR (jointly estimates both directions) | directionality_test; effect-size r2 comparison |
 | Population-level summary discordant with biology | Re-examine instrument selection; check Winner's curse; LD pruning settings | Triangulate with cis-MR; family-based MR if available |
-
-## Per-Method Failure Modes
-
-### MR-Egger NOME violation
-
-**Trigger:** I^2_GX = (Q_GX - df) / Q_GX is below 0.9, indicating measurement-error attenuation of the Egger slope (NOME = "no measurement error" in the exposure GWAS effect sizes).
-
-**Mechanism:** MR-Egger regresses outcome effects on exposure effects with a free intercept. Imprecise exposure effects (high beta.exposure SE relative to beta.exposure variability across instruments) introduce regression dilution that pulls the Egger slope toward the null and inflates the intercept.
-
-**Symptom:** Egger slope much closer to zero than IVW, weighted median, and weighted mode estimates; large Egger SE.
-
-**Fix:** Apply SIMEX correction (Bowden 2016 IJE 45:1961; Cook & Stefanski 1994 JASA 89:1314 SIMEX framework) using the `simex` package on the Egger regression, treating beta.exposure SE as measurement error. See examples/simex_egger_correction.R. Alternative: use MR-RAPS, which models the exposure-effect error explicitly via profile likelihood and does not suffer the NOME failure.
-
-### MR-PRESSO majority-outlier breakdown
-
-**Trigger:** More than 50% of instruments are pleiotropic (UHP), e.g. when instrument set was loosely selected (genome-wide significant but unfiltered).
-
-**Mechanism:** MR-PRESSO's global RSS-out statistic and outlier detection both assume a majority-valid set; outliers are defined relative to that majority. With a pleiotropic majority, PRESSO removes the valid minority.
-
-**Symptom:** PRESSO-corrected estimate is similar in magnitude (and sign) to the uncorrected estimate even after dropping nominally "outlier" SNPs; distortion-test p-value paradoxically non-significant; few or no outliers detected despite obvious global-test significance.
-
-**Fix:** Do not trust PRESSO corrected estimate. Re-examine instrument selection (drop loose p-thresholds, prune LD harder); switch to CAUSE or LHC-MR; consider weighted-mode estimator which is plurality-valid rather than majority-valid.
-
-### MR-PRESSO false negative under CHP
-
-**Trigger:** Strong shared heritable confounder (high rg) producing CHP. Confirmed by significant LDSC rg or LCV gcp.
-
-**Mechanism:** Correlated pleiotropy is a population-level mean shift in alpha conditional on gamma; it is not an outlier pattern. PRESSO's RSS-out distance is invariant under such a mean shift, so the global test is not powered against CHP.
-
-**Symptom:** PRESSO global p > 0.05 (no detected pleiotropy) while a CHP-aware method (CAUSE, LHC-MR) returns a substantially different (often null) causal estimate.
-
-**Fix:** When CHP is plausible, ALWAYS run CAUSE or LHC-MR in addition to PRESSO; do not rely on PRESSO global non-significance as evidence of no pleiotropy.
-
-### MR-Egger underpowered with few SNPs
-
-**Trigger:** Fewer than 10 instruments.
-
-**Mechanism:** Egger's intercept variance is driven by the spread of beta.exposure across instruments; with few SNPs the intercept CI is so wide that even strongly pleiotropic data give non-significant intercepts.
-
-**Symptom:** Non-significant Egger intercept p-value alongside obviously discordant IVW and weighted-median estimates.
-
-**Fix:** Report intercept point estimate and CI rather than a binary "pleiotropy present / absent" verdict; do not use Egger as the only sensitivity method when SNP count is low; weight evidence toward weighted-median, weighted-mode, and CAUSE / LHC-MR.
-
-### Steiger filter inverted by exposure measurement error (Hemani 2017)
-
-**Trigger:** Exposure is imprecisely measured (lower heritability ascertained in the exposure GWAS) and outcome is well-measured.
-
-**Mechanism:** Steiger compares r^2_GX vs r^2_GY per SNP. Measurement error in the exposure underestimates r^2_GX; well-measured outcome captures r^2_GY accurately. Per-SNP, the inequality can flip even when the true causal direction is exposure -> outcome.
-
-**Symptom:** A large fraction of instruments fail Steiger (`steiger_dir == FALSE`) in a direction that conflicts with biological plausibility.
-
-**Fix:** Interpret Steiger as one signal among many, not a hard gate; cross-check with bidirectional MR; verify exposure GWAS heritability and sample size; switch to LHC-MR which models both directions jointly and accounts for heritability.
-
-### CAUSE underpowered with few significant SNPs
-
-**Trigger:** Fewer than 100 genome-wide-significant instruments (p < 5e-8) after harmonization and LD pruning.
-
-**Mechanism:** CAUSE fits a Bayesian mixture model over a shared-factor (CHP) component, a shared-causal component, and a null component. Posterior identification of the mixture weights requires substantial signal across many SNPs.
-
-**Symptom:** CAUSE delta_ELPD CI crosses zero; Pareto-k diagnostic flags unstable points; posterior intervals on q (CHP fraction) span [0, 1].
-
-**Fix:** Use LCV gcp for genome-wide directional inference (does not require many significant SNPs); use LHC-MR if heritability and sumstats are available; or report CAUSE alongside an explicit caveat about its underpowered regime.
-
-### LCV gcp under non-Gaussian effect distributions
-
-**Trigger:** Highly polygenic trait with substantial sparsity in true effects (mixture of large-effect and zero-effect loci).
-
-**Mechanism:** LCV assumes a bivariate normal model for effect sizes after LDSC adjustment. Sparse architectures (e.g. immune traits with HLA dominance) violate this and bias gcp estimates.
-
-**Symptom:** LCV gcp point estimate appears extreme but heritability LDSC z-scores are modest; partitioned heritability shows extreme HLA enrichment.
-
-**Fix:** Exclude HLA region from LDSC inputs; complement with CAUSE / LHC-MR; report gcp with awareness of the polygenicity caveat.
 
 ## Quantitative Thresholds
 
@@ -193,7 +121,7 @@ Methodology evolves; verify against the Burgess & Thompson textbook (2nd ed 2021
 | Steiger r^2 difference | Reverse-causal flag at any per-SNP r2_GY > r2_GX | Hemani 2017 PLoS Genet 13:e1007081 |
 | Standard sensitivity battery | IVW + Egger + median + mode + PRESSO + Steiger + LOO | Hemani 2018 eLife 7:e34408 / STROBE-MR 2021 |
 
-LCV gcp interpretation thresholds (0, 0.5, 0.6, 1) are tabulated in the LCV section above.
+LCV gcp interpretation thresholds (0, 0.5, 0.6, 1) are tabulated in references/lcv.md.
 
 ## Standard Sensitivity Battery (Working Reference)
 
@@ -201,124 +129,7 @@ LCV gcp interpretation thresholds (0, 0.5, 0.6, 1) are tabulated in the LCV sect
 
 **Approach:** Compute IVW + Egger + median + mode side-by-side; test Egger intercept and heterogeneity; run MR-PRESSO with `>=5000` distributions for publication or `>=10000` for stringent reporting; apply Steiger filter; leave-one-out; report all estimates.
 
-```r
-library(TwoSampleMR)
-library(MRPRESSO)
-
-methods <- c('mr_ivw', 'mr_egger_regression', 'mr_weighted_median', 'mr_weighted_mode')
-res_mr <- mr(dat, method_list = methods)
-
-het <- mr_heterogeneity(dat)
-pleio <- mr_pleiotropy_test(dat)
-loo <- mr_leaveoneout(dat)
-steiger <- directionality_test(dat)
-
-isq <- Isq(dat$beta.exposure, dat$se.exposure)
-nome_pass <- isq >= 0.9
-
-set.seed(42)  # mr_presso()'s global/outlier tests are Monte-Carlo; seed for a reproducible p-value
-presso <- mr_presso(
-    BetaOutcome='beta.outcome', BetaExposure='beta.exposure',
-    SdOutcome='se.outcome', SdExposure='se.exposure',
-    OUTLIERtest=TRUE, DISTORTIONtest=TRUE,
-    data=dat, NbDistribution=10000, SignifThreshold=0.05)
-
-global_p <- presso$`MR-PRESSO results`$`Global Test`$Pvalue
-outlier_p <- presso$`MR-PRESSO results`$`Outlier Test`$Pvalue
-distortion_p <- presso$`MR-PRESSO results`$`Distortion Test`$Pvalue
-n_outliers <- sum(outlier_p < 0.05, na.rm=TRUE)
-```
-
-Full working pipeline incl SIMEX, MR-RAPS, contamination mixture, and STROBE-MR table: examples/sensitivity_battery.R.
-
-## CAUSE for CHP-Aware Estimation
-
-**Goal:** Distinguish causal from shared-factor (correlated horizontal pleiotropy) explanations of an exposure-outcome association.
-
-**Approach:** Fit nuisance parameters (LD pruning + rho_GWAS sample-overlap correction) on a random SNP set; fit the sharing and causal posterior; compare ELPD (expected log predictive density) via Pareto-k smoothed importance sampling.
-
-```r
-library(cause)
-params <- est_cause_params(dat_cause, variants = pruned_subset_snps)
-res_cause <- cause(X = dat_cause, variants = pruned_snps, param_ests = params)
-elpd <- summary(res_cause)$tab
-```
-
-Full posterior extraction + reporting: examples/cause_analysis.R.
-
-**Interpreting CAUSE output:**
-
-- `q`: posterior CHP fraction; 0 = no CHP, 1 = all instruments operate via the shared factor
-- `eta`: shared-factor effect on Y (the "confounder pathway" magnitude)
-- `gamma`: posterior causal effect of E on Y after partialling out CHP; report median + 95% credible interval
-- `delta_ELPD` (sharing - causal): negative -> causal model preferred; z = delta_elpd / se(delta_elpd); z > 1.96 standard, z > 3.0 stringent; one-sided p reported alongside posterior gamma
-- Pareto-k > 0.7 indicates unstable posterior on those points; if more than 10% of points are unstable, treat the posterior as unreliable; remediation: add more SNPs (loosen p-threshold one notch then re-prune in LD) or re-fit excluding flagged outliers
-
-CAUSE requires sumstats from both exposure and outcome GWAS in matched effect-allele coding. The pruning step typically retains 100-5000 signature SNPs at LD r^2 < 0.01 in a 1 Mb window; nuisance estimation should use a larger random SNP subset (`>= 100,000` genome-wide SNPs) to fit rho (sample overlap) stably.
-
-## MR-RAPS Loss Function and Overdispersion
-
-**Trigger:** Weak instruments (mean F < 20) and/or suspected UHP requiring outlier-resistant estimation.
-
-- `over.dispersion = TRUE` always for MR (horizontal-pleiotropy variance is real, not noise; turning this off underestimates SE)
-- `loss.function = 'huber'` (default; outlier-resistant; suited to mild to moderate UHP)
-- `loss.function = 'tukey'` (more aggressive; downweights extreme outliers more; choose when many obvious outliers suspected)
-- `loss.function = 'l2'` (non-robust; equivalent to weighted least squares; do not use when UHP suspected)
-
-These are not top-level arguments to `TwoSampleMR::mr_raps()` -- its signature is
-`mr_raps(b_exp, b_out, se_exp, se_out, parameters = default_parameters())`, so pass them nested:
-
-```r
-TwoSampleMR::mr_raps(b_exp = dat$beta.exposure, b_out = dat$beta.outcome,
-                      se_exp = dat$se.exposure, se_out = dat$se.outcome,
-                      parameters = list(over.dispersion = TRUE, loss.function = 'huber', shrinkage = FALSE))
-```
-
-Calling with bare `over.dispersion = TRUE, loss.function = 'huber'` throws `unused arguments`.
-
-Tukey is preferable when leave-one-out reveals 2+ SNPs single-handedly shifting the IVW estimate by > 1 SE.
-
-## MR-Clust for Mechanism Heterogeneity
-
-**Goal:** When a single causal estimate is misleading because instruments operate through multiple causal mechanisms (e.g. LDL on CHD via multiple lipoprotein subfractions), identify clusters of instruments with similar per-SNP Wald ratios.
-
-```r
-library(mrclust)
-ratio_hat <- dat$beta.outcome / dat$beta.exposure
-ratio_se <- abs(dat$se.outcome / dat$beta.exposure)
-res_mc <- mr_clust_em(theta=ratio_hat, theta_se=ratio_se,
-                     bx=dat$beta.exposure, by=dat$beta.outcome,
-                     bxse=dat$se.exposure, byse=dat$se.outcome,
-                     obs_names=dat$SNP)
-per_cluster <- res_mc$results$best
-```
-
-Clusters with cluster_class = 'null' are pleiotropy-only instruments. Per-cluster IVW estimates may differ substantially; biological annotation of the SNPs in each cluster (pathway, target gene) is the interpretation step. Pure statistical clustering without a biological story is weak evidence.
-
-## LHC-MR Workflow
-
-**Goal:** Jointly estimate forward causal effect, reverse causal effect, and the heritable-confounder contribution from genome-wide sumstats (not just significant SNPs).
-
-```r
-library(lhcMR)
-merged <- merge_sumstats(list(df_x, df_y), c('X', 'Y'), LD.filepath='ldsc/LDscores.txt', rho.filepath='ldsc/LDrho.txt')
-sp_list <- calculate_SP(merged, trait.names=c('X', 'Y'), run_ldsc=TRUE, run_MR=TRUE, hm3='ldsc/w_hm3.snplist', ld='ldsc/eur_w_ld_chr/', nStep=2, SP_single=3, SP_pair=50)
-res_lhc <- lhc_mr(sp_list, trait.names=c('X', 'Y'), paral_method='lapply', nBlock=200, nCores=4)
-```
-
-LHC-MR is computationally heavy (hours on full sumstats) but among the most rigorous CHP-aware estimators when both GWAS are well-powered. Output includes axx, ayy, hxy (confounder effect on each trait), and bidirectional alpha_xy, alpha_yx.
-
-**Choosing CAUSE vs LHC-MR (Darrous 2021):**
-
-| Condition | Preferred method |
-|-----------|------------------|
-| `>= 100` genome-wide significant SNPs after pruning | CAUSE (Bayesian; CHP-explicit; mature posterior diagnostics) |
-| Polygenic exposure with few significant loci | LHC-MR (uses genome-wide signal, not just significant SNPs) |
-| Severe sample overlap between exposure and outcome GWAS | LHC-MR (jointly models overlap); CAUSE's rho correction is exposed to misspecification at high overlap |
-| Bidirectionality of central interest | LHC-MR (jointly estimates alpha_xy and alpha_yx); CAUSE only models forward |
-| Limited compute / quick turnaround | CAUSE (minutes to hours); LHC-MR may be > 24h on full sumstats |
-
-When both apply, report both with the agreement / disagreement explicit in the discussion.
+Run it from `examples/sensitivity_battery.R` (IVW / Egger / weighted median / weighted mode via `mr(dat, method_list = ...)`, `mr_heterogeneity`, `mr_pleiotropy_test`, `Isq`, `directionality_test`, `mr_presso`, `mr_leaveoneout`, contamination mixture, MR-RAPS, STROBE-MR table); it simulates its own `dat`, so replace that block with your harmonized data.frame. Keep `set.seed(42)` ahead of the whole battery: `mr()`'s weighted-median and weighted-mode bootstrap SEs and `mr_presso()`'s global/outlier tests are all Monte-Carlo, so an unseeded rerun changes those SEs and p-values. The example uses `NbDistribution = 5000`; raise it to 10000 for stringent reporting. SIMEX correction is separate: examples/simex_egger_correction.R.
 
 ## Bidirectional MR Procedure
 
@@ -341,52 +152,6 @@ Working code: examples/bidirectional_mr.R.
 
 When forward and reverse both clear Steiger and both IVW p < 0.05, run LHC-MR jointly rather than reporting two univariable estimates.
 
-## LCV (Latent Causal Variable)
-
-LCV uses LDSC-merged genome-wide sumstats and reports gcp (genetic causality proportion) on [-1, 1]. It is a complement to, not a replacement for, MR; gcp ~ 0 with high LDSC rg implies pure genetic correlation without partial causation. LCV uses ALL genome-wide SNPs after LDSC-merging, not the MR instrument set.
-
-```r
-source('LCV/R/RunLCV.R')
-res_lcv <- RunLCV(ldscores$L2, x$Z, y$Z)
-# res_lcv$gcp.pm (posterior mean gcp; there is no res_lcv$gcp field); res_lcv$pval.gcpzero.2tailed
-```
-
-**gcp interpretation:**
-
-| gcp value | Interpretation |
-|-----------|----------------|
-| 0 | Pure genetic correlation; no partial causation |
-| 0.5 | Partial causation; mixture |
-| 0.6 | Partial causation; modestly causal direction |
-| 1 | Fully causal in tested direction |
-| Significant p_gcp != 0 | Directional evidence of (partial) causation |
-
-## Required Supplementary Tables
-
-**Instrument table** (one row per SNP retained for primary analysis):
-
-| Column | Content |
-|--------|---------|
-| rsID, chr, pos | Variant identifier and genome position |
-| EA, OA, EAF | Effect allele, other allele, effect allele frequency in exposure GWAS |
-| beta_E, se_E, p_E, F | Exposure-side estimate, SE, p-value, per-SNP F-statistic |
-| beta_Y, se_Y, p_Y | Outcome-side estimate, SE, p-value (harmonized to EA) |
-| harmonization_action | 1=kept, 2=flipped, 3=dropped (palindromic ambiguity) |
-| palindromic_flag | TRUE / FALSE; tracked per Hartwig 2016 IJE 45:1717 |
-| Steiger_direction | forward / reverse / inconclusive |
-| Steiger_p | per-SNP directionality p-value |
-
-**Sensitivity-battery table** (one row per method):
-
-| Column | Content |
-|--------|---------|
-| method | IVW / Egger / WM / WMode / PRESSO (raw + corrected) / RAPS / CAUSE |
-| estimate, se, p, 95% CI | Point estimate and inference |
-| n_SNPs_used | Post-harmonization, post-Steiger SNP count |
-| heterogeneity_p | Q for IVW; Q' for Egger; global p for PRESSO |
-| intercept_p | Egger only (directional UHP test) |
-| ELPD_delta + z | CAUSE only (sharing - causal; negative + |z| > 1.96 -> causal) |
-
 ## Reconciliation Across Methods
 
 | Pattern | Likely cause | Action |
@@ -402,33 +167,6 @@ res_lcv <- RunLCV(ldscores$L2, x$Z, y$Z)
 
 **Operational rule for publication:** Report IVW (primary), Egger slope + intercept, weighted median, weighted mode, MR-PRESSO global + distortion + corrected, Cochran Q, Steiger directionality, F-statistic distribution, I^2_GX (for Egger validity), and at least one CHP-aware method (CAUSE or LHC-MR) when rg `>= 0.3` or biology suggests shared upstream. Failure to report a CHP-aware result when CHP is plausible is a reviewer-flagged red flag since 2020.
 
-## Anticipated Reviewer Pushback
-
-| Pushback | Standard response |
-|----------|-------------------|
-| "Was CHP checked for?" | LDSC rg reported (causal-genomics/genetic-correlation); if rg > 0.3, CAUSE or LHC-MR ran; q posterior reported |
-| "Why CAUSE and not LHC-MR?" | CAUSE preferred when `>= 100` significant SNPs available (Morrison 2020). LHC-MR preferred when significant-SNP set is small or polygenic, using genome-wide sumstats (Darrous 2021) |
-| "Egger NOME?" | I^2_GX computed; if 0.6 <= I^2_GX < 0.9, SIMEX correction applied; if < 0.6, Egger dropped in favor of MR-RAPS |
-| "PRESSO doesn't catch CHP?" | Confirmed (Morrison 2020); CAUSE / LHC-MR reported alongside PRESSO for that reason |
-| "Steiger filter applied pre-MR or post?" | Pre-MR: SNPs failing per-SNP Steiger directionality dropped before primary IVW |
-| "Why no replication cohort?" | Two-sample design uses independent exposure and outcome cohorts; if same biobank, MRlap used or noted as a limitation |
-| "Why not just trust the IVW?" | IVW assumes balanced UHP and no CHP; both violated routinely; sensitivity battery is the standard since STROBE-MR 2021 |
-| "Effect size is implausibly large" | Re-examine F-statistic distribution for weak IV bias; check Winner's curse; consider Wald ratio at a single strong instrument as sanity check |
-
-## STROBE-MR Reporting (Skrivankova 2021)
-
-| Item | Required content |
-|------|-----------------|
-| 1-3 | Title / abstract / background indicates this is an MR study; pre-registered protocol |
-| 4-7 | Study design, data sources, instrument selection criteria (p-threshold, LD clumping, MAF) |
-| 8-11 | Harmonization, palindrome handling, allele alignment |
-| 12-14 | F-statistic distribution; weak-instrument bias mitigation |
-| 15-17 | Primary MR method + all sensitivity methods + CHP-aware method when relevant |
-| 18-19 | Pleiotropy tests, Steiger, heterogeneity |
-| 20 | Discussion of remaining assumption violations; limitations |
-
-Sub-items (30 total) detail per-method reporting. The full statement (JAMA 326:1614) and explanation (BMJ 375:n2233) are now reviewer-required at most cardiovascular and psychiatric journals since 2022.
-
 ## Common Errors
 
 | Error / symptom | Cause | Solution |
@@ -439,10 +177,22 @@ Sub-items (30 total) detail per-method reporting. The full statement (JAMA 326:1
 | MR-RAPS `package not found` after CRAN install | CRAN-archived 2025-03-01 | `remotes::install_github('qingyuanzhao/mr.raps')`; call via `TwoSampleMR::mr_raps()` wrapper or `mr.raps::mr.raps()` directly (MendelianRandomization does NOT export `mr_raps`) |
 | MR-RAPS warns `overdispersion parameter is very small` / `negative, using tau2 = 0` and underperforms IVW | Extreme-weak IV (mean F well below the 10 threshold); the profile-likelihood overdispersion fit degenerates | Report both RAPS and IVW with the warning text; do not switch to RAPS as primary at extreme-weak F without checking which one is closer to other robust estimates (median/mode) |
 | CAUSE delta_ELPD CI spans zero; Pareto-k > 0.7 | <100 sig SNPs OR severe sample overlap | Use LHC-MR; or report CAUSE with the explicit caveat |
+| CAUSE crashes `Error in -1 * comp[2, 1] : non-numeric argument to binary operator` | `loo` >= 2.6 changed `loo_compare()`'s output layout; `cause`'s internal `in_sample_elpd_loo()` still reads the pre-2.6 layout by position (see references/cause.md) | Pin `loo` to <2.6 (e.g. 2.5.1) in a library resolved ahead of `cause`'s |
 | Steiger labels most instruments reverse-causal | Exposure GWAS imprecise OR sample size mismatch | Treat as one signal; cross-check with bidirectional MR |
 | LHC-MR runtime > 24h | Default nCores=1 on full sumstats | Use nCores >= 4; restrict to LDSC-overlapping SNPs first |
 | MR-PRESSO outliers all on same chromosome | Genome-wide LD not properly pruned; clumping window too narrow | Re-clump at r^2 < 0.001 in 10 Mb window |
 | MR-Mix / contamination mixture return a confident point estimate below their documented 20-SNP minimum (not NA) | Small n destabilizes the mixture-model fit without an internal check that refuses to report | Check n before trusting the output: below 20 SNPs, treat MR-Mix / conmix point estimates and CIs as unreliable regardless of apparent significance; report n_SNPs alongside the estimate; cross-check against MR-Clust and the full UHP battery rather than the mixture methods alone |
+
+## Reference Files
+
+| File | Read when |
+|------|-----------|
+| references/failure-modes.md | A method's result looks wrong or unexpected: MR-Egger NOME / SIMEX (incl. the SIMEX overshoot caveat), PRESSO majority-outlier breakdown or CHP false negative, Egger with few SNPs, Steiger inversion, CAUSE with few SNPs, LCV under non-Gaussian effects |
+| references/cause.md | Running CAUSE, or interpreting q / eta / gamma / delta_ELPD / Pareto-k |
+| references/mr-raps-mr-clust.md | Weak instruments (MR-RAPS loss function, overdispersion, nested `parameters =` calling form) or heterogeneous mechanisms (MR-Clust) |
+| references/lhc-mr.md | Polygenic exposure, severe sample overlap or bidirectional interest: LHC-MR workflow and the CAUSE-vs-LHC-MR choice table |
+| references/lcv.md | LCV gcp: `RunLCV` usage (field names) and the gcp interpretation table |
+| references/reporting.md | Writing up: instrument and sensitivity-battery supplementary tables, anticipated reviewer pushback, STROBE-MR items |
 
 ## References
 

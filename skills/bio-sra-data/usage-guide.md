@@ -42,7 +42,7 @@ See SKILL.md's "Required Setup" section for sra-tools/pysradb install commands, 
 
 > "fasterq-dump writes uncompressed FASTQ to scratch (~3x final compressed size). My scratch dir has 500 GB free; the run is 200 GB compressed. That's tight -- use fastq-dump --gzip instead, which writes compressed in-place."
 
-For the agent's decision process (source selection, `--max-size` sizing, pigz/gzip fallback, the ENA-vs-SRA-direct read-count caveat, and the controlled-access/dbGaP boundary), see SKILL.md's decision matrix, "prefetch and the `--max-size` trap", "Controlled-access (dbGaP) data" and "Failure modes" sections -- summarized once there, not repeated here.
+For the agent's decision process (source selection, `--max-size` sizing, pigz/gzip fallback, the ENA-vs-SRA-direct read-count caveat, and the controlled-access/dbGaP boundary), see SKILL.md's decision matrix, "prefetch and the `--max-size` trap", "Controlled-access (dbGaP) data" and "Common errors" sections -- summarized once there, not repeated here.
 
 ## Related Skills
 

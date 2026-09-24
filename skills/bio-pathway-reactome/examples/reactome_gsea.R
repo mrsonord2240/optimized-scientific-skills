@@ -40,7 +40,8 @@ pvalue_cutoff <- 0.05   # filters on p.adjust (BH) by default
 
 set.seed(123)           # gsePathway permutes; fix the seed so p-values reproduce across runs
 gse <- gsePathway(geneList = gene_list, organism = 'human',
-                  pvalueCutoff = pvalue_cutoff, pAdjustMethod = 'BH', verbose = FALSE)
+                  pvalueCutoff = pvalue_cutoff, pAdjustMethod = 'BH', verbose = FALSE,
+                  BPPARAM = BiocParallel::SerialParam()) # bounded, reproducible: avoid implicit worker fan-out
 
 results_df <- as.data.frame(gse)
 cat('Rows returned:', nrow(results_df), '\n')

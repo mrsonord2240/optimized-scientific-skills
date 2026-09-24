@@ -25,7 +25,14 @@ installed via pip; use the bare name, as in the code below.
 
 **On Windows, `pip install vina` has no wheel** (`ValueError: Boost library location was
 not found!` at build time). Use the Vina CLI via `subprocess` instead of `from vina import
-Vina` -- see the CLI-fallback comment in "Vina Docking (Single Ligand)" below.
+Vina` -- see the CLI-fallback comment in "Vina Docking (Single Ligand)" below. The Python-API
+branch itself is verified, not just doc-checked: conda-forge ships prebuilt `vina` 1.2.7 for
+linux-64 (`conda install -c conda-forge vina`), which runs under WSL on a Windows box. Docking
+benzamidine into PDB 3PTB there with `scripts/dock_single.py`'s `from vina import Vina` path and
+with `examples/virtual_screen.py`'s `virtual_screen()` gave the same top pose (-5.978 kcal/mol)
+as the Vina CLI run on the same fixture, and `write_poses`/`v.energies()` round-tripped a valid
+multi-model PDBQT. No Windows build of the PyPI `vina` wheel exists, so the CLI fallback stays
+the Windows-native path -- but the API branch is confirmed correct, not merely plausible.
 
 # Virtual Screening
 
@@ -33,7 +40,20 @@ Screen chemical libraries against protein targets via molecular docking. Vina is
 
 For pose physical-validity QC, see `chemoinformatics/pose-validation`. For ML-driven docking + rescoring, see `chemoinformatics/ml-docking-rescoring`. For covalent docking, see `chemoinformatics/covalent-design`. For affinity calculations (FEP), see `chemoinformatics/free-energy-calculations`.
 
-**Handoff caveat:** converting a docked PDBQT pose to SDF for PoseBusters or another downstream tool can lose formal bond order/charge for charged ligands (PDBQT does not encode bond order; reconstructing it from atom types and coordinates is unreliable for charged or aromatic-adjacent groups), causing an RDKit sanitization failure even when the pose's spatial placement is valid. Where possible, carry the original RDKit `Mol` (with correct formal charges, from `prepare_ligand`) alongside the docked PDBQT instead of reconstructing bonds from the pose alone.
+**Handoff caveat:** Open Babel's PDBQT -> SDF conversion (`obabel out.pdbqt -O pose.sdf`) loses formal bond order and charge for charged ligands (PDBQT encodes neither), so RDKit sanitization fails and PoseBusters passes only 3/12 checks even when the pose is spatially valid. Rebuild the pose from the SMILES that meeko writes into the PDBQT instead (Vina keeps the `REMARK SMILES` lines in its output). Verified on benzamidine docked to trypsin (3PTB): `obabel` route 3/12, meeko route 12/12 on all 5 poses (meeko 0.8.0, RDKit 2026.03.6, PoseBusters 0.6.5, Vina 1.2.7):
+
+```python
+from meeko import PDBQTMolecule, RDKitMolCreate
+from rdkit import Chem
+
+pm = PDBQTMolecule.from_file('out.pdbqt', skip_typing=True)   # Vina output, all poses
+mol = RDKitMolCreate.from_pdbqt_mol(pm)[0]                    # one Mol, one conformer per pose
+with Chem.SDWriter('poses.sdf') as w:
+    for cid in range(mol.GetNumConformers()):
+        w.write(mol, confId=cid)
+```
+
+Then `bust poses.sdf --outfmt short`. This needs the ligand PDBQT to come from meeko (`prepare_ligand`), which writes the `REMARK SMILES` lines; a PDBQT from another writer has none, so carry the original RDKit `Mol` alongside it instead.
 
 ## Docking Tool Taxonomy
 
@@ -59,9 +79,9 @@ For pose physical-validity QC, see `chemoinformatics/pose-validation`. For ML-dr
 
 | Scenario | Recommended workflow |
 |----------|---------------------|
-| Self-dock against known ligand pocket | GNINA `gnina --cnn_scoring rescore` |
-| Cross-dock to apo or related-target structure | DiffDock-L pose + GNINA rescore + PoseBusters |
-| Ultralarge library (10M+) | Calibrated hierarchical screen: property/alert triage -> Vina -> measured top fraction to GNINA -> higher-cost follow-up |
+| Self-dock against known ligand pocket | GNINA `gnina --cnn_scoring rescore` (see `references/gnina.md`) |
+| Cross-dock to apo or related-target structure | DiffDock-L pose + GNINA rescore + PoseBusters (failure modes: `references/failure-modes.md`) |
+| Ultralarge library (10M+) | Calibrated hierarchical screen: property/alert triage -> Vina -> measured top fraction to GNINA -> higher-cost follow-up (see `references/ultralarge-screening.md`) |
 | Cryptic pocket / induced fit | Receptor-ensemble docking and, where appropriate, a separately validated complex-prediction model |
 | Allosteric / undefined site | P2Rank for pocket detection -> ensemble dock all pockets |
 | Metal-coordinated ligand | GOLD (commercial) or manually parameterize Vina metal scoring |
@@ -75,29 +95,15 @@ For pose physical-validity QC, see `chemoinformatics/pose-validation`. For ML-dr
 
 **Approach:** Decide which ligands, cofactors, metals, and structural waters to retain -> fill missing heavy atoms with a structure-repair tool such as PDBFixer -> use PROPKA/PDB2PQR plus manual review to assign pH-dependent protonation -> assign the charge model required by the docking workflow -> prepare receptor PDBQT with a documented AutoDock-compatible tool.
 
-```python
-import subprocess
-from pathlib import Path
-
-def prepare_receptor(repaired_pdb, pdbqt_out, pH=7.4):
-    # Decide which waters/cofactors/metals to retain before this function.
-    base = str(Path(repaired_pdb).with_suffix(''))
-    protonated_pdb = f'{base}_pH{pH}.pdb'
-    pqr_file = f'{base}_pH{pH}.pqr'
-    # --pdb-output writes a protonated PDB alongside the PQR; hand that PDB to
-    # mk_prepare_receptor --read_pdb rather than --read_pqr (see pitfall below).
-    subprocess.run(['pdb2pqr', '--ff=AMBER', f'--with-ph={pH}',
-                    '--pdb-output', protonated_pdb,
-                    repaired_pdb, pqr_file], check=True)
-    output_basename = str(Path(pdbqt_out).with_suffix(''))
-    subprocess.run(['mk_prepare_receptor', '--read_pdb', protonated_pdb,
-                    '-o', output_basename, '-p'], check=True)
-    return pdbqt_out
+```bash
+python scripts/prepare_receptor.py repaired.pdb receptor.pdbqt --ph 7.4
 ```
+
+`scripts/prepare_receptor.py` runs `pdb2pqr --ff=AMBER --with-ph=<pH> --pdb-output` then `mk_prepare_receptor --read_pdb ... -p`. Decide which waters, cofactors and metals to retain before calling it. It needs `pdb2pqr` and `mk_prepare_receptor` on `PATH`; it writes the protonated `<base>_pH<pH>.pdb`/`.pqr` beside the input. It hands meeko the protonated PDB rather than the `.pqr` (see the insertion-code pitfall below).
 
 **Common pitfall:** Forgetting to add hydrogens at protein pH (7.4) but using pH 7.0 ligand charges. Hist mistakenly protonated. Use PROPKA + manual review of catalytic residues.
 
-**Common pitfall:** Feeding pdb2pqr's default `.pqr` output straight into `mk_prepare_receptor --read_pqr`. meeko 0.8.0's PQR reader assumes an all-integer residue-number column and raises `ValueError: invalid literal for int() with base 10` on any residue with a PDB insertion code (e.g. `184A`). Chymotrypsin-numbered serine proteases (trypsin, chymotrypsin, and relatives -- a standard docking-benchmark family) hit this on real structures, not just edge cases. Use `pdb2pqr --pdb-output` and `mk_prepare_receptor --read_pdb` as above; verified on PDB 3PTB (trypsin, insertion-code residues 184A/188A/221A).
+**Common pitfall:** Feeding pdb2pqr's default `.pqr` output straight into `mk_prepare_receptor --read_pqr`. meeko 0.8.0's PQR reader assumes an all-integer residue-number column and raises `ValueError: invalid literal for int() with base 10` on any residue with a PDB insertion code (e.g. `184A`). Any PDB deposition with insertion-code residues triggers it, not one protein family: chymotrypsin-numbered serine proteases (trypsin 3PTB: 184A/188A/221A; elastase 1EAI) are common examples and hit it on real structures, not just edge cases. Use `pdb2pqr --pdb-output` and `mk_prepare_receptor --read_pdb` as above; verified on PDB 3PTB (trypsin, insertion-code residues 184A/188A/221A).
 
 ## Ligand Preparation
 
@@ -106,35 +112,12 @@ def prepare_receptor(repaired_pdb, pdbqt_out, pH=7.4):
 **Approach:** Supply a documented protomer/tautomer state generated by an appropriate pKa/protomer workflow -> parse it with RDKit -> embed 3D with ETKDGv3 -> minimize with MMFF94 -> write PDBQT with Meeko. `MolFromSmiles` parses the supplied state and `Uncharger` neutralizes formal charges; neither predicts protonation at pH 7.4.
 
 ```python
-from rdkit import Chem
-from rdkit.Chem import AllChem
-from meeko import MoleculePreparation, PDBQTWriterLegacy
-
-def prepare_ligand(smiles, pdbqt_out):
-    mol = Chem.MolFromSmiles(smiles)
-    if mol is None:
-        raise ValueError(f'invalid SMILES: {smiles}')
-    mol = Chem.AddHs(mol)
-    embed_status = AllChem.EmbedMolecule(mol, AllChem.ETKDGv3())
-    if embed_status != 0:
-        raise RuntimeError('ETKDGv3 failed to generate a ligand conformer')
-    if not AllChem.MMFFHasAllMoleculeParams(mol):
-        raise ValueError('MMFF94 parameters are unavailable for this ligand')
-    optimization_status = AllChem.MMFFOptimizeMolecule(mol)
-    if optimization_status != 0:
-        raise RuntimeError('MMFF94 ligand optimization did not converge')
-
-    # meeko 0.5+ API: prepare() returns a list of MoleculeSetup objects;
-    # use PDBQTWriterLegacy.write_string() to materialize the PDBQT block.
-    mk_prep = MoleculePreparation()
-    setups = mk_prep.prepare(mol)
-    pdbqt_text, is_ok, err = PDBQTWriterLegacy.write_string(setups[0])
-    if not is_ok:
-        raise RuntimeError(f'meeko PDBQT export failed: {err}')
-    with open(pdbqt_out, 'w') as f:
-        f.write(pdbqt_text)
-    return pdbqt_out
+import sys; sys.path.insert(0, 'examples')      # this skill's examples/ directory
+from virtual_screen import prepare_ligand
+prepare_ligand('NC(=[NH2+])c1ccccc1', 'ligand.pdbqt')   # supplied protomer SMILES -> ETKDGv3 -> MMFF94 -> meeko PDBQT
 ```
+
+`prepare_ligand` in `examples/virtual_screen.py` raises on invalid SMILES, embedding failure, missing MMFF94 parameters, MMFF94 non-convergence, or a meeko export error (meeko 0.5+ API: `MoleculePreparation().prepare(mol)` returns setups; `PDBQTWriterLegacy.write_string(setups[0])` materializes the PDBQT).
 
 `meeko` (AutoDock developers' tool) handles torsion tree creation, rotamer flagging, and PDBQT writing -- preferred over Open Babel's PDBQT writer. Note: meeko 0.5+ separated the writer (`PDBQTWriterLegacy`) from `MoleculePreparation`; older code using `prep.write_pdbqt_file()` is deprecated.
 
@@ -154,200 +137,46 @@ When the binding pocket is not known (apo target, novel allosteric site):
 prank predict -f receptor.pdb -o pockets/
 ```
 
-P2Rank output `<receptor>_predictions.csv` lists pocket centers with scores. The highest model score does not identify a pocket as orthosteric or biologically relevant; verify ranked pockets against co-crystal, mutagenesis, SAR, or other structural evidence.
+**On Windows, `prank.bat` returns immediately with no output when invoked through a shell
+wrapper** (`cmd.exe /c`, or a bash script calling it) -- confirmed on this fixture: it printed
+only the `cmd.exe` banner and produced no `pockets/` directory. Call the jar directly instead,
+which does run and predict:
+
+```bash
+java -cp "<p2rank_dir>/bin/p2rank.jar;<p2rank_dir>/bin/lib/*" cz.siret.prank.program.Main \
+     predict -f receptor.pdb -o pockets/
+```
+
+Verified on PDB 3PTB: 4 pockets in ~4 s, `pockets/rec.pdb_predictions.csv` with `pocket1` centered
+at (-1.52, 14.47, 17.47) -- the same box center used throughout this Skill's Vina examples, which
+sits on the real benzamidine site. P2Rank output `<receptor>_predictions.csv` lists pocket centers
+with scores. The highest model score does not identify a pocket as orthosteric or biologically
+relevant; verify ranked pockets against co-crystal, mutagenesis, SAR, or other structural evidence.
 
 ## Vina Docking (Single Ligand)
 
-```python
-# AutoDock Vina Python API requires Vina 1.2+; for Vina 1.1 use subprocess CLI:
-# subprocess.run(['vina', '--receptor', ..., '--ligand', ..., '--center_x', ...], check=True)
-# On Windows, pip install vina does not build a wheel (no Boost found); use the
-# Vina CLI via subprocess instead -- pass --seed the same way (see below).
-from vina import Vina
-
-def dock_single(receptor_pdbqt, ligand_pdbqt, center, box_size,
-                exhaustiveness=8, n_poses=10, seed=42):
-    v = Vina(sf_name='vina', seed=seed)
-    v.set_receptor(receptor_pdbqt)
-    v.set_ligand_from_file(ligand_pdbqt)
-    v.compute_vina_maps(center=center, box_size=box_size)
-    v.dock(exhaustiveness=exhaustiveness, n_poses=n_poses)
-    energies, poses = v.energies(), v.poses()
-    # Filter search artifacts: Vina occasionally emits a physically nonsensical
-    # positive-energy mode among the returned poses (e.g. +68 kcal/mol seen in
-    # testing) -- see "Sanity-filter reported poses" below.
-    valid = [i for i, e in enumerate(energies) if e[0] < 0]
-    if len(valid) < len(energies):
-        energies = [energies[i] for i in valid]
-    return energies, poses
+```bash
+python scripts/dock_single.py receptor.pdbqt ligand.pdbqt --center X Y Z --size X Y Z \
+       --exhaustiveness 8 --n-poses 10 --seed 42 --out poses.pdbqt
 ```
+
+`scripts/dock_single.py` uses the Vina Python API (Vina 1.2+) when `from vina import Vina` imports, and otherwise runs the Vina CLI (`--vina-exe` if `vina` is not on `PATH`; Windows has no `vina` wheel, see Version Compatibility). Both paths pass the same seed. It writes the poses to `--out` and prints one affinity per mode with `affinity >= 0` modes dropped (Vina occasionally emits a physically nonsensical positive-energy mode, e.g. +68 kcal/mol; see "Sanity-filter reported poses").
 
 **Exhaustiveness:** `8` is the Vina default. Increasing it increases search effort, but runtime and pose recovery depend on hardware, ligand flexibility, box size, and software version. Benchmark settings such as 8, 16, 32, and 64 on target-relevant controls instead of assigning universal timing or quality labels.
 
-**Seed and reproducibility:** `dock_single()`/`virtual_screen()` accept a `seed` (CLI: `--seed`). Top-1 affinity is empirically stable run-to-run without a fixed seed, but poses ranked 2+ reorder between runs on the same input. Set and record a seed (default `42` above) whenever the top-N poses -- not only the single best -- will be reported or compared.
+**Seed and reproducibility:** `scripts/dock_single.py` and `examples/virtual_screen.py` accept a `seed` (CLI: `--seed`). Top-1 affinity is empirically stable run-to-run without a fixed seed, but poses ranked 2+ reorder between runs on the same input. Set and record a seed (default `42` above) whenever the top-N poses -- not only the single best -- will be reported or compared.
 
 **Sanity-filter reported poses:** Vina's raw mode list can include a physically nonsensical outlier (a positive-energy mode was observed among 9 returned modes in testing). Filter or flag `affinity >= 0` poses before reporting or ranking; do not assume every mode Vina returns is a plausible binder.
 
 Vina's `rmsd_lb` and `rmsd_ub` are lower and upper heavy-atom RMSD bounds between a reported mode and the best-scoring mode; the bounds differ in how symmetry-equivalent atoms are handled. They are not pose-versus-experimental-reference RMSDs. Use an external symmetry-aware RMSD to a reference pose for accuracy QC.
 
-## GNINA with CNN Scoring (modern default)
+## Reference Files
 
-```bash
-gnina -r receptor.pdb -l ligand.sdf \
-      --autobox_ligand reference_ligand.sdf \
-      --cnn_scoring rescore \
-      -o poses.sdf.gz \
-      --num_modes 9 --exhaustiveness 8
-```
-
-`--cnn_scoring`:
-- `none`: no CNN; use the selected empirical scoring function throughout
-- `rescore` (default): use empirical scoring during the search, then CNN-rerank the final poses; least computationally expensive CNN option
-- `refinement`: use the CNN to refine poses after Monte Carlo chains and to rank the final poses; approximately 10 times slower than `rescore` on a GPU in the official documentation
-- `metrorescore`: use CNN scoring in the Metropolis search and rescore the resulting poses
-- `metrorefine`: use CNN scoring in the Metropolis search and refine the resulting poses
-- `all`: use the CNN scoring function throughout; the official documentation describes this as extremely computationally intensive and not recommended
-
-The six choices above are from GNINA 1.3. Earlier releases expose a smaller set; check `gnina --help` for the installed executable rather than assuming every mode is available.
-
-`--autobox_ligand`: define box from reference ligand SDF/PDB. Otherwise specify `--center_x/y/z` + `--size_x/y/z`.
-
-**Critical:** GNINA distributions include multiple named CNN models/ensembles rather than one universally described "PDBbind 2019" model. Record the selected model or ensemble and validate it with known co-crystal redocking and, when relevant, cross-docking controls.
-
-## Virtual Screening Pipeline (Hierarchical)
-
-**Goal:** Screen 10M-compound library down to top-1k candidates for follow-up.
-
-**Approach:** Three-stage filter. The 1% and top-1000 selections below are repository starting heuristics; choose production cutoffs from target-relevant enrichment, diversity, and throughput measurements.
-
-Pseudo-code skeleton (orchestrator). Each helper function delegates to a dedicated skill: drug-likeness filter to `chemoinformatics/admet-prediction`, single-ligand Vina/GNINA to `dock_single` defined earlier in this skill, PoseBusters QC to `chemoinformatics/pose-validation`.
-
-```python
-import pandas as pd
-from concurrent.futures import ProcessPoolExecutor
-from functools import partial
-
-# Stub helpers to be implemented per project; see the cross-referenced skills.
-def drug_like_filter(df):
-    raise NotImplementedError('Implement via chemoinformatics/admet-prediction (Lipinski+Veber+PAINS)')
-def vina_dock(smi, receptor_pdbqt, center, box):
-    raise NotImplementedError('Wrap dock_single() above; return best affinity')
-def gnina_rescore(smi, receptor_pdbqt, center, box):
-    raise NotImplementedError('Wrap gnina --cnn_scoring rescore subprocess call')
-def pose_validate(df):
-    raise NotImplementedError('Implement via chemoinformatics/pose-validation (PoseBusters)')
-
-def vs_pipeline(library_smi, receptor_pdbqt, center, box, output_dir, n_workers=16):
-    df = pd.read_csv(library_smi)
-    df_stage1 = drug_like_filter(df)
-
-    worker = partial(vina_dock, receptor_pdbqt=receptor_pdbqt,
-                     center=center, box=box)
-    with ProcessPoolExecutor(max_workers=n_workers) as ex:
-        affinities = list(ex.map(worker, df_stage1['smiles']))
-    df_stage1['vina_affinity'] = affinities
-    df_stage2 = df_stage1.nsmallest(int(len(df_stage1) * 0.01), 'vina_affinity')
-
-    df_stage2['gnina_affinity'] = df_stage2['smiles'].apply(
-        lambda smi: gnina_rescore(smi, receptor_pdbqt, center, box))
-    df_stage3 = df_stage2.nsmallest(1000, 'gnina_affinity')
-
-    return pose_validate(df_stage3)
-```
-
-For very large libraries, use a restartable scheduler-backed workflow and measure throughput on a representative tranche. Record hardware, software version, box dimensions, ligand flexibility, and failure rate with every throughput estimate.
-
-## Ultralarge Library Screening (ZINC22, Enamine REAL)
-
-| Library | Scope | Typical access | Verification requirement |
-|---------|-------|----------------|--------------------------|
-| ZINC22 | Purchasable and make-on-demand compounds | Tranche/download interfaces | Record the tranche query and retrieval date |
-| Enamine REAL | Make-on-demand compounds | Provider files or search interface | Record product-space release and retrieval date |
-| Enamine HTS | Screening collection | Provider files | Confirm current stock/version with the provider |
-| Mcule | Aggregated purchasable compounds | Provider search/export | Record filters and retrieval date |
-| ChEMBL | Curated compounds and bioactivities | Versioned database release | Record ChEMBL release and extraction query |
-
-Library sizes and availability change frequently. Obtain counts from the provider or versioned database at execution time rather than copying a static total into a workflow.
-
-For ultralarge VS, the following percentages and thresholds are repository starting heuristics that must be calibrated for the target and library:
-1. Apply a documented property/alert policy while retaining flagged and rejected counts
-2. If known actives exist, test a permissive 2D-similarity prefilter such as ECFP4 Tanimoto >=0.4 and measure active/chemotype retention
-3. Vina dock the filtered subset
-4. Rescore top 1% with GNINA
-5. Rescore top 0.1% with MM/GBSA or FEP
-
-Lyu et al. (2019) screened 170 million make-on-demand compounds against AmpC and the D4 dopamine receptor. Of 549 D4 candidates synthesized and tested, 81 were new active chemotypes and 30 had submicromolar activity.
-
-## Per-Tool Failure Modes
-
-### Vina -- cross-dock failure
-
-**Trigger:** Receptor structure not the holo (co-crystal with ligand from another binder).
-
-**Mechanism:** Cross-docking introduces receptor-conformation mismatch, so pose recovery can be substantially worse than self-docking; the size of the decrease is benchmark- and target-dependent.
-
-**Symptom:** Top-ranked pose makes no geometric sense; key contacts missing.
-
-**Fix:** GNINA CNN scoring or ensemble docking. For genuine apo, predict holo with AlphaFold3 / Boltz-1 then dock.
-
-### GNINA CNN -- novel chemotype out-of-distribution
-
-**Trigger:** Ligand chemotype not in PDBbind training.
-
-**Mechanism:** CNN scoring overfits to PDBbind chemotypes; novel macrocycle / peptide / PROTAC scores poorly.
-
-**Symptom:** Affinity prediction far worse than Vina alone.
-
-**Fix:** Use `--cnn_scoring rescore` (sampling still by Vina) rather than CNN sampling. Validate against co-crystal of close analog.
-
-### Box too small
-
-**Trigger:** Binding box defined tightly around small ligand reference.
-
-**Mechanism:** Vina explores only within the box; large analogs cannot fit.
-
-**Symptom:** Many ligands report "no valid pose"; chemotype-biased hits.
-
-**Fix:** Derive the box from the reference ligand or known pocket and add enough explicit padding for the largest intended ligands to translate and rotate. Then verify containment and redocking/search convergence on controls. There is no universal padding value or 25 A cube that fits every ligand series.
-
-### Multi-pocket protein -- wrong site
-
-**Trigger:** Protein has multiple binding sites (orthosteric + allosteric).
-
-**Mechanism:** P2Rank or AutoBox picks the most "drugable" pocket; not always the desired one.
-
-**Symptom:** Hits dock in wrong pocket; SAR confusing.
-
-**Fix:** Verify pocket from co-crystal data; explicitly set `center_x/y/z` from known ligand centroid.
-
-### DiffDock-L -- PoseBusters invalid
-
-**Trigger:** Default DiffDock-L output for any receptor.
-
-**Mechanism:** Diffusion-generated poses are not guaranteed to satisfy every bond-geometry, stereochemistry, and intermolecular-clash check; failure rates vary by method and benchmark.
-
-**Symptom:** Poses look reasonable but fail PoseBusters checks.
-
-**Fix:** Filter to PB-valid (PoseBusters); rescore with GNINA. See `chemoinformatics/pose-validation`.
-
-### Wrong ionization state
-
-**Trigger:** Ligand or receptor residues protonated incorrectly at pH 7.4.
-
-**Mechanism:** Aspartate/glutamate/histidine protonation depends on local environment; default protonation may be wrong.
-
-**Symptom:** Salt bridges missing; poses misranked.
-
-**Fix:** Run PROPKA on the receptor to estimate residue pKas; for catalytic histidines, manually inspect protonation and tautomer state in the local environment.
-
-## Reconciliation: Vina vs GNINA Disagreement
-
-| Vina top pose | GNINA top pose | Action |
-|---------------|----------------|--------|
-| Same pose, similar score | Same pose, similar score | Treat agreement as supporting evidence; still run physical-validity checks |
-| Vina top pose ≠ GNINA top pose | Same pocket, different orientation | Retain both and compare against target-relevant controls or interaction evidence |
-| Vina excellent, GNINA mediocre | Different pose, very different score | Inspect both poses; do not infer which method is correct from score disagreement alone |
-| Both poor scores | Many ligands score similarly poor | Wrong pocket / protein conformation; reconsider receptor |
+| File | Read when |
+|------|-----------|
+| `references/gnina.md` | Running GNINA: CLI, `--cnn_scoring` modes, choosing a CNN model or ensemble |
+| `references/ultralarge-screening.md` | Screening more than ~100k compounds: hierarchical Vina -> GNINA pipeline skeleton, ZINC22/Enamine REAL access, stage-by-stage heuristics |
+| `references/failure-modes.md` | A docking result looks wrong (cross-dock, box too small, wrong pocket, wrong ionization, DiffDock-L invalid poses, GNINA out-of-distribution), or Vina and GNINA disagree |
 
 ## Common Errors
 
@@ -357,11 +186,13 @@ Lyu et al. (2019) screened 170 million make-on-demand compounds against AmpC and
 | GNINA hangs | GPU OOM | Reduce concurrent work and, if fewer output poses are acceptable, use `--num_modes 5` |
 | All affinities very poor (-3 to -5) | Wrong protonation; ligand too large for box | Re-check pKa; expand box |
 | Identical affinity across ligands | Receptor grid not computed | Call `v.compute_vina_maps()` before dock |
+| PoseBusters passes only ~3/12 on a docked charged ligand; `Explicit valence ... is greater than permitted` | `obabel` PDBQT -> SDF dropped bond orders/charges | Rebuild with meeko `RDKitMolCreate.from_pdbqt_mol` (see Handoff caveat) |
+| `prank predict` exits with no `pockets/` directory and no error | `prank.bat` returns immediately when run through a shell wrapper on Windows | Call the jar directly: `java -cp ".../bin/p2rank.jar;.../bin/lib/*" cz.siret.prank.program.Main predict ...` (see Binding Site Detection) |
 | Pose poses make no sense | Receptor and ligand in different frames | Ensure same coordinate origin |
 | Metal-coordination pose is wrong | The selected scoring/preparation protocol lacks a validated model for that metal geometry | Use a metal-specific validated workflow; the Vina executable can use AutoDock4Zn maps with `--scoring ad4` for zinc, while other metals require separately supported parameters/protocols |
 | GPU mode slow | Vina is CPU-only; only GNINA is GPU | Use GNINA for GPU; if using a third-party GPU port of Vina, benchmark it on the same hardware, target, library tranche, and search settings before adopting it |
-| `mk_prepare_receptor.py: command not found` | meeko's pip-installed console-script has no `.py` suffix | Call `mk_prepare_receptor` (no `.py`), as in the code above |
-| `ValueError: invalid literal for int() with base 10: '184A'` from `mk_prepare_receptor --read_pqr` | pdb2pqr's default `.pqr` output has no room for insertion-code residue numbers (e.g. chymotrypsin-numbered serine proteases); meeko's PQR reader can't parse them | Use `pdb2pqr --pdb-output` + `mk_prepare_receptor --read_pdb` instead of `--read_pqr` |
+| `mk_prepare_receptor.py: command not found` | meeko's pip-installed console-script has no `.py` suffix | Call `mk_prepare_receptor` (no `.py`), as `scripts/prepare_receptor.py` does |
+| `ValueError: invalid literal for int() with base 10: '184A'` from `mk_prepare_receptor --read_pqr` | Any residue with a PDB insertion code (e.g. chymotrypsin-numbered serine proteases such as trypsin, elastase): meeko's PQR reader assumes an all-integer residue-number column | Use `pdb2pqr --pdb-output` + `mk_prepare_receptor --read_pdb` instead of `--read_pqr` |
 | `pip install vina` fails with "Boost library location was not found" | No Windows wheel for the `vina` PyPI package | Use the Vina CLI via `subprocess` instead of `from vina import Vina` |
 
 ## References

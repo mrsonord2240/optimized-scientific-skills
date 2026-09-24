@@ -6,12 +6,7 @@
 
 ## Prerequisites
 
-```bash
-conda install -c conda-forge rdkit
-```
-
-RDKit provides USRCAT through `rdMolDescriptors`; no separate `usrcat` package is required for the documented workflow.
-ShaEP is a separate binary; verify the official current release and use its documented `-q`, positional input/output, `-s`, and `--output-file` syntax.
+Install notes are in `SKILL.md` (Version Compatibility).
 
 ## Quick Start
 
@@ -35,23 +30,7 @@ Tell the AI agent what to do:
 ### Conformer-aware shape search
 > "For each library compound, generate 20 conformers; find best-shape conformer match to query. Use Open3DAlign."
 
-## What the Agent Will Do
-
-1. Generate 3D conformers, verify embedding and MMFF coverage/convergence, and record failures.
-2. Compute shape descriptors (USRCAT) or align (Open3DAlign).
-3. Rank hits by shape Tanimoto / Open3DAlign score.
-4. Optionally compute Tanimoto-Combo (shape + color/pharmacophore).
-5. Output ranked list with shape score + ECFP4 similarity for diversity check.
-
-## Tips
-
-- Benchmark throughput on the actual conformer count, hardware, and library; published or vendor rates are not interchangeable.
-- ROCS TanimotoCombo is shape Tanimoto plus color Tanimoto (range 0-2), whereas RDKit O3A's raw score is unnormalized.
-- Use conformer ensembles sized from a convergence check; 20 conformers is a repository starting budget, not a universal minimum.
-- Calibrate the shape-high/ECFP4-low quadrant on a task-relevant reference set rather than applying universal 0.7/0.5 cutoffs.
-- ROCS TanimotoCombo ranges from 0 to 2; choose follow-up cutoffs from a query- and library-matched benchmark.
-- Validate with docking on top shape hits; not all shape matches dock well.
-- Open3DAlign mutates probe coordinates; preserve or copy the best-aligned conformer when coordinates are part of the output.
+The workflow, thresholds and failure modes are in `SKILL.md`.
 
 ## Related Skills
 

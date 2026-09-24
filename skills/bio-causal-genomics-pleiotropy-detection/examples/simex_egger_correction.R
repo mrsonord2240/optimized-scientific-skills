@@ -6,7 +6,9 @@
 ## inflates the intercept. SIMEX (Cook & Stefanski 1994 JASA 89:1314) re-fits
 ## Egger at simulated, amplified measurement-error levels and extrapolates
 ## back to zero error. Below I^2_GX 0.6, Egger should be dropped entirely
-## (MR-RAPS or CAUSE preferred). Between 0.6 and 0.9, SIMEX is the rescue.
+## (MR-RAPS or CAUSE preferred). Between 0.6 and 0.9, SIMEX is the rescue, but
+## its extrapolation is noisy in small samples and can land further from the truth
+## than the naive slope: report both slopes and compare against IVW / median / mode.
 
 library(simex)
 library(TwoSampleMR)

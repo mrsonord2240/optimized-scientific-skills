@@ -23,8 +23,15 @@ seb1 <- abs(rnorm(n_genome, 0.01, 0.002))
 
 n_sig <- 150
 sig_idx <- sample(1:n_genome, n_sig)
-beta_hat_1[sig_idx] <- rnorm(n_sig, 0, 0.05)
-seb1[sig_idx] <- 0.008
+# Effect magnitude and SE are fixed, not drawn from a distribution that straddles zero,
+# so every planted SNP actually clears the p<5e-8 pruning threshold below (min |z| = 0.035/0.006
+# = 5.83 > the ~5.45 two-sided z for p=5e-8): a version that instead drew beta_hat_1[sig_idx]
+# from rnorm(n_sig, 0, 0.05) with se 0.008 left many draws too close to zero to be significant,
+# only ~55-60 of the 150 survived pruning, and cause()'s in_sample_elpd_loo() crashed outright
+# ("non-numeric argument to binary operator") on the resulting <100-SNP fit rather than merely
+# returning the wide CIs the WARNING below describes.
+beta_hat_1[sig_idx] <- sample(c(-1, 1), n_sig, replace = TRUE) * runif(n_sig, 0.035, 0.07)
+seb1[sig_idx] <- 0.006
 
 true_gamma <- 0.3
 true_eta <- 0.4

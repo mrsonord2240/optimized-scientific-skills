@@ -8,15 +8,17 @@ with a full global TM-score at higher cost. E-values are not meaningful under ty
 '''
 # Reference: foldseek 8+ (checked on 10.941cd33) | Verify CLI flags if version differs
 
-import subprocess
 import csv
 import math
+import subprocess
+import sys
 
 def foldseek_search(query_pdb, database, output_m8, tmp_dir='tmp/', alignment_type=2, max_seqs=200):
     cmd = [
         'foldseek', 'easy-search', query_pdb, database, output_m8, tmp_dir,
         '--alignment-type', str(alignment_type),
         '--max-seqs', str(max_seqs),
+        '-v', '1',    # errors only: the default prints Foldseek's whole parameter table
         '--format-output', 'query,target,evalue,bits,alntmscore,qtmscore,ttmscore,lddt,alnlen,pident',
     ]
     subprocess.run(cmd, check=True)
@@ -45,8 +47,10 @@ def confident_hits(hits, alignment_type=2):
     return keep
 
 if __name__ == '__main__':
-    alignment_type, max_seqs = 2, 200
-    foldseek_search('query.pdb', '/path/to/afdb', 'result.m8', alignment_type=alignment_type, max_seqs=max_seqs)
+    # usage: python foldseek_search.py QUERY.pdb DATABASE [ALIGNMENT_TYPE]
+    query_pdb, database = sys.argv[1], sys.argv[2]
+    alignment_type, max_seqs = (int(sys.argv[3]) if len(sys.argv) > 3 else 2), 200
+    foldseek_search(query_pdb, database, 'result.m8', alignment_type=alignment_type, max_seqs=max_seqs)
     hits = parse_results('result.m8')
     if len(hits) >= max_seqs:
         print(f'Warning: {len(hits)} rows = the --max-seqs cap; the database has more hits. Raise max_seqs to count them all.')

@@ -32,8 +32,11 @@ except ImportError as e:
 # The perturbation/gene_target/replicate columns live on the joined mdata.obs, not on adata.obs
 # (adata = mdata.mod['rna'] only carries nCount_RNA/nFeature_RNA/percent.mito) -- pull them across first.
 mdata.push_obs(columns=['perturbation', 'gene_target', 'replicate'], mods=['rna'])
+# Memory: the default (unbatched, sparse) path grew past 20 GB on these 20,729 cells and was killed in an audit. Densify X and
+# pass batch_size: peak ~7 GB, ~2 min, KO/NP/NT counts within a few cells (checked pertpy 1.3.0). batch_size on sparse X raises ValueError.
+adata.X = adata.X.toarray()
 ms = pt.tl.Mixscape()
-ms.perturbation_signature(adata, pert_key='perturbation', control='NT', n_neighbors=20)
+ms.perturbation_signature(adata, pert_key='perturbation', control='NT', n_neighbors=20, batch_size=1000)
 ms.mixscape(adata, pert_key='gene_target', control='NT', layer='X_pert')   # pert_key renamed from labels
 # An all-NP target confounds no-phenotype with no-editing: report the perturbed fraction, do not call the gene dead
 print(adata.obs['mixscape_class_global'].value_counts())

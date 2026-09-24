@@ -67,8 +67,14 @@ def has_feature_types(query_features, target_mol, factory):
     return (not missing), missing
 
 
-def feature_family_prefilter(query_mol_list, library_smiles):
+def feature_family_prefilter(query_mol_list, library_smiles,
+                             min_shared_fraction=1.0):
     '''Prefilter by feature families before a distance-constrained 3D search.
+
+    min_shared_fraction (default 1.0 = strict): a library molecule passes when
+    it carries at least this fraction of the shared query feature types, so
+    0.8 tolerates a molecule that lacks 1 of 5 non-essential features. The
+    default keeps the strict all-features behaviour.
 
     Caution: this intersects feature-type sets across ALL supplied actives
     with no fallback. On a small or scaffold-diverse active set, the
@@ -94,14 +100,16 @@ def feature_family_prefilter(query_mol_list, library_smiles):
         mol = Chem.MolFromSmiles(smi)
         if mol is None:
             continue
-        is_match, missing = has_feature_types(list(common), mol, factory)
-        if is_match:
+        _, missing = has_feature_types(list(common), mol, factory)
+        n_shared = len(common) - len(missing)
+        if n_shared >= min_shared_fraction * len(common) - 1e-9:
             hits.append(smi)
         else:
             rejected_missing[smi] = sorted(missing)
 
     if rejected_missing:
-        print('Rejected (missing query feature types):')
+        print(f'Rejected (below min_shared_fraction={min_shared_fraction}; '
+              'missing query feature types):')
         for smi, missing in rejected_missing.items():
             print(f'  {smi}: missing {missing}')
 

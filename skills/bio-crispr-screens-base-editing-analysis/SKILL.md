@@ -9,10 +9,10 @@ author: GPTomics
 
 ## Version Compatibility
 
-Reference examples checked against CRISPResso2 2.3.4 (2026-09-16, Docker `pinellolab/crispresso2:latest`) and BE-Hive git HEAD (maxwshen/be_predict_bystander, 2026-09-16) real output -- the parsers below assume that output schema, not the file layouts described in older CRISPResso2 docs. Also tested with pandas 2.2+, biopython 1.83+, numpy 1.26+, scipy 1.12+, scikit-learn 1.4+; Broad be-validation-pipeline notebooks (repo HEAD).
+Reference examples checked against CRISPResso2 2.3.4 (2026-09-16, Docker `pinellolab/crispresso2:latest`) and BE-Hive git HEAD (maxwshen/be_predict_bystander, 2026-09-16) real output -- the parsers in this Skill assume that output schema, not the file layouts described in older CRISPResso2 docs. Also tested with pandas 2.2+, biopython 1.83+, numpy 1.26+, scipy 1.12+, scikit-learn 1.4+; Broad be-validation-pipeline notebooks (repo HEAD).
 
 Before using code patterns, verify installed versions match. If versions differ:
-- CLI: `CRISPResso --version`
+- CLI: `CRISPResso --version` (install: `conda install -c bioconda crispresso2`)
 - Python: `pip show CRISPResso2`; BE-Hive is a GitHub clone (maxwshen/be_predict_bystander), not a PyPI package
 
 If code throws ImportError, AttributeError, or TypeError, introspect the installed package and adapt the example to match the actual API rather than retrying.
@@ -23,45 +23,20 @@ If code throws ImportError, AttributeError, or TypeError, introspect the install
 
 - CLI: `CRISPResso --base_editor_output` for per-amplicon BE quantification
 - CLI: Broad `be-validation-pipeline` for end-to-end pooled-screen analysis with editing-efficiency filtering
-- Python: `BE-Hive` (Arbab 2020) for editing-efficiency prediction; clone maxwshen/be_predict_bystander and import via sys.path -- see worked example below
+- Python: `BE-Hive` (Arbab 2020) for editing-efficiency prediction; clone maxwshen/be_predict_bystander and import via sys.path -- see `references/be-hive-prediction.md`
 - Web: `BE-Designer` (Hwang 2018, RGEN Tools) for variant-encoding sgRNA design
 
-## BE-Hive Editing-Efficiency Prediction
+## Reference Files
 
-BE-Hive (`be_predict_bystander`) takes a fixed **50nt substrate**, not the bare 20nt spacer:
-19nt of upstream context + the 20nt spacer + the 3nt PAM + 8nt of downstream context
-(`-19..30` in the README's own numbering; spacer occupies substrate positions 1-20 of that
-window, PAM at 21-23). Getting the upstream-context length wrong by even 1nt silently
-shifts every predicted position by one base with no error -- checked on this Skill's own
-worked example, verified via BE-Hive's own `pred_df` diagnostic field.
+| Need | Read |
+| --- | --- |
+| Predict per-spacer editing efficiency / bystander outcomes with BE-Hive (50nt substrate) | `references/be-hive-prediction.md` |
+| Tile spacers across a protein region, annotate target vs bystander edits | `references/library-design.md` |
+| After the screen: filter sgRNAs by editing efficiency (>50% convention), attribute signal to target vs bystander, aggregate sgRNA scores to variants | `references/screen-analysis.md` |
+| Hanna 2021 / Cuella-Martin 2021 design and results | `references/published-screens.md` |
+| Post-process CRISPResso2 BE amplicon output with the Broad notebooks | `references/be-validation-pipeline.md` |
 
-```python
-import sys
-sys.path.append("/path/to/be_predict_bystander/..")  # parent dir of the cloned repo
-from be_predict_bystander import predict as bystander_model
-
-spacer = "TGATCACGTAGCATGCACGT"  # 20nt
-pam = "TGG"
-upstream_19nt = "ATGCATGGATCGTAGCTAG"    # 19nt of real genomic context immediately 5' of the spacer
-downstream_8nt = "CATGCTAG"              # 8nt of real genomic context immediately 3' of the PAM
-substrate = upstream_19nt + spacer + pam + downstream_8nt
-assert len(substrate) == 50
-
-bystander_model.init_model(base_editor="BE4", celltype="mES")  # celltype in {'mES','HEK293','U2OS',...}
-pred_df, stats = bystander_model.predict(substrate)
-
-# Always cross-check BE-Hive's own read-back against the intended spacer before trusting
-# pred_df's position-labeled columns (e.g. 'C4', 'C6') -- a wrong substrate length or
-# offset produces a plausible-looking but silently mis-positioned prediction.
-assert substrate[19:39] == spacer, "substrate/spacer offset is wrong -- check upstream context length"
-print(stats["Total predicted probability"])
-print(pred_df.sort_values("Predicted frequency", ascending=False).head(10))
-```
-
-Checked on BE-Hive git HEAD (maxwshen/be_predict_bystander, 2026-09-16) against a synthetic guide
-with a known target C at spacer position 5 and bystander C at spacer position 7: `pred_df`'s `C4`/`C6`
-columns (BE-Hive's own 0-indexed-from-position-4 editable-C naming) correctly identified both, and
-`Total predicted probability` was 0.97-0.98 (not a stub, not all-zero).
+Runnable code lives in `scripts/` (each has a header with inputs and a usage line; the reference files above show the invocation): `behive_predict.py`, `find_be_spacers.py`, `filter_by_editing_efficiency.py`, `deconvolute_bystander.py`, `aggregate_variant_scores.py`. `examples/base_editing_analysis.sh` has the CRISPResso2 CLI runs.
 
 ## Base Editor Chemistry Selection
 
@@ -97,213 +72,6 @@ PAM-distal end                                                            PAM-pr
 
 **Critical implication for variant interpretation:** If the intended edit is at position 5 and there is an additional editable C/A at position 7, both will be edited in the same molecule. The screen scores the *combination* of edits, not the intended one alone. This is bystander confounding.
 
-## sgRNA Library Design for BE Screens
-
-**Goal:** Tile editing-window-positioned spacers across a protein region of interest to enable variant scanning.
-
-**Approach:** For each amino acid in the target region, find NGG-adjacent spacers where the SNV-of-interest base falls in editing positions 4-8 with minimal bystander C/A in the same window. Annotate each spacer with the predicted amino acid changes (target + bystander).
-
-```python
-import pandas as pd
-import re
-from Bio.Seq import Seq
-
-def find_be_spacers(cds_sequence, cds_protein_start, target_aa, target_base='C', editor='BE4max'):
-    '''Find sgRNAs that place target_base in editor-specific window at target_aa.
-    Returns spacers with bystander annotation.
-
-    Args:
-        cds_sequence: nucleotide CDS (translated frame 1)
-        cds_protein_start: amino acid number of CDS start (usually 1)
-        target_aa: amino acid number to install variant (e.g., 130 for residue 130)
-        target_base: 'C' (CBE) or 'A' (ABE)
-        editor: 'BE3', 'BE4max', 'eA3A-BE3', 'ABE7.10', 'ABE8.20', 'ABE8e', 'evoCDA-BE'
-
-    Returns: DataFrame with spacer, position-in-cds, target-base-position-in-spacer,
-             bystander_positions, predicted_aa_changes
-    '''
-    # Editor-specific editing window (positions from PAM-distal end of spacer)
-    window_by_editor = {
-        'BE3': (4, 8),       'BE4max': (4, 8),    'eA3A-BE3': (5, 7),
-        'ABE7.10': (4, 7),   'ABE8.20': (4, 8),   'ABE8e': (4, 8),     # SpABE8e matches CBE window (Richter 2020)
-        'evoCDA-BE': (1, 9),
-    }
-    window_lo, window_hi = window_by_editor[editor]
-    aa_index = target_aa - cds_protein_start  # 0-indexed in protein
-    aa_start_nt = aa_index * 3                # nt offset in cds
-    candidates = []
-    spacer_len = 20
-    pam_pattern = re.compile(r'(?=([ACGT]GG))')
-    for strand, seq in [('+', cds_sequence), ('-', str(Seq(cds_sequence).reverse_complement()))]:
-        for pam_match in pam_pattern.finditer(seq):
-            pam_pos = pam_match.start()
-            spacer_start = pam_pos - spacer_len
-            if spacer_start < 0:
-                continue
-            spacer = seq[spacer_start:pam_pos]
-            # Editor-specific window from PAM-distal end (1-indexed)
-            # Find all editable bases in window
-            edit_bases_in_window = []
-            for i, b in enumerate(spacer[window_lo-1:window_hi], start=window_lo):
-                if b == target_base:
-                    edit_bases_in_window.append(i)
-            if not edit_bases_in_window:
-                continue
-            # Annotate which edits hit the target_aa codon
-            target_codon_start = aa_start_nt
-            target_codon_end = target_codon_start + 3
-            target_position_in_spacer = []
-            for i in edit_bases_in_window:
-                pos_in_seq = spacer_start + i - 1  # 0-indexed position within `seq` (strand-specific)
-                # For strand '-', `seq` is the reverse complement of cds_sequence; convert
-                # back to forward-CDS coordinates before comparing against target_codon_start/
-                # end, which are always forward-strand. Without this, reverse-strand spacers
-                # silently misattribute target vs bystander (verified: a hand-constructed
-                # reverse-strand case with a known on-target C was called "bystander" by the
-                # unconverted math, and the audit's own random-CDS run produced an on-target
-                # call 65nt from the true codon).
-                genomic_pos = (len(cds_sequence) - 1 - pos_in_seq) if strand == '-' else pos_in_seq
-                if target_codon_start <= genomic_pos < target_codon_end:
-                    target_position_in_spacer.append(i)
-            bystander_positions = [i for i in edit_bases_in_window if i not in target_position_in_spacer]
-            candidates.append({
-                'spacer': spacer,
-                'strand': strand,
-                'spacer_start': spacer_start,
-                'target_positions': target_position_in_spacer,
-                'bystander_positions': bystander_positions,
-                'n_bystanders': len(bystander_positions),
-            })
-    return pd.DataFrame(candidates).sort_values('n_bystanders')
-```
-
-**Decision rule:** Select spacers with target_positions != empty AND n_bystanders minimized. For variant-by-variant scanning, accept up to 1-2 bystanders if biology of those positions is interpretable; flag for downstream variant attribution.
-
-## Editing Efficiency Filtering (Critical Pre-Hit-Calling)
-
-**Goal:** Drop sgRNAs that do not edit efficiently, since unedited reads represent no biological perturbation.
-
-**Approach:** From CRISPResso2 output, compute target-base-conversion percentage per sgRNA; filter library to sgRNAs with >50% target editing in a pilot or co-screened control.
-
-```python
-def filter_by_editing_efficiency(crispresso_outputs_dir, target_pos, target_base, efficiency_threshold=0.5):
-    '''Drop sgRNAs that edit <efficiency_threshold of reads at target position.
-    crispresso_outputs_dir: directory containing CRISPResso per-sample outputs.
-    target_pos: 1-indexed position WITHIN THE QUANTIFICATION WINDOW, in column
-    order -- CRISPResso2 does not emit a literal "Position" column.'''
-    from pathlib import Path
-    results = []
-    for sample_dir in Path(crispresso_outputs_dir).glob('CRISPResso_on_*'):
-        sgrna_id = sample_dir.name.replace('CRISPResso_on_', '')
-        quant_file = sample_dir / 'Quantification_window_nucleotide_percentage_table.txt'
-        if not quant_file.exists():
-            continue
-        # Real CRISPResso2 2.3.4 file layout (verified against actual output, not
-        # assumed): rows are nucleotide identity (A/C/G/T/N/-, the index column);
-        # columns are one per window position, header-labeled with the REFERENCE
-        # base at that position (so headers repeat -- pandas suffixes duplicates
-        # .1/.2/... -- select columns positionally, not by label). Values are
-        # FRACTIONS in [0, 1], not 0-100, despite the filename.
-        df = pd.read_csv(quant_file, sep='\t', index_col=0)
-        # Schema check: fail loudly and specifically on drift instead of a bare
-        # KeyError deep in a groupby/indexing call.
-        if target_base not in df.index:
-            raise ValueError(f"target_base={target_base!r} not in table rows {list(df.index)} ({quant_file}); "
-                              "unexpected CRISPResso2 Quantification_window_nucleotide_percentage_table.txt schema")
-        if not (1 <= target_pos <= df.shape[1]):
-            raise ValueError(f"target_pos={target_pos} out of range for a {df.shape[1]}-position "
-                              f"quantification window in {quant_file}")
-        original_frac = df.loc[target_base].iloc[target_pos - 1]
-        editing_pct = 1 - original_frac
-        results.append({'sgrna_id': sgrna_id, 'editing_pct': editing_pct,
-                         'pass_filter': editing_pct >= efficiency_threshold})
-    return pd.DataFrame(results)
-```
-
-**Convention:** Drop sgRNAs below 50% editing for variant-function screens. A common working split is a 30% editing floor for primary screening and a 50% floor for confirmed hits. Below 30%, the screen has insufficient power; above 70%, results approach saturation editing.
-
-## Bystander Edit Attribution
-
-**Why this matters:** When a sgRNA's editing window contains the target base AND a bystander base, the screen scores the combination. To attribute screen signal to the target variant alone, either (a) include sgRNAs that edit only the target (no bystander) -- often impossible -- or (b) deconvolute via parallel measurements.
-
-**Strategies for variant-by-variant attribution:**
-
-1. **Tile multiple sgRNAs with different bystander patterns:** If 5 different sgRNAs all hit the target base but have different bystanders, common signal across them is target-attributable (Hanna 2021 approach).
-
-2. **Use orthogonal chemistry:** Run the same variant scan with prime editor (no bystanders); cross-validate. See [[prime-editing-screens]].
-
-3. **Bystander stratification:** From CRISPResso2 allele table, partition reads by exact edit pattern (target only, target+bystander_1, target+bystander_2, etc.); separately score each pattern's contribution to the phenotype.
-
-4. **Restrict library:** Use only sgRNAs with zero bystanders in the editing window (rare; may exclude most candidate spacers).
-
-```python
-def deconvolute_bystander(allele_table_path, target_pos, bystander_pos_list):
-    '''From CRISPResso2 allele table, partition reads by edit pattern at target + bystanders.
-    Returns: per-pattern frequency for each combination of target/bystander edits.'''
-    alleles = pd.read_csv(allele_table_path, sep='\t', compression='zip')
-    required_cols = {'Aligned_Sequence', 'Reference_Sequence', '%Reads'}
-    missing = required_cols - set(alleles.columns)
-    if missing:
-        raise ValueError(f"Unexpected Alleles_frequency_table schema: missing {missing}; "
-                          f"got columns {list(alleles.columns)}")
-    # Mark target_edited and per-bystander_edited
-    alleles['target_edited'] = alleles['Aligned_Sequence'].str[target_pos-1] != alleles['Reference_Sequence'].str[target_pos-1]
-    for bp in bystander_pos_list:
-        alleles[f'bystander_{bp}_edited'] = alleles['Aligned_Sequence'].str[bp-1] != alleles['Reference_Sequence'].str[bp-1]
-    # Real Alleles_frequency_table.zip has no 'Reference_pct' column -- the
-    # per-allele read-fraction column is '%Reads' (verified against actual
-    # CRISPResso2 2.3.4 output).
-    return alleles.groupby(['target_edited'] + [f'bystander_{bp}_edited' for bp in bystander_pos_list])['%Reads'].sum().reset_index()
-```
-
-## Hit Calling for Variant-Function Screens
-
-**Goal:** Score per-variant fitness from a base-editor screen.
-
-**Approach:** Filter library to efficiency-passing sgRNAs (>50% editing), then run MAGeCK MLE or drugZ on the sgRNA-level counts; map each significant sgRNA to its predicted variant + bystander pattern; aggregate to per-variant scores.
-
-```python
-def aggregate_variant_scores(mageck_sgrna_summary, variant_annotation_df):
-    '''Aggregate sgRNA-level scores to per-variant scores.
-    variant_annotation_df: per-sgRNA -> predicted variants (target + bystanders),
-    keyed on the same sgRNA-identifier column name as mageck_sgrna_summary.
-    MAGeCK's real sgrna_summary.txt column is lowercase 'sgrna' (not 'sgRNA') --
-    build variant_annotation_df with that same column name.'''
-    for _name, _frame in (('mageck_sgrna_summary', mageck_sgrna_summary), ('variant_annotation_df', variant_annotation_df)):
-        if 'sgrna' not in _frame.columns:
-            raise ValueError(f"{_name} is missing the 'sgrna' merge column (got {list(_frame.columns)})")
-    df = mageck_sgrna_summary.merge(variant_annotation_df, on='sgrna')
-    # Target-only contribution: sgRNAs with no bystanders
-    target_only = df[df['n_bystanders'] == 0]
-    target_only_scores = target_only.groupby('target_variant')['LFC'].agg(['mean', 'std', 'count'])
-    # Mixed signal: sgRNAs with bystanders
-    mixed = df[df['n_bystanders'] > 0]
-    return target_only_scores, mixed
-```
-
-## Hanna 2021 BRCA1/2 Variant-Function Screen Methodology
-
-**Hanna et al 2021 *Cell* 184:1064** benchmarked CBE variant scanning at scale, screening 68,526 sgRNAs covering 52,034 ClinVar variants across 3,584 genes, with BRCA1 and BRCA2 as the positive/negative-selection benchmark:
-
-1. Design the CBE library from predicted variant impact (ClinVar annotation), covering each variant with the sgRNAs that install it
-2. Run drug-modifier screens (PARPi sensitivity) with vehicle vs drug
-3. Score per variant by aggregating over all sgRNAs that install it; cross-check against bystander-controlled sgRNAs
-
-**Standard surrounding practice:** verify editing efficiency at a control timepoint via amplicon sequencing, drop low-efficiency sgRNAs (see the editing-efficiency convention above), and call sensitizers with a bidirectional method such as drugZ.
-
-**Quantified result:** Recovered known loss-of-function variants in BRCA1 and BRCA2 with high precision, and identified PARP1 variants conferring resistance to PARP inhibitors.
-
-## Cuella-Martin 2021 DDR-Gene Variant Screening
-
-**Cuella-Martin et al 2021 *Cell* 184:1081-1097** screened ~86 DNA-damage-response (DDR) genes (including BRCA1/2) with CBE saturation mutagenesis:
-
-- Saturation CBE design across 86 DDR genes (not BRCA1/2 alone)
-- Identified pathogenic/likely-pathogenic variants in critical protein domains
-- Combined with biochemical and genetic validation (for example the 53BP1-USP28 interaction surface)
-- Demonstrated saturation mutagenesis is feasible at protein-domain scale
-
-**Relationship to Hanna 2021:** the two studies appeared back-to-back in the same *Cell* issue and apply the same CBE variant-scanning strategy to complementary targets -- Hanna benchmarks against ClinVar-annotated variants genome-wide, Cuella-Martin saturates 86 DDR genes. Treat them as complementary methodology references, not as cross-validations of each other.
-
 ## Cas9 vs Base Editor vs Prime Editor for Variant Installation
 
 | Approach | What it does | Bystander | Indels | When to use |
@@ -317,29 +85,13 @@ def aggregate_variant_scores(mageck_sgrna_summary, variant_annotation_df):
 
 **Decision:** For C->T or A->G with available editing window: base editor is preferred (higher efficiency than PE). For other transitions/transversions, multi-base edits, or zero-bystander requirements: prime editor.
 
-## Broad be-validation-pipeline
+## Validation Strategy
 
-The Broad Institute's `be-validation-pipeline` (https://broadinstitute.github.io/be-validation-pipeline/) is a CRISPResso2 post-processing and validation toolkit for BE amplicon data -- a set of Jupyter notebooks, not a workflow-engine pipeline. Run CRISPResso2 first, then execute the notebooks in order:
-
-```bash
-git clone https://github.com/broadinstitute/be-validation-pipeline
-cd be-validation-pipeline
-pip install -r requirements.txt
-
-# Step 1: run CRISPResso2 in batch mode (or use the BEV tool on GPP LIMS).
-# The batch file is tab-delimited with columns: name, fastq_r1, amplicon_seq, guide_seq
-# (plus optional -w, -wc, --exclude_bp_from_left/right).
-docker run -v ${PWD}:/DATA -w /DATA -i pinellolab/crispresso2 \
-    CRISPRessoBatch --batch_settings batch_file.txt --skip_failed --base_edit
-
-# Step 2: run the notebooks in order against the CRISPResso2 output
-#   notebooks/01_BEV_allele_frequencies.ipynb
-#   notebooks/02_BEV_nucleotide_percentage_plots.ipynb
-#   notebooks/03_BEV_editing_efficiency.ipynb
-# Outputs: allele-frequency tables, nucleotide-percentage plots, editing-efficiency heat maps
-```
-
-The notebooks cover allele-frequency tabulation, nucleotide-level editing quantification and editing-efficiency summaries. Hit calling is NOT part of this toolkit -- score the screen separately with drugZ or MAGeCK.
+| Tier | Validation requirement |
+|------|-------------------------|
+| Tier 1 (high confidence) | BE + PE concordant at same variant + arrayed confirmation (convergent BE + PE is the gold standard for pathogenicity calls) |
+| Tier 2 (medium) | BE alone, multiple sgRNAs converge despite bystander differences |
+| Tier 3 (exploratory) | Single sgRNA hit; bystander confounded; not interpretable |
 
 ## Failure Modes
 
@@ -389,6 +141,8 @@ The notebooks cover allele-frequency tabulation, nucleotide-level editing quanti
 | Bystander rate (target attribution) | <10% acceptable; <5% ideal for clean attribution | Application-dependent |
 | Cell-line BE activity (pilot) | >30% editing at validated target | Below = wrong cell line for BE |
 | Per-amino-acid sgRNA density | 10-15 (saturation designs); 5-8 (smaller screens) | Tradeoff with library size |
+| Plasmid pool evenness | Gini <0.1 | Verify by sequencing the pool before packaging |
+| Lentiviral MOI | 0.3 | One integrant per cell |
 
 ## Common Errors
 

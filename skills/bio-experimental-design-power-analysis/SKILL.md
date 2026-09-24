@@ -16,6 +16,8 @@ Before using code patterns, verify installed versions match. If versions differ:
 
 If code throws an error, introspect the installed package and adapt to the actual API. Notes: `RNASeqPower::rnapower()` solves for whichever of `n` or `power` is omitted, and despite its name applies to any negative-binomial per-feature count assay, not only RNA-seq (its own vignette is titled "Sample Size for RNA-Seq and **similar** Studies") — see the ATAC/ChIP/methylation section below; PROPER is a multi-step pipeline (`RNAseq.SimOptions.2grp` -> `simRNAseq` -> `runSims` -> `comparePower`) whose `RNAseq.SimOptions.2grp` hard-codes `sim.seed = 11111` when `sim.seed` is not supplied, which is why repeated runs of the blocks below are byte-identical without an explicit `set.seed()`; pass `sim.seed = <n>` explicitly for a documented, intentional re-run. powsimR, if installed separately, is GitHub-only and its `estimateParam`/`Setup`/`simulateDE` signatures drift — pin a commit SHA for reproducible work. Verify each against the installed help before relying on argument names.
 
+**Parameter ranges (checked on RNASeqPower 1.46.0, pwr 1.3.0):** `alpha` and `power` must lie in (0, 1); `effect` is a positive fold change other than 1 (`0.5` gives the same result as `2`, so depletion needs no separate handling); `cv`, `depth` and `n` must be positive. `pwr.t.test` stops with an error on `power`/`sig.level` outside [0, 1], but `rnapower()` does not validate: `power = 1.2` returns `NaN` (with a warning), `power = 1` or `effect = 1` returns `Inf`, `alpha = 1.5` returns power 0.999 and `effect = 0` returns power 1 with no warning, and a negative `cv` is silently treated as positive. Check inputs before calling, and treat any `NaN`/`Inf`/implausible result as a bad input rather than a finding.
+
 # Power Analysis for Genomics Experiments
 
 **"How many replicates does my sequencing experiment need?"** -> Compute the probability of detecting a biologically meaningful effect given replicate number, sequencing depth, and biological variability — modeling counts as negative-binomial and recognizing that power is a per-gene quantity, not one number for the whole transcriptome.
@@ -53,14 +55,44 @@ Power in a sequencing experiment is not a single number. It is a per-gene quanti
 
 **Goal:** Get a fast, transparent power or replicate number for bulk RNA-seq from depth, biological CV, and fold change.
 
-**Approach:** Supply per-gene depth, biological coefficient of variation, the fold change to detect, and alpha; supply `n` to get power, or `power` to get the required `n`. Treat the result as a single-gene approximation and sanity-check against simulation.
+**Approach:** Supply per-gene depth, biological coefficient of variation, the fold change to detect, and alpha; supply `n` to get power, or `power` to get the required `n`. Use the checked wrapper below rather than calling `rnapower()` directly: RNASeqPower can return plausible numbers for invalid values. Treat the result as a single-gene approximation and sanity-check against simulation.
 
 ```r
 library(RNASeqPower)
+
+# Exactly one of n, power, or effect may be omitted for RNASeqPower to solve.
+# This wrapper intentionally accepts scalar prospective-design inputs only.
+validate_rnapower_inputs <- function(depth, cv, effect = NULL, alpha = 0.05,
+                                     n = NULL, power = NULL) {
+  check_scalar <- function(x, name, predicate, rule) {
+    if (length(x) != 1L || !is.finite(x) || !predicate(x)) {
+      stop(sprintf("%s must be one finite scalar %s", name, rule), call. = FALSE)
+    }
+  }
+  check_scalar(depth, "depth", function(x) x > 0, "> 0")
+  check_scalar(cv, "cv", function(x) x > 0, "> 0")
+  check_scalar(alpha, "alpha", function(x) x > 0 && x < 1, "in (0, 1)")
+  if (!is.null(n)) check_scalar(n, "n", function(x) x > 0, "> 0")
+  if (!is.null(power)) check_scalar(power, "power", function(x) x > 0 && x < 1, "in (0, 1)")
+  if (!is.null(effect)) check_scalar(effect, "effect", function(x) x > 0 && x != 1, "> 0 and != 1")
+  if (sum(vapply(list(n, power, effect), is.null, logical(1))) != 1L) {
+    stop("Provide exactly two of n, power, and effect; RNASeqPower solves the omitted quantity.", call. = FALSE)
+  }
+  invisible(TRUE)
+}
+
+checked_rnapower <- function(depth, cv, effect = NULL, alpha = 0.05,
+                             n = NULL, power = NULL) {
+  validate_rnapower_inputs(depth, cv, effect, alpha, n, power)
+  args <- Filter(Negate(is.null), list(depth = depth, n = n, cv = cv,
+                                        effect = effect, alpha = alpha, power = power))
+  do.call(RNASeqPower::rnapower, args)
+}
+
 # depth = per-gene coverage (see "Depth Units" below, NOT total library size);
 # cv = biological coefficient of variation; effect = fold change
-rnapower(depth = 20, n = 5, cv = 0.4, effect = 2, alpha = 0.05)          # solves for POWER
-rnapower(depth = 20, cv = 0.4, effect = 2, alpha = 0.05, power = 0.80)   # solves for n per group
+checked_rnapower(depth = 20, n = 5, cv = 0.4, effect = 2, alpha = 0.05)          # solves for POWER
+checked_rnapower(depth = 20, cv = 0.4, effect = 2, alpha = 0.05, power = 0.80)   # solves for n per group
 ```
 
 ## Depth Units -- Converting a Real Read Budget to `depth`
@@ -74,8 +106,8 @@ library(RNASeqPower)
 reads_millions <- 20                       # e.g. 20M mapped reads/sample
 depth_conservative <- 0.1 * reads_millions # majority-of-targets floor, per the package vignette
 cat('20M reads/sample -> depth ~=', depth_conservative, '(conservative, per Hart 2013)\n')
-rnapower(depth = depth_conservative, n = 14, cv = 0.3, effect = 1.5, alpha = 0.05)  # power at that budget
-rnapower(depth = 20, n = 14, cv = 0.3, effect = 1.5, alpha = 0.05)                  # same n at the deeper depth=20 example
+checked_rnapower(depth = depth_conservative, n = 14, cv = 0.3, effect = 1.5, alpha = 0.05)  # power at that budget
+checked_rnapower(depth = 20, n = 14, cv = 0.3, effect = 1.5, alpha = 0.05)                  # same n at the deeper depth=20 example
 ```
 At `n = 14, cv = 0.3, effect = 1.5`, the conservative `depth = 2` (20M reads) gives power ~0.29 versus ~0.82 at `depth = 20` — the same replicate count can look adequate or badly underpowered depending on which `depth` was silently assumed, which is why the conversion has to be explicit rather than reusing the vignette's example value.
 
@@ -83,39 +115,49 @@ At `n = 14, cv = 0.3, effect = 1.5`, the conservative `depth = 2` (20M reads) gi
 
 **Goal:** Estimate marginal power and the true realized FDR across the whole expression distribution, accounting for the mean-dispersion trend.
 
-**Approach:** Build (or fit from pilot) a simulation model of counts with a realistic dispersion-mean relationship and DE-effect distribution, simulate many datasets at each candidate sample size, run the intended DE test, and read the average power at the target FDR.
+**Approach:** Build (or fit from pilot) a simulation model of counts with a realistic dispersion-mean relationship and DE-effect distribution, simulate many datasets at each candidate sample size, run the intended DE test, and inspect both marginal power **and Actual FDR**. A nominal alpha is only the requested threshold: do not report or select a candidate unless its realized FDR is at or below the pre-specified target (plus an explicitly pre-specified Monte Carlo tolerance). `NaN` Actual FDR is a failed candidate, not a zero FDR.
 
 ```r
 library(PROPER)
+assess_realized_fdr <- function(summary_table, target_fdr = 0.05, tolerance = 0) {
+  required <- c("Actual FDR", "Marginal power")
+  if (!all(required %in% colnames(summary_table))) {
+    stop("summaryPower output is missing Actual FDR or Marginal power.", call. = FALSE)
+  }
+  actual <- as.numeric(summary_table[, "Actual FDR"])
+  out <- data.frame(
+    replicates_per_group = if ("SS1" %in% colnames(summary_table)) summary_table[, "SS1"] else seq_along(actual),
+    actual_fdr = actual,
+    marginal_power = as.numeric(summary_table[, "Marginal power"]),
+    accepted = is.finite(actual) & actual <= target_fdr + tolerance
+  )
+  out$decision <- ifelse(out$accepted, "ACCEPT", "REJECT")
+  out
+}
 sim_opts <- RNAseq.SimOptions.2grp(ngenes = 20000, p.DE = 0.05,
-                                   lOD = 'cheung', lBaselineExpr = 'cheung')  # empirical dispersion/expr priors
+                                    lOD = 'cheung', lBaselineExpr = 'cheung')  # empirical dispersion/expr priors
 sims <- runSims(Nreps = c(3, 5, 8, 12), sim.opts = sim_opts, nsims = 50,
                 DEmethod = 'edgeR')
 powr <- comparePower(sims, alpha.type = 'fdr', alpha.nominal = 0.05,
                      stratify.by = 'expr', delta = log(1.5))          # delta is NATURAL-log lfc in PROPER; marginal power by expression stratum
-summaryPower(powr)
-plotPower(powr)   # the grant-ready power curve (per-Nreps marginal power at the target FDR)
+fdr_gate <- assess_realized_fdr(summaryPower(powr), target_fdr = 0.05, tolerance = 0)
+print(fdr_gate)
+if (!all(fdr_gate$accepted)) {
+  message("REJECTED: do not report or select power for failed candidates. Increase nsims, then refit the pilot dispersion/effect model or revise the DE method before trying again.")
+} else {
+  plotPower(powr) # grant-ready curve only after every shown candidate passes the realized-FDR gate
+}
 ```
 
 ## scRNA-seq Power -- Pseudobulk on Donors, Not Cells
 
 **Goal:** Size a scRNA-seq cross-condition DE study by the quantity that actually sets population power: number of donors, not number of cells.
 
-**Approach:** powsimR is the tool most often named for this, but it is GitHub-only with a compile-required dependency (`bayNorm`) and is not required — population DE power is a donor-level NB power problem, so aggregating (summing) counts per donor into a pseudobulk matrix and running the same edgeR machinery already used elsewhere in this Skill answers it directly, with `n` = number of donors. `examples/scrna_pseudobulk_power.R` runs a full donor x cell simulation end-to-end (edgeR 4.4.2, verified 2026-09-17) and contrasts pseudobulk power against the anti-pattern of testing cells as if they were independent replicates:
+**Approach:** powsimR is the tool most often named for this, but it is GitHub-only with a compile-required dependency (`bayNorm`) and is not required — population DE power is a donor-level NB power problem, so aggregating (summing) counts per donor into a pseudobulk matrix and running the same edgeR machinery already used elsewhere in this Skill answers it directly, with `n` = number of donors. `examples/scrna_pseudobulk_power.R` runs a full donor x cell simulation end-to-end (edgeR 4.4.2, verified 2026-09-17) and contrasts pseudobulk power against the anti-pattern of testing cells as if they were independent replicates.
 
-```r
-suppressPackageStartupMessages(library(edgeR))
-# pb_counts: genes x donors, each column = summed counts across that donor's cells
-y <- DGEList(counts = pb_counts, group = donor_group)   # donor_group: 0/1 per donor, length = n_donors
-y <- y[filterByExpr(y), , keep.lib.sizes = FALSE]
-y <- calcNormFactors(y)
-design <- model.matrix(~donor_group)
-y <- estimateDisp(y, design)
-fit <- glmQLFit(y, design)
-qlf <- glmQLFTest(fit, coef = 2)
-padj <- p.adjust(qlf$table$PValue, 'BH')   # power/FDR read off against the known-DE gene set
-```
-Run `Rscript examples/scrna_pseudobulk_power.R` for the full sweep: at 4 donors/group, pseudobulk power stays near 0 regardless of cells per donor (200 vs. 50 makes no difference), while naive cell-level testing looks strong (power > 0.8) at a realized FDR near 0.9 — nine in ten "discoveries" false, because cells are pseudoreplicates, not biological replicates. More donors (not more cells) is the only fix; a quick closed-form cross-check on the pseudobulk matrix (`RNASeqPower::rnapower(depth = <post-aggregation depth>, n = <n_donors>, ...)`) applies exactly as in the bulk case once counts are aggregated.
+The pseudobulk step itself is `DGEList` on the donor-summed matrix (genes x donors, one column per donor) -> `filterByExpr` -> `calcNormFactors` -> `estimateDisp` -> `glmQLFit`/`glmQLFTest`, then BH-adjusted p-values read against the known-DE gene set; the full code is in `examples/scrna_pseudobulk_power.R`. Apply the same realized-FDR gate to each donor-count configuration: a power estimate from a configuration with non-finite or above-target realized FDR is **rejected**, not a candidate design.
+
+Run `Rscript examples/scrna_pseudobulk_power.R` for the full sweep: at 4 donors/group, pseudobulk power stays near 0 regardless of cells per donor (200 vs. 50 makes no difference), while naive cell-level testing looks strong (power > 0.8) at a realized FDR near 0.9 — nine in ten "discoveries" false, because cells are pseudoreplicates, not biological replicates. More donors (not more cells) is the only fix; after that, accept only donor-count configurations whose pseudobulk realized FDR passes the pre-specified gate. A quick closed-form cross-check on the pseudobulk matrix (`checked_rnapower(depth = <post-aggregation depth>, n = <n_donors>, ...)`) applies exactly as in the bulk case once counts are aggregated.
 
 ## ATAC-seq / ChIP-seq / Methylation Power -- Same NB Machinery, Per-Region Counts
 
@@ -126,7 +168,7 @@ Run `Rscript examples/scrna_pseudobulk_power.R` for the full sweep: at 4 donors/
 ```r
 library(RNASeqPower)
 # Same call as bulk RNA-seq; depth/cv now describe per-peak or per-CpG coverage and variability.
-rnapower(depth = 10, n = 6, cv = 0.5, effect = 1.5, alpha = 0.05)   # per-region power, e.g. ATAC peak
+checked_rnapower(depth = 10, n = 6, cv = 0.5, effect = 1.5, alpha = 0.05)   # per-region power, e.g. ATAC peak
 ```
 For marginal (genome-wide) power across all regions rather than one region, reuse the PROPER simulation block above verbatim with region counts in place of gene counts and an appropriate `lOD`/`lBaselineExpr` fit from pilot data (the built-in `'cheung'` priors are RNA-seq-derived and are a rough stand-in only; a pilot-based mean-dispersion fit is preferred when available).
 
@@ -236,8 +278,8 @@ These are starting points, not substitutes for a pilot estimate; real dispersion
 | Pushback | Response |
 |----------|----------|
 | "Where did the CV come from?" | estimated from pilot dispersions (DESeq2); literature value used only as a conservative cross-check |
-| "Why simulation rather than a formula?" | count power is per-gene; simulation captures the mean-dispersion trend and reports marginal power at the target FDR |
-| "Is the study powered?" | marginal power >= 0.8 at FDR 0.05 for the minimum meaningful fold change; power curve provided |
+| "Why simulation rather than a formula?" | count power is per-gene; simulation captures the mean-dispersion trend, but its Actual FDR gate must pass before marginal power is usable |
+| "Is the study powered?" | only if realized FDR is at or below the pre-specified target (plus stated tolerance) and marginal power >= 0.8 for the minimum meaningful fold change |
 | "Why not just sequence deeper?" | depth saturates ~10-20M reads (Liu 2014); replicates added instead |
 | "Did you correct for testing 4000 proteins at once?" | yes — Bonferroni/BH-corrected `sig.level`, not the raw per-protein 0.05; both n's reported so they are never confused |
 | "Observed power of the null?" | observed power is uninformative (Hoenig-Heisey); CI on the effect reported instead |

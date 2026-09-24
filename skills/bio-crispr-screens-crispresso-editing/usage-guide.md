@@ -6,19 +6,7 @@ Decision-grade quantification of CRISPR editing outcomes with CRISPResso2 across
 
 ## Prerequisites
 
-```bash
-conda install -c bioconda crispresso2   # primary tool; not on PyPI
-# Visualization helpers
-pip install pandas matplotlib seaborn
-```
-
-Required inputs:
-- FASTQ files (paired-end recommended, single-end accepted)
-- Amplicon reference sequence (primer-trimmed; do NOT include primer regions)
-- Guide protospacer sequence (20 nt; PAM not included)
-- For HDR: expected edited amplicon sequence
-- For BE: target nucleotide conversion direction (C->T for CBE; A->G for ABE)
-- For PE: pegRNA spacer + extension (RTT+PBS) + scaffold sequences
+Install and required inputs are in SKILL.md (Version Compatibility).
 
 ## Quick Start
 
@@ -65,64 +53,6 @@ Tell the AI agent what to analyze:
 > "My CRISPResso alignment rate is 38%. Diagnose: wrong amplicon sequence, primer-dimer contamination, low-quality FASTQ, or strand orientation issue?"
 
 > "Allele table shows a -7 bp deletion in 35% of reads at the cut site. Distinguish MMEJ-mediated repair from random NHEJ; recommend follow-up validation."
-
-## What the Agent Will Do
-
-1. Identify experimental design: nuclease vs base editor vs prime editor; single vs multi-sample vs pooled
-2. Pick the correct CRISPResso mode from the decision tree
-3. Verify amplicon sequence is primer-trimmed (primers excluded)
-4. Verify guide sequence matches amplicon orientation
-5. Set quantification window: size 1 for precision Cas9 (default); size 10 for base editor coverage; widened for prime editor template
-6. For BE: set `--conversion_nuc_from`/`--conversion_nuc_to` per chemistry
-7. For PE: include pegRNA spacer + extension + scaffold parameters
-8. Run with `--min_average_read_quality 30` for stringent quality filtering
-9. Verify mapping rate >85%; if not, diagnose amplicon sequence / contamination
-10. For `CRISPRessoPooled`: check `SAMPLES_QUANTIFICATION_SUMMARY.txt` for `NA` rows -- the default `--min_reads_to_use_region` (1000) silently skips any amplicon with fewer aligned reads and still exits 0; lower it for pilot/validation-scale pools
-11. Parse output: editing quantification, allele-frequency table, per-position nucleotide table
-12. For BE: report target conversion + bystander rate separately; check substitution-vs-indel ratio
-13. For PE: report intended-edit / scaffold-incorporation / indel %
-14. Detect MMEJ patterns in allele table (recurring same-size deletions)
-15. Output editing-efficiency summary, allele-table flagged hits, recommended follow-up validation
-
-## Tips
-
-- The single most common silent failure is including primers in `--amplicon_seq`. CRISPResso aligns reads to the amplicon; if primers are included, the alignment region differs from the sequenced region. Always trim primers from the amplicon parameter.
-- Quantification window size 1 (Cas9) vs 10 (BE) vs wider (PE) is not optional. Mis-sized windows under- or over-count edits; consult the CRISPResso2 paper (Clement 2019) for canonical settings.
-- BE samples showing high indel rates (>5%) usually indicate Cas9 / nCas9 expression mismatch; the substitution-vs-indel ratio is the key diagnostic. A ratio <3 = use Cas9-like analysis; >10 = clean BE.
-- For BE variant-function screens, always report target-conversion AND bystander rates per position. Bystander edits are not noise -- they are real edits at adjacent bases that may have biological consequences.
-- Pooled-amplicon mode (`CRISPRessoPooled`) silently misassigns reads when amplicons share primer regions. Always design pooled amplicons with ≥3 bp distinguishing flanks.
-- `CRISPRessoPooled`'s `--min_reads_to_use_region` defaults to 1000; a pilot/validation-scale pool (hundreds of reads/amplicon) exits 0 with every field `NA` unless you lower it. Always check `SAMPLES_QUANTIFICATION_SUMMARY.txt` for `NA` before trusting the run.
-- For prime editor screens, scaffold incorporation indicates RTT design failure. Re-derive pegRNA with PRIDICT2 (see [[prime-editing-screens]]).
-- Allele tables reveal MMEJ patterns: look for recurring deletions of specific sizes (e.g., 7 bp, 14 bp) at the cut site that share microhomology at junctions. These deletions are biologically distinct from random NHEJ and may have different functional consequences.
-- For WGS off-target analysis, supply both the matched-tumor BAM and GUIDE-seq / CIRCLE-seq predicted sites; randomly chosen regions yield no useful comparison.
-
-## Mode Decision Cheat Sheet
-
-| Design | Mode | Key flags |
-|--------|------|-----------|
-| Single amplicon | `CRISPResso` | `--amplicon_seq --guide_seq` |
-| Same amplicon, many samples | `CRISPRessoBatch` | `--batch_settings` |
-| Many amplicons in pool | `CRISPRessoPooled` | `--amplicons_file` |
-| Off-target from BAM | `CRISPRessoWGS` | `--bam_file --reference_file --region_file` |
-| Compare two runs | `CRISPRessoCompare` | two positional output folders |
-| HDR | Add `--expected_hdr_amplicon_seq` to CRISPResso | |
-| CBE | Add `--base_editor_output --conversion_nuc_from C --conversion_nuc_to T` | |
-| ABE | Add `--base_editor_output --conversion_nuc_from A --conversion_nuc_to G` | |
-| Prime editor | Add `--prime_editing_pegRNA_*` | |
-
-## Thresholds
-
-| Threshold | Value | Rationale |
-|-----------|-------|-----------|
-| Functional Cas9 KO | >70% indels | Below this, KO incomplete |
-| Clean BE indel byproduct | <5% | Above this = Cas9-like activity |
-| Substitution-vs-indel ratio (BE) | >10 = clean BE; <3 = Cas9 contamination | Diagnostic for BE purity |
-| Target conversion (BE) | >30% for screen power | Variable by target site and chemistry |
-| Intended-edit (PE) | >5% per-edit; >20% at favorable sites | Field convention |
-| Scaffold incorporation (PE) | <2% | Above = RTT design issue |
-| Mapping rate | >85% | Below indicates amplicon design issue |
-| Read quality | Phred 30 minimum | Q30 Illumina standard |
-| Read depth per sample | 1,000+ for reliable allele table | Higher for low-frequency variants |
 
 ## Related Skills
 

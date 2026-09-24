@@ -68,14 +68,28 @@ The most integrative metric (% MS2 identified / ID count) is the first alarm but
 | MaxQuant `txt/` folder, want fast multi-metric report | PTXQC `createReport(txt_folder=...)` | Scores Level-2/3 metrics vs a representative file; writes the PDF + mzQC + heatmap + YAML with no extra dependency, and an HTML report ONLY when Pandoc is reachable |
 | One run per condition (no replicates) | Report which checks could NOT run: replicate r, CV and the within-group loading rule all need >=2 samples per group | An empty correlation table and a NaN CV mean "not measured", never "clean" |
 | Protein-count drop, cause unknown | Descend to Level 1: read TIC + injection time + RT/FWHM together | Co-readouts localize spray vs column vs sample |
-| Replicate correlation low for one sample | Check if it correlates better with a DIFFERENT group | Distinguishes sample swap from prep failure |
+| Replicate correlation low for one sample | `cross_group_correlation` (`references/matrix-metrics.md`): does it correlate better with a DIFFERENT group? | Distinguishes sample swap from prep failure |
 | Boxplots flat but a sample feels wrong | Re-plot the RAW (un-normalized) matrix | Normalization erased the loading evidence |
-| Deciding how to impute | Diagnose MNAR (left tail) vs MCAR (all-abundance) from the histogram FIRST | Wrong imputer corrupts present/absent calls |
+| Deciding how to impute | Diagnose MNAR (left tail) vs MCAR (all-abundance) from the histogram FIRST (`references/matrix-metrics.md`) | Wrong imputer corrupts present/absent calls |
+| Replicate r, CV or completeness numbers needed | `references/matrix-metrics.md` | log2 r, linear-scale CV and the completeness filter, with `status` columns for degenerate designs |
+| PCA dominated by one axis, batch suspected, or a sample may be excluded | `references/pca-batch.md` | Batch test, confounding rule, and the stop-and-ask conditions before any exclusion |
 | TMT data, channel looks off | Within-plex channel totals on raw reporter intensities (code below); MSstatsTMT `dataProcessPlotsTMT` only after `proteinSummarization(..., global_norm = FALSE, reference_norm = FALSE)` | The MSstatsTMT default (`global_norm = TRUE`) equalizes channel medians, so its QC plot hides imbalance; it also needs PSM-level input |
 | DIA matrix, how many proteins are real | Filter Global.Q.Value and Global.PG.Q.Value, route q internals to dia-analysis | Precursor q != protein q; both needed |
+| DIA-NN report, want RT fit and peak width per run | `references/diann-level1.md` | Level-1 metrics from columns the report already carries |
 | Long sample queue, drift suspected | Interspersed QC every 4th-5th injection + Levey-Jennings | Turns one check into a time series |
 
 Default when uncertain: plot the RAW per-sample boxplots, ID counts, total signal, and missing fraction first; remove loading/injection failures and contaminants; only then normalize, re-plot, and proceed to correlation/CV/PCA on the survivors.
+
+## Reference Files
+
+| File | Read when |
+|------|-----------|
+| `references/matrix-metrics.md` | Replicate correlation, sample-swap check (`cross_group_correlation`), linear-scale CV, MNAR/MCAR missingness, completeness filter |
+| `references/pca-batch.md` | PCA and batch test (`pca_batch_check`), a batch confounded with condition, and the stop-and-ask conditions before excluding samples |
+| `references/diann-level1.md` | RT-fit and FWHM per run from a DIA-NN report (`diann_level1`) |
+| `references/qc-report-template.md` | Writing up the QC result: exclusion log, with/without table |
+
+Code lives in `scripts/` (run from the Skill folder, or `sys.path.insert(0, "scripts")` and import): `raw_qc.py` (raw per-sample QC, contaminant strip), `matrix_metrics.py`, `pca_batch.py`, `diann_level1.py`. Each has a CLI and a header saying inputs and usage.
 
 ## Inspect Raw Signal and Remove Contaminants Before Normalizing
 
@@ -86,183 +100,16 @@ Default when uncertain: plot the RAW per-sample boxplots, ID counts, total signa
 Which column is un-normalized: MaxQuant `Intensity <sample>` (`LFQ intensity <sample>` is already MaxLFQ-normalized and hides a 3x-low load); DIA-NN `Precursor.Quantity` (not `Precursor.Normalised` or `PG.MaxLFQ`); TMT raw reporter intensities before any channel/global normalization. Search engines write missing values as 0 (MaxQuant intensities, DIA-NN `PG.MaxLFQ`), so convert 0 to NaN before counting IDs or missingness.
 
 ```python
-import pandas as pd
-import numpy as np
-
-contaminant_flags = ['Potential contaminant', 'Reverse', 'Only identified by site']
-
-def strip_contaminant_rows(protein_groups):
-    keep = pd.Series(True, index=protein_groups.index)
-    for col in contaminant_flags:
-        match = next((c for c in protein_groups.columns if c.lower() == col.lower()), None)  # MaxQuant casing varies by version -- match case-insensitively
-        if match is not None:
-            keep &= protein_groups[match].fillna('') != '+'  # MaxQuant marks flagged rows with a literal '+'
-    return protein_groups[keep]
-
-def raw_sample_qc(raw_intensities, sample_groups):
-    raw = raw_intensities.replace(0, np.nan)  # MaxQuant/DIA-NN write missing as 0; zeros are NOT quantified
-    qc = pd.DataFrame({
-        'n_quantified': raw.notna().sum(),
-        'total_signal': raw.sum(),
-        'median_intensity': raw.median(),
-        'missing_pct': 100 * raw.isna().sum() / len(raw)})
-    group = sample_groups.reindex(qc.index)
-    sizes = group.value_counts()
-    singletons = sorted(sizes[sizes < 2].index.astype(str))
-    if singletons:
-        # A group of one IS its own median: fold and ids would be exactly 1.000 and the flag
-        # could never fire. Say so and fall back to the all-sample baseline for those samples.
-        print(f'WARNING: single-sample group(s) {singletons}: the within-group loading rule cannot '
-              'fire there, so those samples are compared to the ALL-sample median instead. A loading '
-              'difference that tracks condition is NOT detectable in a design with no replicates.')
-        baseline = group.where(group.map(sizes) >= 2, 'ALL')
-    else:
-        baseline = group
-    qc['baseline'] = baseline
-    qc['fold_total_vs_group'] = qc['total_signal'] / qc.groupby(baseline)['total_signal'].transform('median')
-    qc['ids_vs_group'] = qc['n_quantified'] / qc.groupby(baseline)['n_quantified'].transform('median')
-    qc['flag'] = (qc['fold_total_vs_group'] <= 0.5) | (qc['ids_vs_group'] < 0.8)  # >=2x low total, or >20% fewer IDs
-    return qc
-
-def contaminant_fraction(protein_groups, intensity_cols, flag_col='Potential contaminant'):
-    flagged = protein_groups[flag_col].fillna('') == '+'
-    raw = protein_groups[intensity_cols].replace(0, np.nan)
-    return 100 * raw[flagged].sum() / raw.sum()  # percent of summed raw intensity, per sample
+import sys; sys.path.insert(0, "scripts")
+from raw_qc import strip_contaminant_rows, raw_sample_qc, contaminant_fraction  # scripts/raw_qc.py
+qc = raw_sample_qc(raw_intensities, sample_groups)  # or: python scripts/raw_qc.py proteinGroups.txt sample_annotation.csv
 ```
 
 Read the boxplots before normalizing, but apply the loading rule to TOTAL raw signal and ID count, not the boxplot median: a sample with total signal >=2x below its group median, or an ID count more than 15-20% below it, is a loading/injection failure to exclude, not to rescale. Left-censoring removes a low-loaded sample's weakest values, so its median looks less shifted than it is (synthetic test: 0.41x total but 0.62x median). Judge the contaminant fraction against the lab's own baseline for that sample type and check whether it differs between groups; there is no universal cutoff (PTXQC's 1% threshold belongs to its user-defined special-contaminant plot, not the general contaminant score). Keratin and trypsin autolysis dominate LOW-INPUT samples (single-cell, IPs, gel bands) because they are a roughly fixed absolute amount whose fractional share explodes as load shrinks.
 
-With ONE run per condition the within-group form of this rule is inert -- every sample is its own group median, so `fold_total_vs_group` is exactly 1.0 and nothing can flag. The function above falls back to the all-sample median and prints a warning; report that fallback, and report that a loading difference which tracks condition is not separable from biology in that design.
+Record every sample this rule flags, and every one you keep despite a flag, in the exclusion log (`references/qc-report-template.md`): the metric and value, the threshold, the decision, and who approved it.
 
-## Replicate Correlation on log2
-
-**Goal:** Quantify reproducibility without letting a few abundant proteins fake agreement.
-
-**Approach:** Correlate on log2 intensities (variance-stabilized, high-abundance tail compressed), report within-group pairs, and flag a sample correlating better with another group as a possible swap.
-
-```python
-from itertools import combinations
-
-def replicate_correlation(log2_intensities, sample_groups):
-    # DESIGN REQUIREMENT: >=2 samples in at least one group. Without it this silently returned
-    # an empty table, which reads like "no reproducibility problem" when it means "not measured".
-    sizes = sample_groups.value_counts()
-    if (sizes >= 2).sum() == 0:
-        raise ValueError(f'replicate_correlation needs >=2 samples in a group; sizes are '
-                         f'{sizes.to_dict()}. With one run per condition there is no replicate '
-                         'reproducibility to measure -- do not report "no outliers found".')
-    unchecked = sorted(sizes[sizes < 2].index.astype(str))
-    if unchecked:
-        print(f'WARNING: no within-group pairs for {unchecked}; those samples are UNCHECKED here.')
-    corr = log2_intensities.corr(method='pearson')  # log2 first: Pearson on raw is a high-abundance artifact
-    rows = []
-    for group in sample_groups.unique():
-        members = sample_groups[sample_groups == group].index
-        for s1, s2 in combinations(members, 2):
-            rows.append({'group': group, 's1': s1, 's2': s2, 'r': corr.loc[s1, s2]})
-    return pd.DataFrame(rows)
-```
-
-Technical replicates r > 0.98 (instrument noise only); biological r ~ 0.90-0.98 (genuine variance, lower is expected and correct); soft floor r > 0.8 to retain a biological replicate. A Spearman check is a robustness aid only -- ranks discard the magnitude that quant QC cares about.
-
-## Coefficient of Variation on the Linear Scale
-
-**Goal:** Summarize per-condition precision with a number that means what it says.
-
-**Approach:** Compute CV = SD/mean on LINEAR (non-log) intensities; if only logged values exist use the geometric-CV formula. Report the median CV per condition (the per-protein distribution is right-skewed).
-
-```python
-def median_cv_linear(linear_intensities, sample_groups):
-    # DESIGN REQUIREMENT: >=2 samples per group. A one-sample group yields NaN, and a table of
-    # NaNs is not "excellent precision" -- fail loudly instead of returning it.
-    sizes = sample_groups.value_counts()
-    if (sizes >= 2).sum() == 0:
-        raise ValueError(f'median_cv_linear needs >=2 samples in a group; sizes are {sizes.to_dict()}. '
-                         'CV is undefined with no replicates -- report "not measurable", not NaN.')
-    rows = []
-    for group in sample_groups.unique():
-        members = sample_groups[sample_groups == group].index
-        if len(members) < 2:
-            print(f'WARNING: group {group!r} has {len(members)} sample(s); its CV is NaN (undefined), not low.')
-        block = linear_intensities[members]
-        per_protein_cv = block.std(axis=1) / block.mean(axis=1)  # base CV formula REQUIRES linear scale
-        rows.append({'group': group, 'median_cv_pct': 100 * per_protein_cv.median()})
-    return pd.DataFrame(rows)
-
-def geometric_cv_from_log(log_intensities):
-    sigma = log_intensities.std(axis=1) * np.log(2)  # convert log2 SD to natural-log SD
-    return 100 * np.sqrt(np.expm1(sigma ** 2))  # gCV = sqrt(exp(sigma^2) - 1)
-```
-
-Applying the base formula to log-transformed data compresses CV by roughly ln2 x mean log2 intensity -- about 15-20x at typical MaxQuant intensities, scale-dependent (most proteins appear to have CV < 1%) -- meaningless (Brenes 2024). State normalization state, transform, and software params or the CV is uninterpretable: DIA-NN "High precision" mode silently median-normalizes, halving median CV vs "High accuracy". Technical median CV < ~10-20%, biological ~20-40%; a LOWER CV is not automatically better (loose FDR or faulty MS1 extraction produce artificially low CVs).
-
-## Missingness Mechanism and Completeness
-
-**Goal:** Decide how to impute by first deciding why values are missing.
-
-**Approach:** Diagnose the missingness profile -- left-tail concentration means MNAR (left-censored, abundance-dependent), all-abundance scatter means MCAR -- and filter on completeness before imputing only the shallow remainder.
-
-```python
-def missingness_profile(log2_intensities, n_bins=10):
-    present_per_protein = log2_intensities.notna().mean(axis=1)
-    mean_abundance = log2_intensities.mean(axis=1)
-    abundance_bin = pd.qcut(mean_abundance, n_bins, duplicates='drop')
-    # present fraction per mean-abundance bin: rising-with-abundance = MNAR, flat = MCAR
-    return present_per_protein.groupby(abundance_bin, observed=True).mean()
-
-def completeness_filter(log2_intensities, sample_groups, min_valid_frac=0.7):
-    keep = pd.Series(False, index=log2_intensities.index)
-    for group in sample_groups.unique():
-        block = log2_intensities[sample_groups[sample_groups == group].index]
-        keep |= block.notna().mean(axis=1) >= min_valid_frac  # valid in >=70% of >=1 condition
-    return log2_intensities[keep]
-```
-
-kNN-imputing a genuinely-absent (MNAR) value invents mid-range abundance and KILLS a real present/absent difference; a left-shifted draw (Perseus down-shifted normal, downshift=1.8 SD below the observed mean, width=0.3 of observed SD) on an MCAR gap FABRICATES a false low and inflates a difference. Match the imputer to the mechanism. The imputation mechanics themselves are quantification.
-
-## PCA and Batch Detection
-
-**Goal:** See whether the dominant variance is biology or batch, and flag outlier samples.
-
-**Approach:** On the normalized survivors, run PCA, color by condition and by batch, and test whether top PCs associate with batch.
-
-```python
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
-from scipy.stats import f_oneway
-
-def pca_batch_check(normalized_log2, sample_info, batch_col='batch'):
-    # sample_info must be indexed by sample name, e.g. pd.read_csv(...).set_index('sample')
-    if set(sample_info.index) != set(normalized_log2.columns):
-        raise ValueError('sample_info index must equal the matrix column names (set_index on the sample column)')
-    # complete cases only: a row-median fill pulls high-missing (failed) samples to the centre of the PCA
-    complete = normalized_log2.dropna(how='any')
-    n_samples = complete.shape[1]
-    if n_samples < 3 or len(complete) < n_samples:
-        raise ValueError(f'too few samples ({n_samples}) or complete proteins ({len(complete)}) for PCA')
-    n_pc = min(5, n_samples - 1)
-    scaled = StandardScaler().fit_transform(complete.T)
-    # REPRODUCIBILITY: sklearn's default svd_solver='auto' switches to RANDOMIZED SVD on a wide
-    # matrix (samples x proteins), so an unseeded PCA returns different minor components and a
-    # different printed p-value on every identical run. 'full' is exact and cheap at QC sizes;
-    # random_state pins the randomized path for anyone who changes the solver back.
-    pcs = PCA(n_components=n_pc, svd_solver='full', random_state=0).fit(scaled)
-    coords = pd.DataFrame(pcs.transform(scaled), columns=[f'PC{i+1}' for i in range(n_pc)],
-                          index=complete.columns).join(sample_info)
-    print(f'PCA on {len(complete)} complete proteins of {len(normalized_log2)}')
-    for pc in coords.columns[:min(3, n_pc)]:
-        groups = [coords[coords[batch_col] == b][pc] for b in coords[batch_col].unique()]
-        # a level with one sample makes f_oneway raise 'At least two samples are required; got 1'
-        if len(groups) < 2 or min(len(g) for g in groups) < 2:
-            print(f'{pc} ~ {batch_col}: NOT TESTABLE, level sizes {[len(g) for g in groups]} '
-                  f'(need >=2 levels with >=2 samples each) -- this is not evidence of no batch effect')
-            continue
-        _, p = f_oneway(*groups)
-        print(f'{pc} ~ {batch_col}: p={p:.4f}')
-    return coords, pcs.explained_variance_ratio_
-```
-
-A sample isolated from its group is a removal/re-run candidate, but a high-missing sample is judged by `raw_sample_qc`, not by PCA. If batch is PC1, keep batch in the design matrix for the differential test (preferred when batch and condition are balanced), and use `limma::removeBatchEffect` (or ComBat) only on the matrix used for PCA/plots to re-inspect biology; do not test on a batch-corrected matrix and also model batch. If batch is FULLY confounded with condition (every batch level holds exactly one condition) nothing can be corrected: batch and condition are the same variable, and removing one removes the other -- on a fully confounded synthetic set the mean |log2FC| of 104 truly-changed proteins went from 1.55 to 0.00 after batch removal. Report the design as non-identifiable and stop; do not correct, and do not test. Stop and ask before excluding samples, when n < 5 per group makes PCA unstable, or when no un-normalized column is available for the loading check. Visualization of the projection routes to data-visualization/dimensionality-reduction-plots.
+With ONE run per condition the within-group form of this rule is inert -- every sample is its own group median, so `fold_total_vs_group` is exactly 1.0 and nothing can flag. `raw_sample_qc` falls back to the all-sample median and prints a warning; report that fallback, and report that a loading difference which tracks condition is not separable from biology in that design.
 
 ## TMT Channel Balance Within Each Plex
 
@@ -282,6 +129,8 @@ def tmt_channel_balance(plex_matrices):
     balance['investigate'] = np.abs(np.log2(balance['fold_vs_plex_median'])) > 1  # > 2x; flag > 3-4x
     return balance
 ```
+
+A channel with `investigate` True is a row in the exclusion log (`references/qc-report-template.md`, section 3): the value, the threshold that fired, and the decision. The `investigate` band (> 2x from the plex median, flag > 3-4x) lives in this function and in the Quantitative Thresholds table only.
 
 ## Per-Method Failure Modes
 
@@ -339,7 +188,7 @@ def tmt_channel_balance(plex_matrices):
 | Every sample shows 0% missing and identical ID counts | MaxQuant/DIA-NN zeros counted as values | `.replace(0, np.nan)` before counting |
 | `TypeError: At least two samples are required; got 1` in `pca_batch_check` | Either `sample_info` has a RangeIndex so the join produced NaN batches, OR a level of `batch_col` genuinely has one sample (e.g. one run per condition) | `sample_info.set_index('sample')` first. If the index is already correct the design is the cause: the function now prints `NOT TESTABLE` with the level sizes instead of raising -- report that, do not read it as "no batch effect" |
 | `pca_batch_check` prints a different p-value on every identical run | sklearn's default `svd_solver='auto'` picks randomized SVD on a wide matrix, and `PCA()` has no `random_state` | `PCA(n_components=n_pc, svd_solver='full', random_state=0)`; PC1/PC2 were already stable, PC3+ and every printed p-value were not (six unseeded fits on a 20x600 matrix gave six different PC3 p-values) |
-| `replicate_correlation` returns 0 rows / `median_cv_linear` returns NaN | Fewer than 2 samples in every group | Not a clean result -- both now raise with the group sizes. Say which checks could not run |
+| `replicate_correlation` / `median_cv_linear` raise `ValueError` (or return NaN / `not_measurable_n1` rows) | Fewer than 2 samples in every group, or in some groups | Not a clean result: raised when no group has replicates, marked `status = 'not_measurable_n1'` when only some do. Say which checks could not run |
 | PTXQC prints "The 'Pandoc' converter is not installed on your system ... Pandoc is required for HTML reports" | `createReport()` renders the HTML leg through rmarkdown, which needs Pandoc on `PATH` or at `RSTUDIO_PANDOC` | NOT fatal: the PDF, mzQC, heatmap and YAML are still written and the call completes. For the HTML too, install Pandoc or `Sys.setenv(RSTUDIO_PANDOC='<pandoc dir>')` and confirm `rmarkdown::pandoc_available()` is TRUE before the call |
 | MSstatsTMT QC plot shows identical channel medians | `proteinSummarization` default `global_norm = TRUE` | re-run with `global_norm = FALSE, reference_norm = FALSE` for the balance view |
 | PTXQC "not found" via `BiocManager` | PTXQC is on CRAN, not Bioconductor | `install.packages('PTXQC')` |

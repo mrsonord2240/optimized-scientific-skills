@@ -1,11 +1,19 @@
 ---
 name: bio-single-cell-multimodal-integration
+
 description: Integrate multimodal single-cell data (CITE-seq RNA+protein, 10x Multiome RNA+ATAC, unpaired/diagonal RNA+ATAC) and choose the right joint method. Use when classifying an integration task by anchor structure (paired vs unpaired), denoising CITE-seq ADT background before joint embedding, picking between WNN, totalVI, MultiVI, MOFA+, GLUE, or Seurat v5 bridge integration, or diagnosing why a modality dominates a joint clustering.
+
 tool_type: mixed
+
 primary_tool: Seurat
+
 license: MIT
+
 author: GPTomics
+
 ---
+
+
 
 ## Version Compatibility
 
@@ -18,6 +26,11 @@ Before using code patterns, verify installed versions match. If versions differ:
 If code throws ImportError, AttributeError, or TypeError, introspect the installed
 package and adapt the example to match the actual API rather than retrying.
 
+Muon WNN is stored on a `MuData` object, not an `AnnData` object: after
+`mu.pp.neighbors(..., key_added='wnn')`, run
+`mu.tl.umap(mdata, neighbors_key='wnn')`. Do not pass Muon's multimodal WNN
+metadata to `scanpy.tl.umap`, whose AnnData neighbor contract is different.
+
 ## Prerequisites
 
 ```r
@@ -27,7 +40,7 @@ BiocManager::install('Signac')          # Multiome ATAC
 
 ```bash
 pip install muon mudata scanpy anndata scvi-tools
-pip install scglue                       # unpaired/diagonal integration
+pip install scglue                       # unpaired/diagonal integration; no Windows install (pybedtools -> pysam has no wheel, pip fails building it): use WSL/Linux/macOS, or skip if GLUE is not needed
 ```
 
 # Multimodal Integration
@@ -66,18 +79,18 @@ When methods compete, verify the current best-practice default against the insta
 
 | Method | Model / assumption | Use when | Fails when |
 |---|---|---|---|
-| WNN (Seurat) | Per-cell, per-modality weights from cross-modality neighbor prediction; one weighted graph | Fast joint embedding/clustering of one well-normalized paired dataset | Protein background not removed upstream; noisy/saturating modality dominates; not for unpaired/mosaic |
-| totalVI (scvi-tools) | Conditional VAE; RNA NB/ZINB, each protein a 2-component NB mixture (background+foreground) | Need denoised protein, principled DE, batch integration, merging different antibody panels | Tiny datasets (VAE overfits); no GPU and very large data; protein-specific background structure not captured by one per-cell factor |
-| MultiVI (scvi-tools) | Single joint VAE over RNA+ATAC(+protein); mosaic-capable, imputes missing modality | Paired+unpaired RNA/ATAC mixed (mosaic); want generative DE/DA | "batch" key is the modality indicator, not sequencing batch; imputed modalities treated as measured |
-| MOFA+ (MOFA2) | Linear Bayesian group factor analysis; sparse factors, per-modality variance explained | Interpreting shared vs modality-specific axes of variation (exploratory/explanatory) | Used for clustering/denoising; likelihood mismatched to data; expecting batch correction within a view |
+| WNN (Seurat; `references/cite-seq-dsb-wnn.md`, `references/multiome-mofa.md`) | Per-cell, per-modality weights from cross-modality neighbor prediction; one weighted graph | Fast joint embedding/clustering of one well-normalized paired dataset | Protein background not removed upstream; noisy/saturating modality dominates; not for unpaired/mosaic |
+| totalVI (scvi-tools; `references/scvi-totalvi-multivi.md`) | Conditional VAE; RNA NB/ZINB, each protein a 2-component NB mixture (background+foreground) | Need denoised protein, principled DE, batch integration, merging different antibody panels | Tiny datasets (VAE overfits); no GPU and very large data; protein-specific background structure not captured by one per-cell factor |
+| MultiVI (scvi-tools; `references/scvi-totalvi-multivi.md`) | Single joint VAE over RNA+ATAC(+protein); mosaic-capable, imputes missing modality | Paired+unpaired RNA/ATAC mixed (mosaic); want generative DE/DA | "batch" key is the modality indicator, not sequencing batch; imputed modalities treated as measured |
+| MOFA+ (MOFA2; `references/multiome-mofa.md`) | Linear Bayesian group factor analysis; sparse factors, per-modality variance explained | Interpreting shared vs modality-specific axes of variation (exploratory/explanatory) | Used for clustering/denoising; likelihood mismatched to data; expecting batch correction within a view |
 | mojitoo | CCA across precomputed per-modality reductions; fast, parameter-free | Quick paired joint reduction from existing PCA/LSI slots | No knob to down-weight a noisy modality; bounded by input reductions; paired only |
 
 ## Method Decision Table (Unpaired / Diagonal / Mosaic)
 
 | Method | Model / assumption | Use when | Fails when |
 |---|---|---|---|
-| GLUE (scglue) | Per-modality VAEs + prior feature graph (peak-near-gene); adversarial cell alignment | Unpaired diagonal scRNA + scATAC; want regulatory inference as a byproduct | Genome-build/coordinate mismatch yields an empty guidance graph and garbage alignment; adversarial over-mixing of distinct states |
-| Seurat v5 bridge | Multiome bridge dataset = dictionary linking query modality to reference modality | Mapping a query (scATAC) onto a reference built in another modality (scRNA) | Poor/batch-mismatched bridge propagates error; rare query-only populations mislabeled |
+| GLUE (scglue; `references/unpaired-glue-bridge.md`) | Per-modality VAEs + prior feature graph (peak-near-gene); adversarial cell alignment | Unpaired diagonal scRNA + scATAC; want regulatory inference as a byproduct | Genome-build/coordinate mismatch yields an empty guidance graph and garbage alignment; adversarial over-mixing of distinct states |
+| Seurat v5 bridge (`references/unpaired-glue-bridge.md`) | Multiome bridge dataset = dictionary linking query modality to reference modality | Mapping a query (scATAC) onto a reference built in another modality (scRNA) | Poor/batch-mismatched bridge propagates error; rare query-only populations mislabeled |
 | StabMap | Mosaic topology from shared features; project all cells via shortest paths | Mosaic with informative unshared features that cannot be dropped | Unshared-feature chaining compounds error per hop |
 | Cobolt / scMoMaT | Generative shared latent over joint + single-modality datasets | Mosaic where a generative latent is preferred over feature chaining | DE/marker calls made on imputed values |
 
@@ -86,184 +99,21 @@ When methods compete, verify the current best-practice default against the insta
 | Method | What it does | Use when | Fails when |
 |---|---|---|---|
 | CLR (centered log-ratio) | Rescales compositionally; Seurat `NormalizeData(method="CLR", margin=2)` | Quick, no empty droplets available; small panels | Does NOT remove background; geometric-mean denominator distorted by saturating high-abundance ADTs |
-| DSB | Ambient correction from empty droplets + per-cell technical denoising via 2-component mixture + isotype controls | Raw/unfiltered matrix available (needs empty droplets); want background removed before embedding | No empty droplets retained; protein-specific non-specific binding (one per-cell factor under/over-corrects); no clearly bimodal proteins |
+| DSB (`references/cite-seq-dsb-wnn.md`) | Ambient correction from empty droplets + per-cell technical denoising via 2-component mixture + isotype controls | Raw/unfiltered matrix available (needs empty droplets); want background removed before embedding | No empty droplets retained; protein-specific non-specific binding (one per-cell factor under/over-corrects); no clearly bimodal proteins |
 
 Seurat's CLR margin is genuinely ambiguous across versions (margin=2 = per-feature is the WNN-tutorial recommendation for large panels); verify with `?NormalizeData` on the installed version.
 
-## CITE-seq: Denoise ADT, Then Joint Embed (Seurat)
+## Reference Files
 
-**Goal:** Remove ADT background with DSB before WNN, because WNN does not denoise protein.
+Read the file for the method you are running; `SKILL.md` above decides which method applies.
 
-**Approach:** Estimate ambient from empty droplets and per-cell technical noise from a mixture plus isotype controls, then feed denoised ADT into the standard PCA -> WNN flow.
-
-```r
-library(dsb)
-library(Seurat)
-
-raw <- Read10X('raw_feature_bc_matrix/')           # unfiltered: contains empty droplets
-cells <- Read10X('filtered_feature_bc_matrix/')    # called cells
-
-adt_cells <- as.matrix(cells[['Antibody Capture']])
-adt_empty <- as.matrix(raw[['Antibody Capture']][, setdiff(colnames(raw[['Antibody Capture']]), colnames(adt_cells))])
-
-# Guard against DSB's own documented failure mode (see Common Errors): a filtered/cell
-# matrix passed as empty_drop_matrix produces a plausible-looking but meaningless output
-# with NO error or warning from DSBNormalizeProtein itself (verified, dsb 2.0.1). True
-# empty droplets carry mostly ambient signal, so their total ADT counts must be markedly
-# lower than in called cells.
-med_cells <- median(colSums(adt_cells))
-med_empty <- median(colSums(adt_empty))
-if (med_empty >= med_cells * 0.5) {
-    stop(sprintf(
-        "empty_drop_matrix does not look like empty droplets (median total ADT %.1f vs cells %.1f) -- DSB needs the raw/unfiltered matrix's non-cell barcodes, not a second cell matrix.",
-        med_empty, med_cells))
-}
-
-# isotype.control.name.vec must name the ACTUAL isotype rows (often IgG1/IgG2a/Mouse-IgG2b-Ctrl); the regex below misses those
-# When isotypes are absent or not matched, set use.isotype.control = FALSE (keep denoise.counts = TRUE) and pass real names explicitly
-adt_dsb <- DSBNormalizeProtein(
-    cell_protein_matrix = adt_cells,
-    empty_drop_matrix = adt_empty,
-    denoise.counts = TRUE,
-    use.isotype.control = TRUE,
-    isotype.control.name.vec = grep('[Ii]sotype|IgG', rownames(adt_cells), value = TRUE)
-)
-```
-
-## CITE-seq: WNN Joint Clustering (Seurat)
-
-**Goal:** Build one weighted-NN graph from denoised RNA and ADT and cluster on it.
-
-**Approach:** Reduce each modality independently (PCA on RNA, PCA on the small ADT panel), then learn per-cell modality weights and cluster/embed on the joint graph.
-
-```r
-obj[['ADT']] <- CreateAssay5Object(data = adt_dsb)        # DSB output is already normalized data
-DefaultAssay(obj) <- 'RNA'
-obj <- NormalizeData(obj) |> FindVariableFeatures() |> ScaleData() |> RunPCA(reduction.name = 'pca')
-
-DefaultAssay(obj) <- 'ADT'
-VariableFeatures(obj) <- rownames(obj[['ADT']])
-obj <- ScaleData(obj) |> RunPCA(reduction.name = 'apca', npcs = min(18, nrow(obj[['ADT']]) - 1))
-
-# dims.list matched to informative dims; small ADT panels saturate by ~1:18
-obj <- FindMultiModalNeighbors(obj, reduction.list = list('pca', 'apca'), dims.list = list(1:30, 1:18))
-obj <- FindClusters(obj, graph.name = 'wsnn', algorithm = 3)   # algorithm 3 = SLM (the tutorial choice), NOT Leiden
-obj <- RunUMAP(obj, nn.name = 'weighted.nn', reduction.name = 'wnn.umap')
-
-# Inspect the per-cell weight distribution; a single dominant modality is a red flag
-VlnPlot(obj, features = 'RNA.weight', group.by = 'seurat_clusters')
-```
-
-## CITE-seq: totalVI (Python, denoise + DE in one model)
-
-**Goal:** Jointly model RNA + protein with explicit protein background, yielding a denoised latent space and foreground probabilities.
-
-**Approach:** Register a MuData object, train the conditional VAE, then read the latent representation and per-protein foreground probability.
-
-```python
-import scvi
-import mudata as md
-
-# scvi-tools VAE training is stochastic unless seeded: verified two unseeded runs of this
-# exact pattern on identical input differ by up to 0.97 (max abs latent diff); seeding
-# makes reruns bit-identical. Set this before setup_mudata/train, every run.
-scvi.settings.seed = 0
-
-# mdata holds .mod['rna'] (raw counts) and .mod['prot'] (raw ADT counts)
-scvi.model.TOTALVI.setup_mudata(
-    mdata, rna_layer='counts', protein_layer=None,
-    modalities={'rna_layer': 'rna', 'protein_layer': 'prot'}
-)
-model = scvi.model.TOTALVI(mdata)
-model.train()
-
-mdata.obsm['X_totalVI'] = model.get_latent_representation()
-fg = model.get_protein_foreground_probability()        # 1 - background mixing weight per protein per cell
-denoised_rna, denoised_prot = model.get_normalized_expression()
-```
-
-## Multiome (RNA + ATAC, same cell): Native Pipelines, Then Join
-
-**Goal:** Process each modality in its own statistics before joining, because RNA and ATAC have incompatible distributions.
-
-**Approach:** PCA on RNA, TF-IDF + LSI on ATAC (drop depth-correlated components), then WNN. See scatac-analysis for ATAC QC and the binarization/depth-component caveats.
-
-```r
-library(Signac)
-DefaultAssay(obj) <- 'RNA'
-obj <- NormalizeData(obj) |> FindVariableFeatures() |> ScaleData() |> RunPCA()
-
-DefaultAssay(obj) <- 'ATAC'
-obj <- RunTFIDF(obj) |> FindTopFeatures(min.cutoff = 'q0') |> RunSVD()
-DepthCor(obj)                                          # diagnose which LSI components track depth
-
-# dims = 2:30 drops LSI_1 ONLY if DepthCor confirms it tracks depth (usually true, not guaranteed)
-obj <- FindMultiModalNeighbors(obj, reduction.list = list('pca', 'lsi'), dims.list = list(1:30, 2:30))
-obj <- RunUMAP(obj, nn.name = 'weighted.nn', reduction.name = 'wnn.umap')
-obj <- FindClusters(obj, graph.name = 'wsnn', algorithm = 3)
-```
-
-Merging multiome datasets requires a common peak set: re-quantify all cells against unified peaks, or peak-boundary differences manufacture spurious batch structure. The ATAC gene-activity matrix is an approximation, not measured RNA; do not conflate it with the RNA modality.
-
-## MOFA+ (interpretable shared/specific factors)
-
-**Goal:** Decompose modalities into shared latent factors with per-modality variance explained.
-
-**Approach:** Build a MOFA object from per-modality matrices, set likelihoods to match each data type, run, then interpret factor loadings.
-
-```python
-import muon as mu
-
-# likelihoods must match data: gaussian for scaled RNA, bernoulli for binarized ATAC, poisson for counts
-mu.tl.mofa(mdata, n_factors=15, outfile='mofa_model.hdf5')   # writes mdata.obsm['X_mofa']
-```
-
-## Unpaired / Diagonal: GLUE (Python)
-
-**Goal:** Align independent scRNA and scATAC with no shared cells via a prior feature graph.
-
-**Approach:** Configure each dataset with a count-appropriate probabilistic model, build a gene-anchored guidance graph, fit GLUE, then read aligned embeddings.
-
-```python
-import scglue
-
-scglue.models.configure_dataset(rna, 'NB', use_highly_variable=True, use_rep='X_pca')     # NB needs RAW counts
-scglue.models.configure_dataset(atac, 'ZINB', use_highly_variable=True, use_rep='X_lsi')
-graph = scglue.genomics.rna_anchored_guidance_graph(rna, atac)     # peak-near-gene prior; coords must share genome build
-# GLUE has the same reproducibility gap as totalVI (both train a VAE): pin the seed
-# explicitly rather than relying on the model class default (checked against scglue's
-# documented API, not run -- scglue has no Windows build in this environment).
-glue = scglue.models.fit_SCGLUE({'rna': rna, 'atac': atac}, graph, init_kws={'random_seed': 0})
-rna.obsm['X_glue'] = glue.encode_data('rna', rna)
-atac.obsm['X_glue'] = glue.encode_data('atac', atac)
-```
-
-Verify cell-type structure is preserved (not just modality overlap); adversarial alignment can over-mix distinct populations.
-
-## Mosaic: MultiVI (Python, RNA+ATAC partially observed)
-
-**Goal:** Jointly embed a mosaic design -- some cells have both RNA and ATAC (paired), others only one modality -- imputing the missing side.
-
-**Approach:** Build one MuData with an RNA AnnData and an ATAC AnnData that both cover the full cell union; cells missing a modality get all-zero rows for that modality's block (MultiVI detects presence per cell from whether that block's raw counts sum to zero, not from a separate flag). Register with `setup_mudata`, not `setup_anndata` -- `MULTIVI.setup_anndata` on a plain AnnData is deprecated since scvi-tools 1.4 and silently skips registration (warns, then `MULTIVI(adata)` raises "Please set up your AnnData with MULTIVI.setup_anndata first").
-
-```python
-import scvi
-
-scvi.settings.seed = 0
-
-# mdata.mod['rna']: all cells, real counts. mdata.mod['atac']: real counts for paired
-# cells, all-zero rows for RNA-only cells (and vice versa for an ATAC-only block).
-scvi.model.MULTIVI.setup_mudata(
-    mdata, modalities={'rna_layer': 'rna', 'atac_layer': 'atac'}
-)
-model = scvi.model.MULTIVI(
-    mdata, n_genes=mdata.mod['rna'].n_vars, n_regions=mdata.mod['atac'].n_vars
-)
-model.train()
-mdata.obsm['X_multivi'] = model.get_latent_representation()
-```
-
-Verified on synthetic 150-cell mosaic data (90 paired, 60 RNA-only, 3 known cell types, scvi-tools 1.5.1): RNA-only cells land nearer their same-type paired counterparts (mean latent distance 0.27) than different-type ones (0.56), confirming the model actually uses the shared RNA signal to place unpaired cells rather than clustering by modality of origin. This example passes no `batch_key` because the modality mask above is not a sequencing batch; if cells also span real sequencing batches, add `batch_key` for that separately -- see Common Errors' MultiVI row for the pitfall of confusing the two.
+| File | Read when |
+|---|---|
+| `references/cite-seq-dsb-wnn.md` | CITE-seq: denoising ADT with DSB from the raw matrix, then WNN joint clustering (Seurat). Runnable end to end: `examples/cite_seq_analysis.R` |
+| `examples/cite_seq_analysis.py` | CLR-only Python/Muon CITE-seq WNN fallback. It creates modality-local Scanpy graphs, then uses Muon's WNN and MuData-aware UMAP path. |
+| `references/scvi-totalvi-multivi.md` | Training totalVI (CITE-seq denoising + DE) or MultiVI (mosaic, RNA+ATAC partially observed) with scvi-tools. Runs `scripts/totalvi_cite_seq.py`, `scripts/multivi_mosaic.py` |
+| `references/multiome-mofa.md` | 10x Multiome RNA + ATAC WNN (Signac LSI), or MOFA+ shared/specific factors |
+| `references/unpaired-glue-bridge.md` | Unpaired scRNA + scATAC: GLUE, or Seurat v5 bridge integration through a multiome bridge. Runs `scripts/seurat_bridge_integration.R` |
 
 ## MuData Housekeeping
 

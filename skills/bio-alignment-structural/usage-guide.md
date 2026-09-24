@@ -22,7 +22,7 @@ This skill covers backbone-aware structural alignment: pairwise (TM-align, US-al
 
 > "Cluster all PDB structures sharing TM-score > 0.5 with my query."
 
-> "Search this antibody-antigen complex against AFDB-Multimer with Foldseek-Multimer and rank by complex TM-score"
+> "Search this antibody-antigen complex against a folder of PDB complexes with Foldseek-Multimer and rank by complex TM-score"
 
 ### Structural Multiple Alignment
 > "Build an MSA from these 30 PDB structures using Foldmason"

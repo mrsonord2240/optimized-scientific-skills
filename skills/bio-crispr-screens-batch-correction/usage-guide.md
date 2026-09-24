@@ -6,20 +6,13 @@ Decision-grade batch correction for pooled CRISPR screens. Covers diagnosis (PCA
 
 ## Prerequisites
 
-```bash
-pip install combat        # provides combat.pycombat; PyPI 'pycombat' is a different project pandas numpy scipy scikit-learn matplotlib seaborn
-conda install -c bioconda mageck   # not on PyPI
-# R (for SVA, RUVSeq, limma)
-R -e "BiocManager::install(c('sva', 'RUVSeq', 'limma'))"
-```
-
-Required inputs: count matrix (rows=sgRNA, columns=samples), metadata table with at least `batch`, `condition`, and `replicate` columns, and (for NTC-anchored norm) a list of non-targeting control sgRNAs.
+Install commands, required inputs and the versions the code was checked on are in `SKILL.md` ("Version Compatibility").
 
 ## Quick Start
 
 Tell the AI agent what to do:
 - "Diagnose batch effects in my screen: PCA, variance decomposition, is correction needed?"
-- "Apply ComBat correction with biological_covariate=condition; verify PR-AUC is preserved post-correction"
+- "Apply ComBat correction with condition as the `mod` covariate; verify PR-AUC is preserved post-correction"
 - "Add batch as a covariate to MAGeCK MLE design matrix instead of pre-correcting"
 - "Compare ComBat vs NTC-anchored normalization on my multi-batch screen"
 - "Decide if I should correct or redesign because batch is fully confounded with condition"
@@ -36,7 +29,7 @@ Tell the AI agent what to do:
 
 ### ComBat Application
 
-> "Apply ComBat to log10(counts+1) with biological_covariate=condition. Verify post-correction PCA shows batches overlap and CEGv2 PR-AUC is preserved."
+> "Apply ComBat to log2(counts+1) with condition as the `mod` covariate. Verify post-correction PCA shows batches overlap and CEGv2 PR-AUC is preserved."
 
 > "Compare ComBat with mod (biological covariate) vs without. Quantify how much biological signal is preserved in each case."
 
@@ -60,54 +53,7 @@ Tell the AI agent what to do:
 
 ## What the Agent Will Do
 
-1. Load count matrix and metadata; verify batch and condition columns
-2. Run PCA + variance decomposition to diagnose batch dominance
-3. Check confounding: is batch correlated with condition? If yes, recommend covariate modeling over pre-correction
-4. Decide correction method based on diagnostic and batch annotation:
-   - Annotated batches + ≥3 samples per batch -> ComBat with biological covariate
-   - Unknown batch sources -> RUV with NTC reference set
-   - Multi-screen with same library -> JACKS or Chronos (built-in batch handling)
-   - Confounded batch+condition -> MLE with batch covariate (no pre-correction)
-5. Apply correction or build MLE design matrix
-6. Re-run PCA to confirm batches now overlap
-7. Compute pre- vs post-correction CEGv2 PR-AUC (should be same or higher post)
-8. Run hit calling on corrected counts; compare to uncorrected hit list
-9. Output corrected counts, PCA before/after plots, correction summary
-
-## Tips
-
-- The single most common mistake is applying ComBat without biological covariate, which removes condition variance along with batch. Always supply `mod`.
-- ComBat shifts counts before testing; the MLE-with-covariate approach correctly propagates batch-term uncertainty into the condition-beta standard error. ComBat-then-test is over-confident in FDR.
-- Verify post-correction by re-checking the same metrics that motivated correction (PCA, PR-AUC, replicate Pearson). Don't trust correction blindly.
-- For DepMap-style cancer cell-line panels, Chronos handles batch + CN bias + screen quality jointly. Use it instead of ComBat + MAGeCK.
-- NTC-anchored normalization requires ≥500 NTCs in the library for stable median. Below this, fall back to median normalization.
-- For in-vivo screens, batch sources are different (animal cohort, surgical day, tissue dissociation prep); see [[in-vivo-screens]] for in-vivo-specific batch handling.
-- Sequential corrections (ComBat then RUV, or RUV then median) double-correct and destroy biology. Pick one method.
-- Cancer-line screens have CN bias as a "batch-like" effect per cell line; CN correction (CRISPRcleanR / Chronos) is separate from batch correction. Apply CN correction first, then batch (or use Chronos which handles both).
-
-## Decision Cheat Sheet
-
-| Diagnostic finding | Action |
-|--------------------|--------|
-| PC1 batch F >> condition F | Apply ComBat with `mod` |
-| Batch ⊥ condition | ComBat or MLE-with-covariate |
-| Batch fully ⊆ condition | Redesign or only MLE-with-covariate |
-| Multi-cell-line cancer | Chronos (preferred) |
-| Multi-screen with same library | JACKS (joint efficacy) |
-| Day-0 separates by batch but endpoint doesn't | Pre-screen technical bias; ComBat |
-| Endpoint separates by batch but Day-0 doesn't | Selection-driven (FBS, drug lot); covariate model |
-| <3 samples per batch | Cannot estimate batch; use covariate or redesign |
-
-## Validation Checklist
-
-After applying correction:
-- [ ] Corrected matrix has no NaN/Inf values (ComBat can return all-NaN with exit code 0)
-- [ ] PCA: batches now overlap (visual)
-- [ ] Within-batch Pearson preserved (should be unchanged)
-- [ ] Across-batch Pearson improved
-- [ ] CEGv2 PR-AUC preserved or higher
-- [ ] NTC distribution stable across batches
-- [ ] No new outlier samples introduced
+Diagnose (PCA + variance decomposition), check batch-versus-condition confounding, choose the correction, re-check PCA and CEGv2 PR-AUC afterwards. The decision tree, thresholds, failure modes and the validation checklist are all in `SKILL.md`.
 
 ## Related Skills
 

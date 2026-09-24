@@ -76,6 +76,7 @@ pav_excluded <- if (nrow(dat_no_pav) >= 1) run_cis_panel(dat_no_pav) else NULL
 print(pav_excluded)
 
 if (nrow(dat) >= 2) {
+    # with_alleles = FALSE drops the reference alleles; sign-align the matrix to dat first (SKILL.md, API caveat)
     ld <- ld_matrix(dat$SNP, bfile = ld_bfile, plink_bin = plink_bin, with_alleles = FALSE)
     common <- intersect(dat$SNP, rownames(ld))
     d_corr <- subset(dat, SNP %in% common)
@@ -83,7 +84,8 @@ if (nrow(dat) >= 2) {
     mr_obj <- mr_input(bx = d_corr$beta.exposure, bxse = d_corr$se.exposure,
                        by = d_corr$beta.outcome, byse = d_corr$se.outcome,
                        correlation = ld_sub)
-    result_correl <- mr_ivw(mr_obj, model = 'default', correl = TRUE)
+    # namespaced: TwoSampleMR::mr_ivw masks the MendelianRandomization generic; the LD matrix rides in mr_obj
+    result_correl <- MendelianRandomization::mr_ivw(mr_obj, model = 'default')
     print(result_correl)
 }
 

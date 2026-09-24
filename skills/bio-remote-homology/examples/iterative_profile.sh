@@ -5,7 +5,7 @@
 set -euo pipefail
 
 QUERY="${1:-distant_protein.fa}"
-DB="${2:-uniref90}"   # blast/HMMER FASTA path; MMseqs2 will build its own DB
+DB="${2:-uniref90.fa}"   # protein FASTA path; psiblast and MMseqs2 get DBs built from it below
 
 ITERATIONS=3
 INCL_E=0.002          # Tighter than default 0.005 -- reduces paralog drift
@@ -13,7 +13,11 @@ EVALUE=1e-5
 THREADS=8
 
 echo "=== PSI-BLAST ${ITERATIONS} iterations, -inclusion_ethresh ${INCL_E} ==="
-psiblast -query "${QUERY}" -db "${DB}" \
+# psiblast needs a formatted BLAST database, not a FASTA path (skip if a pre-built one is reused).
+if [ ! -f psiblast_db.pin ] && [ ! -f psiblast_db.pal ]; then
+    makeblastdb -in "${DB}" -dbtype prot -parse_seqids -out psiblast_db > /dev/null
+fi
+psiblast -query "${QUERY}" -db psiblast_db \
          -num_iterations "${ITERATIONS}" \
          -inclusion_ethresh "${INCL_E}" \
          -evalue "${EVALUE}" \
@@ -32,7 +36,7 @@ jackhmmer -N "${ITERATIONS}" \
           --chkhmm jackhmmer.hmm \
           --cpu "${THREADS}" \
           "${QUERY}" "${DB}" > jackhmmer.txt
-jackhmmer_hits=$(grep -cv '^#' jackhmmer.tbl)
+jackhmmer_hits=$(grep -cv '^#' jackhmmer.tbl || true)   # grep -c exits 1 on zero hits
 echo "  jackhmmer: ${jackhmmer_hits} hits"
 
 echo

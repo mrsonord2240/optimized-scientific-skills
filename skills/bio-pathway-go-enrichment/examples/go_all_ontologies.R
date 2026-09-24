@@ -1,7 +1,8 @@
 # Reference: clusterProfiler 4.18.4+, org.Hs.eg.db 3.22+ | Verify API if version differs
 # GO ORA across all three ontologies, simplified PER ONTOLOGY.
-# simplify() operates on one ontology (GOSemSim similarity is defined within a single DAG),
-# so an ont='ALL' object must be split into BP/MF/CC and each simplified separately.
+# simplify() works within one ontology (GOSemSim similarity is defined within a single DAG); this
+# script runs BP/MF/CC separately and simplifies each explicitly. On clusterProfiler 4.14.6 an
+# ont='ALL' object is also handled by simplify() itself (see "Reduce GO-DAG Redundancy" in SKILL.md).
 # Self-contained, like go_enrichment_basic.R: draws foreground/universe straight from
 # org.Hs.eg.db so it runs offline instead of requiring an unshipped de_results.csv. In a real
 # analysis, gene_list/universe_ids instead come from a DE table's hits and tested genes (see

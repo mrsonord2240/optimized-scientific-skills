@@ -4,19 +4,6 @@
 
 Hashtag demultiplexing assigns pooled, hashed cells back to their sample of origin and calls cross-sample doublets directly from the HTO count matrix. Each sample is labeled before pooling with a unique oligo-tagged reagent (CITE-seq antibody HTO, MULTI-seq lipid/cholesterol tag, or CellPlex CMO), so a singlet is dominated by one tag above background and a cross-sample doublet shows two tags high. This skill covers Seurat HTODemux and MULTIseqDemux, scanpy hashsolo, pegasus/demuxEM, GMM-Demux, and demuxmix, when to pick each, and how hashtag demux relates to genetic demux and expression-based doublet detection.
 
-## Prerequisites
-
-```r
-# Seurat and demuxmix (R)
-install.packages('Seurat')
-BiocManager::install('demuxmix')
-```
-
-```bash
-# hashsolo via scanpy/solo, and demuxEM via pegasus (Python)
-pip install scanpy solo-sc pegasuspy demuxEM
-```
-
 ## Quick Start
 
 Tell your AI agent what you want to do:
@@ -44,32 +31,4 @@ Tell your AI agent what you want to do:
 
 ## What the Agent Will Do
 
-1. Confirm the hashing chemistry (antibody HTO, MULTI-seq lipid, CellPlex CMO) and that the HTO matrix barcodes match the GEX cells
-2. Normalize the HTO counts with CLR, choosing the margin deliberately (margin=2 corrects per-tag capture bias)
-3. Pick a caller from the decision table: HTODemux/MULTIseqDemux for clean data, hashsolo for few hashes, demuxEM/demuxmix when staining is marginal or ambient is high
-4. Classify cells into singlet (with sample), cross-sample doublet, and Negative; if the Negative fraction is roughly 50%+ (or ~100%, see SKILL.md's hashsolo section), stop and diagnose parameters/staining before proceeding rather than reporting the result as-is
-5. Reconcile the cross-sample doublet rate against the expected loading doublet rate to sanity-check thresholds
-6. Recommend expression-based doublet detection in addition to catch within-sample doublets hashing cannot see
-7. Subset to confident singlets and pass them downstream for integration and clustering
-
-## Tips
-
-- **The cross-sample doublet rate calibrates the total** - with two samples within- and cross-sample doublets are equally frequent, with k samples within-sample doublets fall to about 1/k of all doublets, and a near-zero hashing doublet rate signals loose thresholds.
-- **Negatives are not empties** - empty droplets are removed in preprocessing; Negatives are real cells whose true tag never cleared background.
-- **Choose the CLR margin deliberately** - margin=2 normalizes each tag across cells and corrects capture-efficiency differences; do not blindly accept the default.
-- **Switch methods when staining is weak** - demuxEM models background from empty droplets and demuxmix regresses on detected genes; both beat a fixed quantile.
-- **Nucleus hashing is harder** - lower tag capture means more Negatives; demuxEM was built for it.
-- **Hashing and genetics cannot see within-sample doublets** - always add expression-based doublet detection.
-- **Genetic demux cannot split same-donor samples** - use hashtag demux when several samples share a genotype.
-- **Low Negatives can still mean failed staining** - if one tag captures nearly all cells the assignment is meaningless; check the per-tag singlet distribution against the expected pooling.
-- **Check every tag has positives** - a single near-zero tag means a failed antibody silently dropped or misassigned that sample even when global QC looks fine.
-- **Unequal pooling destabilizes minority tags** - inspect per-tag ridge plots and consider demuxmix for a rare sample; 3+ tags high signals over-loading or ambient, not ordinary doublets.
-- **hashsolo with 2-3 hashtags needs `number_of_noise_barcodes` set explicitly** - its default silently classifies every cell Negative; see SKILL.md's hashsolo section.
-
-## Related Skills
-
-- single-cell/doublet-detection - Expression-based within-sample doublet calling that complements cross-sample hashing doublets
-- single-cell/preprocessing - Filter empty droplets and QC the cells before and after demultiplexing
-- single-cell/batch-integration - Integrate the demultiplexed per-sample data; covers genetic demultiplexing as an alternative
-- single-cell/multimodal-integration - HTOs are an ADT-like modality; the CLR normalization here parallels CITE-seq ADT handling
-- single-cell/clustering - Cluster the recovered singlets after sample assignment
+See SKILL.md: Choosing a demultiplexing modality, Choosing a hashtag caller, the per-method sections, Common Errors and Related Skills. Install commands are in SKILL.md's Install section.

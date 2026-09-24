@@ -4,25 +4,7 @@
 
 This skill turns demultiplexed marker-gene FASTQ (16S rRNA, ITS) into an ASV (amplicon sequence variant) feature table plus representative sequences, using DADA2's per-run error model. An ASV is a model-inferred exact sequence conditioned on one sequencing run - not a clustered OTU and not an organism. The decisions that matter (which are invisible in a recipe) are: remove primers before truncating, learn the error model separately per run, choose truncation lengths within the merge-overlap budget, and never fix-truncate variable-length ITS. The output feeds taxonomy assignment, diversity, and differential abundance; the compositional statistics of the resulting table are shared with shotgun metagenomics.
 
-## Prerequisites
-
-```bash
-conda install -c bioconda cutadapt itsxpress
-```
-
-```r
-install.packages(c('BiocManager', 'ggplot2'))   # ggplot2 for plotErrors()/ggsave()
-BiocManager::install(c('dada2', 'decontam'))
-```
-
-The QIIME2 path (`qiime dada2 denoise-paired`, `qiime deblur denoise-16S`) installs as its own conda env (`qiime2-amplicon-<release>`); see qiime2-workflow.
-
-Conceptual prerequisites:
-- Input is DEMULTIPLEXED paired-end (or single-end) FASTQ, one file set per sample.
-- The forward and reverse PCR primer sequences are known (needed for cutadapt).
-- The amplicon region and its approximate length are known (V4 ~253 bp, V3-V4 ~460 bp, ITS variable) - this sets the truncation budget.
-- The error model is learned PER sequencing run; a multi-run study processes each run separately before merging tables.
-- For low-biomass samples (skin, biopsy, BAL, sterile-site swabs), sequence negative controls (extraction blanks, no-template PCR) and a positive mock community so contaminants can be identified with decontam.
+Install commands, the method, thresholds and failure modes are in `SKILL.md`. You need demultiplexed FASTQ, the primer sequences and the amplicon region; for low-biomass samples, also negative controls.
 
 ## Quick Start
 
@@ -52,30 +34,6 @@ Tell your AI agent what you want to do:
 
 ### Low-biomass / decontamination
 > "These are low-biomass biopsy samples sequenced with extraction-blank and no-template-PCR negative controls. After building the ASV table, run decontam to flag and remove reagent/kit contaminants, and report how many ASVs and reads were removed."
-
-## What the Agent Will Do
-
-1. Confirm the marker, region, primers, read length, and number of sequencing runs.
-2. Remove primers with cutadapt (`--discard-untrimmed`) before any quality step.
-3. Inspect quality profiles and compute the truncation budget from amplicon and read length.
-4. Filter and truncate on expected errors within that budget (per run).
-5. Learn the error model from each run separately and inspect `plotErrors` (enforcing monotonicity on binned-quality data).
-6. Denoise, merge pairs, and build a per-run sequence table.
-7. Merge run-level tables, then run a single chimera removal.
-8. For low-biomass studies, classify and remove reagent/kit contaminant ASVs with decontam using the negative controls (and DNA concentration if measured), reporting what was removed.
-9. Produce the ASV table, representative sequences, and a read-tracking table; flag whether ASV count overstates richness.
-
-## Tips
-
-- An ASV is a run-conditioned exact sequence, not an organism; do not equate ASV count with species richness without collapsing to a rank.
-- Primers off FIRST. A large read fraction removed as "chimeric" usually means primers were not trimmed.
-- truncLen is a detection budget: truncLen_F + truncLen_R must exceed the amplicon length by at least 12 bp, or pairs cannot merge.
-- A near-zero merge rate is almost always a budget problem, not bad data.
-- For ITS, never set a fixed truncLen - trim the spacer with ITSxpress and use truncLen=0.
-- On NovaSeq/NextSeq/iSeq, quality scores are binned to ~4 values; inspect plotErrors and enforce a monotonic error fit.
-- Use pool='pseudo' when rare or singleton ASVs matter.
-- Low-biomass samples can be dominated by the reagent/kit "kitome": never interpret a near-sterile sample without negative controls, and run decontam (prevalence method with controls, frequency with DNA concentration, combined with both). The shotgun analogue is metagenomics/contamination-controls.
-- Save the chimera-free sequence table as an RDS for downstream taxonomy and phyloseq work.
 
 ## Related Skills
 

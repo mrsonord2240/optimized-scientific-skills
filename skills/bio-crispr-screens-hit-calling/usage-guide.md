@@ -11,10 +11,7 @@ Decision-grade cross-method orchestration for calling significant hits in pooled
 conda install -c bioconda mageck                     # RRA + MLE (not on PyPI)
 git clone https://github.com/hart-lab/bagel          # BAGEL2 (PyPI 'bagel' is an unrelated package)
 git clone https://github.com/felicityallen/JACKS     # JACKS (PyPI 'jacks' is an unrelated package)
-# drugZ via PyPI or GitHub
-git clone https://github.com/hart-lab/drugz          # drugZ is not on PyPI
-# or
-git clone https://github.com/hart-lab/drugz
+git clone https://github.com/hart-lab/drugz          # drugZ (not on PyPI)
 # Chronos (DepMap)
 pip install crispr_chronos
 # Custom analyses
@@ -70,55 +67,9 @@ Tell the AI agent what to call:
 
 > "Apply the second-best-sgRNA rule: a gene is a hit only if the 2nd-most-extreme sgRNA also passes the threshold. Filter MAGeCK output by this rule."
 
-## What the Agent Will Do
+## Where the method lives
 
-1. Inspect experimental design: condition count, replicates, cell lines, batches, chemistry
-2. Reference screen-qc output to confirm screen is interpretable (PR-AUC >0.7)
-3. Apply method-decision tree from the SKILL: primary method by design
-4. Run primary method; check convergence and output sanity
-5. Run secondary method on same data for reconciliation
-6. (For high-stakes) run third method for tier-1 consensus
-7. Apply tier thresholds: Tier 1 = 3/3, Tier 2 = 2/3, Tier 3 = 1/3
-8. Apply second-best-sgRNA rule to flag single-guide-driven hits
-9. For cancer-line screens, confirm copy-number correction applied (Chronos or CRISPRcleanR pre-hoc)
-10. For multi-batch / multi-screen, confirm batch covariates in MAGeCK MLE or use Chronos
-11. Output ranked hit list with tier annotation, per-method FDR, second-best LFC
-12. Recommend orthogonal validation strategy (arrayed; orthogonal modality; cell-line panel)
-
-## Tips
-
-- Pick the method that matches the design, not the method you know best. RRA is great for 2-condition screens but fails on time-course; Chronos is great for cancer panels but overkill for single-line screens.
-- For high-stakes hit lists (drug-target nomination, paper-level claims), require 2-of-3 or 3-of-3 method consensus. Single-method hits at FDR 0.05 will have ~5% false discoveries; consensus shrinks this dramatically.
-- BAGEL2's BF >6 ≈ 90% posterior probability (Hart 2017); it is commonly treated as roughly MAGeCK FDR 0.05 by convention. Use this when comparing across methods.
-- Cancer-line screens ALWAYS need CN correction. Either pre-process with CRISPRcleanR before MAGeCK / BAGEL2, or use Chronos which models CN jointly.
-- The single most common silent failure: not running an essentialome PR-AUC against CEGv2 before hit calling. A screen with PR-AUC <0.5 has no signal regardless of how many "hits" MAGeCK calls.
-- For multi-cell-line studies, run per-line analysis first; pool across lines as meta-analysis downstream. Joint MLE across cell lines without indicator covariates dilutes per-line signal.
-- The second-best-sgRNA rule is your friend for novel libraries with mixed efficacy: a hit driven by one extreme guide is more likely an outlier than a true effect.
-- Heavy-selection drug screens (>40% guides change) break median normalization. Use BAGEL2 (reference-set-anchored, robust) or MAGeCK with `--norm-method control`.
-- BAGEL2's `bf` step is unseeded by default and gives different Bayes Factors on identical reruns of the same data (up to 33 gene calls flipping at BF>6 on real HAP1 TKOv3 data) -- always pass a fixed `-s <int>` seed and verify byte-identical reruns before trusting a single BF table or treating a rerun difference as new biology. See crispr-screens/bagel-essentiality's Reproducibility section.
-- Before merging hit lists into a consensus, confirm every file traces to the *same* experimental comparison. Three individually valid files from different comparisons (e.g. an essentiality screen's MAGeCK+BAGEL2 pair merged against an unrelated drug screen's drugZ table) will merge without error and can produce a misleadingly empty -- or, with unlucky gene overlap, misleadingly nonempty -- "consensus". An empty consensus is not proof of a bad screen; check each file's own QC first.
-
-## Decision Cheat Sheet
-
-| If your design is... | Primary method | Backup |
-|----------------------|----------------|--------|
-| Single 2-condition essentiality | MAGeCK RRA | BAGEL2 |
-| Time course | MAGeCK MLE | JACKS |
-| Multi-cell-line cancer | Chronos | MAGeCK MLE per line |
-| Drug screen | drugZ | MAGeCK MLE |
-| Multi-screen, same library | JACKS | MAGeCK MLE |
-| Variant function (BE/PE) | Custom + CRISPResso2 | See [[base-editing-analysis]] |
-| Combinatorial | MAGeCK MLE + GI scoring | See [[combinatorial-screens]] |
-| Single-cell | SCEPTRE | See [[perturb-seq-analysis]] |
-| Cancer + multi-batch | Chronos | MAGeCK MLE with batch covariate |
-
-## Confidence Tiers
-
-| Tier | Definition | Validation requirement |
-|------|------------|-------------------------|
-| Tier 1 | Called by 3/3 orthogonal methods | Minimal: arrayed in matched line |
-| Tier 2 | Called by 2/3 methods | Arrayed validation; orthogonal modality |
-| Tier 3 | Called by 1 method | Hypothesis; needs further screens before publication |
+The decision tree, thresholds, reconciliation rules, confidence tiers, failure modes and the order of operations are all in SKILL.md; this guide does not repeat them.
 
 ## Related Skills
 

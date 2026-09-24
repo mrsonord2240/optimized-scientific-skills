@@ -13,7 +13,10 @@ stage_map = {'Plasmid': 'plasmid', 'Day0_r1': 'day_0', 'Day0_r2': 'day_0',
              'Endpoint_r1': 'endpoint', 'Endpoint_r2': 'endpoint'}
 condition_map = {'day_0': ['Day0_r1', 'Day0_r2'], 'endpoint': ['Endpoint_r1', 'Endpoint_r2']}
 
-STAGE_THRESHOLDS = {                      # same numbers as SKILL.md's stage_specific_thresholds()
+# Hand-copied from the Skill: pct_zero_max from stage_specific_thresholds() in scripts/library_representation.py
+# (SKILL.md "Library Representation Metrics"), gini_pass/gini_fail from the SKILL.md "Gini Coefficient"
+# stage table (Excellent bound / Failure bound). If you change either there, change this dict too.
+STAGE_THRESHOLDS = {
     'plasmid':  {'pct_zero_max': 0.5, 'gini_pass': 0.10, 'gini_fail': 0.20},
     'day_0':    {'pct_zero_max': 1.0, 'gini_pass': 0.12, 'gini_fail': 0.25},
     'endpoint': {'pct_zero_max': 5.0, 'gini_pass': 0.30, 'gini_fail': 0.55},
@@ -27,6 +30,12 @@ def validate_counts(counts, stage_map):
     '''Fail with a clear message instead of a traceback halfway through the report.'''
     if 'Gene' not in counts.columns:
         raise ValueError("count table has no 'Gene' column (MAGeCK format: sgRNA, Gene, samples...)")
+    # The sgRNA identifier is the index: a default 0..n-1 index means the ID column was lost
+    if isinstance(counts.index, pd.RangeIndex) or (
+            pd.api.types.is_integer_dtype(counts.index)
+            and (counts.index.to_numpy() == np.arange(len(counts))).all()):
+        raise ValueError('index is a default 0..n-1 range, not sgRNA identifiers '
+                         '(MAGeCK format: sgRNA, Gene, samples...; read with index_col=0)')
     matrix = counts.drop('Gene', axis=1)
     non_numeric = [c for c in matrix.columns if not pd.api.types.is_numeric_dtype(matrix[c])]
     if non_numeric:

@@ -24,7 +24,7 @@ package and adapt the example to match the actual API rather than retrying.
 
 The agent's first decision is always: does this workflow need the full record, or just metadata? ESummary is 5-10x cheaper than EFetch for the equivalent record set. For "tell me the organism, length, and definition line for 10,000 accessions", ESummary wins by an order of magnitude.
 
-This Skill assumes you already have UIDs or accessions to fetch. If you need to discover them from a search term, use `entrez-search` first (ESearch) — this Skill does not do discovery, except as the input side of the "History-server fetch" pattern below.
+This Skill assumes you already have UIDs or accessions to fetch. If you need to discover them from a search term, use `entrez-search` first (ESearch) — this Skill does not do discovery, except as the input side of the "History-server fetch" pattern (`references/history-server-fetch.md`).
 
 - Python: `Entrez.efetch(db=..., id=..., rettype=..., retmode=...)` (BioPython)
 - CLI: `efetch -db nucleotide -id NM_007294 -format gb` (Entrez Direct, NBK179288)
@@ -33,10 +33,19 @@ This Skill assumes you already have UIDs or accessions to fetch. If you need to 
 ## Required Setup
 
 ```python
+import time
 from Bio import Entrez, SeqIO
 Entrez.email = 'researcher@institution.edu'
-Entrez.api_key = 'optional_api_key'  # raises rate to 10 req/sec
+# Entrez.api_key = '<your NCBI key>'  # optional: raises rate to 10 req/sec. A placeholder string here gives HTTP 400, so leave unset without a real key
+
+def expect_start(text, prefix):
+    '''EFetch can return an HTML/XML error body with HTTP 200 -- check the first line before parsing.'''
+    if not text.lstrip().startswith(prefix):
+        raise RuntimeError(f'Unexpected EFetch response, starts {text[:80]!r}')
+    return text
 ```
+
+`expect_start` is used by the plain-text patterns (`fetch_genbank` below, `sra_runinfo` in `references/sra.md`); see Failure modes -> "EFetch returns HTML error page".
 
 ## Decision matrix: rettype + retmode per database
 
@@ -55,60 +64,16 @@ The combinations are not orthogonal — each (db, rettype, retmode) triple is en
 | `acc` | `text` | Accession.version per line | Just resolve UID -> accession |
 | `seqid` | `text` | Internal seq-id | Rarely needed |
 
-### pubmed
+### Other databases
 
-| rettype | retmode | Returns | Use when |
-|---|---|---|---|
-| `abstract` | `text` | Title + authors + abstract | Reading abstracts |
-| `medline` | `text` | MEDLINE flat | Parsing with `Bio.Medline` |
-| `xml` | `xml` | Full PubMed XML | Programmatic — get MeSH, grants, PMC link |
-| (omitted) | (omitted) | Defaults to XML | EFetch default for pubmed is XML — pass `retmode='xml'` explicitly for clarity |
+| db | rettype / retmode | File |
+|---|---|---|
+| pubmed | `abstract`, `medline`, `xml` | `references/pubmed.md` |
+| gene, taxonomy, gds | `gene_table`/`xml`, `xml`, default text | `references/gene-taxonomy-gds.md` |
+| sra | `runinfo`, `xml` | `references/sra.md` |
+| clinvar, snp | `vcv`/`xml`, `xml` | `references/variants-clinvar-snp.md` |
 
-### gene
-
-| rettype | retmode | Returns | Use when |
-|---|---|---|---|
-| `gene_table` | `text` | Tabular per-transcript layout | Exon coordinates |
-| `xml` | `xml` | Full Entrez Gene XML | Everything else — name, synonyms, GeneRIFs, locus |
-
-### sra
-
-| rettype | retmode | Returns | Use when |
-|---|---|---|---|
-| `runinfo` | `text` | CSV of run metadata | Convert SRA UID -> SRR accession + Run metrics |
-| `xml` | `xml` | Full SRA XML hierarchy | Need BioSample/BioProject linkage in one call |
-
-### taxonomy
-
-| rettype | retmode | Returns | Use when |
-|---|---|---|---|
-| `xml` | `xml` (default) | TaxNode XML | Lineage, parent, common name |
-
-### gds (GEO)
-
-| rettype | retmode | Returns | Use when |
-|---|---|---|---|
-| (default — no rettype) | `text` | Plaintext SOFT-style summary | Quick metadata; for full series matrix go to FTP |
-
-EFetch for GDS records is intentionally minimal — full GEO downloads go via the FTP mirror or `GEOparse`. See `geo-data` skill.
-
-### clinvar
-
-| rettype | retmode | Returns | Use when |
-|---|---|---|---|
-| `vcv` | `xml` | ClinVar Variation Archive XML | Clinical significance, variant name, accession (checked live 2026-09-17) |
-
-The VCV XML ships with **no DTD or XSD**, so `Entrez.read()` cannot parse it (Biopython raises `ValueError` and recommends `xml.etree.ElementTree` instead — see `clinvar_record()` under Code patterns). ESummary also works (`Entrez.esummary(db='clinvar', id=uid)`) but its docsum references a `common_name` tag missing from Biopython's cached DTD; pass `validate=False` to `Entrez.read()` or use EFetch instead.
-
-ClinVar records report clinically sensitive information (pathogenicity classifications). Report only the record's own stated classification — never infer a diagnosis or a treatment recommendation from it; defer those to a clinician or genetic counselor.
-
-### snp
-
-| rettype | retmode | Returns | Use when |
-|---|---|---|---|
-| `xml` | `xml` | dbSNP docsum XML (alleles, gene, clinical significance, frequencies) | Variant-level metadata for an rs# / numeric SNP UID (checked live 2026-09-17) |
-
-Response is a namespaced (`https://www.ncbi.nlm.nih.gov/SNP/docsum`) `ExchangeSet`/`DocumentSummary` document; parse with `xml.etree.ElementTree` and the namespace map, same as clinvar — see `snp_record()` under Code patterns.
+Wrong combinations return silent empty responses or HTTP 400; read the matching file before sending an unfamiliar one.
 
 ## GI deprecation (still bites in 2026)
 
@@ -134,7 +99,7 @@ NCBI stopped issuing new GI numbers for major nucleotide/protein submissions sta
 | Cross-references (xref) | partial | yes (in GB) | yes |
 | Bulk metadata for 10K records | best (1 call per ~500) | slow | slow |
 
-*Current nucleotide ESummary docsums (Biopython 1.88, checked 2026-09-17) carry no `Organism` field — only `AccessionVersion`, `Length`, `Title`, `TaxId`, etc. Derive organism from the leading binomial in `Title`, or resolve `TaxId` via a `db='taxonomy'` EFetch. See `bulk_summaries()` under Code patterns.
+*Current nucleotide ESummary docsums (Biopython 1.88, checked 2026-09-17) carry no `Organism` field — only `AccessionVersion`, `Length`, `Title`, `TaxId`, etc. Derive organism from the leading binomial in `Title`, or resolve `TaxId` via a `db='taxonomy'` EFetch. See `bulk_summaries()` / `organism_of()` in `examples/fetch_summaries.py`.
 
 ESummary's documented hard limit is 10,000 docsums per call, but the practical sweet spot is ~500 (keeps the URL under length limits when IDs are comma-joined; for >500 use EPost to push IDs server-side first). Per-record payload is much smaller than EFetch. Use ESummary as the default for any metadata-only workflow.
 
@@ -158,10 +123,12 @@ Defensive patterns:
 
 **Reference (BioPython 1.83+):**
 ```python
+from io import StringIO
+
 def fetch_genbank(accession):
     h = Entrez.efetch(db='nucleotide', id=accession, rettype='gb', retmode='text')
-    record = SeqIO.read(h, 'genbank'); h.close()
-    return record
+    text = h.read(); h.close()
+    return SeqIO.read(StringIO(expect_start(text, 'LOCUS')), 'genbank')
 
 gb = fetch_genbank('NM_007294.4')
 for feat in gb.features:
@@ -175,28 +142,7 @@ for feat in gb.features:
 
 **Approach:** ESummary on a comma-joined ID batch (max 500 per call by convention; supports 10K hard limit).
 
-**Reference (BioPython 1.83+):**
-```python
-def bulk_summaries(db, ids, chunk=500):
-    out = []
-    for i in range(0, len(ids), chunk):
-        h = Entrez.esummary(db=db, id=','.join(ids[i:i+chunk]))
-        out.extend(Entrez.read(h)); h.close()
-        time.sleep(0.1 if Entrez.api_key else 0.34)
-    return out
-
-def organism_of(s):
-    '''No direct Organism field on current nucleotide docsums -- derive from Title.'''
-    org = s.get('Organism')
-    if org:
-        return org
-    words = s.get('Title', '').split()
-    return ' '.join(words[:2]) if len(words) >= 2 else s.get('Title', '?')
-
-records = bulk_summaries('nucleotide', uid_list)
-for s in records:
-    print(s['AccessionVersion'], s['Length'], organism_of(s))
-```
+**Reference:** `examples/fetch_summaries.py` defines `bulk_summaries(db, ids, chunk=500)` (chunked ESummary, rate-limited) and `organism_of(docsum)` (derives the organism from `Title` when the docsum has no `Organism` field); run it for a demo, or copy the two functions.
 
 ### Extract CDS in one round-trip
 
@@ -214,122 +160,13 @@ proteins = cds_proteins('NC_000913.3')  # E. coli K-12 genome
 print(f'{len(proteins)} CDS-translated proteins')
 ```
 
-### Pull PubMed with structured MeSH
+### Other code patterns
 
-**Goal:** Get MeSH terms and grant information that aren't in the abstract format.
-
-**Approach:** `rettype='xml'` and walk the PubmedArticle structure defensively.
-
-**Reference (BioPython 1.83+):**
-```python
-def pubmed_full(pmid):
-    h = Entrez.efetch(db='pubmed', id=pmid, retmode='xml')
-    records = Entrez.read(h); h.close()
-    article = records['PubmedArticle'][0]
-    citation = article['MedlineCitation']
-    mesh = [m['DescriptorName'] for m in citation.get('MeshHeadingList', [])]
-    title = citation['Article']['ArticleTitle']
-    # ArticleIdList entries are StringElement (a str subclass with .attributes), not
-    # {'#text': ...} dicts, on Biopython 1.88 -- id['#text'] raises TypeError. Use str(id).
-    ids = article.get('PubmedData', {}).get('ArticleIdList', [])
-    pmc_id = next((str(i) for i in ids if i.attributes.get('IdType') == 'pmc'), None)
-    return {'pmid': pmid, 'title': title, 'mesh': mesh, 'pmc_id': pmc_id}
-```
-
-### History-server fetch (post-ESearch)
-
-**Goal:** Pull a 50,000-record result set without re-sending UIDs.
-
-**Approach:** ESearch with `usehistory='y'`; iterate EFetch with `webenv`/`query_key` and `retstart`. See `batch-downloads` for the production pattern.
-
-```python
-h = Entrez.esearch(db='nucleotide', term='Homo sapiens[ORGN] AND srcdb_refseq[PROP] AND biomol_mrna[PROP]',
-                   usehistory='y', retmax=0)
-r = Entrez.read(h); h.close()
-total = int(r['Count'])
-
-with open('out.fasta', 'w') as out:
-    for start in range(0, total, 500):
-        h = Entrez.efetch(db='nucleotide', rettype='fasta', retmode='text',
-                          retstart=start, retmax=500,
-                          webenv=r['WebEnv'], query_key=r['QueryKey'])
-        out.write(h.read()); h.close()
-        time.sleep(0.1 if Entrez.api_key else 0.34)
-```
-
-### SRA UID -> SRR accession + run metrics
-
-**Goal:** Convert an opaque SRA UID into the SRR run accession plus Bases/Spots metrics, in one EFetch.
-
-**Approach:** `rettype='runinfo'` returns a CSV row per run.
-
-```python
-def sra_runinfo(uids):
-    h = Entrez.efetch(db='sra', id=','.join(uids), rettype='runinfo', retmode='text')
-    raw = h.read(); h.close()
-    # db='sra' returns bytes here despite retmode='text' (Biopython 1.88) -- decode first.
-    text = raw.decode() if isinstance(raw, bytes) else raw
-    lines = text.strip().split('\n')
-    header = lines[0].split(',')
-    return [dict(zip(header, row.split(','))) for row in lines[1:]]
-```
-
-### Taxonomy lineage by TXID
-
-```python
-def lineage(txid):
-    h = Entrez.efetch(db='taxonomy', id=str(txid), retmode='xml')
-    record = Entrez.read(h)[0]; h.close()
-    return record['Lineage'], record['ScientificName']
-```
-
-Given a species name instead of a TXID, ESearch the `taxonomy` db first to resolve it — never assume a TXID from memory.
-
-### ClinVar record by UID
-
-**Goal:** Get a variant's clinical significance from a ClinVar UID.
-
-**Approach:** `rettype='vcv', retmode='xml'`. The response has no DTD/XSD, so `Entrez.read()` cannot parse it (Biopython raises `ValueError` and recommends ElementTree) — parse with `xml.etree.ElementTree` instead.
-
-```python
-import xml.etree.ElementTree as ET
-
-def clinvar_record(uid):
-    h = Entrez.efetch(db='clinvar', id=uid, rettype='vcv', retmode='xml')
-    raw = h.read(); h.close()
-    text = raw.decode() if isinstance(raw, bytes) else raw
-    archive = ET.fromstring(text).find('.//VariationArchive')
-    sig = archive.find('.//Classifications/GermlineClassification/Description')
-    return {
-        'accession': archive.get('Accession'),
-        'variation_name': archive.get('VariationName'),
-        'clinical_significance': sig.text if sig is not None else None,
-    }
-```
-
-Report only the record's own stated classification — never a diagnosis or treatment recommendation.
-
-### dbSNP record by UID
-
-**Goal:** Get alleles, gene, and clinical significance for a numeric SNP UID (e.g. `rs429358` -> UID `429358`).
-
-**Approach:** `rettype='xml', retmode='xml'`; response is namespaced, parse with `xml.etree.ElementTree`.
-
-```python
-def snp_record(uid):
-    h = Entrez.efetch(db='snp', id=uid, rettype='xml', retmode='xml')
-    raw = h.read(); h.close()
-    text = raw.decode() if isinstance(raw, bytes) else raw
-    ns = {'s': 'https://www.ncbi.nlm.nih.gov/SNP/docsum'}
-    doc = ET.fromstring(text).find('s:DocumentSummary', ns)
-    gene = doc.find('.//s:GENE_E/s:NAME', ns)
-    sig = doc.find('s:CLINICAL_SIGNIFICANCE', ns)
-    return {
-        'chr': doc.findtext('s:CHR', default=None, namespaces=ns),
-        'gene': gene.text if gene is not None else None,
-        'clinical_significance': sig.text if sig is not None else None,
-    }
-```
+- PubMed with structured MeSH: `references/pubmed.md`
+- History-server fetch (post-ESearch): `references/history-server-fetch.md`
+- SRA UID -> SRR accession + run metrics: `references/sra.md`
+- Taxonomy lineage by TXID: `references/gene-taxonomy-gds.md`
+- ClinVar and dbSNP records: `references/variants-clinvar-snp.md`
 
 ## Failure modes
 
@@ -366,8 +203,8 @@ def snp_record(uid):
 ### EFetch returns HTML error page
 - **Trigger:** Invalid UID, mid-maintenance window, or expired WebEnv.
 - **Mechanism:** Failure surfaces in HTML body, HTTP status is 200.
-- **Symptom:** SeqIO chokes parsing HTML as GenBank.
-- **Fix:** Sniff the first line of the response — `LOCUS` for GB, `>` for FASTA — and raise on mismatch.
+- **Symptom:** SeqIO chokes parsing HTML as GenBank; a naive CSV split (`sra_runinfo`) silently returns junk rows.
+- **Fix:** Sniff the first line of the response with `expect_start()` (Required Setup) — `LOCUS` for GB, `>` for FASTA, `Run,` for SRA runinfo — and raise on mismatch. `Entrez.read()` routes already raise `RuntimeError` on a backend `<ERROR>` element.
 
 ## Common errors
 
@@ -382,6 +219,19 @@ def snp_record(uid):
 | `TypeError: a bytes-like object is required, not 'str'` | Some databases (e.g. `sra`) return `bytes` from EFetch even with `retmode='text'` | `raw.decode() if isinstance(raw, bytes) else raw` before string ops |
 | `TypeError: string indices must be integers` on a parsed XML element | Treating a `StringElement` (str subclass with `.attributes`) as a dict, e.g. `id['#text']` | Use `str(element)` for the value, `element.attributes.get(...)` for attributes |
 | `ValueError: ... neither a DTD nor an XML Schema ...` | `Entrez.read()` on XML with no DTD (e.g. ClinVar VCV, some dbSNP responses) | Parse with `xml.etree.ElementTree` instead |
+
+
+## Reference Files
+
+| File | Read when |
+|---|---|
+| `references/pubmed.md` | Fetching PubMed abstracts, MEDLINE or XML (MeSH, grants, PMC ID) |
+| `references/gene-taxonomy-gds.md` | Fetching `gene`, `taxonomy` lineage or `gds` records |
+| `references/sra.md` | Converting SRA UIDs to SRR accessions and run metrics |
+| `references/variants-clinvar-snp.md` | Fetching ClinVar VCV or dbSNP records |
+| `references/history-server-fetch.md` | Pulling a large ESearch result set via `webenv`/`query_key` |
+
+Runnable scripts (paths relative to this Skill folder): `scripts/history_fetch.py` (large ESearch result set to FASTA), `scripts/variant_records.py` (ClinVar / dbSNP record by UID). Runnable demos: `examples/`.
 
 ## References
 

@@ -12,10 +12,23 @@ author: GPTomics
 Reference examples tested with: MAGeCK 0.5+ (count + VISPR), MAGeCKFlute 2.0+ (R), pandas 2.2+, numpy 1.26+, scikit-learn 1.4+, matplotlib 3.8+, seaborn 0.13+.
 
 Before using code patterns, verify installed versions match. If versions differ:
-- CLI: `mageck --version` then `mageck count --help`; R: `packageVersion('MAGeCKFlute')`
+- CLI: `mageck --version` then `mageck count --help`
 - R: `packageVersion('MAGeCKFlute')` then `?BatchRemove` / `?FluteRRA`
 
 If code throws ImportError, AttributeError, or TypeError, introspect the installed package and adapt the example to match the actual API rather than retrying.
+
+## Install and Inputs
+
+```bash
+conda install -c bioconda mageck   # not on PyPI
+pip install pandas numpy scipy matplotlib seaborn scikit-learn
+# MAGeCK QC dashboard
+conda install -c bioconda -c conda-forge mageck-vispr
+# R dashboard (optional)
+R -e "remotes::install_github('WubingZhang/MAGeCKFlute')"   # removed from Bioconductor at 3.22
+```
+
+Required inputs: MAGeCK count output (`screen.count.txt`), plasmid-pool counts (separate file or first sample), known copy-number profile per cell line (from WGS / SNP-array / ASCAT / matched cell-line database), and CEGv2 / NEGv1 reference gene sets (CEGv2 from Hart 2017, NEGv1 from Hart 2014; `hart-lab/bagel` repository).
 
 ## CRISPR Screen Quality Control
 
@@ -28,16 +41,16 @@ If code throws ImportError, AttributeError, or TypeError, introspect the install
 
 A pooled screen has six distinct bottlenecks where complexity can collapse. Audit each:
 
-| Stage | Metric | Acceptable threshold | Failure consequence |
-|-------|--------|----------------------|----------------------|
-| Plasmid pool | Gini, skew, % zero-count guides | Gini <0.1, skew <2 (Joung 2017 states <10), zero <0.5% | Missing guides cannot be screened; dropout indistinguishable from non-coverage |
-| Day-0 infection | Library coverage, MOI verification | ≥99% guide detection at 500x cells/sgRNA; MOI 0.3 | Founder effects; polyclonality with high MOI |
-| Selection (puro/blast) | % cells surviving, time-course Gini | 30-40% survival at 5-7 days; Gini drift <0.05 | Selection artifact; fast-growers enriched |
-| Endpoint | Replicate correlation, depth | Pearson >=0.8 on log-counts (MAGeCK-VISPR floor), Spearman >0.7-0.8, >500 reads/sgRNA (Joung 2017 screening) | Noise dominates; FDR inflates |
-| Biological signal | CEGv2 PR-AUC, NEGv1 false-positive rate | PR-AUC >0.7 at FDR 5% (community "passing" convention); CEGv2 enrichment in top 1k | Screen lacks essentiality signal; hits not credible |
-| Copy-number artifact | Amplified-region enrichment, sgRNA-cut-count correlation | No correlation between sgRNA off-target count and depletion | False-positive essentiality at amplicons; ERBB2 in HER2+ etc. |
+| Stage | Metric | Acceptable threshold | Failure consequence | Detail |
+|-------|--------|----------------------|----------------------|--------|
+| Plasmid pool | Gini, skew, % zero-count guides | Gini <0.1, skew <2 (Joung 2017 states <10), zero <0.5% | Missing guides cannot be screened; dropout indistinguishable from non-coverage | Below; [failure modes](references/failure-modes.md) |
+| Day-0 infection | Library coverage, MOI verification | ≥99% guide detection at 500x cells/sgRNA; MOI 0.3 | Founder effects; polyclonality with high MOI | [depth-and-moi](references/depth-and-moi.md) |
+| Selection (puro/blast) | % cells surviving, time-course Gini | 30-40% survival at 5-7 days; Gini drift <0.05 | Selection artifact; fast-growers enriched | Below |
+| Endpoint | Replicate correlation, depth | Pearson >=0.8 on log-counts (MAGeCK-VISPR floor), Spearman >0.7-0.8, >500 reads/sgRNA (Joung 2017 screening) | Noise dominates; FDR inflates | Below; [depth-and-moi](references/depth-and-moi.md); [pca-and-composite-score](references/pca-and-composite-score.md) |
+| Biological signal | CEGv2 PR-AUC, NEGv1 false-positive rate | PR-AUC >0.7 at FDR 5% (community "passing" convention); CEGv2 enrichment in top 1k | Screen lacks essentiality signal; hits not credible | [essentialome-recovery](references/essentialome-recovery.md) |
+| Copy-number artifact | Amplified-region enrichment, sgRNA-cut-count correlation | No correlation between sgRNA off-target count and depletion | False-positive essentiality at amplicons; ERBB2 in HER2+ etc. | [copy-number-bias](references/copy-number-bias.md) |
 
-Each metric below quantifies one of these stages.
+Each metric below, and in the reference files, quantifies one of these stages.
 
 ## Library Representation Metrics
 
@@ -45,31 +58,11 @@ Each metric below quantifies one of these stages.
 
 **Approach:** Compute per-sample zero-count fraction, low-count fraction (<30 reads, the CRISPRcleanR `ccr.NormfoldChanges` default), and percentile-based skew, then track how these change between plasmid -> Day-0 -> endpoint to localize the bottleneck.
 
-```python
-import pandas as pd
-import numpy as np
-
-def library_representation(counts_df):
-    '''Per-sample library coverage diagnostics.
-    counts_df: rows = sgRNAs, columns = samples (numeric counts).'''
-    out = pd.DataFrame(index=counts_df.columns)
-    out['n_sgrnas_detected'] = (counts_df > 0).sum()
-    out['pct_zero'] = (counts_df == 0).sum() / len(counts_df) * 100
-    out['pct_lowcount'] = (counts_df < 30).sum() / len(counts_df) * 100
-    out['median_count'] = counts_df.median()
-    out['p10_count'] = counts_df.quantile(0.10)
-    out['p90_count'] = counts_df.quantile(0.90)
-    out['skew_ratio'] = out['p90_count'] / out['p10_count'].replace(0, np.nan)
-    return out
-
-def stage_specific_thresholds():
-    '''Stage conventions: Joung 2017 (zero-count, skew) + MAGeCK-VISPR (Gini).'''
-    return {
-        'plasmid':  {'pct_zero_max': 0.5, 'skew_max': 2.0, 'gini_max': 0.10},   # skew 2.0 is a stricter modern convention; Joung 2017 states <10
-        'day_0':    {'pct_zero_max': 1.0, 'skew_max': 2.5, 'gini_max': 0.12},
-        'endpoint': {'pct_zero_max': 5.0, 'skew_max': 10.0, 'gini_max': 0.30},
-    }
+```bash
+python scripts/library_representation.py screen.count.txt --out library_representation.tsv
 ```
+
+`scripts/library_representation.py` prints one row per sample (`n_sgrnas_detected`, `pct_zero`, `pct_lowcount`, `median_count`, `p10_count`, `p90_count`, `skew_ratio`) and also exports `library_representation(counts_df)` and `stage_specific_thresholds()` for import. The stage limits it returns (pct_zero_max / skew_max / gini_max: plasmid 0.5 / 2.0 / 0.10, day_0 1.0 / 2.5 / 0.12, endpoint 5.0 / 10.0 / 0.30) follow Joung 2017 (zero-count, skew) and MAGeCK-VISPR (Gini); skew 2.0 is a stricter modern convention, Joung 2017 states <10.
 
 **Interpretation:** Plasmid pool failing Gini <0.1 indicates synthesis or amplification bias; the screen is unfit for use. Endpoint Gini drifting above 0.30 indicates either heavy biological selection (acceptable for strong-phenotype drug screens) or a bottleneck (must be diagnosed). The Day-0 vs plasmid delta isolates whether the issue arose during infection (cloning is unlikely to lose specific guides between extraction and infection -- the change happens in cells).
 
@@ -133,204 +126,28 @@ def replicate_concordance(counts_df, condition_map):
 
 **When Pearson is high but Spearman is low**, a few outlier sgRNAs are driving correlation (one extreme guide dominates). Inspect the scatterplot; typically caused by PCR jackpotting at a single guide. Hit calling should use a method that ranks (RRA, drugZ) rather than one that fits per-sgRNA fold change directly.
 
-## Essentialome Recovery (CEGv2 PR-AUC)
+## Reference Files
 
-**Goal:** Verify the screen has detectable biological essentiality signal by checking whether known essentials (Hart 2017 CEGv2) drop out faster than known non-essentials (NEGv1).
+Read the one that matches the failing stage or the request; they hold the code and method detail.
 
-**Approach:** Compute precision-recall AUC where positives are CEGv2 genes and negatives are NEGv1; the screen "passes" if PR-AUC >0.7 (community convention; the CEGv2/NEGv1 sets come from Hart 2017 / Hart 2014).
+| File | Read when |
+|------|-----------|
+| [references/essentialome-recovery.md](references/essentialome-recovery.md) | Computing CEGv2/NEGv1 PR-AUC, or PR-AUC is low despite good Gini and Pearson |
+| [references/copy-number-bias.md](references/copy-number-bias.md) | Cancer-cell-line screen, amplicon genes among the hits, or gating on CN bias (two-rule diagnostic) |
+| [references/depth-and-moi.md](references/depth-and-moi.md) | Auditing reads per sgRNA, total-read CV, or verifying MOI and the Poisson multi-guide fraction |
+| [references/pca-and-composite-score.md](references/pca-and-composite-score.md) | Checking condition vs batch clustering, or building the single pipeline-gate score |
+| [references/failure-modes.md](references/failure-modes.md) | A metric fails and the cause is not obvious (PCR bias, Cas9 heterogeneity, amplicons, outlier replicate, high MOI, CRISPRi TSS) |
 
-```python
-from sklearn.metrics import precision_recall_curve, auc, roc_auc_score
+Runnable code: `scripts/library_representation.py`, `scripts/essentialome_recovery.py`, `scripts/cn_bias.py` (each takes files as arguments and is importable), and the end-to-end `examples/screen_qc.py` (edit its `stage_map` / `condition_map`, run in the folder holding `screen.count.txt`).
 
-def essentialome_recovery(gene_lfc_df, cegv2_set, negv1_set):
-    '''gene_lfc_df: must have ["gene", "lfc"] columns (gene-level mean LFC, negative = depleted).
-    cegv2_set, negv1_set: sets of gene symbols from Hart 2017.'''
-    labeled = gene_lfc_df[gene_lfc_df['gene'].isin(cegv2_set | negv1_set)].copy()
-    labeled['is_essential'] = labeled['gene'].isin(cegv2_set).astype(int)
-    y_score = -labeled['lfc']  # negative LFC = depleted = more essential -> higher score
-    precision, recall, _ = precision_recall_curve(labeled['is_essential'], y_score)
-    return {
-        'pr_auc': auc(recall, precision),
-        'roc_auc': roc_auc_score(labeled['is_essential'], y_score),
-        'n_essential_detected': labeled['is_essential'].sum(),
-        'n_nonessential_detected': (1 - labeled['is_essential']).sum(),
-    }
-```
+## Interpretation Notes
 
-**Source / threshold:** Hart 2017 *G3* 7:2719 defines CEGv2 (~684 core essentials); NEGv1 (~927 non-essentials) comes from Hart 2014 *Mol Syst Biol* 10:733. Both lists at https://github.com/hart-lab/bagel/blob/master/CEGv2.txt and NEGv1.txt. DepMap convention: PR-AUC >0.7 at FDR 5% is the "passing" threshold; <0.5 means the screen has no essentiality signal and is not interpretable.
-
-**When PR-AUC is low despite good Gini and Pearson**: cause is usually one of (a) Cas9 was not selected for before screen start (lots of Cas9-negative cells in the pool diluting signal), (b) puromycin selection truncated too aggressively (over-bottleneck), (c) the timepoint is too early (need 14-21 days for KO + decay + selection to manifest). Each has a different remediation.
-
-## Copy-Number Amplicon Bias Diagnostic
-
-**Goal:** Detect the Aguirre 2016 / Munoz 2016 copy-number artifact where sgRNAs targeting amplified loci appear "essential" purely from DNA-damage burden.
-
-**Approach:** Bin genes by copy number (if known from matched WGS/SNP-array) and check whether mean LFC correlates with CN. Alternatively, count off-target cut sites per sgRNA and check correlation with depletion -- amplified loci share many identical cut sites.
-
-```python
-def cn_bias_diagnostic(gene_lfc_df, cn_df):
-    '''cn_df: per-gene copy number (from WGS/SNP-array/matched ASCAT).
-    Tests whether amplified genes show systematically lower LFC.'''
-    merged = gene_lfc_df.merge(cn_df, on='gene')
-    bins = pd.qcut(merged['copy_number'], q=5, duplicates='drop')
-    bin_lfc = merged.groupby(bins, observed=True)['lfc'].agg(['mean', 'median', 'std', 'count'])
-    from scipy.stats import spearmanr, mannwhitneyu
-    rho, p = spearmanr(merged['copy_number'], merged['lfc'])
-    amplified = merged[merged['copy_number'] > 4]['lfc']
-    diploid = merged[merged['copy_number'].between(1.5, 2.5)]['lfc']
-    gap, p_gap = np.nan, np.nan
-    if len(amplified) >= 3 and len(diploid) >= 3:
-        gap = amplified.mean() - diploid.mean()
-        p_gap = mannwhitneyu(amplified, diploid, alternative='less').pvalue
-    return {'cn_vs_lfc_rho': rho, 'cn_vs_lfc_p': p,
-            'n_amplified_genes': len(amplified),
-            'amplified_mean_lfc': amplified.mean(),
-            'diploid_mean_lfc': diploid.mean(),
-            'amplified_vs_diploid_gap': gap,        # negative = amplified genes more depleted
-            'p_amplified_more_depleted': p_gap,
-            'cn_bias_present': bool((rho < -0.1 and p < 0.01) or (gap < -0.5 and p_gap < 0.01)),
-            'per_bin': bin_lfc}
-```
-
-**Interpretation: two rules, not one.**
-
-1. **Genome-wide.** Spearman ρ < -0.1 (p < 0.01) between copy number and LFC indicates a broad
-   copy-number artifact.
-2. **Focal.** Compare `amplified_mean_lfc` with `diploid_mean_lfc` directly. A single amplicon
-   covers tens of genes out of ~18,000, so it barely moves ρ: on a realistic 40-gene amplicon the
-   genome-wide ρ was only -0.066 while amplified genes averaged LFC -0.877 against -0.019 for
-   diploid ones (p = 7e-19). Treat a gap below -0.5 with a significant one-sided test as bias even
-   when ρ passes.
-
-Either rule firing means correct before hit calling. When a specific amplicon is suspected, run the
-diagnostic again on that region's genes plus a diploid background. Remediation: CRISPRcleanR, CERES
-or Chronos (see [[copy-number-correction]], whose `detect_cn_bias()` applies the same two rules)
-before hit calling.
-
-## Sequencing Depth Audit
-
-**Goal:** Verify that sequencing depth is sufficient to resolve fold changes at the smallest interesting effect size.
-
-**Approach:** Compute reads/sgRNA per sample and the coefficient of variation (CV) of total reads across samples. Compare against Joung 2017's >100 reads/sgRNA for plasmid QC and >500 for screening, or MAGeCK-VISPR's 300x.
-
-```python
-def depth_audit(counts_df):
-    '''Verify depth: Joung 2017 recommends >100 reads/sgRNA for plasmid QC and
-    >500 for screening; MAGeCK-VISPR uses 300x.'''
-    total = counts_df.sum()
-    n_sgrnas = len(counts_df)
-    depth = total / n_sgrnas
-    cv = total.std() / total.mean()
-    return pd.DataFrame({'total_reads': total, 'reads_per_sgrna': depth,
-                          'depth_grade': np.where(depth < 100, 'FAIL',
-                                          np.where(depth < 300, 'CAUTION',
-                                          np.where(depth < 500, 'OK', 'EXCELLENT')))}).assign(across_sample_cv=cv)
-    # 100 = Joung 2017 plasmid-QC floor; 300 = MAGeCK-VISPR; 500 = Joung 2017 screening
-```
-
-**CV interpretation:** CV >0.5 across samples in total reads indicates demultiplexing imbalance or library-pooling error; even if individual samples pass depth thresholds, the relative count is then biased.
-
-## MOI Verification
-
-**Goal:** Confirm that infection occurred at MOI 0.3-0.5 so that ≤1 sgRNA/cell predominates.
-
-**Approach:** From titration plate (control wells with serial-diluted virus), compute infection efficiency, then verify by qPCR of integrated proviral copy number in the screen pool.
-
-| MOI | P(≥1 sgRNA/cell) | P(≥2 sgRNAs/cell) | Cells with 2+ guides as fraction of infected |
-|-----|------------------|--------------------|-----------------------------------------------|
-| 0.3 | 26% | 4% | 14% |
-| 0.5 | 39% | 9% | 23% |
-| 1.0 | 63% | 26% | 41% |
-
-**Decision rule:** Always titrate to 0.3. At 0.5, 14-23% of "perturbed" cells carry combinatorial perturbations that confound single-gene scoring. The Poisson math is non-negotiable -- there is no analytical correction for high-MOI confounding.
-
-## PCA and Batch Effect Detection
-
-**Goal:** Visualize whether samples cluster by biology or by batch.
-
-**Approach:** PCA on log10(counts+1); samples should cluster by condition, not by batch/replicate-day/library-lot.
-
-```python
-from sklearn.decomposition import PCA
-
-def screen_pca(counts_df, metadata_df, condition_col='condition'):
-    '''metadata_df: rows = samples, columns include condition_col, batch (optional).'''
-    log_counts = np.log10(counts_df + 1).T  # samples as rows for PCA
-    pca = PCA(n_components=3)
-    pcs = pca.fit_transform(log_counts)
-    out = pd.DataFrame(pcs, columns=['PC1', 'PC2', 'PC3'], index=counts_df.columns)
-    out = out.join(metadata_df)
-    return out, pca.explained_variance_ratio_
-```
-
-**Interpretation:** If PC1 separates batches, see [[batch-correction]]. If PC1 separates conditions cleanly, the screen has interpretable biology. If neither separates anything, the screen has no signal (failed) or is dominated by technical noise.
-
-## Composite DepMap-Style Quality Score
-
-**Goal:** Generate a single quality grade combining all metrics for pipeline gating.
-
-**Approach:** Rescale each metric to a comparable 0-1 direction and average them into a single gate score. Screens scoring <-1 SD are typically excluded from DepMap.
-
-```python
-def composite_qc_score(per_sample_qc):
-    '''per_sample_qc: one row per sample, joining library_representation() output
-    (n_sgrnas_detected, reads_per_sgrna) with gini, pearson_min_replicate, pr_auc
-    and n_sgrnas_total.'''
-    metrics = {
-        'gini_inv': 1 - per_sample_qc['gini'],
-        'pearson': per_sample_qc['pearson_min_replicate'],
-        'pr_auc': per_sample_qc['pr_auc'],
-        'depth_log': np.log10(per_sample_qc['reads_per_sgrna']),
-        'detected_frac': per_sample_qc['n_sgrnas_detected'] / per_sample_qc['n_sgrnas_total'],
-    }
-    return pd.DataFrame(metrics).mean(axis=1)
-```
-
-This is a pipeline gate, not a publication metric. DepMap reports `gene effect score quality` (Chronos-derived) separately from screen quality; Pacini 2021 scores the latter with NNMD.
-
-## Failure Modes
-
-### High Gini in plasmid pool despite passing all design rules
-
-**Trigger:** Library was cloned and amplified through too many PCR cycles (>20) or used a high-GC-bias polymerase.
-**Mechanism:** Each PCR cycle compounds GC bias by ~5%; high-GC and low-GC guides become non-linear functions of starting abundance.
-**Symptom:** Gini >0.15 in plasmid, GC-content stratification of dropout.
-**Fix:** Cap PCR at 15 cycles for amplification; use Q5 / NEBNext Ultra II / KAPA HiFi (low-bias); re-sequence post-amp; if still bad, re-clone from glycerol stock.
-
-### Falling PR-AUC across timepoints despite stable Gini
-
-**Trigger:** Cas9 was not selected for before screen start; Cas9-negative cells in the pool dilute essentiality signal.
-**Mechanism:** Each Cas9-negative cell carries a sgRNA but no editing; its sgRNA persists despite biological essentiality of the target.
-**Symptom:** PR-AUC declines from 0.7 at week 1 to 0.4 at week 3; Gini and Pearson both pass.
-**Fix:** Always select Cas9-positive cells (FACS or blast) before infection. For a salvage of an already-run screen, model Cas9-expression heterogeneity as a noise floor and accept reduced sensitivity.
-
-### Apparent essentiality of amplified loci
-
-**Trigger:** Cancer cell line with focal amplification (ERBB2 in SK-BR-3, MYC in colorectal, FGFR1 in head and neck).
-**Mechanism:** Aguirre 2016 / Munoz 2016: many simultaneous Cas9 cuts trigger a DNA-damage response and G2 arrest; sgRNAs at amplified loci appear depleted independently of target essentiality.
-**Symptom:** Hits include genes within known amplicons; sgRNAs with more genome-wide cut sites are more depleted.
-**Fix:** Apply CRISPRcleanR pre-hoc or use Chronos/CERES with matched CN profile (see [[copy-number-correction]]). Always required for cancer-cell-line screens, not optional.
-
-### Outlier replicate dragging Pearson down
-
-**Trigger:** One technical replicate had a library-prep failure (low input, PCR jackpot, sequencing-lane swap).
-**Mechanism:** Outlier sample has different total reads or different per-sgRNA distribution but passes individual sample QC.
-**Symptom:** Pearson between replicates 0.85-0.90 with one pair as outlier; condition-level means look fine.
-**Fix:** Drop the outlier replicate; re-derive Pearson on the remaining pair. If only two replicates and one is outlier, the condition lacks replication and must be re-run.
-
-### Low Day-0 coverage from high MOI
-
-**Trigger:** Infection at MOI >0.5.
-**Mechanism:** Poisson: at MOI 0.5, 23% of infected cells carry multiple sgRNAs; the "single-perturbation" assumption underlying every analysis method is violated.
-**Symptom:** Apparent gene-gene interactions in single-gene screens; gene-level z-scores noisy; Pearson lower than expected for high-quality counts.
-**Fix:** No analytical correction. Re-titrate, re-infect at MOI 0.3, re-run screen.
-
-### CRISPRi/a screen with no signal on validated essentials
-
-**Trigger:** Library targets wrong TSS (Ensembl canonical vs FANTOM5 highest-rank).
-**Mechanism:** dCas9-KRAB knockdown is maximal within ±100 bp of the actual Pol II loading site; canonical annotation can be off 1-10 kb.
-**Symptom:** RPS/RPL/EIF families dropping out as expected (these have clean canonical TSSs) but downstream genes failing; PR-AUC on broader CEGv2 panel drops.
-**Fix:** Re-design library against FANTOM5 highest-CAGE-peak TSS (Sanson 2018); for tissue-specific lines, use matched CAGE / GRO-seq.
+- Plasmid-pool sequencing (Gini <0.1, >=99% guide detection at >25 reads/guide) is non-negotiable; everything downstream is normalized against this baseline. A screen with an un-sequenced plasmid pool is uninterpretable.
+- Day-0 vs plasmid: Pearson >0.9 is expected; below it, diagnose the infection step.
+- CEGv2 PR-AUC is the single most diagnostic metric: a pass means the screen has biology even if individual sample metrics look weak, and a screen below 0.5 cannot be fixed in software. "Passing" every earlier stage is necessary but not sufficient; PR-AUC is the final gate.
+- Drug screens: endpoint Gini drifting to 0.3-0.5 is normal because biology drives selection. Compare against vehicle, not Day 0, for any chemogenomic interpretation.
+- CRISPRi/a: expect lower per-gene PR-AUC than Cas9 (not every essential responds to knockdown as it does to knockout); calibrate against the DepMap CRISPRi sub-essentialome rather than CEGv2.
+- Pick the hit-calling method from the quality grade: high quality -> MAGeCK MLE or Chronos; low quality -> RRA or drugZ; cancer line -> Chronos with CN correction; in vivo -> bottleneck-adjusted thresholds.
 
 ## When NOT to Use This Skill
 
@@ -346,7 +163,7 @@ Before any metric, check the count table and fail with a clear message rather th
 
 | Check | Expectation | If it fails |
 |-------|-------------|-------------|
-| Required columns | an sgRNA identifier column (index) and a `Gene` column, then one numeric column per sample | name the missing column; do not guess |
+| Required columns | an sgRNA identifier column (index) and a `Gene` column, then one numeric column per sample; a default `0..n-1` index means the identifier column was lost | name the missing column; do not guess |
 | Dtypes | every sample column numeric | report which column is non-numeric and the first offending value |
 | All-zero sample | at least one non-zero count per sample | report the sample as failed at sequencing, and skip (not `nan`-propagate) its Gini and correlation |
 | Negative counts | none | reject the file; these are not counts |

@@ -13,16 +13,24 @@ git clone https://github.com/uzh-dqbm-cmi/PRIDICT2
 
 # CRISPResso2 for amplicon analysis
 conda install -c bioconda crispresso2   # not on PyPI
+# or, as SKILL.md's block assumes, the container: pinellolab/crispresso2:latest
 
-# Helpers
-pip install pandas numpy biopython
+# ePRIDICT for the chromatin-context check (Linux/macOS only -- pybigwig has no Windows wheel;
+# use WSL on Windows). Needs the model's ENCODE bigWigs too: ~5.3 GB for the light model.
+git clone https://github.com/Schwank-Lab/epridict
+conda create -n epridict -c conda-forge python=3.10 numpy pandas scipy tqdm joblib xgboost pybigwig
+# then: ./epridict_download_encode.sh light   (see references/epridict-chromatin.md)
+
+# Helpers (biopython is not used -- PBS/RTT extraction is a hand-rolled reverse complement)
+pip install pandas numpy
 ```
 
 Required inputs:
 - Intended variant list with genomic coordinates
 - Target genome reference (e.g. GRCh38)
 - Cell line for PE chemistry validation
-- Chromatin accessibility profile (ATAC-seq) for chromatin-aware filtering
+- The ePRIDICT model's ENCODE chromatin tracks for chromatin-aware filtering (downloaded with the
+  tool, not a user-supplied ATAC-seq track)
 
 ## Quick Start
 
@@ -49,7 +57,7 @@ Tell the AI agent what to do:
 
 ### Chromatin-Aware Design
 
-> "Cross-reference my pegRNA library with K562 ATAC-seq accessibility. Flag pegRNAs targeting closed chromatin (signal <0.5) for empirical pilot validation before library order. Mathis 2025 documented chromatin as a major locus-level determinant beyond PRIDICT sequence prediction, which is why ePRIDICT is meant to be combined with PRIDICT2.0."
+> "Score the loci my PRIDICT2-selected pegRNAs target with ePRIDICT (K562). Flag pegRNAs whose ePRIDICT percentile is low despite a high PRIDICT2 score for empirical pilot validation before library order. Mathis 2025 documented chromatin as a major locus-level determinant beyond PRIDICT sequence prediction, which is why ePRIDICT is meant to be combined with PRIDICT2.0."
 
 ### MOSAIC / Saturation
 
@@ -63,7 +71,7 @@ Tell the AI agent what to do:
 
 > "PE screen has 30% scaffold incorporation across library. Diagnose: RTT too short relative to PBS, or RT processivity issue with this cell line? Recommend pegRNA re-design or chemistry switch."
 
-> "PRIDICT2 predicts 65% efficiency for my top pegRNAs, but pilot CRISPResso2 shows 8%. Identify chromatin context as the cause; cross-reference ATAC-seq."
+> "PRIDICT2 predicts 65% efficiency for my top pegRNAs, but pilot CRISPResso2 shows 8%. Score those loci with ePRIDICT to test chromatin context as the cause."
 
 ## What the Agent Will Do
 
@@ -72,7 +80,7 @@ Tell the AI agent what to do:
 3. Design pegRNA candidates: spacer + PBS (11-13 nt, 40-55% GC) + RTT (10-20 nt) + scaffold
 4. Run PRIDICT2 to predict per-pegRNA efficiency, indel rate, scaffold incorporation
 5. Filter library to top 3 pegRNAs per variant with predicted efficiency >50%
-6. Cross-reference with ATAC-seq accessibility; flag closed-chromatin loci for pilot
+6. Score the selected targets' chromatin context with ePRIDICT; flag low-percentile loci for pilot
 7. Pilot the library at 20-50 representative loci; verify empirical efficiency matches PRIDICT2
 8. Scale to full screen at MOI 0.3 in PE-expressing cell line
 9. Endpoint amplicon sequencing of each target locus
@@ -99,7 +107,7 @@ For efficiency/QC thresholds, see SKILL.md's "Quantitative Thresholds".
 ## Validation Checklist
 
 - [ ] Pre-synthesis PRIDICT2 filter (>50%)
-- [ ] Chromatin accessibility cross-referenced
+- [ ] Chromatin context cross-referenced (ePRIDICT on the PRIDICT2-selected positions)
 - [ ] Pilot empirical efficiency match >70% of PRIDICT2 prediction
 - [ ] CRISPResso2 PE mode for quantification
 - [ ] Scaffold incorporation <5% library-wide

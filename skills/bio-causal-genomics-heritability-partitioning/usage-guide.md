@@ -6,9 +6,9 @@ Estimate SNP heritability (`h2_SNP`) and decompose it across functional categori
 
 ## Prerequisites
 
-Install notes for LDSC, LDAK, HDL, HESS, BOLT-LMM, GCTA, and Popcorn (which fork, which flags need a
-patch, and the reference-resource downloads) are in SKILL.md's "Tool Install Notes" -- that is the
-one place they're kept up to date.
+Install notes for LDSC, BOLT-LMM, GCTA, and Popcorn (which fork, which flags need a patch, and the
+reference-resource downloads) are in SKILL.md's "Tool Install Notes"; LDAK, HESS and HDL installs are in
+their `references/` files (SKILL.md, "Per-Method Reference Files").
 
 Inputs: GWAS summary statistics with columns SNP, A1, A2, BETA (or Z), SE, P, N (per-SNP or column-supplied). Allele frequency column EAF strongly recommended. For case-control GWAS, also supply sample case fraction (`--samp-prev`) and population lifetime prevalence (`--pop-prev`).
 
@@ -37,7 +37,7 @@ Tell your AI agent what you want to do:
 > "Prioritize trait-relevant tissues using the Multi_tissue_chromatin_1000Gv3 ldcts file with `ldsc.py --h2-cts`. Apply Bonferroni at `0.05 / N_tissue` (~ 2.5e-4 for 200 tissues). Cross-reference top tissues against the disease's known biology."
 
 ### LDSC vs LDAK Reconciliation
-> "Functional enrichment claim depends on the per-SNP heritability model. Run BOTH LDSC baseline-LD AND LDAK SumHer with LDAK-Thin tagging. If they disagree by > 2x, report enrichment as model-dependent (the unresolved S-LDSC vs LDAK enrichment debate: Gazal 2019 Nat Genet 51:1202 favours baseline-LD S-LDSC; the LDAK developers defend SumHer, Speed 2020 Nat Genet 52:458). Prefer LDAK for conserved regions per Speed 2019."
+> "Functional enrichment claim depends on the per-SNP heritability model. Run BOTH LDSC baseline-LD AND LDAK SumHer with LDAK-Thin tagging. If they disagree by > 2x, report enrichment as model-dependent (the unresolved S-LDSC vs LDAK enrichment debate: Gazal 2019 Nat Genet 51:1202 favours baseline-LD S-LDSC; the LDAK developers defend SumHer, Speed 2020 Nat Genet 52:458)."
 
 ### Cross-Trait Genetic Correlation
 > "Estimate rg between trait1 and trait2 from sumstats. If sample overlap > 5%, use cross-trait LDSC (`ldsc.py --rg`) because HDL is biased under overlap. If non-overlapping, use HDL for ~60% lower variance. Report rg, SE, p, and cross-trait intercept."

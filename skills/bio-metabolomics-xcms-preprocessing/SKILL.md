@@ -14,10 +14,12 @@ Reference examples tested with: xcms 4.x+ (MsExperiment/XcmsExperiment container
 Before using code patterns, verify installed versions match. If versions differ:
 - R: `packageVersion('xcms')` then `?CentWaveParam` to verify parameter names and defaults
 
+Install: `BiocManager::install(c('xcms', 'MsExperiment', 'Spectra', 'CAMERA'))` (checked on xcms 4.4.0, MsExperiment 1.8.0, CAMERA 1.62.0, Bioconductor 3.20).
+
 If code throws ImportError, AttributeError, or TypeError, introspect the installed
 package and adapt the example to match the actual API rather than retrying.
 
-A feature table is only meaningful alongside its full processing specification: which xcms version, every `*Param` value, and the fill/filter ordering. The table is a parameterized hypothesis about which molecules exist, not the data.
+A feature table is only meaningful alongside its full processing specification: which xcms version, every `*Param` value, and the fill/filter ordering. The table is a parameterized hypothesis about which molecules exist, not the data; a finding that survives only one software/parameter set is a candidate, not a result.
 
 # XCMS Untargeted LC-MS Preprocessing
 
@@ -42,12 +44,12 @@ Parameters are objects, not loose args: `findChromPeaks(data, param = CentWavePa
 | Situation | Do | Why |
 |-----------|----|----|
 | High-res centroid (Orbitrap, Q-Exactive, qTOF) | `CentWaveParam` | Wavelet on real mass traces, no fixed binning |
-| Low-res / quadrupole / profile-only | `MatchedFilterParam` | Model-peak on binned EICs tolerates poor resolution |
-| Profile data of any kind | Centroid first (msconvert vendor peakPicking, or `Spectra::pickPeaks`) | centWave requires centroids; profile input yields garbage mass traces |
+| Low-res / quadrupole / profile-only | `MatchedFilterParam` (worked example in Peak Detection) | Model-peak on binned EICs tolerates poor resolution |
+| Profile data of any kind | Centroid first, in software with a documented algorithm (msconvert vendor peakPicking, or `Spectra::pickPeaks`), not irreversible on-instrument centroiding | centWave requires centroids; profile input yields garbage mass traces |
 | Many shared, well-behaved peaks across samples | `PeakGroupsParam` (after an initial `groupChromPeaks`) | Loess on universal anchor peaks; gentle and fast |
 | Few shared peaks / sparse / strong nonlinear drift | `ObiwarpParam` | Full-profile warping needs no prior peaks |
 | Cohort with large case/control compositional differences | `ObiwarpParam`, or `PeakGroupsParam` with `subset =` QC indices | Few universal anchors mis-register the condition-specific metabolome |
-| New instrument, no parameter priors | AutoTuner / IPO for a starting neighborhood, then verify against EIC FWHM | Optimizers maximize a surrogate, not biology (McLean 2020) |
+| New instrument, no parameter priors | Start from the Quantitative Thresholds table, then measure peak base-widths on 5-10 known EICs (Peak Detection) and iterate `peakwidth`, `snthresh` and `ppm` | Automated optimizers (AutoTuner, IPO) are not covered here: they maximize a surrogate, not biology (McLean 2020), so EIC width is the check either way |
 | GC-EI data | Deconvolution tools, not xcms peak picking -> metabolomics/msdial-preprocessing | Co-elution + universal fragmentation require component separation first |
 
 ## Peak Detection
@@ -58,7 +60,8 @@ Parameters are objects, not loose args: `findChromPeaks(data, param = CentWavePa
 
 ```r
 library(xcms)
-# spectraFiles: centroided mzML paths; pd: data.frame with one row per file
+# spectraFiles: centroided mzML paths; pd: data.frame with one row per file, recording the
+# sample design before processing (sample_name, sample_group, QC/blank type, injection order)
 raw <- readMsExperiment(spectraFiles = mzml_files, sampleData = pd)
 
 # ppm is across-scan centroid scatter (~2-3x measured error), NOT the spec mass accuracy.
@@ -70,20 +73,44 @@ xdata <- findChromPeaks(raw, param = cwp)
 nrow(chromPeaks(xdata))
 ```
 
+**Check the parameters on real EICs** (also the starting point for a new instrument with no priors): take a few known compounds, plot their EICs and read the peak base-width off them.
+
+```r
+# mz0 / rt0 (s): a known compound; window is +/- 10 ppm and +/- 60 s
+chr <- chromatogram(raw, mz = mz0 + c(-1, 1) * mz0 * 10e-6, rt = rt0 + c(-60, 60))
+plot(chr)   # base-width of the peak sets peakwidth
+```
+
+**Low-res / quadrupole / profile-only data** (centroided first, see Decision Tree): use `MatchedFilterParam` instead of `CentWaveParam`. `fwhm` is the chromatographic peak FWHM in seconds, measured from EICs as above; it matters (on faahKO, `fwhm = 10` found 276 peaks vs 470 at the default 30 in the same file). `sigma` is derived as `fwhm / 2.3548`. `binSize` is the m/z slice width (default 0.1); `mzdiff` defaults to `0.8 - binSize * steps`, so restate it if you change `binSize` or `steps`. The rest of the workflow (alignment, `PeakDensityParam`, gap-filling) is unchanged.
+
+```r
+mfp <- MatchedFilterParam(binSize = 0.1, fwhm = 30, snthresh = 10, steps = 2)   # defaults; fwhm 30 s = broad HPLC
+xdata <- findChromPeaks(raw, param = mfp)
+nrow(chromPeaks(xdata))
+```
+
 ## Retention-Time Alignment
 
 **Goal:** Remove cross-run RT drift so the same compound lands at the same RT in every sample.
 
-**Approach:** Choose obiwarp (no prior peaks) or peakGroups (anchor-based); align to a pooled QC, never to file #1. Regroup afterward because RTs changed. `PeakGroupsParam`'s `minFraction` sets the fraction of anchor samples a peak group must appear in to count as a universal anchor; with a small anchor subset a high `minFraction` leaves too few peak groups and `adjustRtime` fails - sometimes with the informative "Not enough peak groups even for linear smoothing available!", sometimes with a cryptic low-level error ("attempt to set 'colnames' on an object with less than two dimensions") at an even smaller effective anchor count. Start from `minFraction = 0.5` and raise it only after confirming enough peak groups survive at the target value; treat either error as "raise the anchor count or lower minFraction," not a code bug.
+**Approach:** Choose obiwarp (no prior peaks) or peakGroups (anchor-based). When at least two pooled QCs are available, estimate the alignment from their indices with `subset =` and `subsetAdjust = 'average'`; this avoids letting file #1 (possibly an outlier) determine every warp. Without QCs, obiwarp aligns the full cohort instead. Inspect `plotAdjustedRtime` and a few EICs: alignment can look perfect in QCs while corrupting rare features. Regroup afterward because RTs changed. `PeakGroupsParam`'s `minFraction` sets the fraction of anchor samples a peak group must appear in to count as a universal anchor; with a small anchor subset a high `minFraction` leaves too few peak groups and `adjustRtime` fails - sometimes with the informative "Not enough peak groups even for linear smoothing available!", sometimes with a cryptic low-level error ("attempt to set 'colnames' on an object with less than two dimensions") at an even smaller effective anchor count. Start from `minFraction = 0.5` and raise it only after confirming enough peak groups survive at the target value; treat either error as "raise the anchor count or lower minFraction," not a code bug.
 
 ```r
 # obiwarp: full-profile warping. binSize here is the m/z profile bin (default 1),
-# distinct from PeakDensityParam$binSize and MatchedFilterParam$binSize.
-xdata <- adjustRtime(xdata, param = ObiwarpParam(binSize = 0.6))
+# distinct from PeakDensityParam$binSize and MatchedFilterParam$binSize. With >=2
+# pooled QCs, calculate warps from those injections and interpolate between them.
+qc_idx <- which(sampleData(xdata)$sample_type == 'QC')
+obip <- ObiwarpParam(binSize = 0.6)
+if (length(qc_idx) >= 2) {
+    obip <- ObiwarpParam(binSize = 0.6, subset = qc_idx, subsetAdjust = 'average')
+}
+xdata <- adjustRtime(xdata, param = obip)
 
 # peakGroups alternative needs an initial correspondence and good universal anchors.
 # minFraction = 0.85 needs many anchors; with a small QC subset (e.g. <10 samples) start
 # at 0.5 and raise only after confirming enough peak groups survive - see note above.
+# pdp_anchor <- PeakDensityParam(sampleGroups = sampleData(xdata)$sample_group,
+#     bw = 5, minFraction = 0.5, minSamples = 1, binSize = 0.025)
 # xdata <- groupChromPeaks(xdata, param = pdp_anchor)
 # xdata <- adjustRtime(xdata, param = PeakGroupsParam(minFraction = 0.5, span = 0.4,
 #     subset = which(sampleData(xdata)$sample_type == 'QC'), subsetAdjust = 'average'))
@@ -94,7 +121,7 @@ plotAdjustedRtime(xdata)
 
 **Goal:** Match peaks across samples into consensus features.
 
-**Approach:** Peak-density grouping in m/z slices; `bw` is the dominant knob and must reflect residual post-alignment RT scatter, not raw peak width. For very small cohorts (e.g. n=2 per group) re-derive `minFraction` as a fraction of the *smaller* group rather than reusing a moderate-cohort default: `minFraction = 1.0` for n=2 per group requires presence in both replicates, while a moderate default like 0.5 can retain features present in only one of the two.
+**Approach:** Peak-density grouping in m/z slices; `bw` is the dominant knob and must reflect residual post-alignment RT scatter, not raw peak width. `minFraction` is a fraction of the samples *within each sample group*, so for very small cohorts re-derive it from the smaller group rather than reusing a moderate-cohort default. With 2 replicates of one condition, `minFraction = 1.0` requires presence in both, while 0.5 admits features seen in only one (259 vs 2158 features on 2 faahKO KO replicates). With one sample per condition (a case/control pair, no true replicates) every group has a single sample, so any `minFraction` in (0, 1] gives the same features (1877 for both 1.0 and 0.5) and `minSamples = 2` returns 0 features; to require presence in both files, group them as one (`sampleGroups = c('all', 'all')`, `minFraction = 1.0`: 319 features).
 
 ```r
 pdp <- PeakDensityParam(sampleGroups = sampleData(xdata)$sample_group,

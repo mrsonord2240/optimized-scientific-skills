@@ -201,7 +201,7 @@ Pharmacophore is more *interpretable* than shape: a hit explains why it matched 
 
 **Symptom:** Pharmacophore matches no actives in retrospective.
 
-**Fix:** Cluster actives by scaffold first; derive per-cluster pharmacophore.
+**Fix:** Cluster actives by scaffold first; derive per-cluster pharmacophore. For the coarse feature-family prefilter in `examples/pharmacophore.py`, `feature_family_prefilter(..., min_shared_fraction=0.8)` also lets a molecule lacking a few non-essential shared feature types through (default 1.0 is strict); it stays a coarse filter, so follow with a distance-constrained 3D match.
 
 ### Receptor-based -- apo structure
 

@@ -102,12 +102,24 @@ units$run_order <- sample(nrow(units))
 
 ```r
 library(designit)                        # constrained assignment; verify API vs installed vignette
-bc <- BatchContainer$new(dimensions = list(block = 3, position = 8))
+# `block` is sample metadata above, so do not reuse that name for a designit
+# container dimension: current designit rejects colliding sample/dimension names.
+bc <- BatchContainer$new(dimensions = c(processing_day = 3, position = 8))
 bc <- assign_in_order(bc, samples = units)
+scoring <- osat_score_generator(
+  batch_vars = 'processing_day', feature_vars = 'treatment'
+)
 bc <- optimize_design(
   bc,
-  scoring = osat_score_generator(batch_vars = 'block',
-                                 feature_vars = c('treatment')))  # balance treatment across blocks
+  scoring = scoring,
+  n_shuffle = 2,
+  check_score_variance = FALSE,          # one score; skip expensive variance probing
+  max_iter = 20,
+  min_delta = 0.01,
+  quiet = TRUE
+)                                                    # bounded constrained optimization
+layout <- bc$get_samples(assignment = TRUE)
+stopifnot(all(with(layout, table(processing_day, treatment)) == 4L))
 ```
 
 ## Split-Plot and Nested Designs -- the Genomics Trap

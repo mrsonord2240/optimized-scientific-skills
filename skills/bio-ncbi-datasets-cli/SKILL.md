@@ -1,6 +1,6 @@
 ---
 name: bio-ncbi-datasets-cli
-description: Download genome assemblies, gene records, and ortholog data from NCBI using the modern Datasets v2 CLI (replaces assembly_summary.txt scraping and many EFetch workflows). Use when bulk-pulling genome assemblies, gene metadata across species, ortholog sets, or BLAST databases; when E-utilities are too slow for genome-scale work; or when automatic checksum verification, parallel download, and clean accession-driven retrieval are required. Encodes the JSON-lines output format, dataformat conversion, --dehydrated for cloud workflows, and when Datasets is/isn't the right tool.
+description: Download genome assemblies, gene records, and ortholog data from NCBI using the modern Datasets v2 CLI (replaces assembly_summary.txt scraping and many EFetch workflows). Use when bulk-pulling genome assemblies, gene metadata across species, ortholog sets, or BLAST databases; when E-utilities are too slow for genome-scale work; or when download-time zip checksum validation, parallel download, and clean accession-driven retrieval are required. Encodes the JSON-lines output format, dataformat conversion, --dehydrated for cloud workflows, and when Datasets is/isn't the right tool.
 tool_type: cli
 primary_tool: NCBI Datasets CLI
 license: MIT
@@ -52,9 +52,9 @@ dataformat --version  # bundled companion tool; broken on 18.37.0, see Version C
 |---|---|---|
 | Genome assembly download | yes | — |
 | All reference genomes for a taxon | yes | — |
-| Gene record metadata (multi-species) | yes | — |
-| Ortholog data for a gene | yes (`datasets summary gene ... --ortholog <taxon|all>`) | OrthoDB / Compara for tree-aware orthology |
-| Virus data (assemblies, metadata) | yes (`datasets download virus`) | — |
+| Gene record metadata (multi-species) | yes (see `references/gene-orthologs.md`) | — |
+| Ortholog data for a gene | yes (`datasets summary gene ... --ortholog <taxon|all>`; see `references/gene-orthologs.md`) | OrthoDB / Compara for tree-aware orthology |
+| Virus data (assemblies, metadata) | yes (`datasets download virus`; see `references/virus-genomes.md`) | — |
 | Annotation files (GFF3, GTF) for a genome | yes | — |
 | Protein records (curated, with cross-refs) | partial | UniProt REST for richer annotation |
 | PubMed | no | `entrez-search` / `entrez-fetch` |
@@ -92,7 +92,7 @@ dataformat --version  # bundled companion tool; broken on 18.37.0, see Version C
 | `--api-key XXX` | Optional API key (raises rate limit) |
 | `--no-progressbar` | For non-interactive use |
 
-For very large pulls (1000+ genomes), `--dehydrated` is the right choice: download the metadata stubs first, then run `datasets rehydrate` later or pull URLs in parallel from the manifest.
+For very large pulls (1000+ genomes), `--dehydrated` is the right choice: download the metadata stubs first, then run `datasets rehydrate` later or pull URLs in parallel from the manifest. The workflow, the aria2c conversion of `fetch.txt` and the post-transfer size check (`rehydrate` does not verify existing files) are in `references/dehydrated-bulk.md`. `download` itself validates the zip checksum (`--fast-zip-validation` skips it).
 
 ## JSON-lines output + dataformat
 
@@ -111,19 +111,13 @@ prefixes (e.g. `assminfo-level`, `assmstats-scaffold-n50`, `assmstats-contig-n50
 `assmstats-total-sequence-len`) and the gene catalog uses `tax-name` (not `taxname`); there is no
 `nomenclature-authority-symbol` field on this build.
 
-## When to use --dehydrated for cloud workflows
+## Reference Files
 
-The "dehydrated" mode separates data discovery from data transfer:
-
-1. **Discover**: `datasets download genome taxon human --reference --dehydrated --filename human.zip` (fast; ~MB).
-2. **Inspect**: `unzip -p human.zip ncbi_dataset/fetch.txt` -- a TSV of all URLs to pull.
-3. **Pull**: either `datasets rehydrate --directory ./human/` or use `aria2c --input-file=fetch.txt` for parallel pull.
-
-This is essential for HPC / cloud pipelines where inspection of the pending transfer is needed before committing the I/O.
-
-## Checksum verification (automatic)
-
-`datasets` verifies MD5 checksums for every downloaded file automatically. Rehydrate workflows also verify. If a file fails checksum, Datasets retries up to 3 times then errors. This replaces the `md5sum -c` step that was required with assembly_summary.txt-based scraping.
+| File | Read when |
+|---|---|
+| `references/dehydrated-bulk.md` | Pulling hundreds of genomes or more, transferring with aria2c or `datasets rehydrate`, or verifying files after a transfer |
+| `references/gene-orthologs.md` | A gene request spans more than one species, or asks for orthologs (`--ortholog`) |
+| `references/virus-genomes.md` | Virus assemblies, metadata or proteins (`datasets download virus`) |
 
 ## Code patterns
 
@@ -146,67 +140,6 @@ unzip -q human_grch38.zip -d human_grch38/
 ls -lh human_grch38/ncbi_dataset/data/GCF_000001405.40/
 ```
 
-### Bulk download all reference bacterial genomes
-
-**Goal:** Pull every RefSeq reference bacterial assembly with annotation.
-
-**Approach:** `--dehydrated` first for inspection; rehydrate with parallel pull.
-
-**Reference (NCBI Datasets CLI 18.37.0, checked 2026-09-19):**
-```bash
-#!/bin/bash
-# Step 1: dehydrated discovery
-datasets download genome taxon Bacteria \
-    --reference --annotated --assembly-source RefSeq \
-    --include genome,gff3,protein \
-    --dehydrated --filename bact_refs.zip
-
-unzip -q bact_refs.zip -d bact_refs/
-wc -l bact_refs/ncbi_dataset/fetch.txt   # how many files will be pulled
-
-# Step 2: parallel pull via aria2 (or datasets rehydrate)
-aria2c --input-file=bact_refs/ncbi_dataset/fetch.txt \
-       --dir=bact_refs/ncbi_dataset/data/ \
-       --max-concurrent-downloads=8 \
-       --retry-wait=5
-```
-
-### Gene metadata across species
-
-`--taxon` on `summary gene symbol` is **single-species only** (it picks which species' gene record
-to resolve the symbol against; default `human`) -- it does not accept a clade like `Mammalia` and
-errors outright if you try (`gene requires an at-or-below-species-level taxon`). The only mechanism
-this subcommand has for a genuinely multi-species pull is `--ortholog <taxon|all>`, which accepts
-any taxonomic rank (not just `all`) and returns NCBI's ortholog set for that clade -- one
-representative gene per species, limited to vertebrates and insects:
-
-```bash
-datasets summary gene symbol BRCA1 \
-    --ortholog Mammalia \
-    --as-json-lines \
-  | dataformat tsv gene --fields gene-id,symbol,tax-name,description,chromosomes \
-  > brca1_mammals.tsv
-
-head brca1_mammals.tsv
-```
-
-Verified live (18.37.0): this returns 272 real rows across Mammalia (human, mouse, rat, dog, cow,
-macaque, chimp, opossum, pig, ...). Outside vertebrates/insects, or for a single specific species,
-loop `--taxon <species>` per species instead.
-
-### Find orthologs for a gene
-
-```bash
-datasets summary gene symbol BRCA1 --taxon human --ortholog all --as-json-lines \
-  | dataformat tsv gene --fields gene-id,symbol,tax-name,description \
-  > brca1_orthologs.tsv
-```
-
-`--ortholog` takes a required value (`all`, or one or more taxa) -- a bare `--ortholog` flag is
-consumed as swallowing the next flag's value and fails with a misleading "taxonomy name not exact"
-error. It returns NCBI's ortholog set (a single representative per species; tree-aware orthology
-with multiple co-orthologs is in `ortholog-inference` / Compara / OMA).
-
 ### Filter assemblies by quality and date
 
 ```bash
@@ -218,40 +151,14 @@ datasets summary genome taxon "Salmonella enterica" \
   > sal_2024.tsv
 ```
 
-### Python wrapper with checksum + retry awareness
+### Python wrapper
 
-**Reference (NCBI Datasets CLI 18.37.0, checked 2026-09-19):**
-```python
-import subprocess
-import json
-from pathlib import Path
+`scripts/datasets_wrapper.py` (checked on NCBI Datasets CLI 18.37.0, 2026-09-19) wraps `datasets summary`
+(JSON-lines parsed into dicts; keys are snake_case, e.g. `assembly_stats.contig_n50`) and
+`datasets download` (returns the zip path). Import `datasets_summary` / `datasets_download`, or run:
 
-
-def datasets_summary(subcommand, *args):
-    '''Run `datasets summary` and parse JSON-lines stdout.'''
-    cmd = ['datasets', 'summary', subcommand, *args, '--as-json-lines']
-    out = subprocess.run(cmd, capture_output=True, text=True, check=True)
-    return [json.loads(line) for line in out.stdout.strip().split('\n') if line]
-
-
-def datasets_download(subcommand, *args, out='dataset.zip', include=None):
-    cmd = ['datasets', 'download', subcommand, *args, '--filename', out]
-    if include:
-        cmd += ['--include', ','.join(include)]
-    subprocess.run(cmd, check=True)
-    return Path(out)
-
-
-genomes = datasets_summary('genome', 'taxon', 'Escherichia coli', '--reference')
-print(f'{len(genomes)} reference E. coli assemblies')
-for g in genomes[:3]:
-    acc = g.get('accession')
-    n50 = g.get('assembly_stats', {}).get('contig_n50')  # snake_case JSON keys, not camelCase
-    print(f'  {acc}  N50={n50}')
-
-datasets_download('genome', 'accession', 'GCF_000005845.2',
-                  out='ecoli_k12.zip',
-                  include=['genome', 'gff3', 'protein'])
+```bash
+python scripts/datasets_wrapper.py --taxon "Escherichia coli" --accession GCF_000005845.2 --out ecoli_k12.zip --include genome,gff3,protein
 ```
 
 ### Comparison vs E-utilities
@@ -260,7 +167,7 @@ datasets_download('genome', 'accession', 'GCF_000005845.2',
 # E-utilities path: ESearch in assembly db -> ESummary -> manual FTP pull
 #   ~30 API calls + manual md5 + serial download
 # Datasets path:
-#   datasets download genome accession GCF_...  # one command, automatic md5, parallel inside
+#   datasets download genome accession GCF_...  # one command, zip checksum validated
 ```
 
 For genome workflows, Datasets is 5-50x faster than the equivalent E-utilities pipeline and far more reliable.
@@ -323,7 +230,8 @@ For genome workflows, Datasets is 5-50x faster than the equivalent E-utilities p
 | "Unknown field" in dataformat | Wrong field name | Check `dataformat <type> --help` |
 | Throttled bulk pull | No API key | Pass `--api-key` |
 | `--reference` returns 1 per species | By design | Drop the flag or use `--assembly-level` |
-| MD5 mismatch retried | Network issue | Datasets retries automatically; persistent failure -> investigate network |
+| Zip checksum validation fails on `download` | Truncated or corrupt transfer | Re-run the download; persistent failure -> investigate network |
+| `rehydrate` says "All N files already rehydrated" but files are wrong/tiny | It only checks that files exist, not size or checksum (see Checksum verification) | Size-check against `dataset_catalog.json`, delete mismatches, rehydrate again |
 | `{"total_count": 0}`, exit code 0 | Accession doesn't exist, was withdrawn, or was superseded | Exit 0 alone is not success for `summary`/`download` -- check for a nonzero record/file count too; verify the accession at ncbi.nlm.nih.gov/datasets |
 | "gene requires an at-or-below-species-level taxon" | `--taxon` given a clade (e.g. Mammalia), not a species | Use `--ortholog <clade\|all>` for cross-species gene queries instead |
 | "The taxonomy name '--as-json-lines' is not exact" (unrelated taxa suggested) | Bare `--ortholog` flag swallowed the next flag as its value | Always give `--ortholog` an explicit value: `--ortholog all` or `--ortholog <taxon>` |

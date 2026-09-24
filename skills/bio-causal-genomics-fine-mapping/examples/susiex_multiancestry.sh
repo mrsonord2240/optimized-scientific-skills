@@ -28,14 +28,18 @@ EUR_LD=eur_ld
 EAS_LD=eas_ld
 AFR_LD=afr_ld
 
+PLINK_BIN=$(command -v plink)   # SuSiEx 1.1.2 requires --plink; not auto-detected
+
 OUT_DIR=susiex_out
 mkdir -p "${OUT_DIR}"
 
 # Each summary-stat file requires columns CHR/SNP/BP/A1/A2/BETA/SE/P (column numbers
 # supplied via --chr_col, --snp_col, --bp_col, --a1_col, --a2_col, --eff_col, --se_col,
 # --pval_col). Each reference panel: PLINK bim/bed/fam triplet covering the locus.
-# --ld_file is required even when --ref_file is provided; LD matrices can be pre-built
-# with `plink --r square` per population, or use SuSiEx's bundled `getLD` helper.
+# --ld_file is an OUTPUT prefix: SuSiEx computes each population's in-sample LD
+# itself from --ref_file (shelling out to --plink) and writes it there -- you do
+# not pre-build it with `plink --r square`. Checked on SuSiEx 1.1.2 (`--help`):
+# --plink=<path> is also required, or the internal PLINK calls fail.
 # Populations are assigned by the ORDER of the comma-separated --sst_file/--n_gwas/
 # --ref_file/--ld_file lists (there is no --pop flag); keep all four in the same order.
 
@@ -54,15 +58,16 @@ SuSiEx \
     --eff_col=6,6,6 \
     --se_col=7,7,7 \
     --pval_col=8,8,8 \
+    --plink="${PLINK_BIN}" \
     --out_dir="${OUT_DIR}" \
     --out_name="${LOCUS_NAME}" \
     --level=0.95 \
     --threads=4
 
-# Outputs:
-#   ${OUT_DIR}/${LOCUS_NAME}.snp   per-SNP PIP and credible-set membership (joint)
-#   ${OUT_DIR}/${LOCUS_NAME}.cs    credible set summary (size, purity, top SNP)
-#   ${OUT_DIR}/${LOCUS_NAME}.log   convergence diagnostics
+# Outputs (verified on SuSiEx 1.1.2 -- there is no .log file):
+#   ${OUT_DIR}/${LOCUS_NAME}.snp      per-SNP PIP and credible-set membership (joint)
+#   ${OUT_DIR}/${LOCUS_NAME}.cs       credible set summary (size, purity, top SNP)
+#   ${OUT_DIR}/${LOCUS_NAME}.summary  per-population convergence/model summary
 
 # Inspect the credible set summary:
 cat "${OUT_DIR}/${LOCUS_NAME}.cs"

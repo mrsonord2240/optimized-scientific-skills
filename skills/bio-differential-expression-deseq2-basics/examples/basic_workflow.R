@@ -58,12 +58,14 @@ dds$condition <- relevel(dds$condition, ref = 'control')
 # Run DESeq2 pipeline
 dds <- DESeq(dds)
 
-# Get results with shrinkage
-res <- lfcShrink(dds, coef = 'condition_treated_vs_control', type = 'apeglm')
+# Results (explicit coefficient, alpha stated), then shrink the LFCs.
+# res = res carries padj from results(); without it lfcShrink() recomputes padj at alpha = 0.1.
+res <- results(dds, name = 'condition_treated_vs_control', alpha = 0.05)
+res_shrunk <- lfcShrink(dds, coef = 'condition_treated_vs_control', res = res, type = 'apeglm')
 
 # Summary
-summary(res)
+summary(res_shrunk)
 
 # Get significant genes
-sig_genes <- subset(res, padj < 0.05)
+sig_genes <- subset(res_shrunk, padj < 0.05)
 cat('\nSignificant genes (padj < 0.05):', nrow(sig_genes), '\n')

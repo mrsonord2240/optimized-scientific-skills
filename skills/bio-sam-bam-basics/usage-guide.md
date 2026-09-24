@@ -1,7 +1,7 @@
 # SAM/BAM/CRAM Basics - Usage Guide
 
 ## Overview
-View, convert, and understand alignment files in SAM, BAM, and CRAM formats using samtools and pysam. Commands, tables (FLAG, CIGAR, MAPQ, tags), CRAM reference setup and failure modes live in `SKILL.md`; installation is in its "Version Compatibility" section.
+View, convert, and understand alignment files in SAM, BAM, and CRAM formats using samtools and pysam. Commands, tables (FLAG, CIGAR, MAPQ, tags), CRAM reference setup and failure modes live in `SKILL.md` and the `references/` files it indexes; installation is in its "Version Compatibility" section.
 
 ## Quick Start
 Tell your AI agent what you want to do:

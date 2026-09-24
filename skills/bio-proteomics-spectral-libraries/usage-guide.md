@@ -4,14 +4,8 @@
 Builds and manages DIA spectral libraries, which are tables of peptide query parameters (precursor m/z, a few fragment m/z plus relative intensities, normalized RT, optional CCS) rather than whole spectra. Covers experimental DDA, chromatogram, predicted (Koina-served Prosit/AlphaPeptDeep/MS2PIP, DeepLC), and empirically-corrected libraries, plus iRT/CiRT RT calibration, NCE tuning, format conversion, and QC/merge. The point that decides library quality: a predicted library is only as good as its empirical RT/CCS calibration, and NCE must match the predictor's training.
 
 ## Prerequisites
-```bash
-pip install koinapy ms2pip deeplc pandas numpy scipy
-# CLI: EncyclopeDIA (Java), EasyPQP/FragPipe for DDA libraries, OpenMS for OpenSwathDecoyGenerator
-# Predicted intensities/RT/CCS also served from Koina (koina.wilhelmlab.org)
-```
-ms2pip's first `predict_batch()` call downloads its XGBoost model files to `~/.ms2pip` with no
-progress output and no timeout -- the default `HCD` model alone is ~915MB. See the Common
-Errors table in SKILL.md for what this looks like and how to work around it.
+Install notes and version checks are in SKILL.md ("Version Compatibility"); the first ms2pip call
+downloads a large model, see its Common Errors table.
 
 ## Quick Start
 Tell your AI agent what you want to do:
@@ -55,22 +49,6 @@ Tell your AI agent what you want to do:
 > "Report precursors, proteins, and transitions per precursor in my library"
 
 > "Merge these libraries keeping the full transition key so I don't drop charge states"
-
-## What the Agent Will Do
-1. Choose a library type (experimental DDA, chromatogram, predicted, or empirically-corrected) from the project context.
-2. Generate fragment intensities and RT (and CCS) via Koina, MS2PIP/DeepLC, or an empirical pass.
-3. Tune NCE by scanning candidate values for maximum spectral contrast against real spectra.
-4. Calibrate predicted iRT/CCS to the actual gradient/instrument using anchor peptides (R^2 > 0.95).
-5. Convert to the target format, reconciling RT units, intensity scaling, and modification notation; generate decoys for OpenSWATH.
-6. QC and merge libraries on the full transition key, then report precursor/protein/transition counts.
-
-## Tips
-- A predicted library searched without RT calibration extracts at the wrong time and IDs collapse silently.
-- Fragment relative intensities transfer across instruments at matched NCE; predicted RT/CCS do not -- always calibrate them.
-- Do not reuse NCE=30 from a tutorial; scan and pick the best NCE for the instrument and method.
-- Retain about 6 fragments per precursor; more invites interference.
-- OpenSWATH needs decoys in the library; DIA-NN and Spectronaut generate their own, so do not supply both.
-- SpectraST is legacy; prefer EasyPQP/FragPipe for DDA-based libraries.
 
 ## Related Skills
 

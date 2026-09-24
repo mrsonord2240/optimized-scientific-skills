@@ -40,11 +40,4 @@ Tell your AI agent what you want to do:
 
 ## Related Skills
 
-single-cell/cell-annotation - Cell-type labels define senders and receivers; annotation resolution is a hidden CCC hyperparameter
-single-cell/clustering - Cluster granularity changes who is "specific"; fix it before running CCC
-single-cell/doublet-detection - Doublets create fake co-expressing cells that masquerade as senders-receivers
-single-cell/preprocessing - Ambient-RNA decontamination and stress-gene handling happen here, before CCC
-single-cell/metabolite-communication - Metabolite-mediated CCC (enzyme-sensor) as the doubly-inferred counterpart to ligand-receptor
-spatial-transcriptomics/spatial-communication - Proximity-constrained CCC when spatial coordinates are available
-pathway-analysis/go-enrichment - Functional enrichment of NicheNet target genes or interacting receptors
-differential-expression/deseq2-basics - Pseudobulk DE to build the receiver gene set NicheNet requires
+See SKILL.md, Related Skills.

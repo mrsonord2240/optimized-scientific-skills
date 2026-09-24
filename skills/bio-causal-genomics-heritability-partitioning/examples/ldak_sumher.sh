@@ -88,7 +88,7 @@ ${LDAK} --sum-hers ${OUT_DIR}/${TRAIT}_bld \
 # Per Gazal 2019 Nat Genet 51:1202:
 #   - For functional enrichment claims, report BOTH model estimates
 #   - If LDSC and LDAK disagree by > 2x, flag as model-dependent
-#   - Prefer LDAK SumHer for conserved-region enrichment per Speed 2019
+#   - Report LDSC primary + LDAK confirmatory; never pick the model that gives the desired answer
 
 echo "LDAK SumHer pipeline complete. Results in ${OUT_DIR}/"
 echo "  ${TRAIT}_sumher.hers   -> total h2 (LDAK-Thin)"

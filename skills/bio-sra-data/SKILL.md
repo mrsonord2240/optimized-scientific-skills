@@ -43,11 +43,7 @@ vdb-config --set /repository/user/main/public/root=/data/sra_cache
 pip install pysradb
 ```
 
-For STRIDES cloud, install `aws-cli` and run from EC2 in the bucket's own region (`us-east-1` for AWS, `us-central1` for GCP) for free egress:
-```bash
-# AWS CLI (no NCBI auth needed for public buckets)
-aws s3 ls s3://sra-pub-run-odp/sra/SRR12345678/ --no-sign-request
-```
+For STRIDES cloud, install `aws-cli` (no NCBI auth needed for public buckets) and run from EC2 in the bucket's own region (`us-east-1` for AWS, `us-central1` for GCP) for free egress; a cross-region pull is charged. Commands are under "Cloud (STRIDES) access".
 
 ## Decision matrix: where to pull from
 
@@ -80,7 +76,7 @@ Everything above assumes **public** SRA data. SRA also hosts **dbGaP-controlled*
 | PRJNA / PRJEB / PRJDB | BioProject | Top-level project ID |
 | SAMN / SAMEA / SAMD | BioSample | Biological sample (cross-archive) |
 
-Conversion is via SRA metadata: `pysradb metadata <ID>` or `efetch -db sra -id <UID> -rettype runinfo`.
+Conversion is via SRA metadata: `pysradb metadata <ID>` or `efetch -db sra -id <UID> -format runinfo`.
 
 The actual download unit is SRR/ERR/DRR (runs). The BioProject (PRJNA...) is the convenient top-level handle for "pull all data for paper X".
 
@@ -97,7 +93,7 @@ The actual download unit is SRR/ERR/DRR (runs). The BioProject (PRJNA...) is the
 | Single-cell technical reads | `--include-technical` works | Some 10x records need fastq-dump for full extraction |
 | 10x split semantics | Sometimes incomplete | Sometimes the only way to get all reads |
 
-The **uncompressed-scratch trap**: `fasterq-dump` writes uncompressed FASTQ first, then leaves it uncompressed. A 100 GB compressed FASTQ needs ~300 GB of scratch space + 300 GB of final output. Either compress post-hoc with `pigz` or use `--mem` to control RAM/disk tradeoff.
+The **uncompressed-scratch trap**: `fasterq-dump` writes uncompressed FASTQ first, then leaves it uncompressed. A 100 GB compressed FASTQ needs ~300 GB of scratch space + 300 GB of final output. Either compress post-hoc with `pigz` or use `--mem` to control RAM/disk tradeoff, or stick with `fastq-dump --gzip` (slower, lower scratch). Symptom of getting it wrong: "out of disk space" mid-extraction.
 
 **No official `pigz` build exists for Windows.** On a bare Windows shell (no WSL/conda), `pigz -p N file` fails outright even though the download/extraction already succeeded. All post-hoc compression in this Skill's code patterns uses `command -v pigz` to fall back to `gzip` (single-threaded, slower, but present via Git-for-Windows/WSL/conda alike):
 ```bash
@@ -119,7 +115,7 @@ prefetch SRR12345678 --max-size 100G -p
 
 For unknown-size queues, set max-size to a generous upper bound (e.g. `--max-size 200G`) or check the size first -- **but check the right size for the path you're using; `.sra` size and FASTQ size are not the same number:**
 
-- For **`prefetch`'s `--max-size`** (governs the `.sra` download, this path): `pysradb`'s `sra_metadata(detailed=True)` **does** carry a usable field, `total_size` (checked pysradb 2.5.1) -- on real accession ERR10419835 it reported 1,744,967 bytes, matching a live `prefetch` run's actual verified `.sra` size (1,742,656 bytes) to within 0.1%. Ignore SKILL.md's own older claim that this column doesn't exist; it does, and it tracks `.sra` size, not FASTQ size.
+- For **`prefetch`'s `--max-size`** (governs the `.sra` download, this path): `pysradb`'s `sra_metadata(detailed=True)` **does** carry a usable field, `total_size` (checked pysradb 2.5.1) -- on real accession ERR10419835 it reported 1,744,967 bytes, matching a live `prefetch` run's actual verified `.sra` size (1,742,656 bytes) to within 0.1%. It tracks `.sra` size, not FASTQ size.
 - For the **ENA mirror** (downloads FASTQ directly, a different, usually larger, file): use the ENA portal API's `fastq_bytes` field instead -- confirmed live, returns real per-mate byte counts:
 ```bash
 curl -s "https://www.ebi.ac.uk/ena/portal/api/filereport?accession=${SRR}&result=read_run&fields=fastq_bytes&format=tsv" | tail -1
@@ -149,7 +145,7 @@ ENA's mirror is typically faster than SRA's because (a) it's hosted on Aspera-aw
 
 ## Single-cell / 10x quirks
 
-10x Genomics records include "technical reads" (cell barcodes, UMIs) interleaved with biological reads. Default `fasterq-dump` (or `fastq-dump`) skips them. To get all reads:
+10x Genomics records include "technical reads" (cell barcodes, UMIs) interleaved with biological reads. Default `fasterq-dump` (or `fastq-dump`) skips them, so only the cDNA file (R2) appears and CellRanger / STARsolo error out. To get all reads:
 
 ```bash
 # fasterq-dump with technical reads
@@ -201,74 +197,11 @@ For cloud-native analysis pipelines (Nextflow on AWS Batch, Cromwell, etc.), STR
 
 **Approach:** Query ENA portal API for FASTQ URLs and md5; download with curl; verify with md5sum.
 
-**Reference (ENA portal API 2.0+, curl; checked 2026-09-17):**
-```bash
-#!/bin/bash
-set -euo pipefail
-SRR="${1:-SRR12345678}"
-OUT="${2:-./fastq}"
-mkdir -p "${OUT}"
-
-# Get FASTQ URLs + md5 from ENA portal API. Locate columns by their documented field
-# name, not a fixed index: ENA's filereport ALWAYS prepends run_accession as column 1,
-# regardless of what `fields=` lists, so fields=fastq_ftp,fastq_md5 puts the real data
-# in columns 2 and 3, not 1 and 2 (cut -f1/-f2 silently grabs the accession and the URL,
-# one column short -- confirmed against the live API).
-RESPONSE=$(curl -s "https://www.ebi.ac.uk/ena/portal/api/filereport?accession=${SRR}&result=read_run&fields=fastq_ftp,fastq_md5&format=tsv")
-HEADER=$(echo "${RESPONSE}" | head -1)
-ROW=$(echo "${RESPONSE}" | tail -1)
-FTP_COL=$(echo "${HEADER}" | tr '\t' '\n' | grep -nx 'fastq_ftp' | cut -d: -f1) || true
-MD5_COL=$(echo "${HEADER}" | tr '\t' '\n' | grep -nx 'fastq_md5' | cut -d: -f1) || true
-# fastq_ftp genuinely absent (not just this pipeline's exit status) is a real signal, not
-# an error to swallow -- check it explicitly instead of letting a fixed-index cut fail silently.
-if [ -z "${FTP_COL}" ] || [ -z "${MD5_COL}" ]; then
-    echo "fastq_ftp not found in ENA response for ${SRR} -- may indicate controlled-access (dbGaP) data, see SKILL.md 'Controlled-access (dbGaP) data' section" >&2
-    exit 1
-fi
-URLS=$(echo "${ROW}" | cut -f"${FTP_COL}" | tr ';' '\n')
-MD5S=$(echo "${ROW}" | cut -f"${MD5_COL}" | tr ';' '\n')
-
-i=0
-while read url; do
-    fname="${OUT}/$(basename ${url})"
-    expected_md5=$(echo "${MD5S}" | sed -n "$((i+1))p")
-    echo "Downloading ${fname}"
-    curl -sL -o "${fname}" "https://${url}"
-    actual_md5=$(md5sum "${fname}" | awk '{print $1}')
-    if [ "${actual_md5}" != "${expected_md5}" ]; then
-        echo "MD5 MISMATCH ${fname}: expected ${expected_md5}, got ${actual_md5}"
-        exit 1
-    fi
-    echo "  md5 OK"
-    i=$((i+1))
-done <<< "${URLS}"
-```
+`echo ERR10419835 > acc.txt; bash examples/download_batch.sh acc.txt ./fastq` -- a one-line accessions file is the single-run case (ENA portal API 2.0+, curl; checked 2026-09-17). It locates the `fastq_ftp` / `fastq_md5` columns by header name (ENA always prepends `run_accession`, so a fixed `cut -f1/-f2` grabs the accession and the URL), names the missing field when one is absent (a missing `fastq_ftp` may be controlled-access, see the dbGaP section), md5-verifies every file, and lists failed accessions in `<out_dir>/failed.txt` (the script itself exits 0, so check that file).
 
 ### prefetch + fasterq-dump (SRA toolkit, classic)
 
-```bash
-#!/bin/bash
-SRR="${1:-SRR12345678}"
-OUT="${2:-./fastq}"
-THREADS="${3:-8}"
-mkdir -p "${OUT}"
-
-# prefetch with explicit max-size (default 20G silently skips larger)
-prefetch "${SRR}" --max-size 100G -p
-
-# Validate SRA file
-vdb-validate "${SRR}" || { echo "Validation FAILED"; exit 1; }
-
-# Extract FASTQ (multi-threaded; uncompressed scratch ~3x final size)
-fasterq-dump "${SRR}" -O "${OUT}" -e "${THREADS}" -p --split-files
-
-# Compress post-hoc (fasterq-dump does NOT compress); pigz has no Windows build
-if command -v pigz >/dev/null 2>&1; then pigz -p "${THREADS}" "${OUT}/${SRR}"_*.fastq
-else gzip "${OUT}/${SRR}"_*.fastq; fi
-
-# Cleanup SRA cache if you don't need it
-# rm -rf ~/ncbi/sra/${SRR}.sra
-```
+`bash examples/download_single.sh <SRR> [out_dir] [threads] [max_size]` -- accepts only uppercase run accessions (`SRR`, `ERR`, or `DRR` followed by digits), then runs prefetch with explicit `--max-size`, `vdb-validate`, `fasterq-dump --split-files`, and pigz/gzip. It passes `--skip-technical`; drop that flag for 10x or other single-cell data. Toolkit cache and temporary FASTQ staging are owned directories under `out_dir` and are cleaned on every exit. If the current SRA Toolkit cannot complete a public run (including an unresolved normalized-reference dependency), the script retries the MD5-verified ENA mirror route; publication uses no-clobber hard links, so an existing file or dangling symlink is refused. The ENA helper respects the controlled-access guard: an accession without public ENA FASTQ fields produces no files and exits nonzero.
 
 ### Batch via pysradb metadata
 
@@ -276,137 +209,28 @@ else gzip "${OUT}/${SRR}"_*.fastq; fi
 
 **Approach:** pysradb metadata returns a full hierarchy table; pull SRR column.
 
-**Reference (pysradb 2.2+):**
-```python
-from pysradb import SRAweb
-import pandas as pd
+`python scripts/pysradb_resolve.py GSE123456 [PRJNA... SRX...]` prints the SRR runs for each ID (pysradb 2.2+, checked 2.5.1). Import `gse_to_srr` (GSE -> SRP -> SRR), `bioproject_to_runs` (full detailed metadata table) or `batch_resolve` (many IDs, failures printed and skipped) for use in a pipeline.
 
+### Cloud (STRIDES) and 10x single-cell
 
-def gse_to_srr(gse):
-    db = SRAweb()
-    df = db.gse_to_srp(gse)
-    if df.empty:
-        return []
-    srp = df['study_accession'].iloc[0]
-    runs = db.srp_to_srr(srp)
-    return runs['run_accession'].tolist()
-
-
-def bioproject_to_runs(prjna):
-    db = SRAweb()
-    return db.sra_metadata(prjna, detailed=True)
-
-
-def batch_resolve(ids):
-    db = SRAweb()
-    rows = []
-    for id in ids:
-        try:
-            meta = db.sra_metadata(id, detailed=True)
-            rows.append(meta)
-        except Exception as e:
-            print(f'{id}: {e}')
-    return pd.concat(rows, ignore_index=True) if rows else pd.DataFrame()
-
-
-# Resolve a GSE to all its SRRs
-srrs = gse_to_srr('GSE123456')
-print(f'GSE123456 -> {len(srrs)} SRRs')
-```
-
-### Cloud (STRIDES) via AWS
-
-```bash
-#!/bin/bash
-# Run from EC2 in us-east-1 for zero egress
-SRR="${1:-SRR12345678}"
-
-# Check if available on AWS Open Data
-aws s3 ls "s3://sra-pub-run-odp/sra/${SRR}/" --no-sign-request
-
-# Download .sra (then extract locally)
-aws s3 cp "s3://sra-pub-run-odp/sra/${SRR}/${SRR}" "./${SRR}.sra" --no-sign-request
-
-fasterq-dump "./${SRR}.sra" -p -e 8 --split-files
-if command -v pigz >/dev/null 2>&1; then pigz -p 8 "${SRR}"_*.fastq
-else gzip "${SRR}"_*.fastq; fi
-```
-
-### 10x single-cell with technical reads
-
-```bash
-#!/bin/bash
-SRR="${1:-SRR_10x_run}"
-OUT="${2:-./fastq_10x}"
-mkdir -p "${OUT}"
-
-# Get all reads including technical (barcode/UMI/index)
-fasterq-dump "${SRR}" --include-technical --split-files -p -O "${OUT}" -e 8
-
-# 10x v3 expects: R1 (28-bp barcode+UMI), R2 (cDNA), I1 (sample index)
-ls -la "${OUT}/${SRR}"_*.fastq
-if command -v pigz >/dev/null 2>&1; then pigz -p 8 "${OUT}/${SRR}"_*.fastq
-else gzip "${OUT}/${SRR}"_*.fastq; fi
-```
-
-## Failure modes
-
-### prefetch --max-size silent skip
-- **Trigger:** Default 20 GB limit; run is 50 GB.
-- **Mechanism:** prefetch returns success but downloads nothing.
-- **Symptom:** vdb-validate or fasterq-dump fails because no file exists.
-- **Fix:** Always set `--max-size` explicitly to a generous upper bound (e.g. 200G).
-
-### fasterq-dump scratch space exhaustion
-- **Trigger:** Run is 100 GB compressed; scratch dir has 200 GB free.
-- **Mechanism:** fasterq-dump writes ~300 GB uncompressed, fills disk.
-- **Symptom:** "out of disk space" mid-extraction.
-- **Fix:** Use a scratch dir with 4-5x the compressed size; or use `--mem` to trade memory for disk; or stick with `fastq-dump --gzip` (slower but lower scratch).
-
-### 10x technical reads missing
-- **Trigger:** Default `fasterq-dump` on a 10x record.
-- **Mechanism:** Technical reads (barcodes, UMIs) are skipped by default.
-- **Symptom:** Only the cDNA file (R2) appears; CellRanger / STARsolo errors.
-- **Fix:** Add `--include-technical`; verify with `sra-stat --xml` first.
-
-### SRA-direct slowness during US business hours
-- **Trigger:** Downloading from NCBI 9 AM-5 PM ET weekdays.
-- **Mechanism:** NCBI bandwidth contention; institutional users have priority.
-- **Symptom:** kbps-level download speeds.
-- **Fix:** Switch to ENA mirror or AWS STRIDES; run outside US business hours.
-
-### Aspera deprecation
-- **Trigger:** Old script using `ascp` against `anonftp@ftp.ncbi.nlm.nih.gov`.
-- **Mechanism:** NCBI retired public Aspera in 2019; ENA followed ~2023; only institutional accounts retain support.
-- **Symptom:** Connection refused or auth fails.
-- **Fix:** Switch to HTTPS (slower but works); for fastest cloud transfer use STRIDES (AWS/GCP).
-
-### Cloud egress costs surprise
-- **Trigger:** STRIDES pull from EC2 in us-west-2 against bucket in us-east-1.
-- **Mechanism:** Cross-region egress is charged.
-- **Symptom:** Unexpected AWS bill.
-- **Fix:** Match compute region to bucket region (us-east-1 for AWS, us-central1 for GCP).
-
-### vdb-config not persisted across containers
-- **Trigger:** Docker container without persisted `~/.ncbi/user-settings.mkfg`.
-- **Mechanism:** Cache config is per-user, per-home; container rebuild loses it.
-- **Symptom:** Cache fills container's small layer; download fails.
-- **Fix:** Mount a host volume at `~/.ncbi/` and persist user-settings.mkfg; or set `--temp` and `-O` explicitly in commands.
+`bash examples/prefetch_large.sh <SRR> [out_dir] [threads] [yes|no]` -- accepts only uppercase run accessions, checks the AWS Open Data bucket (run from EC2 in us-east-1 for zero egress), falls back to `prefetch --max-size 200G`, validates, runs `fasterq-dump --split-files`, compresses, and cleans its owned cache/staging directories. If neither Toolkit/STRIDES path completes for a public run, it safely retries the MD5-verified ENA mirror route with no-clobber publication. Pass `yes` as the 4th argument for 10x records: it swaps `--skip-technical` for `--include-technical` (10x v3 expects R1 28-bp barcode+UMI, R2 cDNA, I1 sample index).
 
 ## Common errors
 
 | Error / symptom | Cause | Solution |
 |---|---|---|
 | "item not found" | Invalid accession or not in current SRA | Verify; check ENA mirror |
-| Scratch disk full mid-extraction | fasterq-dump uncompressed write | Use larger scratch or fastq-dump --gzip |
-| Slow SRA-direct download | Business-hours contention | ENA or STRIDES |
-| 10x reads missing | --include-technical not set | Add the flag |
-| Container loses cache config | vdb-config not persisted | Mount ~/.ncbi as volume |
-| prefetch returns "success" but no file | --max-size silent skip | Set --max-size explicitly |
-| AWS bill on STRIDES | Cross-region pull | Match compute region |
+| Scratch disk full mid-extraction | fasterq-dump uncompressed write | Use larger scratch, `--mem`, or fastq-dump --gzip |
+| Slow SRA-direct download (kbps, 9 AM-5 PM ET weekdays) | NCBI bandwidth contention; institutional users have priority | ENA or STRIDES; or run outside US business hours |
+| 10x reads missing (only R2 appears) | --include-technical not set | Add the flag; verify with `sra-stat --xml` first |
+| Container loses cache config; cache fills the container's small layer and the download fails | `~/.ncbi/user-settings.mkfg` is per-user, per-home and lost on rebuild | Mount a host volume at `~/.ncbi/` and persist `user-settings.mkfg`; or set `--temp` and `-O` explicitly |
+| prefetch returns "success" but no file; vdb-validate / fasterq-dump then fail | Run larger than the default 20 GB `--max-size` (silent skip) | Set `--max-size` explicitly to a generous upper bound (e.g. 200G) |
+| AWS bill on STRIDES | Cross-region pull (e.g. EC2 in us-west-2 against the us-east-1 bucket) | Match compute region to bucket region (us-east-1 for AWS, us-central1 for GCP) |
+| Connection refused / auth fails on `ascp` against `anonftp@ftp.ncbi.nlm.nih.gov` | NCBI retired public Aspera in 2019, ENA ~2023 | Switch to HTTPS; for the fastest cloud transfer use STRIDES |
 | `pigz: command not found` after a successful download | No Windows build of pigz | Fall back to `gzip` (see fasterq-dump vs fastq-dump section) |
 | `curl: (6) Could not resolve host: <accession>` on the ENA path | Wrong filereport column selected (see ENA mirror code pattern) -- not a real DNS/network issue | Use header-based column lookup, not a fixed `cut -f` index |
 | Authorization error / permission denied, or ENA omits `fastq_ftp`, on a human accession | Controlled-access (dbGaP) accession | Stop; see "Controlled-access (dbGaP) data" -- do not retry as a network issue |
+| "Invalid run accession" | Input was not an uppercase `SRR`/`ERR`/`DRR` followed by digits | Correct the run ID; path separators, `.`, `..`, and option-like strings are rejected before download or cleanup |
 
 ## References
 

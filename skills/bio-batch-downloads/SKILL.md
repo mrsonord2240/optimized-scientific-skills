@@ -9,7 +9,7 @@ author: GPTomics
 
 ## Version Compatibility
 
-Reference examples tested with: BioPython 1.83+, NCBI Datasets CLI 16.0+, Entrez Direct 21.0+
+Reference examples tested with: BioPython 1.88, NCBI Datasets CLI 18.37.0, Entrez Direct 26.0 (every runnable block verified live 2026-09-22)
 
 Before using code patterns, verify installed versions match. If versions differ:
 - Python: `pip show biopython` then `help(Bio.Entrez.efetch)` to check signatures
@@ -26,7 +26,7 @@ This skill encodes (a) when to use each retrieval strategy, (b) the precise rate
 
 - Python: `Entrez.esearch(usehistory='y')` + chunked `Entrez.efetch()` (BioPython)
 - CLI: `datasets download genome accession ...` (NCBI Datasets v2 -- preferred for genome/gene bulk)
-- CLI: `epost | efetch -mode webenv` (Entrez Direct)
+- CLI: `epost -db <db> -input ids.txt | efetch -format fasta` (Entrez Direct)
 
 ## Required Setup
 
@@ -51,7 +51,7 @@ Entrez.tool = 'project-name'
 | < 200 known IDs | Any db | EFetch with comma-joined `id=` | Single round-trip; trivial |
 | 200-5,000 known IDs | Any db | EPost (chunked at 200) -> history -> chunked EFetch | URL length limit + chunked retrieval |
 | 5,000-100,000 from a query | Any db | ESearch with `usehistory='y'` -> chunked EFetch | Push to server once; pull in batches |
-| > 100,000 sequences | nucleotide/protein | Consider FTP mirror or Datasets CLI; chunk if E-utils still | NCBI throttles bulk; offline mirror is faster |
+| > 100,000 sequences | nucleotide/protein | Consider FTP mirror or Datasets CLI; if E-utils is still the chosen path, chunk via the history server (single stream) | NCBI throttles bulk; offline mirror is faster |
 | > 1,000,000 sequences, or a literal "entire database" request | nucleotide/protein | **Refuse the EFetch-loop approach outright.** Point only to NCBI's bulk FTP/BLAST-db mirrors (`ftp.ncbi.nlm.nih.gov`) or Datasets CLI; do not attempt a chunked E-utilities loop at this scale | At this scale a single-stream E-utilities loop is a multi-week job this Skill's tools were never designed to serve -- not a "consider," a hard stop, the same way >4 concurrent workers is a hard stop |
 | Whole genome assemblies | Assembly/Datasets | `datasets download genome accession ...` | Datasets v2 is the modern bulk endpoint |
 | All RefSeq for a species | Datasets | `datasets download genome taxon ...` | Replaces assembly_summary.txt scraping |
@@ -114,114 +114,56 @@ Smaller batches for GenBank/XML because per-record payload is larger; larger bat
 
 **Goal:** Download all records matching a query, robust to mid-job failures and session expiry.
 
-**Approach:** ESearch with history; checkpoint cursor to disk; on error, retry the chunk; on session expiry, re-run ESearch and resume from checkpoint.
+**Approach:** ESearch with history; checkpoint cursor to disk; on error, retry the chunk; on session expiry (HTTP 200 with `<ERROR>` body), re-run ESearch and resume from checkpoint. The chunk is never skipped: after `max_retries` failures it raises. Bytes/str bodies are both handled.
 
-**Reference (BioPython 1.83+):**
+The checkpoint stores the output file's **byte length at each committed chunk boundary**, written immediately after the chunk's bytes are flushed. Resume truncates to exactly that offset. This matters because a crash can leave *more* on disk than the checkpoint vouches for -- a chunk's records can be fully written and then the process dies before the checkpoint update. The records past the boundary are complete and well-formed, so nothing about their *content* marks them as already-counted; only the recorded offset does. Truncating to the last newline instead leaves them in place, and the resumed run appends the same records again (see the duplicate-record failure mode below).
+
+Output is opened in binary append mode, so the fetched bytes reach disk unchanged on every platform. Opening in text mode translates NCBI's LF endings to CRLF on Windows, which silently changes a 2 MB payload's bytes and breaks any checksum comparison against the FTP manifest.
+
+**Runnable:** `examples/robust_download.py` -> `checkpointed_download(db, term, out_path, ckpt_path, rettype='fasta', batch_size=500, max_retries=5)`. The module sets a placeholder `Entrez.email` when imported, so set yours after the import:
+
 ```python
-import json
-import time
-from pathlib import Path
-from urllib.error import HTTPError
-from Bio import Entrez
-
-
-def checkpointed_batch_download(db, term, out_path, ckpt_path, rettype='fasta',
-                                 retmode='text', batch_size=500, max_retries=3):
-    '''Download all matching records with disk checkpoint for resumability.'''
-    delay = 0.1 if Entrez.api_key else 0.34
-    ckpt = Path(ckpt_path)
-    start = json.loads(ckpt.read_text())['start'] if ckpt.exists() else 0
-
-    h = Entrez.esearch(db=db, term=term, usehistory='y', retmax=0)
-    s = Entrez.read(h); h.close()
-    webenv, query_key, total = s['WebEnv'], s['QueryKey'], int(s['Count'])
-    print(f'{total:,} records matched; resuming at {start:,}')
-
-    mode = 'a' if start else 'w'
-    with open(out_path, mode) as out:
-        while start < total:
-            for attempt in range(max_retries):
-                try:
-                    h = Entrez.efetch(db=db, rettype=rettype, retmode=retmode,
-                                      retstart=start, retmax=batch_size,
-                                      webenv=webenv, query_key=query_key)
-                    body = h.read(); h.close()
-                    if isinstance(body, bytes):
-                        body = body.decode('utf-8', errors='replace')
-                    if '<ERROR>' in body[:500]:
-                        raise RuntimeError(f'Server error in body: {body[:200]}')
-                    out.write(body)
-                    break
-                except HTTPError as e:
-                    if e.code == 429:
-                        wait = 10 * (attempt + 1)
-                        print(f'  Rate-limited; sleeping {wait}s')
-                        time.sleep(wait)
-                    elif attempt == max_retries - 1:
-                        raise
-                    else:
-                        time.sleep(5 * (attempt + 1))
-                except RuntimeError as e:
-                    # Likely WebEnv expired; re-run ESearch
-                    print(f'  {e}; refreshing WebEnv')
-                    h = Entrez.esearch(db=db, term=term, usehistory='y', retmax=0)
-                    s = Entrez.read(h); h.close()
-                    webenv, query_key = s['WebEnv'], s['QueryKey']
-
-            start += batch_size
-            ckpt.write_text(json.dumps({'start': start, 'total': total}))
-            time.sleep(delay)
-            print(f'  {min(start, total):,}/{total:,}')
-    ckpt.unlink(missing_ok=True)
+import sys; sys.path.insert(0, 'examples')
+from robust_download import checkpointed_download
+from Bio import Entrez; Entrez.email = 'you@institution.edu'  # Entrez.api_key = '...' if you have one
+checkpointed_download('nucleotide', 'BRCA1[GENE] AND Homo sapiens[ORGN] AND biomol_mrna[PROP] AND srcdb_refseq[PROP]',
+                      'brca1_mrna.fasta', 'brca1_mrna.ckpt.json')
 ```
 
 ### EPost large ID list, then EFetch
 
 **Goal:** Download by a known list of 5,000 accessions without 414 URI errors.
 
-**Approach:** EPost in 200-ID chunks; reuse WebEnv across chunks; final fetch reads from history.
+**Approach:** EPost in 200-ID chunks; reuse WebEnv across chunks; final fetch iterates each QueryKey by its own chunk size (retstart is relative to that key, not to the whole list).
 
-**Reference (BioPython 1.83+):**
-```python
-def epost_and_fetch(db, ids, out_path, rettype='fasta', retmode='text', batch_size=500):
-    delay = 0.1 if Entrez.api_key else 0.34
-    webenv = None
-    posted_keys = []  # (query_key, n_ids) so we iterate each key's actual size
-    for i in range(0, len(ids), 200):
-        chunk = ids[i:i+200]
-        kwargs = {'db': db, 'id': ','.join(chunk)}
-        if webenv:
-            kwargs['WebEnv'] = webenv
-        h = Entrez.epost(**kwargs)
-        r = Entrez.read(h); h.close()
-        webenv = r['WebEnv']
-        posted_keys.append((r['QueryKey'], len(chunk)))
-        time.sleep(delay)
+**Runnable:** `examples/batch_by_ids.py` defines `chained_epost_fetch(db, ids, out_path, rettype='fasta', batch_size=500)` for long lists and `direct_efetch(db, ids, out_path)` for <200 IDs. It is a demo script (running or importing it fetches a 255-ID demo list), so copy the functions or edit the `small_list`/`large_list` inputs at the bottom.
 
-    with open(out_path, 'w') as out:
-        for qk, n in posted_keys:
-            for start in range(0, n, batch_size):
-                h = Entrez.efetch(db=db, rettype=rettype, retmode=retmode,
-                                  retstart=start, retmax=min(batch_size, n - start),
-                                  webenv=webenv, query_key=qk)
-                out.write(h.read()); h.close()
-                time.sleep(delay)
+### Entrez Direct from the shell
+
+**Goal:** The same post-then-fetch flow without Python, for one-off pulls.
+
+**Approach:** `epost` prints the WebEnv/QueryKey it created and `efetch` reads them implicitly through the pipe -- there is no `-mode webenv`. `-mode` selects the **response transport** (`text`, `xml`, `asn`, `binary`, `json`) and does not take a history-server value; the **record format** is `-format` (`fasta`, `gb`, `uilist`, ...).
+
+Passing `-mode webenv` is not an error and does not warn: efetch falls through to a UID-list request (`rettype=uilist`), exit status stays 0, and you get an empty FASTA. Verified live against EDirect 26.0 -- `-mode webenv` gave 0 records, `-format fasta` gave 3 records / 22,122 bytes for the same input.
+
+```bash
+# Accessions or UIDs, one per line
+printf 'NM_007294.4\nNM_000059.4\nNM_000546.6\n' > ids.txt
+
+# Post once; fetch sequences through the WebEnv the pipe carries
+epost -db nucleotide -input ids.txt | efetch -format fasta > out.fasta
+
+# Verify -- 0 here means the flag spelling is wrong, not that the query was empty
+grep -c '^>' out.fasta
 ```
+
+For lists in the tens of thousands, stay with the Python path above: its chunking, checkpointing and expiry recovery are explicit, while EDirect's are internal.
 
 ### Integrity check after download
 
 **Goal:** Confirm downloaded FASTA has the expected record count and no truncation.
 
-**Approach:** Count expected (from ESearch Count) vs observed (from SeqIO.parse).
-
-```python
-from Bio import SeqIO
-
-def verify_fasta_count(path, expected):
-    observed = sum(1 for _ in SeqIO.parse(path, 'fasta'))
-    assert observed == expected, f'Expected {expected:,} records, found {observed:,}'
-    return True
-```
+**Approach:** Count expected (from ESearch Count) vs observed (from `SeqIO.parse`): `verify_count(path, expected)` in `examples/batch_by_ids.py` (copy it; same demo-script caveat). Skip the check when ESearch Count is 0 (no output file is written; see `examples/batch_fasta.py`).
 
 For genome assemblies and known-checksum files, NCBI provides MD5 manifests (e.g. `md5checksums.txt` in FTP genome directories). NCBI Datasets CLI verifies checksums automatically; the FTP-direct route needs explicit `md5sum -c`.
 
@@ -256,6 +198,16 @@ sem = Semaphore(4)
 
 Never exceed 4 concurrent workers with an API key, or 1 without. Above that NCBI throttles by IP and the whole pipeline grinds.
 
+### Regression tests
+
+**Runnable:** `examples/test_robust_download.py` -- a network-free pytest module for the resume path and the error guards.
+
+```bash
+python -m pytest examples/test_robust_download.py -q
+```
+
+It swaps the live EFetch for a fake history server serving a locally generated record set, so it runs in ~3 s and is safe in CI. Both silent-corruption classes above are locked here: a crash leaving complete records past the committed checkpoint boundary (which produced 419 records for a 368-record query), and text-mode writes translating LF to CRLF. The fixture reproduces NCBI's blank-line-separated FASTA layout exactly, because the byte-offset arithmetic only holds if that separator is preserved.
+
 ## Failure modes
 
 ### Session expires mid-pipeline
@@ -288,11 +240,23 @@ Never exceed 4 concurrent workers with an API key, or 1 without. Above that NCBI
 - **Symptom:** Batch loop terminates early; missing thousands of records.
 - **Fix:** Always set `usehistory='y'` for any query expected to return >5000.
 
-### Checkpoint corruption / partial chunk
-- **Trigger:** Job crashes mid-chunk; checkpoint hasn't been written.
+### Resume duplicates records (silent, well-formed output)
+- **Trigger:** Job crashes after a chunk's bytes reach disk but before the checkpoint update lands.
+- **Mechanism:** The checkpoint still names the *previous* chunk boundary, so on resume the new run re-fetches from there and appends records that are already in the file. The stale tail is complete FASTA -- last-newline truncation cannot see it, because there is no partial record to detect.
+- **Symptom:** The file parses cleanly and holds **more** records than the query returned, with a duplicated run in the middle. Nothing about the file looks broken; only a count check catches it.
+- **Fix:** Record the output's byte length in the checkpoint alongside the cursor, and truncate to exactly that offset on resume. Flush the chunk before writing the checkpoint, so the offset can only ever under-report -- never claim bytes that were not written. `examples/robust_download.py` does this; `examples/test_robust_download.py` locks it.
+
+### Partial record at the end of the file
+- **Trigger:** Crash mid-write, inside a chunk.
 - **Mechanism:** Output file has half a record at the end.
 - **Symptom:** SeqIO.parse fails on the partial record.
-- **Fix:** Write checkpoint AFTER successful chunk write + file flush; on resume, truncate the output file at the last newline before continuing.
+- **Fix:** Same byte-offset truncation as above; it discards the torn record too. Truncating to the last newline is only a fallback for checkpoints predating the byte offset, and it does not cover the duplicate case.
+
+### Output bytes differ from the source payload
+- **Trigger:** Writing the fetched body in text mode (the default `open(path, 'w')`).
+- **Mechanism:** Windows translates `\n` to `\r\n` on write, so NCBI's LF-ending payload lands on disk changed. A 2.27 MB BRCA1 FASTA gained 31,994 CR bytes this way.
+- **Symptom:** `md5sum` does not match the FTP manifest, or a checksum comparison fails, with no other visible difference. `SeqIO.parse` still succeeds, so the file looks fine.
+- **Fix:** Open outputs with `newline=''` or in binary append mode. Verify with a byte-level check (`file`, or compare against the manifest checksum), not with `SeqIO.parse`.
 
 ## Common errors
 
@@ -301,7 +265,11 @@ Never exceed 4 concurrent workers with an API key, or 1 without. Above that NCBI
 | HTTPError 429 | Rate limit | Sleep with backoff; get API key |
 | HTTPError 414 | URL too long | EPost first |
 | `<ERROR>WebEnv not found</ERROR>` (HTTP 200) | Session expired | Re-run ESearch; resume at checkpoint |
-| Output file ends mid-record | Crash mid-chunk | Truncate-to-newline on resume |
+| Output file ends mid-record | Crash mid-chunk | Truncate to the checkpointed byte offset on resume |
+| File parses but has extra records | Crash between chunk write and checkpoint write | Same -- the recorded offset removes the stale tail |
+| Input file empty or too short | No `-id`/`-input` given | efetch reads IDs from stdin and **hangs** on a terminal; pass `-id` or pipe input, and redirect `< /dev/null` |
+| Output FASTA empty, exit status 0 | `efetch -mode webenv` (invalid mode) | Use `-format fasta`; `-mode` is transport, not record format |
+| Checksum mismatch, file looks fine | Text-mode write added CRLF | Open with `newline=''` or binary |
 | Slow despite API key | Too few records per call | Increase batch_size to 500+ for FASTA |
 | Datasets CLI faster than EFetch | Workflow is genome/gene bulk | Switch to `ncbi-datasets-cli` |
 

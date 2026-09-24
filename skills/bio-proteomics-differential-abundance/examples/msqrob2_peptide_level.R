@@ -13,6 +13,7 @@ suppressPackageStartupMessages({
 
 CONTROL <- 'Control'
 TREATMENT <- 'Treatment'
+OFFSET_MAX <- 0.05  # |median logFC| trip-wire; see references/feature_level.md
 
 read_evidence <- function(evidence_path, annotation_path) {
   ev <- read.table(evidence_path, sep = '\t', header = TRUE, quote = '', comment.char = '')
@@ -91,11 +92,13 @@ main <- function() {
   res <- res[!is.na(res$adjPval), ]
   cat('tested:', nrow(res), ' untestable (adjPval NA):', length(untestable), '\n')
 
-  # A feature-level test has small enough SEs that a normalization offset becomes proteome-wide
-  # significance. The median log2FC must be ~0 unless most of the proteome really moved.
+  # Centring trip-wire (empirical, from one 4 v 4 set, not a distributional bound): per-run median
+  # normalization of the peptide table adds an offset AND shrinks the residual, which together turn
+  # into false positives at the feature level. Passing does not certify a normalization; the
+  # residual-SD check is in references/feature_level.md. This script does not normalize the peptides.
   offset <- median(res$logFC, na.rm = TRUE)
   cat(sprintf('median logFC = %+.4f\n', offset))
-  if (abs(offset) > 0.05)
+  if (abs(offset) > OFFSET_MAX)
     stop(sprintf('median logFC = %+.3f: the contrast is not centred. Re-normalize before reading this table.',
                  offset))
 

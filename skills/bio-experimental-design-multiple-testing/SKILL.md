@@ -1,6 +1,6 @@
 ---
 name: bio-experimental-design-multiple-testing
-description: Controls error rates across thousands of simultaneous tests in genomics discovery using false-discovery-rate methods (Benjamini-Hochberg 1995; Benjamini-Yekutieli 2001 for arbitrary dependence; Storey q-value with pi0 estimation; local FDR; independent filtering Bourgon 2010; covariate-weighted FDR via IHW Ignatiadis 2016), plus family-wise error control (Bonferroni, Holm) and the GWAS genome-wide threshold. Covers the FDR-versus-FWER choice as the discovery-versus-confirmatory distinction, the dependence assumptions behind BH (PRDS) versus BY, pi0 estimation, the independent-filtering and false-coverage-rate traps, and reproducibility ranking via IDR (Li 2011). Use when correcting p-values from genome-wide tests, choosing between BH/BY/q-value/Bonferroni, setting an FDR threshold, applying IHW or independent filtering, or interpreting q-values. For confirmatory trials with few pre-specified endpoints (closed testing, graphical/gatekeeping), see clinical-biostatistics/multiplicity-graphical.
+description: Controls error rates across thousands of simultaneous tests in genomics discovery using false-discovery-rate methods (Benjamini-Hochberg 1995; Benjamini-Yekutieli 2001 for arbitrary dependence; Storey q-value with pi0 estimation; local FDR; independent filtering Bourgon 2010; covariate-weighted FDR via IHW Ignatiadis 2016), plus family-wise error control (Bonferroni, Holm) and the GWAS genome-wide threshold. Covers the FDR-versus-FWER choice as the discovery-versus-confirmatory distinction, the dependence assumptions behind BH (PRDS) versus BY, pi0 estimation, and the independent-filtering and false-coverage-rate traps. Use when correcting p-values from genome-wide tests, choosing between BH/BY/q-value/Bonferroni, setting an FDR threshold, applying IHW or independent filtering, or interpreting q-values. For confirmatory trials with few pre-specified endpoints (closed testing, graphical/gatekeeping), see clinical-biostatistics/multiplicity-graphical.
 tool_type: mixed
 primary_tool: qvalue
 goal_approach_exempt: true
@@ -40,7 +40,6 @@ The choice between false-discovery-rate and family-wise-error control is not a t
 | Storey q-value | pFDR | independence / weak dependence | many true positives (pi0 << 1); family in the thousands+ | `qvalue::qvalue` |
 | Local FDR | posterior null prob | two-groups model | per-feature null probability | `qvalue` ($lfdr); `locfdr` |
 | IHW | FDR | covariate independent of null p | informative covariate available; pin `nbins` low | `IHW::ihw` |
-| IDR | reproducibility | replicate ranks | thresholding by replicate consistency | `idr` (ENCODE) |
 
 ## Decision Tree by Scenario
 
@@ -73,6 +72,10 @@ qobj <- qvalue(pvalues)
 qobj$pi0                                           # estimated proportion of true nulls
 q   <- qobj$qvalues                                # min FDR at which each feature is called
 lfdr <- qobj$lfdr                                  # local FDR: posterior P(null | statistic)
+# lfdr cutoff: Efron's convention is to call features with lfdr < 0.2. The mean lfdr over the called set
+# estimates that set's FDR, so lfdr < 0.2 is a much stricter rule than "FDR 20%" (m=18,000: lfdr < 0.2
+# called 987 features, mean lfdr 0.043, realized FDP 0.0375, qvalue 2.38.0).
+called <- lfdr < 0.2; sum(called); mean(lfdr[called])
 
 # Small-family fallback (tested on all-null families of 20-50 GO terms, qvalue 2.38.0):
 qobj_small <- qvalue(pvalues, lambda = 0)          # no spline fit; stable at every size tested,
@@ -103,20 +106,22 @@ padj_by <- p.adjust(pvalues, method = 'BY')        # valid under any dependence 
 
 ## Covariate-Weighted FDR -- IHW
 
+Weight hypotheses by an INDEPENDENT informative covariate (e.g. mean expression), which must be
+independent of the p-value under the null. Recovers power vs plain BH. **Do not call `ihw()` directly
+in your session**: its LP solver can SEGFAULT (a process crash `tryCatch` cannot catch; 50-75% of runs
+at m=18,000, see "IHW segfaults or silently reduces to BH"). Use this wrapper, which runs `ihw()` in a
+retried child process and falls back to plain BH:
+
 ```r
-# Weight hypotheses by an INDEPENDENT informative covariate (e.g. mean expression),
-# which must be independent of the p-value under the null. Recovers power vs plain BH.
-# CAUTION: the R session can SEGFAULT inside IHW's LP solver -- observed here at every nbins
-# tried (2 through the default 12), roughly 50-75% of runs at m=18,000. Pinning nbins low reduces
-# but does not eliminate this, and it is a process crash, not an R error, so tryCatch cannot help --
-# run it in a child process (system2(..., 'Rscript', ...)) so a segfault kills the child, not your
-# session, and retry there; fall back to BH if it still won't complete (examples/ ships this pattern)
-# (see "IHW segfaults or silently reduces to BH" below).
-library(IHW)
-res <- ihw(pvalue ~ mean_expression, data = de_table, alpha = 0.05, nbins = 5)
-de_table$padj_ihw <- adj_pvalues(res)
-rejections(res)
+source('scripts/ihw_safe.R')   # defines ihw_safe(p, covariate, alpha = 0.05, nbins = 5, tries = 3); checked on IHW 1.34.0 / R 4.4.3
+
+# de_table: one row per feature, with columns pvalue and mean_expression
+res <- ihw_safe(de_table$pvalue, de_table$mean_expression)
+de_table$padj_ihw <- res$padj
+res$method; sum(res$padj < 0.05)                   # report which method actually produced the padj
 ```
+
+`scripts/ihw_safe.R` also runs as a CLI: `Rscript scripts/ihw_safe.R in.csv pvalue mean_expression out.csv [alpha]`.
 
 ## Independent Filtering -- Power for Free, If the Filter Is Independent
 
@@ -192,7 +197,7 @@ The genome-wide significance threshold of ~5e-8 is a Bonferroni-style bound for 
 - **Trigger:** `ihw(pvalue ~ covariate, data = ..., alpha = 0.05)` at default `nbins` ("auto") on a family in the thousands; also observed here at explicit low `nbins` (2-5).
 - **Mechanism:** IHW 1.34.0 defaults to `lp_solver = "lpsymphony"`; on this build it crashes the R session outright (SIGSEGV, exit 139) with no R-level error to catch -- `tryCatch` cannot help. Testing found the crash at every `nbins` tried from 2 to the default 12, roughly 50-75% of runs on the same m=18,000 data; pinning `nbins` low reduced the rate but did not eliminate it. Separately, IHW's own automatic bin selection (`nbins <- floor(m/1500)`, capped at 40) collapses to a single bin below m ~ 1500, and at `nbins == 1` the function explicitly reduces to plain BH with uniform weights (its own message: "Only 1 bin; IHW reduces to Benjamini Hochberg") -- the covariate weighting silently does nothing. Above 1 bin, IHW also warns "We recommend that you supply (many) more than 1000 p-values..." whenever any bin holds fewer than 1000 tests.
 - **Symptom:** R session dies with no traceback (exit 139); or `ihw()` returns but its rejections/padj exactly match plain BH (the silent nbins==1 collapse).
-- **Fix:** pass `nbins` explicitly and start low (2-5) -- it is the first thing to change, and it helps, but the crash is stochastic here, not deterministic per input, so retrying in the same R session does nothing (`tryCatch` cannot catch a process crash). Run the `ihw()` call in a child process instead (`system2(file.path(R.home('bin'), 'Rscript'), c('-e', ...))`, passing data via a temp file) and retry the child a few times -- `examples/multiple_testing_correction.R` ships this pattern. If it still won't complete, fall back to plain BH: the power loss is real (this Skill's own comparison: up to 238 vs 204 discoveries, ~17%) but BH always completes and needs no LP solver.
+- **Fix:** use `ihw_safe()` (Covariate-Weighted FDR section; `examples/multiple_testing_correction.R` ships the same pattern). It pins `nbins = 5` -- pinning helps but the crash is stochastic here, not deterministic per input -- and retries in a child process, since retrying in the same R session does nothing (`tryCatch` cannot catch a process crash). If it still won't complete it falls back to plain BH: the power loss is real (this Skill's own comparison: up to 238 vs 204 discoveries, ~17%) but BH always completes and needs no LP solver.
 
 ### statsmodels default is not BH
 - **Trigger:** `multipletests(p)` expecting Benjamini-Hochberg.
@@ -248,7 +253,6 @@ Symptom-first index into the failure modes above -- causes and fixes are documen
 - Efron B. 2008. Microarrays, empirical Bayes and the two-groups model. *Stat Sci* 23:1-22.
 - Bourgon R, Gentleman R, Huber W. 2010. Independent filtering increases detection power for high-throughput experiments. *PNAS* 107:9546-9551.
 - Ignatiadis N, Klaus B, Zaugg JB, Huber W. 2016. Data-driven hypothesis weighting increases detection power in genome-scale multiple testing. *Nat Methods* 13:577-580.
-- Li Q, Brown JB, Huang H, Bickel PJ. 2011. Measuring reproducibility of high-throughput experiments. *Ann Appl Stat* 5:1752-1779.
 - Dudbridge F, Gusnanto A. 2008. Estimation of significance thresholds for genomewide association scans. *Genet Epidemiol* 32:227-234.
 
 ## Related Skills

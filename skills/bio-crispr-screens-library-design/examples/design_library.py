@@ -17,6 +17,7 @@ np.random.seed(42)
 def find_sgrna_candidates(cds_sequence, pam='NGG', guide_length=20):
     '''Return all protospacer candidates with PAM coordinates on + strand.
     Caller must filter by exon position and Azimuth/CFD score.'''
+    cds_sequence = cds_sequence.upper()  # the PAM/spacer regex matches uppercase ACGT only; lowercase (soft-masked) input would silently return 0 candidates
     pam_pattern = re.compile(f'(?=([ACGT]{{{guide_length}}}{pam.replace("N", "[ACGT]")}))')
     candidates = []
     for strand, seq in [('+', cds_sequence), ('-', str(Seq(cds_sequence).reverse_complement()))]:

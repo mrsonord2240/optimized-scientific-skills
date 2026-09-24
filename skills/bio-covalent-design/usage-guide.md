@@ -6,12 +6,7 @@ Design covalent inhibitors targeting Cys, Lys, Ser, Thr, Tyr, or Asp residues. B
 
 ## Prerequisites
 
-```bash
-pip install rdkit
-# DOCKovalent: web service (covalent.docking.org)
-# GOLD: commercial license
-# HCovDock: standalone installation
-```
+Versions and installs: see SKILL.md's Version Compatibility.
 
 ## Quick Start
 

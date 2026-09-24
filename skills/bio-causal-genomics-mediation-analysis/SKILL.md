@@ -54,39 +54,22 @@ Individual-level genotype, expression and methylation data used as mediators are
 
 Methodology evolves; verify against the current CMAverse vignette and the Steen / Vansteelandt natural-effects-model literature before locking analytic choices. Difference-in-coefficients and product-of-coefficients give identical estimates in fully linear-Gaussian models but DIVERGE for any non-linear outcome model (logistic, Cox, Poisson); the counterfactual ACME from `mediation::mediate()` is the correct quantity for non-linear outcomes.
 
-## 4-Way Decomposition Framework
-
-VanderWeele 4-way explicitly separates effects from exposure-mediator interaction:
-
-```
-Total Effect = CDE + INTref + INTmed + PIE
-```
-
-| Component | Meaning | Active when |
-|-----------|---------|-------------|
-| CDE | Controlled direct effect (with mediator fixed at reference level) | E directly affects Y |
-| INTref | Interaction-reference -- needs interaction AND exposure | E*M interaction with mediator at reference |
-| INTmed | Mediated interaction -- needs interaction AND exposure AND mediation | E shifts M which then interacts with E |
-| PIE | Pure indirect effect (older "mediation" quantity) | E shifts M which shifts Y additively |
-
-Without an exposure-mediator interaction term, INTref = INTmed = 0 and the decomposition collapses to CDE + PIE (= ADE + ACME). With interaction present, traditional ACME mixes PIE and INTmed; the 4-way separation is the only framework that disentangles them. Most epidemiology applications include the interaction term and report all four components (Valeri & VanderWeele 2013 Psychol Methods).
-
 ## Decision Tree by Scenario
 
 | Scenario | Recommended pipeline |
 |----------|---------------------|
 | Observational, single measured mediator, no plausible E-M interaction, continuous outcome | `mediation::mediate()` with `boot=TRUE, sims=5000`; always run `medsens()` |
-| Observational, single mediator, suspected E-M interaction, any outcome family | `CMAverse::cmest(..., EMint=TRUE)` -> read `cde`/`intref`/`intmed`/`pnie` (continuous outcome) or `ERcde`/`ERintref`/`ERintmed`/`ERpnie` (ratio-scale, e.g. logistic/Cox); verify with `summary(result)$summarydf` |
+| Observational, single mediator, suspected E-M interaction, any outcome family | `CMAverse::cmest(..., EMint=TRUE)` -> read `cde`/`intref`/`intmed`/`pnie` (continuous outcome) or `ERcde`/`ERintref`/`ERintmed`/`ERpnie` (ratio-scale, e.g. logistic/Cox); verify with `summary(result)$summarydf`; see `references/cmaverse-4way.md` |
 | Observational, BINARY outcome, rare disease (< 10%) | `cmest(yreg='logistic', EMint=TRUE, casecontrol=FALSE)` -- OR-based 4-way decomposition is valid under rare-disease |
 | Observational, survival outcome | `cmest(yreg='coxph')` OR `HIMA::hima_cox` for high-D; report HRs |
-| High-D mediators (EWAS, transcriptome-wide), continuous outcome | `HIMA::hima(formula, data.pheno, data.M, mediator.type='gaussian', penalty='DBlasso')`; report `sigcut` (FDR threshold, default 0.05) |
+| High-D mediators (EWAS, transcriptome-wide), continuous outcome | `HIMA::hima(formula, data.pheno, data.M, mediator.type='gaussian', penalty='DBlasso')`; report `sigcut` (FDR threshold, default 0.05); see `references/hima-ewas.md` |
 | High-D mediators with latent confounding (very-high-D EWAS) | `HILAMA` (2025) |
 | High-D mediators with Bayesian shrinkage (small n, ~5k features) | `bama::bama()` |
-| Strong genetic IVs for exposure available, single mediator with own IVs | Two-step MR with independent instruments + Steiger filter on mediator |
-| Both E and M have IVs but instruments are weak / correlated | MVMR-mediation with conditional F > 10 each |
-| Observational with rich confounder set, want doubly-robust estimate | `causalweight::medDML` (double-debiased ML) |
-| Longitudinal with time-varying confounding | g-formula via `CMAverse::cmest(estimation='gformula')` OR `gfoRmula` package |
-| Exposure-induced confounder of M-Y exists | Interventional indirect effects (Vansteelandt & Daniel 2017); `CMAverse::cmest(estimation='msm')` |
+| Strong genetic IVs for exposure available, single mediator with own IVs | Two-step MR with independent instruments + Steiger filter on mediator; see `references/mr-mediation.md` |
+| Both E and M have IVs but instruments are weak / correlated | MVMR-mediation with conditional F > 10 each; see `references/mr-mediation.md` |
+| Observational with rich confounder set, want doubly-robust estimate | `causalweight::medDML` (double-debiased ML); see `references/time-varying-and-dml.md` |
+| Longitudinal with time-varying confounding | g-formula via `CMAverse::cmest(estimation='gformula')` OR `gfoRmula` package; see `references/time-varying-and-dml.md` |
+| Exposure-induced confounder of M-Y exists | Interventional indirect effects (Vansteelandt & Daniel 2017); `CMAverse::cmest(estimation='msm')`; see `references/cmaverse-4way.md` |
 
 BAMA vs HIMA2 for high-D mediators: prefer BAMA over HIMA2 when (1) strong prior information on mediator effects is available, (2) the candidate panel is moderately sized (~5k mediators), and (3) the compute budget allows 1-6h MCMC; otherwise HIMA2 is faster with comparable FDR control.
 
@@ -117,48 +100,6 @@ Quantitative interpretation thresholds:
 
 For high-stakes claims (clinical, drug-target, regulatory submissions) report BOTH rho_crit and the mediational E-value; for exploratory work either alone suffices.
 
-### Exposure-induced M-Y confounder
-
-**Trigger:** A covariate L sits between E and Y, AND is affected by E, AND confounds M-Y.
-
-**Mechanism:** Standard regression-based mediation cannot adjust for L without blocking part of the indirect effect (collider stratification bias). Adjusting biases CDE; not adjusting biases ACME.
-
-**Symptom:** Sensitivity to confounder set; ACME flips sign when L is added vs removed.
-
-**Operational identification:** From the DAG, L is a covariate of M and Y that is also affected by E. VanderWeele TJ, Vansteelandt S & Robins JM 2014 (Epidemiology 25:300) give the criterion: if L is adjusted, part of the indirect E -> L -> M -> Y pathway is blocked; if L is not adjusted, L confounds the M-Y leg. Both are wrong under natural-effects; the natural indirect effect is simply not identified.
-
-**Fix:** Switch to **interventional indirect effects** (Vansteelandt & Daniel 2017 Epidemiology 28:258), NOT natural indirect effects. Use `CMAverse::cmest(estimation='msm')` with stabilized inverse-probability weights (yields the randomized-interventional analogue), `gfoRmula` (parametric g-formula), or randomized/interventional indirect effects (Lin SH & VanderWeele TJ 2017 J Causal Inference 5:20150027). The interventional indirect is identified under weaker assumptions than the natural indirect.
-
-### HIMA covariate or data.pheno error
-
-**Trigger:** `data.pheno` contains factor/character columns with NA, or formula references columns missing from `data.pheno`.
-
-**Mechanism:** HIMA v2.3+ uses a formula interface and constructs the design matrix internally from `data.pheno` via `hima_dblasso`'s `process_var()`, which requires every covariate to already be numeric or dummy-coded -- **not** an R `factor`. Passing a `factor` column throws `Non-numeric variable(s) detected... Please convert all factor/character variables to numeric or dummy variables` (verified on HIMA 2.3.4, 2026-09-17); separately, missing values or unparseable formulas surface as cryptic `glmnet`/`storage.mode` errors.
-
-**Symptom:** Pipeline fails inside `hima()` with a non-obvious `storage.mode`/`model.matrix` error, or -- if `factor()` was tried as the fix -- with `process_var()`'s "Non-numeric variable(s) detected" error.
-
-**Fix:** Pre-clean `data.pheno` (drop NA rows for the variables in the formula; ensure all RHS variables exist as columns) and **dummy-code categorical covariates with `model.matrix()`, not `factor()`** -- HIMA 2.3.4 rejects factor columns outright. Example (verified: recovers planted mediators with a 3-level `batch` covariate):
-```r
-dat <- na.omit(dat[, c('outcome', 'exposure', 'age', 'sex', 'batch', 'pc1', 'pc2')])
-batch_dummy <- model.matrix(~ batch, data=dat)[, -1, drop=FALSE]  # drop the intercept column
-dat <- cbind(dat[, setdiff(names(dat), 'batch')], batch_dummy)     # e.g. adds batchB, batchC
-result <- hima(as.formula(paste('outcome ~ exposure + age + sex +',
-                                 paste(colnames(batch_dummy), collapse=' + '), '+ pc1 + pc2')),
-               data.pheno=dat, data.M=M_matrix, mediator.type='gaussian')
-```
-
-### HIMA mediator-type vs outcome-type mismatch
-
-**Trigger:** Survival outcome (`Surv()` on LHS) with `mediator.type='compositional'` chosen against text mediator panel; or count mediators passed as `'gaussian'`.
-
-**Mechanism:** HIMA v2.3+ auto-detects outcome family from the LHS of `formula` (continuous, binary, survival, count); `mediator.type` is set for the mediator data only (`'gaussian'`, `'negbin'`, `'compositional'`). Mismatching mediator-type to the actual mediator distribution biases the screening step.
-
-**Symptom:** Hazard / rate ratios for indirect effects look implausible; many "significant" mediators fail replication.
-
-**Fix:** Set `mediator.type='gaussian'` for continuous (e.g., methylation beta, log-CPM expression), `'negbin'` for raw count (RNA-seq), `'compositional'` for relative-abundance microbiome. Verify by `?hima` in the installed version since the catalogue of mediator types has expanded across releases.
-
-Cell composition is the canonical unmeasured confounder in EWAS mediation: include estimated cell proportions (Houseman or reference-free RPC method) as covariates -- in the formula interface, add them as RHS terms alongside `age + sex + ...`; in `hima_classic()`, pass them in both `COV.XM` and `COV.MY`.
-
 ### Bootstrap iterations too low
 
 **Trigger:** `sims=100` or `sims=500` in early exploration left in for the final report.
@@ -168,16 +109,6 @@ Cell composition is the canonical unmeasured confounder in EWAS mediation: inclu
 **Symptom:** Re-running `mediate()` with a different `set.seed()` gives substantially different CI bounds.
 
 **Fix:** `sims=1000` minimum for any reported result; `sims=5000` for publication; `sims=10000` if proximity to zero matters. BCa CIs (`boot.ci.type='bca'` in `mediate()` -- lowercase `'bca'`, not `'BCa'`) are slightly more accurate than percentile CIs near zero but require more sims for stability.
-
-### Two-step MR instrument independence
-
-**Trigger:** Same set of SNPs used as instruments for E in step 1 and for M in step 2.
-
-**Mechanism:** If a SNP affects both E and M, the M-instrument violates exclusion restriction (the SNP-Y association is not exclusively through M). Estimates are biased toward the direct effect.
-
-**Symptom:** Two-step MR shows large indirect effect; replacing M-instruments with non-overlapping SNPs makes it vanish.
-
-**Fix:** Apply Steiger filter on the mediator: keep only SNPs where the SNP-M F-statistic exceeds SNP-E F-statistic (or where SNP explains more variance in M than E). For MVMR-mediation, require conditional F > 10 for each exposure independently (Sanderson 2019 IJE 48:713).
 
 ### Difference vs product of coefficients diverge for non-linear outcomes
 
@@ -205,29 +136,6 @@ Cell composition is the canonical unmeasured confounder in EWAS mediation: inclu
 
 Reference: AGReMA guideline (Lee H et al 2021 JAMA 326:1045) and MacKinnon 2008 Introduction to Statistical Mediation Analysis.
 
-## Reconciliation: Observational vs MR Mediation
-
-| Pattern | Likely cause | Action |
-|---------|--------------|--------|
-| Observational ACME significant; MR-mediation null | Unmeasured M-Y confounding inflated observational estimate; OR weak IVs in MR | Re-run observational with `medsens()`; if rho_crit < 0.1, trust MR null |
-| Observational ACME null; MR-mediation significant | Measurement error in M attenuated observational estimate | Trust MR (regression-dilution-free) IF instruments pass Steiger and pleiotropy tests (MR-Egger intercept, MR-PRESSO) |
-| Both significant with same sign | Convergent evidence | High-confidence mediation; report effect size from the more-conservative estimate |
-| Both significant with opposite signs | At least one is biased; revisit confounder structure and IV assumptions | Do not pool; investigate via cross-method sensitivity |
-
-**Operational rule for high-stakes claims (clinical / drug-target mediation):** Require (1) significant observational ACME, (2) Imai rho_crit > 0.2 OR mediational E-value > 1.5, (3) directionally consistent MR-mediation result OR documented absence of valid instruments. Single-method mediation claims should be reported as exploratory.
-
-## Anticipated Reviewer Pushback
-
-| Pushback | Standard response |
-|----------|-------------------|
-| "Sequential ignorability?" | Imai rho_crit reported via `medsens`; mediational E-value reported on the risk-ratio scale |
-| "Exposure-induced confounder of M-Y?" | DAG drawn; if L present, switch to `CMAverse::cmest(estimation='msm')` for interventional indirect effect (Vansteelandt & Daniel 2017) |
-| "Why this bootstrap method?" | BCa with sims=5000 for publication; percentile fallback when BCa fails to converge (acceleration estimate unstable at boundary) |
-| "Why was MR-mediation not done?" | If valid IVs for E and M exist: two-step MR or MVMR-mediation done (see code below); if not, documented absence of trans-instruments |
-| "Mediator measured with error?" | When mediator reliability r < 0.9, the indirect effect is attenuated. Regression calibration (Carroll 2006 Measurement Error in Nonlinear Models): replace the observed mediator with its conditional expectation given exposure and covariates. OR run a sensitivity analysis at fixed reliability r = 0.7 (Valeri L, Lin X & VanderWeele TJ 2014 Stat Med 33:4875) |
-| "Why HIMA2 not BAMA?" | HIMA2 = frequentist + FDR control + faster; BAMA = Bayesian when prior information is available; sample-size justification given against simulation rule-of-thumb |
-| "Proportion mediated unstable?" | When |total| < 2*SE(total), proportion-mediated CI is unreliable (denominator near zero); report indirect effect alone with absolute effect size |
-
 ## Quantitative Thresholds
 
 | Quantity | Threshold | Source / Rationale |
@@ -253,169 +161,9 @@ Reference: AGReMA guideline (Lee H et al 2021 JAMA 326:1045) and MacKinnon 2008 
 
 **Approach:** Fit mediator and outcome models, bootstrap ACME/ADE, run `medsens()` for Imai rho-based sensitivity.
 
-```r
-library(mediation)
-
-med_model <- lm(expression ~ genotype + age + sex + pc1 + pc2 + pc3, data=dat)
-out_model <- glm(disease ~ genotype + expression + age + sex + pc1 + pc2 + pc3,
-                 data=dat, family=binomial)
-
-med_result <- mediate(med_model, out_model,
-                      treat='genotype', mediator='expression',
-                      boot=TRUE, sims=5000, boot.ci.type='bca')
-summary(med_result)
-
-sens <- medsens(med_result, rho.by=0.05, effect.type='indirect', sims=1000)
-summary(sens)
-```
+Runnable: `examples/eqtl_mediation.R` (mediator + outcome models, `mediate(..., boot=TRUE, sims=1000)`, multi-gene loop; use `sims=5000` and `boot.ci.type='bca'` for publication) and `examples/sensitivity_analysis.R` (`medsens(..., rho.by=0.05, effect.type='indirect')`, which needs a **probit** outcome model -- see Common Errors).
 
 `d0`, `z0`, `n0`, `tau.coef` slots return ACME, ADE, proportion mediated, total effect.
-
-### 4-Way Decomposition with Exposure-Mediator Interaction
-
-**Goal:** Separate CDE, PIE, INTref, INTmed (continuous outcome) -- or their excess-relative-risk equivalents ERcde/ERpnie/ERintref/ERintmed (binary/survival outcome, shown below) -- when exposure-mediator interaction is biologically plausible (e.g., gene-environment interaction modifying mediator effect).
-
-**Approach:** Use CMAverse regression-based estimator with `EMint=TRUE`; bootstrap CIs.
-
-```r
-library(CMAverse)
-
-result_4way <- cmest(
-  data=dat, model='rb',
-  outcome='disease', exposure='genotype', mediator='expression',
-  basec=c('age','sex','pc1','pc2'),
-  EMint=TRUE,
-  mreg=list('linear'), yreg='logistic',
-  astar=0, a=1, mval=list(0),
-  estimation='paramfunc', inference='bootstrap', nboot=1000
-)
-summary(result_4way)
-```
-
-CMAverse reports the 4-way decomposition (Vanderweele 2014): for continuous outcomes the components are `cde`, `intref`, `intmed`, `pnie` (or `pie`), `te`, `pm`; for non-continuous outcomes (logistic / Cox / Poisson) the ratio effects `Rcde`, `Rpnde`, `Rtnde`, `Rpnie`, `Rtnie`, `Rte` are reported ALONGSIDE an excess-relative-risk decomposition with an `ER` prefix -- `ERcde`, `ERintref`, `ERintmed`, `ERpnie` (plus a `(prop)` share for each) -- **not** the bare `intref`/`intmed` names, which belong only to the continuous-outcome case. When `EMint=TRUE`, `pm`, `int`, `pe` are also included. Verified column set on a logistic-outcome, `EMint=TRUE` fit (CMAverse 0.1.0, 2026-09-17): `Rcde Rpnde Rtnde Rpnie Rtnie Rte ERcde ERintref ERintmed ERpnie ERcde(prop) ERintref(prop) ERintmed(prop) ERpnie(prop) pm int pe`. Verify column names in the installed CMAverse version with `summary(result)$summarydf` (not `$results`, which does not exist on the summary object), since naming has evolved.
-
-### High-Dimensional EWAS Mediation (HIMA2)
-
-**Goal:** Among thousands of candidate CpG mediators, identify those mediating an exposure-outcome effect with FDR control.
-
-**Approach:** HIMA v2.3+ uses a formula interface and auto-detects outcome family (Gaussian / binomial / Cox / Poisson). Screening + MCP/DBlasso penalisation + joint significance with BH; the `sigcut` argument controls the FDR threshold (default 0.05).
-
-```r
-library(HIMA)
-
-dat <- na.omit(dat[, c('outcome', 'exposure', 'age', 'sex', 'cell_pc1', 'cell_pc2')])
-M_matrix <- as.matrix(beta_values)
-
-result <- hima(
-  outcome ~ exposure + age + sex + cell_pc1 + cell_pc2,
-  data.pheno=dat,
-  data.M=M_matrix,
-  mediator.type='gaussian',          # 'negbin' for count, 'compositional' for microbiome
-  penalty='DBlasso',                  # default; alternatives 'MCP', 'SCAD', 'lasso'
-  scale=TRUE,
-  sigcut=0.05,
-  parallel=TRUE, ncore=8, verbose=TRUE
-)
-# result is a LIST of class "hima" ($ID, $alpha, $beta, `$alpha*beta`, $rimp, `$p-value`),
-# NOT a data.frame -- nrow(result) and rownames(result) both return NULL rather than
-# erroring (verified on HIMA 2.3.4). Use result$ID and length(result$ID):
-sig_mediators <- result$ID
-n_sig <- length(sig_mediators)
-```
-
-For survival outcomes wrap the LHS as `Surv(time, status)`; HIMA auto-routes to Cox. The old `hima_classic()` (Zhang 2016 original) is still exported but screens by beta only and misses mediators with strong alpha + weak beta -- prefer the wrapper `hima()` unless reproducing a 2016-2021 paper.
-
-For highly-correlated mediators (CpG-island clusters, gene-module co-expression): HIMA uses joint significance with BH-FDR on max(p_alpha, p_beta) and handles correlation only weakly. Within `hima()`, set `penalty='MCP'` for stronger correlation handling; alternatively pre-reduce the mediator panel by principal components or by clustering correlated mediators and screening the cluster centroid (VanderWeele & Vansteelandt 2014 Epidemiol Methods 2:95).
-
-### Time-Varying Mediation Methods
-
-When the mediator is measured at multiple timepoints (or exposure varies over time), natural-effects estimands are not identified; switch to one of:
-
-- g-formula (parametric or Monte Carlo): `gfoRmula::gformula_continuous_eof()`; `CMAverse::cmest(estimation='gformula')`
-- g-estimation of a structural nested mean model: `gesttools::gestSingle()` / `gestMultiple()`
-- Marginal structural model with stabilized IPTW: `ipw::ipwtm()` followed by `glm(..., weights=sw)`
-- Sequential mediation for K timepoints: VanderWeele & Tchetgen Tchetgen 2017 JRSSB 79:917
-
-Choose based on the experimental structure:
-- >= 3 timepoints required for g-methods to identify time-varying indirect effects
-- Longitudinal mediator measurement at EACH timepoint is required (not just baseline)
-- MSM is preferred when treatment is binary and time-varying; g-formula when continuous
-- Sequential mediation when the causal ordering of multiple mediators is known and stable across time
-
-### MR-Mediation: Two-Step vs MVMR-Mediation
-
-Decision tree:
-- Independent instrument sets available for E and M -> two-step MR (Burgess 2015 IJE 44:484)
-- E and M share instruments (common in cis-eQTL / cis-pQTL mediator cases) -> MVMR-mediation (Carter & Sanderson 2021 Eur J Epidemiol 36:465)
-- Both feasible -> report both (triangulation)
-
-Two-step code sketch:
-
-```r
-library(TwoSampleMR)
-exp_E <- extract_instruments('ieu-a-2', clump=TRUE)
-m_E <- extract_outcome_data(exp_E$SNP, 'ieu-b-30')
-dat_EM <- harmonise_data(exp_E, m_E)
-mr_EM <- mr(dat_EM)
-
-exp_M <- extract_instruments('ieu-b-30', clump=TRUE)
-exp_M_indep <- exp_M[!exp_M$SNP %in% exp_E$SNP, ]
-exp_M_indep <- steiger_filtering(exp_M_indep)
-out_M <- extract_outcome_data(exp_M_indep$SNP, 'ieu-a-7')
-dat_MY <- harmonise_data(exp_M_indep, out_M)
-mr_MY <- mr(dat_MY)
-```
-
-Indirect effect = beta_EM * beta_MY (product of coefficients). CI via delta method or parametric bootstrap of the joint (beta_EM, beta_MY) distribution. Steiger filter on M-instruments is mandatory to ensure the M -> Y direction (not Y -> M).
-
-### MR-Mediation: Total Minus Direct via MVMR
-
-**Goal:** Estimate the proportion of a genetic-instrument-identified causal effect that flows through a mediator, using independent IVs for E and (E + M).
-
-**Approach:** Univariable MR for total E->Y; MVMR for direct E->Y conditional on M; indirect = total - direct via delta-method CI.
-
-```r
-library(TwoSampleMR); library(MVMR)
-
-total <- mr_ivw(beta_E, beta_Y, se_E, se_Y)
-mvmr_dat <- format_mvmr(BXGs=cbind(beta_E, beta_M),
-                        BYG=beta_Y, seBXGs=cbind(se_E, se_M), seBYG=se_Y, RSID=snps)
-fstat <- strength_mvmr(mvmr_dat, gencov=0)
-mvmr_fit <- ivw_mvmr(mvmr_dat)
-direct <- mvmr_fit[1, 'Estimate']
-direct_se <- mvmr_fit[1, 'Std. Error']
-
-indirect <- total$b - direct
-indirect_se <- sqrt(total$se^2 + direct_se^2)
-indirect_ci <- indirect + c(-1.96, 1.96) * indirect_se
-```
-
-Require `fstat` conditional F > 10 for both E and M independently. If `fstat < 10`, use Q-statistic-adjusted IVW (`qhet_mvmr`) or report the result as weak-instrument-limited.
-
-### Double-ML Doubly-Robust Mediation
-
-**Goal:** Avoid model misspecification of both mediator and outcome models via cross-fitted ML nuisance estimators.
-
-**Approach:** `causalweight::medDML` uses random forests (or other learners) with sample splitting to estimate nuisance parameters; final estimator is doubly robust.
-
-```r
-library(causalweight)
-
-result_dml <- medDML(
-  y=dat$outcome, d=dat$treatment, m=dat$mediator,
-  x=as.matrix(dat[, covariates]),
-  trim=0.05, order=1
-)
-# result_dml is a list of class "list" ($results, $ntrimmed) -- NOT a data.frame.
-# $results is a 3x6 matrix: rows "effect"/"se"/"p-val" x columns
-# total, dir.treat, dir.control, indir.treat, indir.control, Y(0,M(0))
-# (verified on causalweight 1.1.4, 2026-09-17). Extract by name, not position:
-total_effect <- result_dml$results['effect', 'total']
-indirect_treat <- result_dml$results['effect', 'indir.treat']
-indirect_control <- result_dml$results['effect', 'indir.control']
-```
-
-Reports direct (`dir.treat`/`dir.control`), indirect (`indir.treat`/`indir.control`, via mediator), and total effects with influence-function-based standard errors, plus `Y(0,M(0))` (baseline counterfactual mean). `dir.treat`/`indir.treat` and `dir.control`/`indir.control` are the effects evaluated with the mediator's treatment/control-arm distribution respectively (Farbmacher 2022's doubly-robust decomposition, analogous to `mediation::mediate()`'s treated/control ACME). Robust to non-linearity and interactions; assumes sequential ignorability still.
 
 ### Mediational E-Value for Sensitivity
 
@@ -428,10 +176,24 @@ library(EValue)
 
 acme_rr <- exp(med_result$d0)
 acme_lower_rr <- exp(med_result$d0.ci[1])
-evalues.RR(acme_rr, lo=acme_lower_rr, hi=NULL)
+evalues.RR(acme_rr, lo=acme_lower_rr)   # omit `hi`: its default is NA; `hi=NULL` crashes (`if (est < true & !is.na(hi))`, EValue 4.1.4)
 ```
 
 For binary outcomes, convert ACME on probability scale to RR; for continuous, use `evalues.OLS()` with the standardized indirect effect. E-value > 2 indicates a confounder would need >2-fold associations with both M and Y to nullify the indirect effect (Smith & VanderWeele 2019). By hand: convert ACME to a risk-ratio bound (`acme_rr = exp(ACME)` on the log scale for continuous outcomes, or VanderWeele's marginal RR conversion for binary), then `E = RR + sqrt(RR * (RR - 1))`; apply the same formula to the CI bound closer to the null for the E-value of the CI. `EValue::evalues.OLS()` automates this for linear outcomes.
+
+## Reference Files
+
+Read the file for the method in use; everything a request always needs (scope, taxonomy, decision tree, sensitivity, thresholds, install, Common Errors) stays in this file.
+
+| File | Read when |
+|------|-----------|
+| `references/cmaverse-4way.md` | 4-way CDE/INTref/INTmed/PIE decomposition, `cmest()` output names, or an exposure-induced M-Y confounder (interventional indirect effects) |
+| `references/hima-ewas.md` | HIMA/HIMA2 on high-dimensional mediators: `data.pheno` covariate errors, `mediator.type`, the `hima()` code pattern, correlated mediators |
+| `references/mr-mediation.md` | Two-step MR (instrument independence, Steiger) or total-minus-direct MVMR mediation |
+| `references/time-varying-and-dml.md` | Longitudinal mediator/exposure (g-formula, SNMM, MSM) or `causalweight::medDML` double-ML |
+| `references/reconciliation-and-reviewers.md` | Observational ACME and MR-mediation disagree, or drafting responses to reviewers |
+
+Runnable code: `scripts/hima_ewas.R` (HIMA pipeline); `examples/` (`eqtl_mediation.R`, `sensitivity_analysis.R`, `cmaverse_4way.R`, `mvmr_mediation.R`).
 
 ## Tool Install Notes
 
@@ -451,7 +213,7 @@ For binary outcomes, convert ACME on probability scale to RR; for continuous, us
 
 | Error / symptom | Cause | Solution |
 |-----------------|-------|----------|
-| `Error in storage.mode(x) <- "double"` inside `hima()` | NA in `data.pheno` columns referenced by formula, or unconverted factors | `na.omit(data.pheno)` first; ensure all RHS vars in formula are numeric or factor |
+| `Error in storage.mode(x) <- "double"` inside `hima()` | NA in `data.pheno` columns referenced by formula, or unconverted factors | `na.omit(data.pheno)` first; ensure all RHS vars in formula are numeric or dummy-coded via `model.matrix()` (HIMA 2.3.4 rejects `factor` columns; see `references/hima-ewas.md`) |
 | ACME significant, ADE significant, total NOT significant | Suppression / inconsistent mediation | Report transparently; effect partitioning can exceed total in suppression |
 | `medsens()` errors on glm outcome | `medsens` requires linear OR probit (not logit) outcome | Refit outcome as `glm(..., family=binomial(link='probit'))` |
 | `mediate()` runs forever with binary outcome | `sims=5000` with bootstrap and small n | Use `sims=1000` exploratory; verify model converges first; consider parallel via `parallel='multicore'` |

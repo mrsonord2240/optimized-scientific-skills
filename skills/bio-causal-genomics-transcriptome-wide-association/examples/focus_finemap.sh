@@ -4,8 +4,9 @@
 # Resolves co-significant gene clusters at gene-dense loci into a credible causal-gene set
 # with per-gene posterior inclusion probabilities (PIPs).
 #
-# Install (checked 2026-09-19; a bare `pip install pyfocus` is non-functional -- see
-# SKILL.md Tool Install Notes for why and for the required post-install patch):
+# Install (checked 2026-09-21; a bare `pip install pyfocus` is non-functional -- see
+# SKILL.md Tool Install Notes for the required post-install patches, including the two
+# finemap.py fixes without which the run crashes at "Calculating PIPs"):
 #   pip install pyfocus "pandas<2.2" "setuptools<81"
 #
 # Windows: use paths relative to the working directory below, never an absolute `F:/...`
@@ -16,7 +17,15 @@ set -euo pipefail
 
 # ---- Inputs ----
 GWAS_FILE='gwas.sumstats'                                # GWAS sumstats (CHR SNP BP A1 A2 Z P columns at minimum)
-LD_REF_PREFIX='1000G_EUR/chr'                            # PLINK bfile per chromosome (chr1.bim/bed/fam, ...)
+LD_REF_PREFIX='1000G_EUR/all'                            # One PLINK bfile (all.bim/bed/fam) covering every
+                                                          # chromosome to analyze -- NOT chr-templated like
+                                                          # FUSION's --ref_ld_chr. `focus finemap` passes this
+                                                          # straight to pandas_plink.read_plink(); a literal
+                                                          # ".../chr" prefix with no matching file 404s
+                                                          # (confirmed 2026-09-21). --chr/--locations subset
+                                                          # the loaded SNPs afterward, they do not pick a file.
+                                                          # For real per-chromosome files, use pandas_plink's
+                                                          # own glob syntax instead, e.g. '1000G_EUR/chr*.bed'.
 FOCUS_DB='focus_gtex_v8_whole_blood.db'                  # FOCUS DB matched to the TWAS weight panel
 TISSUE='Whole_Blood'                                     # Tissue label inside the FOCUS DB
 LOCATIONS='38:EUR'                                       # Required (not optional) in installed pyfocus 0.802;
@@ -29,7 +38,8 @@ P_THRESHOLD='5e-8'
 OUT_PREFIX='gwas_focus_whole_blood'
 
 # ---- Step 1: build FOCUS database from FUSION weights if not pre-built ----
-# Skip this if using a pre-built FOCUS DB. Custom panels need this step.
+# Skip this if using a pre-built FOCUS DB. Custom panels need this step; `focus import` needs
+# mygene + rpy2 (see SKILL.md, FOCUS section, for the direct-build alternative).
 # focus import gtex_whole_blood.pos fusion --tissue Whole_Blood --output focus_gtex_v8_whole_blood
 
 # ---- Step 2: run FOCUS fine-mapping ----

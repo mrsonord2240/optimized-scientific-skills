@@ -17,7 +17,9 @@ locus_start <- 30000000
 locus_end   <- 31000000
 
 # ----- Simulated locus for self-contained demo ------------------------------
-# Comment this block out when feeding real data.
+# Comment this block out when feeding real data. The default simulates
+# z ~ N(R %*% true_z, R), so the diagnostic receives matched LD. Set
+# SUSIE_RSS_DEMO_LD_MISMATCH=1 only to exercise the intentional stop path.
 set.seed(42)
 n_snps <- 500
 n_causal <- 2
@@ -30,12 +32,26 @@ for (i in seq_len(n_snps)) {
     }
 }
 
-z_sim <- rnorm(n_snps, 0, 1)
-for (c in true_causal) {
-    window <- max(1, c - 6):min(n_snps, c + 6)
-    bump <- 6.5 * exp(-0.18 * (window - c) ^ 2)
-    z_sim[window] <- z_sim[window] + bump
+ld_matrix <- block_ld
+
+# Negative eigenvalues from finite-precision storage break both chol() and
+# susie_rss internals. Repair the simulation/analysis matrix before using it.
+eig <- eigen(ld_matrix, only.values = TRUE)$values
+if (min(eig) < -1e-6) {
+    cat(sprintf('LD matrix has min eigenvalue %.2e; adding ridge\n', min(eig)))
+    ridge <- abs(min(eig)) + 1e-4
+    ld_matrix <- ld_matrix + diag(ridge, nrow(ld_matrix))
 }
+
+true_z <- numeric(n_snps)
+true_z[true_causal] <- c(10.5, 10.0)
+simulation_ld <- ld_matrix
+if (identical(Sys.getenv('SUSIE_RSS_DEMO_LD_MISMATCH'), '1')) {
+    # Regression-only counterfactual: Z arises from independent variants but
+    # is analysed against the correlated reference LD above.
+    simulation_ld <- diag(n_snps)
+}
+z_sim <- drop(simulation_ld %*% true_z + chol(simulation_ld) %*% rnorm(n_snps))
 
 gwas_df <- data.frame(
     SNP = sprintf('rs%07d', seq_len(n_snps)),
@@ -44,7 +60,6 @@ gwas_df <- data.frame(
     Z   = z_sim,
     P   = 2 * pnorm(-abs(z_sim))
 )
-ld_matrix <- block_ld
 
 # ----- Real-data loader (uncomment when ready) -------------------------------
 # gwas_df <- read.table(gwas_path, header = TRUE, sep = '\t')
@@ -53,8 +68,8 @@ ld_matrix <- block_ld
 # ld_matrix <- as.matrix(read.table(ld_path))
 # stopifnot(nrow(ld_matrix) == nrow(gwas_df))
 
-# ----- LD positive semi-definite check -------------------------------------
-# Negative eigenvalues from finite-precision storage break susie_rss internals.
+# Re-check after replacing the demo matrix with real LD. This is a no-op for
+# the matched demo, whose matrix was stabilized before the Gaussian draw.
 eig <- eigen(ld_matrix, only.values = TRUE)$values
 if (min(eig) < -1e-6) {
     cat(sprintf('LD matrix has min eigenvalue %.2e; adding ridge\n', min(eig)))
@@ -66,11 +81,16 @@ if (min(eig) < -1e-6) {
 # estimate_s_rss returns the inferred LD inconsistency scale.
 # Source: susieR vignette "Diagnostic for summary statistic"; Zou 2022 PLoS Genet.
 # Threshold convention: < 0.05 acceptable; 0.05-0.10 marginal; > 0.10 refit.
-s_hat <- estimate_s_rss(z = gwas_df$Z, R = ld_matrix, n = n_gwas)
+s_hat <- as.numeric(estimate_s_rss(z = gwas_df$Z, R = ld_matrix, n = n_gwas))
 cat(sprintf('estimate_s_rss lambda = %.4f\n', s_hat))
 if (s_hat > 0.10) {
-    warning('Lambda > 0.10: LD reference likely mismatches the GWAS sample. ',
-            'Consider in-sample LD or ancestry-stratified reference.')
+    stop(sprintf(
+        paste0(
+            'Lambda %.4f > 0.10: LD reference likely mismatches the GWAS sample. ',
+            'Refit with in-sample or ancestry-stratified LD; no credible sets will be reported.'
+        ),
+        s_hat
+    ))
 }
 
 # kriging_rss flags per-SNP inconsistency (typically strand flips / coding mismatches)

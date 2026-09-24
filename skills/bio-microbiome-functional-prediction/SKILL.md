@@ -114,20 +114,11 @@ picrust2_pipeline.py \
 
 **Approach:** Read `combined_marker_predicted_and_nsti.tsv.gz` (the file PICRUSt2 2.6.3's default combined bacterial+archaeal run actually produces - `bac_`/`arc_`/`combined_` prefixed files, never an unprefixed `marker_predicted_and_nsti.tsv.gz`), summarize the `metadata_NSTI` distribution, and report the number of ASVs AND the fraction of READS dropped at `--max_nsti 2` (a study that loses 40% of reads predicted function for a different community than it sampled).
 
-```python
-import pandas as pd
-
-nsti = pd.read_csv('picrust2_out/combined_marker_predicted_and_nsti.tsv.gz', sep='\t')   # cols: sequence, metadata_NSTI
-asv_counts = pd.read_csv('asv_table.tsv', sep='\t', index_col=0)                # ASVs x samples
-nsti = nsti.set_index('sequence')
-reads_per_asv = asv_counts.sum(axis=1)
-
-max_nsti = 2.0   # PICRUSt2 default; ASVs above this are dropped before metagenome inference
-dropped = nsti.index[nsti['metadata_NSTI'] > max_nsti]
-reads_dropped_frac = reads_per_asv.reindex(dropped).sum() / reads_per_asv.sum()
-print(f'mean NSTI {nsti.metadata_NSTI.mean():.3f}  median {nsti.metadata_NSTI.median():.3f}')
-print(f'ASVs dropped at NSTI>{max_nsti}: {len(dropped)}/{len(nsti)}  reads dropped: {reads_dropped_frac:.1%}')
+```bash
+python scripts/nsti_report.py picrust2_out asv_table.tsv --max-nsti 2.0   # ASV table: TSV without the biom comment line
 ```
+
+Prints mean/median NSTI, ASVs dropped, and the fraction of reads dropped (columns read: `sequence`, `metadata_NSTI`).
 
 ## Per-Method Failure Modes
 
@@ -135,7 +126,7 @@ print(f'ASVs dropped at NSTI>{max_nsti}: {len(dropped)}/{len(nsti)}  reads dropp
 **Trigger:** reporting "increased butyrate production" / "upregulated" / "more metabolically active." **Mechanism:** PICRUSt2 measured no genes and no transcripts - only inferred gene presence from relatives' genomes. **Symptom:** a results sentence with an activity verb on a predicted pathway. **Fix:** restrict every claim to "potential" / "predicted capacity"; for activity, cite metatranscriptomics, not this skill.
 
 ### NSTI ignored or under-reported
-**Trigger:** accepting the default `--max_nsti 2` filter without reporting the distribution or the dropped fraction. **Mechanism:** the filter silently deletes the most novel/under-referenced ASVs - exactly the organisms an environmental study cares about. **Symptom:** a predicted-function result with no NSTI numbers in the methods. **Fix:** report mean/median NSTI, the distribution, and the ASV AND read fraction dropped (the helper above); treat high mean NSTI as a red flag that the result is mostly extrapolation.
+**Trigger:** accepting the default `--max_nsti 2` filter without reporting the distribution or the dropped fraction. **Mechanism:** the filter silently deletes the most novel/under-referenced ASVs - exactly the organisms an environmental study cares about. **Symptom:** a predicted-function result with no NSTI numbers in the methods. **Fix:** report mean/median NSTI, the distribution, and the ASV AND read fraction dropped (`scripts/nsti_report.py`); treat high mean NSTI as a red flag that the result is mostly extrapolation.
 
 ### Wrong environment (reference coverage too sparse)
 **Trigger:** running PICRUSt2 on soil/marine/sediment/plant/novel hosts and reporting fine-grained KO differences. **Mechanism:** the ~20k-genome reference tree is gut/host-biased; sparse references mean high NSTI and predictions interpolated from distant relatives. **Symptom:** high mean NSTI yet confident KO/pathway tables. **Fix:** report the environment and NSTI; prefer FAPROTAX for the broad biogeochemical question, or do real shotgun. "Relatively better than other predictors" (per the paper) is not "trustworthy in absolute terms."
@@ -147,7 +138,7 @@ print(f'ASVs dropped at NSTI>{max_nsti}: {len(dropped)}/{len(nsti)}  reads dropp
 **Trigger:** reporting "groups differed taxonomically AND functionally" as two lines of evidence. **Mechanism:** predicted function is a deterministic function of the ASV table, so the functional difference IS the taxonomic difference re-encoded. **Symptom:** a predicted-function DA result presented as orthogonal corroboration of a taxonomic result. **Fix:** present predicted function as a hypothesis-generating summary of the taxonomic signal; for orthogonal functional evidence use shotgun/metatranscriptomics.
 
 ### DA without compositional correction
-**Trigger:** uncorrected Wilcoxon/t-test on relative abundances of the predicted table. **Mechanism:** the table is compositional, depth-confounded, and zero-inflated, on top of prediction error. **Symptom:** a long list of "significant" pathways that do not replicate across methods. **Fix:** use >=2 CoDA tools (ALDEx2, ANCOM-BC2, MaAsLin2, LinDA) and report the intersection (Nearing 2022 *Nat Commun* 13:342); ALDEx2 wants count-like features-as-rows, NOT relab-normalized output - see differential-abundance. Before intersecting, normalize feature names on both sides: tools disagree on how they sanitize MetaCyc pathway IDs (MaAsLin2's `make.names()` turns `PWY-6829` into `PWY.6829`; ALDEx2 and LinDA keep the raw hyphenated ID), so a naive `intersect()` on raw names can silently return an empty consensus set even when the tools agree on every hit.
+**Trigger:** uncorrected Wilcoxon/t-test on relative abundances of the predicted table. **Mechanism:** the table is compositional, depth-confounded, and zero-inflated, on top of prediction error. **Symptom:** a long list of "significant" pathways that do not replicate across methods. **Fix:** use >=2 CoDA tools (ALDEx2, ANCOM-BC2, MaAsLin2, LinDA) and report the intersection (Nearing 2022 *Nat Commun* 13:342); ALDEx2 wants count-like features-as-rows, NOT relab-normalized output - see differential-abundance. Before intersecting, normalize feature names on both sides: tools disagree on how they sanitize MetaCyc pathway IDs (MaAsLin2's `make.names()` turns `PWY-6829` into `PWY.6829`; ALDEx2 and LinDA keep the raw hyphenated ID), so a naive `intersect()` on raw names can silently return an empty consensus set even when the tools agree on every hit. Prevalence-filter the predicted table before LinDA (`prev.filter = 0.1`, checked on MicrobiomeStat 1.4): the default `prev.filter = 0` aborts the whole `linda()` call when any pathway has <2 nonzero samples (34 of 503 pathways on a gut vs left-palm comparison of 16 samples) - see Common Errors.
 
 ### Strain-level function invisible
 **Trigger:** inferring strain-specific function (toxin, resistance, pathogenicity island) from a 16S-based prediction. **Mechanism:** 16S resolves to roughly genus/species; accessory genome, HGT, plasmids, and prophage-borne genes vary within a species and are assigned the reference neighbors' core content. **Symptom:** a strain-level functional claim from amplicon data. **Fix:** state that the species core is the ceiling regardless of NSTI; strain function needs isolate genomes or shotgun.
@@ -176,6 +167,7 @@ print(f'ASVs dropped at NSTI>{max_nsti}: {len(dropped)}/{len(nsti)}  reads dropp
 | Predicted and shotgun pathway tables disagree | comparing PICRUSt2 to HUMAnN as if interchangeable | they are different objects (predicted vs measured); do not merge |
 | `--per_sequence_contrib` produces nothing | used without `--stratified` | it is only meaningful with `--stratified` |
 | Pathway "presence" and "abundance" conflated | reading `path_abun` as coverage | abundance and `--coverage` are different questions |
+| `linda()` aborts with "contrasts can be applied only to factors with 2 or more levels" on a predicted pathway table; no results for any feature | default `prev.filter = 0` keeps pathways with <2 nonzero samples in the compared groups, and one such feature kills the whole run (making the group column a `factor` does not help) | `linda(..., prev.filter = 0.1)` (469/503 pathways fit in the checked run), or drop rows with `rowSums(x > 0) < 2` first |
 | Cross-tool DA intersection comes back empty even though tools agree | different R tools sanitize MetaCyc pathway IDs differently (e.g. MaAsLin2's `make.names()` turns `PWY-6829` into `PWY.6829`; ALDEx2/LinDA keep the raw ID) | normalize feature names on both sides (e.g. run `make.names()` on both hit lists) before computing the intersection |
 
 ## References

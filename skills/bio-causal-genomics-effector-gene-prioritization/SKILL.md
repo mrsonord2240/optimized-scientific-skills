@@ -82,8 +82,8 @@ on a single prioritiser.
 
 | Scenario | Recommended workflow | Why |
 |----------|---------------------|-----|
-| Open Targets Platform covers the trait | Query L2G via GraphQL + cross-check V2G; sanity-check with PoPS | Pre-computed, gold-standard-validated; minimal compute |
-| Custom trait, EUR GWAS sumstats only | MAGMA + manual fine-mapping (SuSiE) + coloc per QTL panel | Build evidence streams from primitives; combine in own integrative scorer |
+| Open Targets Platform covers the trait | Query L2G via GraphQL (`references/opentargets-l2g.md`) + cross-check V2G; sanity-check with PoPS (`references/pops.md`) | Pre-computed, gold-standard-validated; minimal compute |
+| Custom trait, EUR GWAS sumstats only | MAGMA (`references/magma-gene-based.md`) + manual fine-mapping (SuSiE) + coloc per QTL panel | Build evidence streams from primitives; combine in own integrative scorer |
 | Tissue known (e.g. liver for lipid traits) | Tissue-specific eQTL coloc + ABC / ENCODE-rE2G + S-PrediXcan + L2G | Tissue-targeted evidence reduces false positives from wrong-tissue eQTLs |
 | Tissue unknown a priori | LDSC-SEG (Finucane 2018 Nat Genet 50:621) to prioritise tissue + S-MultiXcan + PoPS | Identify causal tissue before locking on a single eQTL panel |
 | Distal / long-range regulation suspected | ABC / ENCODE-rE2G / HiChIP / Cicero overlay; deprioritise distance-only methods | Nearest-gene fails ~ 30-50% of the time at well-studied loci |
@@ -139,124 +139,20 @@ evidence stream -- the two thresholds used constantly are repeated inline where 
 (coloc PP.H4 >= 0.7 in the Multi-Evidence table below; >= 3 of 6 concordance in the
 Operational rule).
 
-## MAGMA Gene-Based and Gene-Set Pipeline
+## Reference Files
 
-**Goal:** Compute gene-level p-values from GWAS summary statistics and test gene sets (e.g. MSigDB pathways) for enrichment.
+Read the file when the task needs that method; the routine flow (decision tree, evidence streams, concordance, reconciliation, common errors) stays in this file.
 
-**Approach:** Pre-format the SNP-to-gene annotation (per-gene SNP membership using a configurable window); run gene-based analysis with `--gene-results`; downstream, test gene sets via `--set-annot`. MAGMA's lambda-correction handles LD via the reference panel.
-
-```bash
-# Step 1: SNP-to-gene annotation using a 35kb upstream + 10kb downstream window (FUMA default)
-magma --annotate window=35,10 \
-    --snp-loc gwas.snploc \
-    --gene-loc NCBI37.3.gene.loc \
-    --out annot_35_10
-
-# Step 2: Gene-based association (raw GWAS sumstats; multi-model approach)
-magma --bfile g1000_eur \
-    --pval gwas.pval ncol=N \
-    --gene-annot annot_35_10.genes.annot \
-    --out gene_step
-
-# Step 3: Gene-set enrichment via competitive testing (recommended over self-contained)
-magma --gene-results gene_step.genes.raw \
-    --set-annot msigdb_v7.5_C2.gmt \
-    --out gene_set_step
-
-# Inspect: gene_step.genes.out (per-gene Z, p); gene_set_step.gsa.out (per-set p)
-```
-
-The `--gene-annot` window choice is the dominant methodological lever; 35kb upstream + 10kb downstream is the FUMA recommendation but is not universally accepted. Sensitivity over 0+0, 35+10, and 50+50 is good practice for high-stakes reports.
-
-**Step 3 has an undocumented minimum gene count.** MAGMA's `--set-annot` competitive regression conditions on 6 internal covariates (gene size, log(gene size), gene density, log(gene density), inverse MAC, log(inverse MAC)). With too few genes in `--gene-results` relative to those 6 covariates, the regression is structurally unidentifiable: MAGMA aborts with `ERROR: insufficient degrees of freedom to run analyses` (verified on a real 5-gene locus run), or, with even fewer genes, fails earlier with `no input variables to analyse` from a gene-set-variance check (verified on a real 3-gene run). Rule of thumb: gene-set enrichment needs several hundred+ genes -- **a single-locus MAGMA run (a handful of genes) should skip Step 3 entirely**; gene-set enrichment is a genome-wide- or many-loci-scale analysis, not a per-locus one. `examples/magma_genebased.sh` checks the gene count and skips Step 3 automatically below this threshold. Windows note: this MAGMA 1.10 build also writes `<prefix>.genes.out.txt` (extra `.txt`) instead of `<prefix>.genes.out`; `examples/magma_genebased.sh` resolves this automatically, and the same mismatch matters for PoPS below.
-
-A tiny offline smoke-test fixture (`examples/toy_gwas_sumstats.tsv` + `examples/toy_gene_loc.txt` + `examples/toy_snp_loc.txt`, ~1,800 real 1000G-EUR SNPs across 3 gene bins spanning the real PCSK9 locus, chr1:55.4-55.6Mb hg19) ships with this Skill for sanity-checking the Steps 1-2 pipeline against a real MAGMA + PLINK reference before pointing it at real data; regenerate or rescale it with `examples/make_toy_fixture.py`.
-
-## Open Targets L2G via GraphQL
-
-**Goal:** Query pre-computed L2G scores for a study and locus without re-running the integrative pipeline.
-
-**Approach:** Query the Open Targets GraphQL endpoint with a study ID and lead variant; parse per-gene scores.
-
-### Open Targets Platform vs Genetics Portal (2024 Consolidation)
-
-In 2024 Open Targets Genetics was merged into the Open Targets Platform GraphQL API at `api.platform.opentargets.org/api/v4/graphql`. The legacy Genetics endpoint (`api.genetics.opentargets.org/graphql`) still responds but is deprecated; new pipelines should target the Platform API. The schema also changed: the Platform exposes `credibleSet(studyLocusId)` with `l2GPredictions` (target, score, SHAP per-feature explainability), whereas the legacy schema exposed `studyLocus2GeneTable` with `yProbaModel` and per-component sub-scores.
-
-Legacy (Genetics, deprecated):
-
-```graphql
-query L2G_legacy($studyId: String!, $variantId: String!) {
-  studyLocus2GeneTable(studyId: $studyId, variantId: $variantId) {
-    rows {
-      gene { symbol }
-      yProbaModel
-      yProbaDistance
-      yProbaMolecularQTL
-      hasColoc
-    }
-  }
-}
-```
-
-Modern (Platform, recommended):
-
-```graphql
-query L2G_modern($studyId: String!) {
-  credibleSet(studyLocusId: $studyId) {
-    l2GPredictions {
-      rows {
-        target { approvedSymbol }
-        score
-        features { name value shapValue }
-        shapBaseValue
-      }
-    }
-  }
-}
-```
-
-```python
-import requests
-import pandas as pd
-
-resp = requests.post('https://api.platform.opentargets.org/api/v4/graphql',
-                     json={'query': '...modern L2G query...',
-                           'variables': {'studyId': 'GCST006464_locus_42'}})
-preds = resp.json()['data']['credibleSet']['l2GPredictions']['rows']
-l2g_df = pd.json_normalize(preds).sort_values('score', ascending=False)
-```
-
-The headline `score` (Platform) corresponds to `yProbaModel` (legacy). Platform `features[].shapValue` values replace the legacy `yProba*` sub-scores and explain what drove the prediction. Genes whose SHAP is dominated by the distance feature but minimal on QTL or chromatin features are distance-only candidates; trust the integrated `score` as primary.
-
-**L2G is populated for GWAS-type credible sets, not molecular-QTL ones.** Querying a gene's own `credibleSets` (e.g. via `target(ensemblId)`) mostly returns eqtl/pqtl/sqtl-type loci with `l2GPredictions.count == 0` -- L2G is computed against GWAS-trait credible sets, at the trait's own lead locus. Use the top-level `credibleSets(studyTypes: [gwas], ...)` query to find a GWAS-type `studyLocusId` first (verified live, 2026-09-18). `examples/opentargets_l2g_query.py` is a runnable, dependency-free (stdlib `urllib`/`json` only) template implementing exactly this two-step lookup and the modern query above; run it directly against the live, unauthenticated API.
-
-## PoPS Polygenic Priority Score
-
-**Goal:** Add a distance-orthogonal similarity-based prior to ranked gene candidates.
-
-**Approach:** Run MAGMA genome-wide to produce gene Z; feed gene Z plus a curated gene-feature matrix (pathway membership + co-expression + PPI) to PoPS ridge (L2-penalized) regression. Per-gene priority scores are produced; per-locus relative ranking is informative.
-
-```bash
-# PoPS requires the gene-feature matrix and MAGMA gene Z output
-# Download features and gene_annot from FinucaneLab/pops releases
-
-python pops.py \
-    --gene_annot_path gene_annot.txt \
-    --feature_mat_prefix PoPS_features_full \
-    --control_features_path control.features \
-    --num_feature_chunks 10 \
-    --magma_prefix gene_step \
-    --out_prefix pops_out
-
-# Output pops_out.preds: per-gene priority score
-# Output pops_out.coefs: per-feature ridge coefficients (interpretation)
-```
-
-PoPS is biology-agnostic; the feature matrix encodes biology. Bias in the features (e.g. cancer-pathway-heavy gene sets for a non-cancer trait) propagates to the output; verify feature coverage matches the trait.
-
-**Windows: rename MAGMA's output before running PoPS.** MAGMA 1.10 on Windows writes `<magma_prefix>.genes.out.txt` (extra `.txt`), but `pops.py` hard-codes `<magma_prefix>.genes.out` and raises `FileNotFoundError` if the exact name is missing -- following this section verbatim on Windows fails with no explanation (verified end-to-end: PoPS confirmed working immediately after `cp <prefix>.genes.out.txt <prefix>.genes.out`; corroborated independently in this Skill's tooling environment, `mendelian-randomization-analyst/TOOLS.md`). `examples/pops_run.py` wraps this exact PoPS invocation and performs the rename automatically (no-op on Linux/Mac, where MAGMA writes `.genes.out` directly) -- prefer it over calling `pops.py` directly on Windows.
-
-**PoPS needs genome-wide, multi-chromosome MAGMA input to be meaningful.** With only one chromosome (or a single locus) of genes, PoPS's held-out-chromosome ridge CV has no held-out fold to validate against, `SELECTED_CV_ALPHA` saturates at its maximum, and every `PoPS_Score` collapses toward 0 -- the code path still runs to completion (exit 0, real output files), but the scores carry no signal at that scale (verified on a real 3-gene single-locus run). Do not present a locus-scale PoPS run's scores as a real result; use it only to confirm the pipeline is wired correctly, and require genome-wide MAGMA output for an actual PoPS-based effector-gene call.
+| File | Read when |
+|------|-----------|
+| `references/algorithmic-taxonomy.md` | Picking between or contrasting the ten V2G tools |
+| `references/failure-modes.md` | Diagnosing a specific discordance or pitfall |
+| `references/quantitative-thresholds.md` | Scoring or reporting a specific evidence stream |
+| `references/magma-gene-based.md` | Running MAGMA gene-based or gene-set analysis (annotation window, minimum gene count for Step 3, Windows `.genes.out.txt` rename, smoke-test fixture) |
+| `references/opentargets-l2g.md` | Querying Open Targets L2G (Platform vs legacy schema; L2G exists only for GWAS-type credible sets) |
+| `references/pops.md` | Running PoPS (Windows rename, needs genome-wide multi-chromosome MAGMA input) |
+| `references/cs2g-lookup.md` | Reading cS2G scores for credible-set rsIDs (`examples/cs2g_lookup.py`) |
+| `references/flames.md` | Running FLAMES (XGBoost + PoPS integrative scorer) on a fine-mapped credible set |
 
 ## Multi-Evidence Integration: Concordance Scoring
 
@@ -264,36 +160,15 @@ PoPS is biology-agnostic; the feature matrix encodes biology. Bias in the featur
 
 **Approach:** Per-locus, gather evidence per candidate gene from each method; score each evidence stream as pass / fail at the canonical threshold; sum the passing streams; report >= 3 passing as high-confidence.
 
-```r
-library(dplyr)
+Run `scripts/concordance_scoring.R` on a per-locus candidate table (one row per (locus, gene); columns `locus, gene, pip_top_variant, credible_set_purity, coloc_pph4, distance_to_tss, pops_decile_rank, l2g_score, abc_score, encode_re2g_score`; leave a cell `NA` when a stream is unavailable):
 
-# Per-locus candidate gene table; one row per (locus, gene)
-candidates <- read.table('locus_candidates.tsv', header = TRUE, sep = '\t')
-
-# Score each evidence stream against canonical thresholds
-candidates <- candidates %>%
-  mutate(
-    pass_finemap = pip_top_variant > 0.5 & credible_set_purity > 0.5,
-    pass_coloc = coloc_pph4 >= 0.7,
-    pass_distance = distance_to_tss <= 100000,
-    pass_pops = pops_decile_rank == 1,
-    pass_l2g = l2g_score >= 0.5,
-    pass_abc = abc_score >= 0.02 | encode_re2g_score >= 0.5,
-    concordance = pass_finemap + pass_coloc + pass_distance +
-                  pass_pops + pass_l2g + pass_abc,
-    confidence_tier = case_when(
-      concordance >= 5 ~ 'near_certain',
-      concordance >= 4 ~ 'strong',
-      concordance >= 3 ~ 'high',
-      concordance >= 2 ~ 'suggestive',
-      TRUE ~ 'associational_only'))
-
-# Report
-candidates %>%
-  filter(concordance >= 3) %>%
-  arrange(desc(concordance), desc(l2g_score)) %>%
-  select(locus, gene, concordance, confidence_tier, l2g_score, pops_decile_rank, coloc_pph4)
+```bash
+Rscript scripts/concordance_scoring.R locus_candidates.tsv out_prefix
+# writes out_prefix.scored.tsv (every gene, per-stream pass flags, n_streams_available) and
+# out_prefix.concordance.tsv (concordance >= 3 only); thresholds are the canonical ones above
 ```
+
+A stream with no data counts as not passed, so `n_streams_available` shows whether a low tier is negative or absent evidence.
 
 Concordance scoring is conservative; some real causal genes score 2-of-6 because not all evidence streams are available at all loci. Report the per-stream availability alongside the concordance score so readers know whether failure reflects negative evidence or absent evidence.
 
@@ -318,10 +193,10 @@ Concordance scoring is conservative; some real causal genes score 2-of-6 because
 | Error / symptom | Cause | Solution |
 |-----------------|-------|----------|
 | MAGMA error `--gene-loc file required` | Path mismatch or wrong reference build | Provide hg19 or hg38 gene location file matching the GWAS build |
-| MAGMA `--set-annot` errors `insufficient degrees of freedom` or `no input variables to analyse` | Too few genes in `--gene-results` for the 6-covariate competitive regression (see MAGMA pipeline section) | Skip Step 3 at locus scale; gene-set enrichment needs several hundred+ genes (genome-wide or many-loci input) |
+| MAGMA `--set-annot` errors `insufficient degrees of freedom` or `no input variables to analyse` | Too few genes in `--gene-results` for the 6-covariate competitive regression (see `references/magma-gene-based.md`) | Skip Step 3 at locus scale; gene-set enrichment needs several hundred+ genes (genome-wide or many-loci input) |
 | All MAGMA genes show p ~ 1 | LD reference panel mismatch (ancestry or sample size) | Use 1000G EUR g1000_eur reference for EUR GWAS; verify with `--gene-results` summary |
 | Open Targets API returns empty | Study not in the OT release OR wrong study ID format | Verify study ID via OT study search; some studies require GCST prefix |
-| PoPS output has all genes scoring near 0 | Feature matrix mis-aligned to gene_annot OR MAGMA gene Z scale wrong; OR MAGMA input is single-chromosome / locus-scale (ridge CV has no held-out fold, see PoPS section) | Verify column ordering in feature matrix; check MAGMA `genes.raw` parsing; confirm MAGMA input is genome-wide, multi-chromosome before trusting scores |
+| PoPS output has all genes scoring near 0 | Feature matrix mis-aligned to gene_annot OR MAGMA gene Z scale wrong; OR MAGMA input is single-chromosome / locus-scale (ridge CV has no held-out fold, see `references/pops.md`) | Verify column ordering in feature matrix; check MAGMA `genes.raw` parsing; confirm MAGMA input is genome-wide, multi-chromosome before trusting scores |
 | PoPS raises `FileNotFoundError` on `<prefix>.genes.out` | Windows MAGMA wrote `<prefix>.genes.out.txt` (extra `.txt`); pops.py expects the exact name | `cp <prefix>.genes.out.txt <prefix>.genes.out` before running, or use `examples/pops_run.py` (handles this automatically) |
 | cS2G gene allocation differs from L2G | Different aggregation strategies; cS2G heritability-calibrated, L2G classifier-trained | Both informative; cS2G is a per-SNP aggregator, L2G is per-(locus, gene) |
 | ABC predicts a passenger gene | Wrong cell-type Hi-C or H3K27ac in ABC input | Verify cell-type-matched epigenome; cross-reference atac-seq/enhancer-gene-linking |
@@ -333,13 +208,13 @@ Concordance scoring is conservative; some real causal genes score 2-of-6 because
 ## Tool Install Notes
 
 - **MAGMA**: Pre-compiled binary from cncr.nl/research/magma. Linux / Mac / Windows. Ships as `magma` CLI; needs PLINK bfile reference (e.g. 1000G g1000_eur). MAGMA ships as a pre-compiled zip, not a git repo -- the old `ctg.cncr.nl` and `vu.data.surfsara.nl` direct links now redirect to an HTML landing page, so a hard-coded `wget` would save that page AS the zip and `unzip` would fail; download the current zip manually from the CNCR page, then `unzip magma_v*.zip` (filename tracks the version).
-- **FUMA**: Web platform at fuma.ctglab.nl/snp2gene. No local install. Requires user account; SNP2GENE jobs run server-side with current reference annotations.
+- **FUMA**: Web platform at fuma.ctglab.nl/snp2gene. No local install. Requires user account; SNP2GENE jobs run server-side with current reference annotations. **Verified 2026-09-21** (FUMA v1.8.2, MAGMA v1.08, job 773100, FUMA's own bundled Crohn's Disease example GWAS, N=21,389, positional mapping only — eQTL/Hi-C/chromatin maps need separate settings not exercised here): 52 genomic risk loci, 257 protein-coding genes by positional mapping, correctly recovering known CD loci (rs11209026/IL23R, rs2476601/PTPN22 among the lead SNPs) — real, non-degenerate output, not just a job that completed. **Input format note**: FUMA requires explicit `chromosome` and `base_pair_location` columns; a summary-stats file that only carries a combined `chr:pos` identifier (e.g. older Global Lipids Consortium files' `SNP_hg19` column) must be split into two columns first, and the declared genome build must match the file's actual coordinates.
 - **Open Targets Platform (current)**: GraphQL at `api.platform.opentargets.org/api/v4/graphql`. Query L2G via `credibleSet(studyLocusId)` -> `l2GPredictions { rows { target, score, features } }`. Recommended for new pipelines.
 - **Open Targets Genetics (legacy, deprecated)**: GraphQL at `api.genetics.opentargets.org/graphql`. Python `pip install gentropy` (official Open Targets) or `pip install otargenpy` (community GraphQL wrapper) OR direct GraphQL queries via `requests`. Genetics Portal was consolidated into the integrated Open Targets Platform in 2024; legacy endpoint still responds but new work should target the Platform.
 - **PoPS**: `git clone https://github.com/FinucaneLab/pops`. Python; ships with feature matrix download instructions. Pre-built feature matrix at the releases page.
 - **cS2G**: Pre-computed gene scores downloadable from zenodo.org/records/7754032 (cS2G_UKBB.zip / cS2G_1000GEUR.zip). No install; lookup table.
 - **DEPICT**: `git clone https://github.com/perslab/depict`. Java + Python; legacy method, see Pers 2015.
-- **FLAMES**: Recent (Schipper M et al 2025 Nat Genet 57:323); check the publication's GitHub for the current install path.
+- **FLAMES**: `git clone https://github.com/Marijn-Schipper/FLAMES` (checked HEAD `159e83a`, 2026-08-25, version 1.1.3). `conda env create -f environment.yml` (Python 3.8.13) then `pip install -r requirements.txt`; needs the ~1.7 GB annotation-data bundle from zenodo.org/records/12635505 (`Annotation_data.tar.gz`) plus the bundled GTEx tissue file. See `references/flames.md` for the verified commands and real output.
 - **INQUISIT**: Originally for breast cancer (Fachal 2020 Nat Genet 52:56); see the paper's supplementary methods for adaptation to other traits.
 - **ABC**: `git clone https://github.com/broadinstitute/ABC-Enhancer-Gene-Prediction`. Python; see atac-seq/enhancer-gene-linking for the full pipeline.
 - **ENCODE-rE2G**: `git clone https://github.com/EngreitzLab/ENCODE_rE2G`. Snakemake; see atac-seq/enhancer-gene-linking.

@@ -72,9 +72,7 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | skill | score | grade |
 | --- | ---: | --- |
 | `bio-admet-prediction` | 86 | Limited Release |
-| `bio-causal-genomics-genetic-correlation` | 89 | Production Ready |
 | `bio-data-visualization-forest-funnel-plots` | 76 | Limited Release |
-| `bio-differential-expression-deseq2-basics` | 92 | Production Ready |
 | `bio-machine-learning-model-validation` | 93 | Limited Release |
 | `bio-machine-learning-prediction-explanation` | 89 | Limited Release |
 | `bio-molecular-descriptors` | 86 | Limited Release |
@@ -86,7 +84,6 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 | `bio-single-cell-batch-integration` | 90 | Limited Release |
 | `bio-single-cell-cell-annotation` | 87 | Limited Release |
 | `bio-single-cell-clustering` | 89 | Limited Release |
-| `bio-single-cell-differential-abundance` | 88 | Production Ready |
 | `bio-single-cell-doublet-detection` | 85 | Limited Release |
 | `bio-single-cell-markers-annotation` | 88 | Production Ready |
 | `bio-single-cell-metabolite-communication` | 88 | Limited Release |
@@ -108,6 +105,7 @@ Changed in staging after their latest audit, so the score below describes earlie
 | `bio-clinical-databases-dbsnp-queries` | 86 | 2026-09-15 |
 | `bio-clinical-databases-gnomad-frequencies` | 86 | 2026-09-15 |
 | `bio-clinical-databases-myvariant-queries` | 84 | 2026-09-15 |
+| `bio-crispr-screens-perturb-seq-analysis` | 89 | 2026-09-23 |
 | `bio-outlier-splicing-detection` | 82 | 2026-09-20 |
 | `bio-phylo-bayesian-inference` | 87 | 2026-09-15 |
 | `bio-phylo-distance-calculations` | 87 | 2026-09-15 |

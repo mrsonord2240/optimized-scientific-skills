@@ -11,11 +11,18 @@
 library(coloc)
 
 harmonise_summary_stats <- function(df1, df2) {
+    comp <- function(a) c(A='T', T='A', C='G', G='C')[a]
     m <- merge(df1, df2, by='SNP', suffixes=c('.1','.2'))
-    same <- m$A1.1 == m$A1.2 & m$A2.1 == m$A2.2
-    flip <- m$A1.1 == m$A2.2 & m$A2.1 == m$A1.2
     palindromic <- (m$A1.1 %in% c('A','T') & m$A2.1 %in% c('A','T')) |
                    (m$A1.1 %in% c('C','G') & m$A2.1 %in% c('C','G'))
+    # Non-palindromic strand mismatch: complement dataset 2's alleles, then treat as same/flip
+    strand <- !palindromic & m$A1.1 == comp(m$A1.2) & m$A2.1 == comp(m$A2.2) |
+              !palindromic & m$A1.1 == comp(m$A2.2) & m$A2.1 == comp(m$A1.2)
+    strand[is.na(strand)] <- FALSE
+    a1 <- ifelse(strand, comp(m$A1.2), m$A1.2); a2 <- ifelse(strand, comp(m$A2.2), m$A2.2)
+    m$A1.2 <- unname(a1); m$A2.2 <- unname(a2)
+    same <- m$A1.1 == m$A1.2 & m$A2.1 == m$A2.2
+    flip <- m$A1.1 == m$A2.2 & m$A2.1 == m$A1.2
     high_maf_palin <- palindromic & pmin(m$MAF.1, 1 - m$MAF.1) > 0.42
     m$BETA.2[flip] <- -m$BETA.2[flip]
     keep <- (same | flip) & !high_maf_palin

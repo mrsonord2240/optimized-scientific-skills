@@ -1,0 +1,4 @@
+Identifier,MolecularFormula,MonoisotopicMass,InChI,InChIKey,SMILES,Name
+citrate_correct,C6H8O7,192.0270,"InChI=1S/C6H8O7/c7-3(8)1-6(13,5(11)12)2-4(9)10/h13H,1-2H2,(H,7,8)(H,9,10)(H,11,12)",KRKNYBCHXYNGOX-UHFFFAOYSA-N,C(C(=O)O)C(CC(=O)O)(C(=O)O)O,Citric acid
+isocitrate_isomer,C6H8O7,192.0270,"InChI=1S/C6H8O7/c7-3(8)1-2(5(10)11)4(9)6(12)13/h2,4,9H,1H2,(H,7,8)(H,10,11)(H,12,13)",ODBLHEXUDAPZAU-UHFFFAOYSA-N,OC(C(=O)O)C(CC(=O)O)C(=O)O,Isocitric acid
+unrelated_sugar,C6H12O6,180.0634,"InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2",WQZGKKKJIJFFOK-UHFFFAOYSA-N,C(C1C(C(C(C(O1)O)O)O)O)O,Glucose

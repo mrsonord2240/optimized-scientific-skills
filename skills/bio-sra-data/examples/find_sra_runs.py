@@ -1,5 +1,7 @@
 '''Resolve hierarchical accessions (PRJNA, GSE, SRX, SRP) to SRR runs via pysradb (preferred) or Entrez runinfo.'''
 # Reference: pysradb 2.2+, biopython 1.83+ | Verify API if version differs
+import csv
+import io
 from Bio import Entrez
 import time
 
@@ -20,10 +22,12 @@ def runs_via_entrez(term, max_results=10000):
         h = Entrez.efetch(db='sra', rettype='runinfo', retmode='text',
                           retstart=start, retmax=500,
                           webenv=webenv, query_key=qk)
-        text = h.read(); h.close()
-        for line in text.strip().split('\n')[1:]:
-            if line:
-                runs.append(line.split(',')[0])
+        raw = h.read(); h.close()
+        text = raw.decode('utf-8') if isinstance(raw, bytes) else raw
+        for row in csv.DictReader(io.StringIO(text)):
+            accession = row.get('Run')
+            if accession:
+                runs.append(accession)
         time.sleep(DELAY)
     return runs
 
@@ -36,8 +40,14 @@ def runs_via_pysradb(identifier):
         print('pysradb not installed; pip install pysradb')
         return []
     db = SRAweb()
-    meta = db.sra_metadata(identifier, detailed=True)
-    if meta.empty:
+    if identifier.upper().startswith('GSE'):
+        study = db.gse_to_srp(identifier)
+        if study is None or study.empty:
+            return []
+        meta = db.srp_to_srr(study['study_accession'].iloc[0])
+    else:
+        meta = db.sra_metadata(identifier, detailed=True)
+    if meta is None or meta.empty or 'run_accession' not in meta:
         return []
     return meta['run_accession'].tolist()
 

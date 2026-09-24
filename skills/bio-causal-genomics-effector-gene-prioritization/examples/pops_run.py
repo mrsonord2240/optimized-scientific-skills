@@ -8,8 +8,7 @@ gene-set enrichment is NOT required for PoPS and should be skipped at locus scal
 Runs PoPS ridge (L2) regression on a MAGMA gene-based prefix + gene-feature matrix,
 producing a per-gene polygenic priority score.
 
-Windows-specific fix (verified 2026-09-17/18, see SKILL.md "PoPS Polygenic Priority
-Score"): MAGMA 1.10 on Windows writes `<prefix>.genes.out.txt` (extra `.txt`), but
+Windows-specific fix (verified 2026-09-17/18, see `references/pops.md`): MAGMA 1.10 on Windows writes `<prefix>.genes.out.txt` (extra `.txt`), but
 `pops.py` hard-codes `<prefix>.genes.out` and raises FileNotFoundError if the exact
 name is missing. This wrapper copies the file to the expected name first (no-op on
 Linux/Mac, where MAGMA writes `.genes.out` directly).
@@ -68,7 +67,7 @@ def run_pops(pops_repo, magma_prefix, gene_annot_path, feature_mat_prefix,
     print("\nCaveat: with too few genes / a single chromosome, PoPS's held-out-chromosome "
           "ridge CV has no fold to validate against and SELECTED_CV_ALPHA saturates, "
           "collapsing all scores toward 0 -- meaningful PoPS output needs genome-wide, "
-          "multi-chromosome MAGMA input (see SKILL.md 'PoPS Polygenic Priority Score').")
+          "multi-chromosome MAGMA input (see references/pops.md).")
 
 
 if __name__ == "__main__":

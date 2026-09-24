@@ -6,9 +6,13 @@ mutant vs wild-type). For unknown correspondence, prefer TMalign / USalign.
 CA atoms are paired by (chain, residue number, insertion code), never by list position, and
 only standard residues of the first model are used (residue.id[0] == ' '). That excludes
 waters, ligands and metal ions: a Ca2+ ion's atom is also named 'CA' and a name-only filter
-pairs it with a real residue. The script refuses when the structures are not co-numbered.
+pairs it with a real residue. Modified residues written as HETATM (selenomethionine MSE, phosphorylated
+residues) are also left out (1-4% of residues in the entries we checked). The script refuses when the structures
+are not co-numbered.
 '''
 # Reference: biopython 1.83+ (checked on 1.88) | Verify API if version differs
+
+import sys
 
 from Bio.PDB import PDBParser, Superimposer, PDBIO
 
@@ -52,8 +56,9 @@ def superpose_ca(reference_structure, mobile_structure, min_paired=0.5, max_mism
 
 if __name__ == '__main__':
     parser = PDBParser(QUIET=True)
-    mobile_structure = parser.get_structure('mobile', 'mobile.pdb')
-    reference_structure = parser.get_structure('reference', 'reference.pdb')
+    # usage: python biopython_superimposer.py REFERENCE.pdb MOBILE.pdb
+    reference_structure = parser.get_structure('reference', sys.argv[1])
+    mobile_structure = parser.get_structure('mobile', sys.argv[2])
 
     sup, n_pairs, n_mismatch = superpose_ca(reference_structure, mobile_structure)
 

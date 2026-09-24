@@ -8,7 +8,6 @@ Lineage tracing reads heritable marks (CRISPR/Cas9 scars, static expressed barco
 
 Cassiopeia and CoSpar/scanpy need two separate environments (numpy version conflict) —
 see SKILL.md's "Installation and Version Compatibility" section for the exact commands.
-Do not `pip install cassiopeia-lineage`: that PyPI name is a stale, unrelated package.
 
 ## Quick Start
 

@@ -39,6 +39,10 @@ true_beta <- 0.35
 dat$beta.outcome <- dat$beta.exposure * true_beta + rnorm(n, 0, 0.006)
 dat$beta.outcome[c(3, 12, 21)] <- dat$beta.outcome[c(3, 12, 21)] + c(0.04, -0.03, 0.05)
 
+# directionality_test() / steiger_filtering() need p-values (or r.exposure / r.outcome) to derive r^2
+dat$pval.exposure <- 2 * pnorm(-abs(dat$beta.exposure / dat$se.exposure))
+dat$pval.outcome <- 2 * pnorm(-abs(dat$beta.outcome / dat$se.outcome))
+
 dat$f_stat <- (dat$beta.exposure / dat$se.exposure)^2
 mean_f <- mean(dat$f_stat)
 weak_n <- sum(dat$f_stat < 10)
@@ -156,7 +160,8 @@ cat('  PRESSO outliers:', n_outliers, '\n')
 cat('  Steiger correct direction:', steiger$correct_causal_direction, '\n')
 
 cat('\n=== Interpretation rule ===\n')
-all_same_sign <- all(report_tab$Estimate > 0) || all(report_tab$Estimate < 0)
+# na.rm: the PRESSO-corrected row is NA when no outliers are detected (report raw IVW then)
+all_same_sign <- all(report_tab$Estimate > 0, na.rm = TRUE) || all(report_tab$Estimate < 0, na.rm = TRUE)
 cat('All methods agree on direction:', all_same_sign, '\n')
 cat('If LDSC rg(exposure, outcome) >= 0.3 OR biology suggests shared factor:\n')
 cat('  Additionally run CAUSE or LHC-MR (see cause_analysis.R)\n')

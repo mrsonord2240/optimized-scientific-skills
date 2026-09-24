@@ -12,6 +12,10 @@ author: GPTomics
 Reference examples tested with: koinapy 0.0.5+ (checked on 0.0.11), ms2pip 4.0+ (checked on 4.2.0),
 deeplc 4.1+ (checked on 4.5.0), pandas 2.2+
 
+Install: `pip install koinapy ms2pip deeplc pandas numpy scipy pyteomics`. CLI tools: EncyclopeDIA
+(Java), EasyPQP/FragPipe for DDA libraries, OpenMS for `TargetedFileConverter` and
+`OpenSwathDecoyGenerator` (checked on OpenMS 3.5.0).
+
 deeplc dropped the `DeepLC()` class in 4.1 for a module-level API built on `psm_utils.PSM`/
 `PSMList` (verified running on deeplc 4.5.0):
 
@@ -76,40 +80,15 @@ Scope: this skill owns library generation (experimental, chromatogram, predicted
 
 | Scenario | Recommended | Why |
 |----------|-------------|-----|
-| No prior DDA, model organism, standard mods | Predicted library (Prosit or AlphaPeptDeep via Koina) + iRT calibration | Whole-proteome coverage, bounded search; calibrate RT to the gradient |
+| No prior DDA, model organism, standard mods | Predicted library (Prosit or AlphaPeptDeep via Koina) + iRT calibration | Whole-proteome coverage, bounded search; calibrate RT to the gradient. Koina how-to: `references/koina-prediction.md` |
 | Need ion mobility (timsTOF/diaPASEF) | AlphaPeptDeep (intensity + RT + CCS) | Only predictor here that emits CCS; calibrate CCS to measured 1/K0 |
 | Non-model organism or custom/variant DB | Empirically-corrected predicted (Searle 2020) | One GPF-DIA pass rewrites predicted intensities/RT with observed values |
 | Maximum depth for one project, have pooled sample | Chromatogram library (EncyclopeDIA + GPF) | Empirical RT and real fragmentation in the actual LC |
 | Deep fractionated DDA already acquired | Experimental DDA library (EasyPQP/FragPipe) | Real consensus spectra; gold-standard intensities |
-| Library for OpenSWATH | Any source, then OpenSwathDecoyGenerator | OpenSWATH needs decoys IN the library; target-only has no null |
+| Library for OpenSWATH | Any source, then OpenSwathDecoyGenerator | OpenSWATH needs decoys IN the library; target-only has no null. Conversion and decoy requirements: `references/format-conversion.md` |
 | Modified/PTM peptidoforms required | Include mods in digest; DeepLC for RT of unseen mods | route to ptm-analysis for PTM-resolved design |
 
 Default when uncertain: a Koina-served predicted library (Prosit intensity + iRT) with explicit iRT/CiRT RT calibration and an NCE scan, exported to the search engine's native format.
-
-### Generate a Predicted Library via Koina
-
-**Goal:** Produce fragment intensities and iRT for a peptide list without a local GPU or wet-lab library.
-
-**Approach:** Send a DataFrame of peptide sequences, charges, and collision energies to a Koina-hosted model; the dead proteomicsdb endpoint is replaced by the Koina server. Network calls are shown; the runnable example operates on an in-memory table so it needs no network.
-
-```python
-# Koina serves Prosit/AlphaPeptDeep/MS2PIP/UniSpec predictions; verify the
-# koinapy constructor signature and input column names at runtime with help(Koina).
-from koinapy import Koina
-import pandas as pd
-
-inputs = pd.DataFrame({
-    'peptide_sequences': ['LGGNEQVTR', 'VEATFGVDESNAK'],
-    'precursor_charges': [2, 2],
-    'collision_energies': [30, 30]  # NCE; scan candidates and pick max spectral contrast
-})
-
-intensity_model = Koina('Prosit_2019_intensity', 'koina.wilhelmlab.org:443')
-fragments = intensity_model.predict(inputs)  # mz, intensities, annotation per fragment
-
-irt_model = Koina('Prosit_2019_irt', 'koina.wilhelmlab.org:443')
-irt = irt_model.predict(inputs[['peptide_sequences']])  # arbitrary iRT units -- calibrate before use
-```
 
 ### Calibrate iRT to Observed RT
 
@@ -135,81 +114,13 @@ def fit_irt_to_rt(anchor_irt, observed_rt):
     return lambda irt: slope * irt + intercept
 ```
 
-### Convert Library Formats
+## Reference Files
 
-**Goal:** Move a library between DIA-NN, OpenSWATH, and Spectronaut conventions without silently corrupting RT, intensity, modification, or decoy content.
-
-**Approach:** Conversion is renaming columns AND reconciling units, not a copy. Check RT units (iRT ~ -25..150 vs normalized 0-1 vs minutes), intensity scaling (relative vs absolute), and modification notation (UniMod:35 vs +15.9949 vs Oxidation). For OpenSWATH, generate decoys with OpenSwathDecoyGenerator -- a target-only library has no null.
-
-```python
-import pandas as pd
-
-# Spectronaut -> DIA-NN column mapping; iRT and RelativeIntensity are renamed, not recomputed.
-SPECTRONAUT_TO_DIANN = {'ModifiedPeptide': 'ModifiedPeptide', 'iRT': 'iRT',
-                        'RelativeIntensity': 'LibraryIntensity', 'FragmentMz': 'ProductMz',
-                        'FragmentNumber': 'FragmentSeriesNumber', 'PrecursorMz': 'PrecursorMz',
-                        'PrecursorCharge': 'PrecursorCharge', 'FragmentCharge': 'FragmentCharge',
-                        'FragmentType': 'FragmentType', 'Genes': 'Genes'}
-
-def spectronaut_to_diann(lib):
-    out = lib.rename(columns=SPECTRONAUT_TO_DIANN)
-    assert out['iRT'].between(-50, 200).all(), 'RT not in iRT units; check column before converting'
-    return out
-```
-
-**OpenSwathDecoyGenerator's real input requirements (verified on OpenMS 3.5.0):**
-`TargetedFileConverter` converts and validates a TSV/TraML with placeholder `ProductMz` values
-without complaint, but `OpenSwathDecoyGenerator` then silently produces `Number of decoy
-peptides: 0` and fails ("... below the threshold of 80.0%") unless the transition list carries
-BOTH a literal `Annotation` column (e.g. `y3^1`) AND chemically real theoretical fragment m/z --
-not placeholders:
-
-```python
-from pyteomics import mass
-
-def y_ion_mz(seq, i, charge=1):
-    return mass.fast_mass(seq[-i:], ion_type='y', charge=charge)  # real theoretical m/z, required
-
-# each transition row needs: ProductMz=y_ion_mz(seq, i), Annotation=f'y{i}^1'
-```
-
-```bash
-TargetedFileConverter -in library.tsv -in_type tsv -out library.TraML -out_type TraML
-OpenSwathDecoyGenerator -in library.TraML -out library_decoy.TraML -method pseudo-reverse
-```
-
-The default `-method shuffle` has no seed flag and is NOT reproducible: two runs on identical
-input produce different decoy peptide sequences (confirmed by diffing output TraML from repeated
-runs). Use `-method reverse` or `-method pseudo-reverse` instead when decoys must be
-reproducible run-to-run -- both are deterministic (confirmed byte-identical across repeated
-runs). `-method shift` is listed by `--helphelp` but rejected every peptide as a duplicate in
-testing (OpenMS 3.5.0) because it leaves the amino-acid sequence unchanged; do not rely on it.
-
-### QC and Merge Libraries
-
-**Goal:** Summarize a library and combine multiple libraries without dropping legitimate distinct transitions.
-
-**Approach:** Report precursor/protein counts and transitions-per-precursor, then dedup on the FULL transition key. Deduping on (sequence, fragment-type, fragment-number) alone drops real transitions that differ only in precursor charge or fragment charge -- key on all five.
-
-```python
-import pandas as pd
-
-TRANSITION_KEY = ['ModifiedSequence', 'PrecursorCharge', 'FragmentType',
-                  'FragmentSeriesNumber', 'FragmentCharge']  # full key; charges matter
-
-def merge_libraries(libs):
-    combined = pd.concat(libs, ignore_index=True)
-    combined['precursor_total'] = combined.groupby(
-        ['ModifiedSequence', 'PrecursorCharge'])['LibraryIntensity'].transform('sum')
-    combined = combined.sort_values('precursor_total', ascending=False)
-    combined = combined.drop_duplicates(subset=TRANSITION_KEY).drop(columns='precursor_total')
-    return combined
-
-def library_stats(lib):
-    n_prec = lib.groupby(['ModifiedSequence', 'PrecursorCharge']).ngroups
-    return {'precursors': n_prec, 'proteins': lib['ProteinId'].nunique(),
-            'transitions_per_precursor': round(len(lib) / n_prec, 1)}
-```
+| File | Read when |
+|------|-----------|
+| `references/koina-prediction.md` | Predicting fragment intensities and iRT for a peptide list via Koina (Prosit/AlphaPeptDeep/MS2PIP/UniSpec), including peptide validation before the request |
+| `references/format-conversion.md` | Converting between DIA-NN, OpenSWATH and Spectronaut; building an OpenSWATH transition TSV (`scripts/build_openswath_tsv.py`, `scripts/spectronaut_to_diann.py`); OpenSwathDecoyGenerator requirements and decoy method choice |
+| `references/library-qc-merge.md` | Reporting library size and merging libraries on the full transition key |
 
 ## Per-Method Failure Modes
 
@@ -231,11 +142,11 @@ def library_stats(lib):
 **Symptom:** FDR cannot be estimated or is meaningless.
 **Fix:** Run OpenSwathDecoyGenerator to append decoys; do NOT also supply decoys to DIA-NN/Spectronaut, which generate their own.
 
-### OpenSwathDecoyGenerator silently generates 0 decoys
-**Trigger:** Transition list has placeholder/approximate `ProductMz` values or lacks a literal `Annotation` column, even though it converted cleanly via TargetedFileConverter.
-**Mechanism:** The decoy algorithm matches target and decoy fragments by annotation and real m/z; without both it cannot pair any fragment and drops every candidate peptide.
-**Symptom:** "Number of decoy peptides: 0" and a hard failure at the 80% threshold check, not a partial library.
-**Fix:** Add a literal `Annotation` column and compute real theoretical fragment m/z (e.g. `pyteomics.mass.fast_mass`) before conversion -- see "Convert Library Formats" above.
+### OpenSwathDecoyGenerator silently generates 0 decoys or merges peptides
+**Trigger:** Transition list has placeholder/approximate `ProductMz`, lacks a literal `Annotation` column, or lacks `transition_group_id`, yet converts cleanly via TargetedFileConverter.
+**Mechanism:** The decoy algorithm matches target and decoy fragments by annotation and real m/z, so without both it pairs no fragment and drops every candidate. Without a grouping column TargetedFileConverter merges peptides sharing a charge into one group.
+**Symptom:** "Number of decoy peptides: 0" and a hard failure at the 80% threshold check; or, with no error at all, fewer `<Peptide>` groups in the TraML than precursors in the TSV.
+**Fix:** Supply `Annotation`, real theoretical fragment m/z and `transition_group_id`, and compare the `<Peptide>` count to the precursor count after conversion -- see `references/format-conversion.md`.
 
 ### Modification mismatch between library and data
 **Trigger:** Library lacks the sample's variable mods, or carries too many.
@@ -269,10 +180,10 @@ def library_stats(lib):
 | DeepLC RT all near constant or on the wrong scale | `deeplc.predict()` called without calibration | Use `deeplc.calibrate()` + `deeplc.predict()`, or `deeplc.predict_and_calibrate(psms, psm_list_reference=cal_psms)`; mods as ProForma via `Peptidoform`, not MS2PIP `location\|name` |
 | Extraction at wrong time, ID collapse | Predicted RT not calibrated to the gradient | Fit iRT/CiRT anchors or run GPF-DIA empirical correction before searching |
 | OpenSWATH FDR meaningless | Target-only library, no decoys | Append decoys with OpenSwathDecoyGenerator |
-| OpenSwathDecoyGenerator: "Number of decoy peptides: 0" / below 80% threshold | Transition list lacks a literal `Annotation` column or has placeholder `ProductMz` | Add `Annotation` (e.g. `y3^1`) and real theoretical fragment m/z before conversion -- see "Convert Library Formats" |
-| Decoy peptide sequences differ between identical `-method shuffle` runs | Shuffle decoy generation has no seed flag; this is expected, not a bug | Use `-method reverse` or `-method pseudo-reverse` for reproducible decoys |
+| OpenSwathDecoyGenerator: "Number of decoy peptides: 0" / below 80% threshold, or fewer `<Peptide>` groups than precursors | Missing `Annotation`, placeholder `ProductMz`, or no `transition_group_id` | See the OpenSwathDecoyGenerator failure mode above |
+| Decoy peptide sequences differ between identical `-method shuffle` runs | Shuffle decoy generation has no seed flag; this is expected, not a bug | Use `-method pseudo-reverse` for reproducible decoys |
 | ms2pip.predict_batch appears to hang on first call ("Model hash not recognized." then nothing) | The default `model='HCD'` (= HCD2021) downloads two XGBoost files to `~/.ms2pip` on first use -- 66MB + 847MB, confirmed via `Content-Length` -- with no progress output, no timeout, and no resume (a killed download restarts from 0, not where it left off) | Let it finish once with network access (~10+ min on a slow link), pre-populate `model_dir` from a machine that already has it cached, or pass a smaller model (`model='HCD2019'`, ~17MB total, confirmed working end-to-end in ~45s) if HCD2021's extra accuracy isn't needed |
-| Fewer transitions than expected after merge | Dedup key missed charges | Key on the full five-field transition key |
+| Fewer transitions than expected after merge | Dedup key missed charges | Key on the full five-field transition key (`references/library-qc-merge.md`) |
 
 ## References
 

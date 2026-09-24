@@ -117,26 +117,17 @@ Entropy of the fate-probability vector is the differentiation-potential proxy: h
 **Goal:** Infer initial states, terminal states, and uncertainty-aware fate probabilities from any directional evidence source.
 **Approach:** Build a directed transition matrix from one or more kernels, combine with a connectivity kernel for smoothing, then coarse-grain into macrostates with GPCCA.
 
-```python
-# As a standalone .py script (not a notebook), this needs a Windows multiprocessing
-# guard -- see the note below. Run this block inside `if __name__ == '__main__':`.
-import cellrank as cr
-pk = cr.kernels.PseudotimeKernel(adata, time_key='dpt_pseudotime').compute_transition_matrix(n_jobs=1)
-ck = cr.kernels.ConnectivityKernel(adata).compute_transition_matrix()
-combined = 0.8 * pk + 0.2 * ck                      # weights are a researcher choice; sweep them
-
-g = cr.estimators.GPCCA(combined)
-g.compute_macrostates(n_states=10, cluster_key='leiden')   # n_states from the Schur/eigenvalue spectral gap
-g.predict_terminal_states(method='stability')
-g.predict_initial_states(n_states=1, allow_overlap=True)   # without allow_overlap, real branching data can raise
-                                                             # ValueError: N cells overlapped between initial/terminal states
-g.compute_fate_probabilities(n_jobs=1)
-g.compute_lineage_drivers()
+```bash
+python scripts/cellrank_fate.py adata.h5ad --time-key dpt_pseudotime --cluster-key leiden --n-states 10 --out fate.h5ad
 ```
+
+`scripts/cellrank_fate.py` builds `PseudotimeKernel` (0.8) + `ConnectivityKernel` (0.2; the weights are a researcher choice, sweep them), runs GPCCA (`n_states` from the Schur/eigenvalue spectral gap), predicts terminal and initial states, and computes fate probabilities and lineage drivers. `predict_initial_states(..., allow_overlap=True)` is deliberate: without it, real branching data can raise `ValueError: N cells overlapped between initial/terminal states`. It prints per-cluster mean fate-probability entropy and keeps the Windows entry-point guard.
 
 Kernels decouple WHERE direction comes from (RealTime when timepoints exist, Pseudotime/CytoTRACE otherwise, Velocity only when trustworthy, Connectivity for smoothing) from WHAT is computed (GPCCA macrostates + fate probabilities). Prefer the RealTimeKernel for time courses. Fate probabilities are a deterministic function of the transition matrix, so a wrong kernel yields confidently wrong, well-formed probabilities with no internal warning; check that conclusions survive dropping the velocity kernel.
 
-**Windows note:** `compute_transition_matrix()` and `compute_fate_probabilities()` spawn a `multiprocessing.Manager()` progress-bar queue that raises `RuntimeError: An attempt has been made to start a new process before the current process has finished its bootstrapping phase` when this code runs as a plain `.py` script on Windows (not from a notebook) -- confirmed with a full traceback. Guard the script's entry point with `if __name__ == '__main__':` (verified fix, used above with `n_jobs=1`) before running this block as a standalone script.
+**VelocityKernel with `mode='deterministic'` velocity:** deterministic velocity is the weakest of the three modes, and its per-cell errors carry straight into `VelocityKernel`. On scVelo's pancreas data (same deterministic velocity, kernel 0.8 + `ConnectivityKernel` 0.2, GPCCA `n_states=8`, checked on cellrank 2.3.3), mean fate-probability entropy in Ductal progenitors vs Alpha/Beta was 0.36 vs 0.32 with `VelocityKernel` (barely any separation) but 1.02 vs 0.45 with `PseudotimeKernel` on `velocity_pseudotime`. When only deterministic velocity exists, take direction from `PseudotimeKernel` (or RealTime/CytoTRACE) and use velocity only as a cross-check; either way inspect the predicted terminal states against markers.
+
+**Windows note:** `compute_transition_matrix()` and `compute_fate_probabilities()` spawn a `multiprocessing.Manager()` progress-bar queue that raises `RuntimeError: An attempt has been made to start a new process before the current process has finished its bootstrapping phase` when this code runs as a plain `.py` script on Windows (not from a notebook). Keep the entry point under `if __name__ == '__main__':` with `n_jobs=1`, as `scripts/cellrank_fate.py` does.
 
 ### Slingshot and Monocle3 (R)
 
@@ -169,20 +160,14 @@ RNA velocity infers the time derivative of the spliced-mRNA state from the lag b
 | `'stochastic'` (default) | adds 2nd-moment treatment; GLS on both moments | a more robust gamma without the dynamical EM cost | still steady-state; same constant-rate assumption; **crashes on this environment, see below** |
 | `'dynamical'` | full likelihood EM; per-gene alpha/beta/gamma + latent time | transient states; needs gene-shared latent time | `recover_dynamics` dominates runtime; can still mis-fit multi-kinetics genes; **crashes on this environment, see below** |
 
-**scVelo 0.3.4 + numpy>=2 + pandas>=3 compatibility:** `mode='dynamical'` and `mode='stochastic'` both crash inside scvelo 0.3.4's own internals on this stack, confirmed by independent runs with full tracebacks -- not fixable from the call site: `recover_dynamics()` raises `TypeError: unique requires a Series, Index, ExtensionArray, np.ndarray or NumpyExtensionArray got list` in `make_unique_list()` (pandas>=3 removed `pandas.unique()`'s support for plain lists), and even past that point (verified with a call-site monkeypatch of `make_unique_list`) `align_dynamics()` fails with `ValueError: assignment destination is read-only` -- a second, independent internal incompatibility. `mode='stochastic'` raises `TypeError: only 0-dimensional arrays can be converted to Python scalars` inside `leastsq_generalized()` (numpy>=2 removed implicit scalar conversion of size-1 arrays). Only `mode='deterministic'` was confirmed to run end-to-end and give a biologically correct result (monotone `velocity_pseudotime` from Ductal through the committed series) on real pancreatic endocrinogenesis data (`scv.datasets.pancreas()`). These modes are expected to work again with an older stack (numpy<2, pandas<3) or a scvelo release newer than 0.3.4 that has fixed these internals -- check `scv.__version__` and re-verify before assuming either is usable.
+**scVelo 0.3.4 + numpy>=2 + pandas>=3 compatibility:** `mode='dynamical'` and `mode='stochastic'` both crash inside scvelo 0.3.4's own internals on this stack, confirmed by independent runs with full tracebacks -- not fixable from the call site: `recover_dynamics()` raises `TypeError: unique requires a Series, Index, ExtensionArray, np.ndarray or NumpyExtensionArray got list` in `make_unique_list()` (pandas>=3 removed `pandas.unique()`'s support for plain lists), and even past that point (verified with a call-site monkeypatch of `make_unique_list`) `align_dynamics()` fails with `ValueError: assignment destination is read-only` -- a second, independent internal incompatibility. `mode='stochastic'` raises `TypeError: only 0-dimensional arrays can be converted to Python scalars` inside `leastsq_generalized()` (numpy>=2 removed implicit scalar conversion of size-1 arrays). Only `mode='deterministic'` was confirmed to run end-to-end and give a biologically correct result (monotone `velocity_pseudotime` from Ductal through the committed series) on real pancreatic endocrinogenesis data (`scv.datasets.pancreas()`). These modes are expected to work again with an older stack (numpy<2, pandas<3) or a scvelo release newer than 0.3.4 that has fixed these internals -- check `scv.__version__` and re-verify before assuming either is usable. On the same stack `scv.pl.velocity` (and `scv.pl.scatter` with a list of genes or a numeric `.obs` color) also raises pandas>=3 errors (`unique requires a Series...`, `KeyError: 0`); use `sc.pl.umap` for numeric colors and `scv.pl.scatter(adata, gene, x='spliced', y='unspliced', color='clusters')` one gene at a time for phase portraits (both run in `examples/scvelo_velocity.py`).
 
 **Goal:** Estimate velocity direction and a latent-time ordering.
 **Approach:** Compute moments, recover dynamics (dynamical only, subject to the compatibility note above), compute velocity, build the velocity graph, then sanity-check confidence and phase portraits before any embedding plot.
 
 ```python
-import scanpy as sc
-import scvelo as scv
-scv.pp.filter_and_normalize(adata, min_shared_counts=20)   # n_top_genes was removed from this call in scvelo 0.3+;
-adata.layers['normalized_X'] = adata.X.copy()               # do HVG selection as a separate step (checked on scvelo 0.3.4),
-sc.pp.log1p(adata)                                           # then restore the non-log normalized X moments() expects
-sc.pp.highly_variable_genes(adata, n_top_genes=2000)
-adata = adata[:, adata.var['highly_variable']].copy()
-adata.X = adata.layers.pop('normalized_X')
+scv.pp.filter_and_normalize(adata, min_shared_counts=20)   # n_top_genes was removed from this call in scvelo 0.3+ (checked on 0.3.4):
+                                                             # do HVG selection separately (see the example)
 scv.pp.moments(adata, n_pcs=30, n_neighbors=30)
 scv.tl.velocity(adata, mode='deterministic')        # DEFAULT is 'stochastic'; use 'dynamical'/'stochastic' only
                                                       # after confirming they run on your installed numpy/pandas/scvelo
@@ -190,8 +175,9 @@ scv.tl.velocity_graph(adata, n_jobs=1, show_progress_bar=False)   # show_progres
                                                                     # multiprocessing.Manager() crash in a plain .py script
 scv.tl.velocity_confidence(adata)                   # inspect BEFORE trusting the stream plot
 scv.tl.velocity_pseudotime(adata)                   # ordering proxy when latent_time (needs recover_dynamics) is unavailable
-scv.pl.velocity(adata, var_names=['GATA1'])         # per-gene phase portrait, not just the embedding
 ```
+
+The complete pipeline (loom merge, HVG selection with the `normalized_X` save/restore that `moments()` needs, stream plot, confidence, per-gene phase portraits, top velocity genes) is `examples/scvelo_velocity.py`.
 
 Bergen 2021 failure modes are the DEFAULT expectation, not edge cases. Velocity is unreliable or invalid in mature/terminal/non-dividing systems (adult neurons, steady-state tissue), where little net du/dt means noise dominates and arrows can point backward; under heterogeneous kinetics, one global gamma per gene mis-fits multi-branch systems; and a clean 2D stream plot can manufacture coherence the high-dimensional field lacks. Deeper still (Gorin 2022), the velocity ODE is a deterministic reduction of a stochastic process, intronic reads are a biased proxy for nascent RNA (internal priming, intron retention, 3' and length bias all corrupt gamma), and confidence/coherence metrics reward the kNN smoothing of the moments step rather than correspondence to truth (Zheng 2023). Do not consume raw arrows: feed velocity into CellRank 2 as ONE kernel, validate against known markers or metabolic labeling, and gate interpretation with uncertainty (veloVI `get_directional_uncertainty`).
 
@@ -210,8 +196,8 @@ Quantifier disagreement is first-order, not a detail (Soneson 2021): velocyto vs
 | high `velocity_confidence` but biologically wrong arrows | metric rewards kNN smoothing, not truth (Zheng 2023) | sweep `n_neighbors`; require orthogonal validation, not the confidence score alone |
 | CellRank invents discrete macrostates from a smooth flow | metastability assumption violated; GPCCA forced to partition a continuum | show the Schur/eigenvalue spectrum; justify n_states by a real gap or treat states as coarse-graining artifacts |
 | Pseudotime intervals reported as durations | pseudotime is monotone in progression, not time | only RealTimeKernel/WOT exploit actual time; do not read intervals as elapsed hours |
-| `recover_dynamics`/`mode='dynamical'` or `mode='stochastic'` raise `TypeError`/`ValueError` inside scvelo's own internals | pandas>=3 / numpy>=2 incompatibility in scvelo 0.3.4, not fixable from the call site | fall back to `mode='deterministic'` + `velocity_pseudotime`; confirm your numpy/pandas/scvelo versions before assuming dynamical/stochastic work |
-| `cellrank`/`scvelo` code raises `RuntimeError` about "bootstrapping phase" when run as a `.py` script on Windows | a kernel or tool spawned a `multiprocessing.Manager()` progress-bar queue without a guarded entry point | wrap the script body in `if __name__ == '__main__':` (confirmed fix; verified for CellRank's `compute_transition_matrix`/`compute_fate_probabilities`) |
+| `recover_dynamics`/`mode='dynamical'` or `mode='stochastic'` raise `TypeError`/`ValueError` inside scvelo's own internals | pandas>=3 / numpy>=2 incompatibility in scvelo 0.3.4 | see the scVelo compatibility note under RNA Velocity: `mode='deterministic'` + `velocity_pseudotime` |
+| `cellrank`/`scvelo` code raises `RuntimeError` about "bootstrapping phase" when run as a `.py` script on Windows | a `multiprocessing.Manager()` progress-bar queue started without a guarded entry point | guard the entry point (see the CellRank Windows note); for scvelo pass `show_progress_bar=False, n_jobs=1` |
 
 ## Related Skills
 

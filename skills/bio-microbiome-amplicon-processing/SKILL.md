@@ -19,9 +19,22 @@ Before using code patterns, verify installed versions match. If versions differ:
 If code throws ImportError, AttributeError, or TypeError, introspect the installed
 package and adapt the example to match the actual API rather than retrying.
 
-The error model is a PER-RUN artifact, not a version: `learnErrors` is fit to one sequencing run (flowcell/chemistry/instrument). Multi-run studies run the per-run inference separately, then `mergeSequenceTables`, then a single chimera removal - never pool FASTQs across runs before `learnErrors`. DADA2 `dada()` defaults (`OMEGA_A` 1e-40, `mergePairs` `minOverlap` 12) and QIIME2 plugin flag spellings drift between releases; confirm with `?dada` and `qiime dada2 --help`.
+DADA2 `dada()` defaults (`OMEGA_A` 1e-40, `mergePairs` `minOverlap` 12) and QIIME2 plugin flag spellings drift between releases; confirm with `?dada` and `qiime dada2 --help`.
 
 # Amplicon Processing with DADA2
+
+Install:
+
+```bash
+conda install -c bioconda cutadapt itsxpress
+```
+
+```r
+install.packages(c('BiocManager', 'ggplot2'))   # ggplot2 for plotErrors()/ggsave()
+BiocManager::install(c('dada2', 'decontam'))
+```
+
+The QIIME2 path (`qiime dada2 denoise-paired`, `qiime deblur denoise-16S`) installs as its own conda env (`qiime2-amplicon-<release>`); see qiime2-workflow.
 
 **"Process my 16S amplicon data to get ASVs"** -> Strip primers, learn a per-run error model, denoise into exact amplicon sequence variants, merge pairs, and remove chimeras - because an ASV is a model-inferred sequence conditioned on one run, not a clustered consensus or an organism.
 - R: `dada(filtFs, err=learnErrors(filtFs, multithread=TRUE), multithread=TRUE)`
@@ -35,7 +48,7 @@ The feature table is not an observation of the community; it is the residue of m
 
 1. **Primers and truncLen decide what is detectable, silently.** Leftover primers corrupt the error model (mismatches read as sequencing error) and masquerade as chimeras; truncating reads below the merge-overlap budget erases taxa by arithmetic, not biology. These knobs are set before the answer exists - declare them.
 2. **The error model is fit PER RUN.** Illumina error rates are run-specific. Concatenating runs before `learnErrors` fits one model to a mixture of error structures and denoises wrong. Infer each run separately, then `mergeSequenceTables` (the exact-sequence string is the join key), then one chimera removal.
-3. **An ASV is an exact sequence, not a cell, genome, or species.** One genome carries multiple, often divergent 16S copies, so one organism becomes several ASVs and inflates richness (Schloss 2021). Reads are not cells (16S copy number varies); a species-level 16S call is usually overconfident.
+3. **An ASV is an exact sequence, not a cell, genome, or species.** One genome carries multiple, often divergent 16S copies, so one organism becomes several ASVs and inflates richness (Schloss 2021). Reads are not cells (16S copy number 1-15+); a species-level 16S call is usually overconfident.
 
 Organize the work around declaring and defending these knobs - not around running `dada()` and calling the columns "species."
 
@@ -88,7 +101,7 @@ cutadapt \
     sample_R1.fastq.gz sample_R2.fastq.gz
 ```
 
-The QIIME2 equivalent is `qiime cutadapt trim-paired --p-front-f FWD --p-front-r REV --p-discard-untrimmed`.
+For a directory of samples run `examples/remove_primers.sh` (edit `FWD`/`REV`/`raw_dir`). The QIIME2 equivalent is `qiime cutadapt trim-paired --p-front-f FWD --p-front-r REV --p-discard-untrimmed`.
 
 ## The Per-Run DADA2 Pipeline
 
@@ -118,10 +131,10 @@ Paired-end merging needs `truncLen_F + truncLen_R >= amplicon_length + ~12` (DAD
 
 **There is also a silent ceiling: truncLen must not exceed the read length AFTER cutadapt, not the raw cycle count.** `filterAndTrim` does not pad a short read up to truncLen - a read shorter than truncLen is dropped entirely. Ask for a truncLen longer than what primer removal left and the filter can discard every read with no error, only a `No reads passed the filter` warning as the tell. A 2x250 MiSeq run with the 19bp 515F / 20bp 806R primers removed leaves reads only ~231bp/~230bp long, not 250bp - confirmed by running the primer-trimmed read length before truncating (`plotQualityProfile`, or `nchar` a few reads), not by assuming the raw cycle count.
 
-- **V4 (515F/806R, ~253 bp), 2x250:** 250+250 raw vs 253+12 leaves huge slack, but after cutadapt strips the primers only ~231bp/~230bp remain - truncate to quality freely within THAT length (e.g. `c(220, 200)`), not against the raw 250bp cycle count.
+- **V4 (515F/806R, ~253 bp), 2x250:** 250+250 raw vs 253+12 leaves huge slack - truncate to quality freely within the post-cutadapt length (e.g. `c(220, 200)`).
 - **V3-V4 (341F/805R, ~460 bp), 2x250:** 250+250 vs 460+12 leaves only ~28 bp slack. Aggressive truncation of both reads kills the overlap and the merge rate collapses to near zero. Preserve length: barely truncate the reverse and loosen `maxEE` to `c(2, 5)` to keep low-Q reverse reads.
 
-A merge cliff in the read-tracking table is a budget problem, not bad data - the taxa were erased by arithmetic. A filter that drops every read outright is the OTHER end of the same truncLen budget - too high against the post-primer-trim length, not too low against the merge budget.
+A merge cliff in the read-tracking table (near-zero `merged` column) is a budget problem, not bad data or "low diversity" - the taxa were erased by arithmetic.
 
 ## Combine Runs, Then Remove Chimeras
 
@@ -135,7 +148,9 @@ seqtab_nochim <- removeBimeraDenovo(st_all, method='consensus', multithread=TRUE
 sum(seqtab_nochim) / sum(st_all)   # chimeras = many ASVs but few READS (~0.8-0.99 retained)
 ```
 
-Carry "run" forward as a batch covariate into differential abundance. A large READ fraction removed as chimeric is a leftover-primer smell (degenerate bases look chimeric), not a real chimera storm.
+The whole multi-run workflow (per-run inference, merge, one chimera removal, read tracking) is `examples/dada2_workflow.R`. Carry "run" forward as a batch covariate into differential abundance, and save the chimera-free table with `saveRDS` for downstream taxonomy/phyloseq work.
+
+`removeBimeraDenovo` is not exhaustive. On a planted-truth check (DADA2 1.34.0), a low-abundance chimera (115 reads, 0.6% of reads) survived `method='consensus'`, `'pooled'` and `'per-sample'` alike, so switching method does not recover it. Do not call the table chimera-free: inspect low-abundance ASVs whose sequence is a left/right splice of two abundant ASVs.
 
 ## Decontamination and Controls (low-biomass)
 
@@ -152,17 +167,20 @@ contam <- isContaminant(seqtab_nochim, neg = meta$is_control, conc = meta$dna_co
 seqtab_clean <- seqtab_nochim[, !contam$contaminant]
 ```
 
-Low-biomass samples (skin, biopsy, BAL, sterile-site swabs) can be dominated by the kitome, so a "community" there may be mostly contamination - never interpret a low-biomass result without controls. The shotgun analogue is metagenomics/contamination-controls.
+Low-biomass samples (skin, biopsy, BAL, sterile-site swabs) can be dominated by the kitome, so a "community" there may be mostly contamination - never interpret a low-biomass result without controls (a plausible "community" in a near-sterile sample, prominent reagent-associated genera, or results that track DNA yield are kitome signatures). Report what decontam removed (Davis 2018). The shotgun analogue is metagenomics/contamination-controls.
+
+Do not substitute a flat relative-abundance cutoff (e.g. "drop ASVs below 1% or 5%") for decontam. Contaminant status is evidence about controls and DNA concentration, not about abundance: in a synthetic test with extraction blanks the kit contaminant (*Ralstonia*, 5.1% of reads) is more abundant than a real community member (*Escherichia-Shigella*, 4.3%), so any cutoff that removes it also removes the real taxon, while a cutoff that spares the real taxon keeps the contaminant.
 
 ## ITS: Never Fixed-Truncate
 
 **Goal:** Isolate the biologically variable-length ITS spacer without slicing real sequence.
 
-**Approach:** Strip primers with cutadapt, then HMM-trim the conserved SSU/5.8S/LSU flanks with ITSxpress (preserving quality scores), then denoise with `truncLen=0`, filtering on `maxEE`/`minLen` only.
+**Approach:** Strip primers with cutadapt, then HMM-trim the conserved SSU/5.8S/LSU flanks with ITSxpress (preserving quality scores), then denoise with `truncLen=0`, filtering on `maxEE`/`minLen` only. ITS length is biological (ITS1 ~200-600 bp), so a fixed cut slices real sequence off long variants and merge-fails short ones (lost long fungal taxa, poor merging).
 
 ```bash
+# --region ITS1/ITS2/ALL; --taxa selects the HMM model. Paired input is merged: one trimmed FASTQ out.
 itsxpress --fastq r1.fastq.gz --fastq2 r2.fastq.gz \
-    --region ITS2 --taxa Fungi \   # ITS1/ITS2/ALL; --taxa selects the HMM model
+    --region ITS2 --taxa Fungi \
     --outfile trimmed.fastq.gz --threads 4
 ```
 
@@ -176,8 +194,9 @@ out_its <- filterAndTrim(trimmed, filtered, truncLen=0,   # NEVER fix-truncate I
 DADA2 inside QIIME2: `qiime dada2 denoise-paired --p-trunc-len-f --p-trunc-len-r` (also `denoise-single`, `denoise-pyro` for 454/Ion Torrent, `denoise-ccs` with `--p-front`/`--p-adapter`/`--p-min-len`/`--p-max-len` for PacBio CCS). Deblur (static positive filter, one fixed length, 16S only):
 
 ```bash
+# --p-trim-length: ONE fixed length; Deblur cannot handle variable length
 qiime deblur denoise-16S --i-demultiplexed-seqs qc.qza \
-    --p-trim-length 250 --p-sample-stats \   # ONE fixed length; Deblur cannot handle variable length
+    --p-trim-length 250 --p-sample-stats \
     --o-representative-sequences rep-seqs.qza --o-table table.qza --o-stats stats.qza
 ```
 
@@ -191,20 +210,8 @@ Do not merge a DADA2 ASV table with a Deblur sOTU table - different feature defi
 ### Pooling runs before learnErrors
 **Trigger:** concatenating multiple runs' FASTQs into one pipeline. **Mechanism:** one error model is fit to a mixture of run-specific error structures. **Symptom:** distorted denoising; ASVs that vanish or appear when runs are split. **Fix:** per-run inference, then `mergeSequenceTables`, then one chimera removal; carry run as a batch covariate.
 
-### Merge cliff from over-truncation
-**Trigger:** truncLen_F + truncLen_R below amplicon length + 12. **Mechanism:** denoised pairs no longer overlap enough to merge. **Symptom:** near-zero `merged` column in read tracking; misread as "low diversity"/"bad data". **Fix:** compute the budget from amplicon and read length first; for long amplicons keep length and loosen `maxEE` R.
-
-### Fixed-truncating ITS
-**Trigger:** any `truncLen` on ITS. **Mechanism:** ITS length is biological (ITS1 ~200-600 bp), so a fixed cut slices real sequence off long variants and merge-fails short ones. **Symptom:** lost long fungal taxa, poor merging. **Fix:** cutadapt + ITSxpress, then `truncLen=0`, filter on `maxEE`/`minLen`.
-
 ### NovaSeq/NextSeq binned-quality error fit
 **Trigger:** default `learnErrors` on ~4-bin quality data. **Mechanism:** the loess error-vs-Q fit is starved and can become non-monotonic (error rising at high Q). **Symptom:** in `plotErrors` the fitted line diverges from observed points. **Fix:** enforce monotonicity in the error matrix (nf-core/ampliseq `--illumina_novaseq`, or set sub-max-Q entries to the max-Q error); never trust the default fit on binned Q.
-
-### ASV count read as species richness
-**Trigger:** reporting ASV count as richness or each ASV as one organism. **Mechanism:** intragenomic 16S copy divergence splits one genome into several ASVs (Schloss 2021); reads are not cells (copy number 1-15+). **Symptom:** inflated richness, "species" that are copies of one organism. **Fix:** collapse to genus/species (taxonomy-assignment) before richness claims; treat ASV count as an upper bound.
-
-### Low-biomass contamination ignored (no controls / no decontam)
-**Trigger:** analysing low-biomass samples (skin, biopsy, BAL, sterile site) without sequencing controls or running decontam. **Mechanism:** reagent/kit DNA (the kitome) is amplified alongside scarce template and can dominate the reads. **Symptom:** a plausible "community" in a near-sterile sample; reagent-associated genera prominent; results track DNA yield. **Fix:** sequence extraction-blank + no-template-PCR negatives (and a positive mock), run decontam (prevalence or combined), report what was removed (Davis 2018; metagenomics/contamination-controls).
 
 ## Quantitative Thresholds
 

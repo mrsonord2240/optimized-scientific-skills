@@ -17,15 +17,14 @@ Before using code patterns, verify installed versions match. If versions differ:
 If code throws an error, introspect the installed package and adapt to the actual API. Notes:
 - `ssizeRNA_single()` takes **one mean/dispersion scalar for all genes**; `ssizeRNA_vary()` takes **per-gene vectors**. Passing scalars to `ssizeRNA_vary()` raises `Error in integrate(...) : non-finite function value` on 1.3.3 — use `_single` for a single mean/dispersion and reserve `_vary` for real pilot vectors.
 - `res$ssize` from both functions is a **1x3 matrix** `(pi0, ssize, power)`, not a scalar — index it: `res$ssize[, "ssize"]`.
-- Both estimators return `ssize = NA` silently, with no error, when no n within `maxN` reaches the target — see "When No n Is Reachable" below. Always check `is.na()` before reporting a number.
+- Both estimators normally return `ssize = NA` silently when no n within `maxN` reaches the target. In ssizeRNA 1.3.3, an extremely low `maxN` can instead raise `argument is of length zero`; treat that exact package edge case as unreachable and emit the same clear `no n <= maxN` message — see "When No n Is Reachable" below.
 - `powsimR` is GitHub-only, drifts across versions, and its dependency closure (`bayNorm`) can fail to build against a newer Bioconductor than it was pinned to. If it is not installed or fails to build, use the pseudobulk-on-donors pattern below (`ssizeRNA_vary`/PROPER on donor-level pseudobulk counts) — it needs no extra dependency and is not a lesser substitute, since population DE power is set by donors either way (Squair 2021).
 - `PROPER::estParam()` errors with `the condition has length > 1` on R >= 4.0 because a plain `matrix` now has class `c("matrix","array")` and the package's `class(X) %in% c(...)` check was written for R < 4.0. Work around it with `oldClass(X) <- "matrix"` before calling `estParam` (verified on PROPER 1.38.0 / R 4.4.3).
 
 **Setup:**
 ```r
-install.packages('BiocManager')
-BiocManager::install(c('ssizeRNA', 'PROPER', 'DESeq2', 'edgeR'))
-install.packages('pwr')
+install.packages(c('BiocManager', 'ssizeRNA', 'pwr'))
+BiocManager::install(c('PROPER', 'DESeq2', 'edgeR'))
 ```
 
 **Worked script:** `examples/sample_size_estimation.R` runs sections 1-4 below end to end on the ssizeRNA/DESeq2/pwr defaults and prints real numbers (not `NA`/`NaN`) — run it first to see the shape of the output before adapting parameters.
@@ -121,21 +120,15 @@ summary(disp_vec)                                        # use the MEDIAN as a s
 
 **Approach:** `estParam` characterizes the pilot count matrix; `RNAseq.SimOptions.2grp` builds a simulation config from those estimates plus a target fold change; `runSims` simulates each candidate replicate number; `comparePower` reports power/FDR by replicate number.
 
-```r
-library(PROPER)
-set.seed(20260918)
-counts_mat <- as.matrix(pilot_counts)
-oldClass(counts_mat) <- "matrix"        # work around PROPER::estParam's `class(X) %in% c(...)` check,
-                                         # which errors on R >= 4.0's matrix/array dual class (verified PROPER 1.38.0)
-params <- estParam(counts_mat, type = 1)
-sim.opts <- RNAseq.SimOptions.2grp(ngenes = nrow(counts_mat), seqDepth = params$seqDepth,
-                                    lBaselineExpr = params$lmean, lOD = params$lOD,
-                                    p.DE = 0.05, lfc = log2(1.5), sim.seed = 20260918)
-simres <- runSims(Nreps = c(3, 6, 10, 20), nsims = 20, sim.opts = sim.opts, DEmethod = "DESeq2")
-powres <- comparePower(simres, alpha.type = "fdr", alpha.nominal = 0.05,
-                       stratify.by = "expr", target.by = "lfc", delta = log2(1.5))
-powres$powerAveraged                    # average power per Nreps, at the target fold change
+Run `scripts/proper_power.R` (args: pilot counts CSV, `reps`, `nsims`, `fc`, `max_genes`, `seed`):
+
+```bash
+r.sh scripts/proper_power.R pilot_counts.csv 3,6,10,20 20 1.5   # estParam -> RNAseq.SimOptions.2grp -> runSims -> comparePower
 ```
+
+The script carries the `oldClass(counts_mat) <- "matrix"` workaround above, sets `delta = log2(fc) - 0.01` (`comparePower` counts a DE gene as a target only if `abs(lfc) > delta`, STRICT, and `runSims` plants every DE gene at exactly `log2(fc)`, so `delta = log2(fc)` leaves ZERO target genes and `power.marginal` is all NaN), and prints `names(powres)` (16 fields; there is no `powerAveraged`, and `$` on a missing name returns NULL silently), `powres$Nreps1`, `rowMeans(powres$power.marginal, na.rm = TRUE)` (`power.marginal` is Nreps x nsims) and `summaryPower(powres)` (PROPER's own table: nominal vs actual FDR, marginal power, avg TD/FD per Nreps).
+
+Read the row where marginal power first reaches 0.80 as the sample size per group; if none does, raise the top `Nreps`. Verified on PROPER 1.38.0 (6v6 synthetic pilot, 2,500 genes, `nsims = 8`): with `delta = log2(1.5) - 0.01` marginal power was 0.006 / 0.060 / 0.22 / 0.61 at n = 3 / 6 / 10 / 20 (actual FDR 0.74 / 0.48 / 0.20 / 0.11), while `delta = log2(1.5)` returned `NaN` for every cell. `power.marginal` can also be `NaN` when `nsims` is very low or a simulation has no true discoveries; raise `nsims` before trusting a cell. Interpret the FDR-aware result as in "When No n Is Reachable".
 
 ## scRNA-seq Cohort Sizing -- Pseudobulk on Donors
 
@@ -143,37 +136,34 @@ powres$powerAveraged                    # average power per Nreps, at the target
 
 **Approach:** Aggregate (sum) each donor's cell-level counts per gene into one pseudobulk sample per donor, then size donors exactly like a bulk RNA-seq study — `ssizeRNA_vary`/PROPER on the pseudobulk dispersions. This needs only DESeq2/edgeR + ssizeRNA/PROPER, already installed for the bulk route, and is the fallback when `powsimR` is not installed (see Version Compatibility).
 
-```r
-library(DESeq2); library(ssizeRNA)
-set.seed(20260918)
-# cell_counts: named list, one genes x cells matrix per donor (from the scRNA-seq count matrix, split by donor)
-pseudobulk <- sapply(cell_counts, rowSums)               # genes x donors -- sum, not mean, across cells
-coldata <- data.frame(condition = donor_condition)       # one condition label per donor, aligned to pseudobulk's columns
-dds <- DESeqDataSetFromMatrix(pseudobulk, coldata, ~ condition)
-dds <- DESeq(dds)
-disp_vec <- dispersions(dds); mu_vec <- rowMeans(counts(dds, normalized = TRUE))
-keep <- is.finite(disp_vec) & is.finite(mu_vec) & mu_vec > 0
-disp_vec <- disp_vec[keep]; mu_vec <- mu_vec[keep]
+Run `scripts/pseudobulk_donor_ssize.R` (args: `cell_counts.rds` = named list of one genes x cells matrix per donor, `donor_condition.csv` with columns `donor,condition`, then `fc`, `fdr`, `power`, `maxN`, `seed`):
 
-res <- ssizeRNA_vary(nGenes = length(mu_vec), pi0 = 0.95, mu = mu_vec, disp = disp_vec,
-                     fc = 1.5, fdr = 0.05, power = 0.80, maxN = 200)
-res$ssize[, "ssize"]                                      # minimum DONORS per group -- NOT cells
-# Verified on synthetic 8-donor pilot (donor dispersion 0.35, 150 cells/donor): pseudobulk median
-# dispersion recovered at 0.32; donor count from ssizeRNA_vary = 84 at fc=1.5 (comparable order to
-# the bulk case above -- donors are the same statistical unit as bulk replicates once pseudobulked).
+```bash
+r.sh scripts/pseudobulk_donor_ssize.R cell_counts.rds donor_condition.csv 1.5 0.05 0.80 200   # sum per donor -> DESeq2 dispersions -> ssizeRNA_vary
 ```
+
+It sums (not means) cells per gene per donor, fits DESeq2 on the donor-level pseudobulk, and reports the minimum DONORS per group -- NOT cells.
+
+Verified on synthetic 8-donor pilot (donor dispersion 0.35, 150 cells/donor): pseudobulk median dispersion recovered at 0.32; donor count from `ssizeRNA_vary` = 84 at fc=1.5 (comparable order to the bulk case above -- donors are the same statistical unit as bulk replicates once pseudobulked).
 
 ## When No n Is Reachable
 
-`ssizeRNA_single`/`_vary` return `ssize = NA` **silently**, with no warning or error, when no n within `maxN` reaches the target -- this is not a computation failure, it means the search ceiling was too low or the target itself is unreachable. `check.power` returns `fdr_bh_ave = NaN` when the average number of BH discoveries is zero across simulations -- **a NaN true FDR means zero discoveries, not "FDR unknown."**
+`ssizeRNA_single`/`_vary` normally return `ssize = NA` **silently** when no n within `maxN` reaches the target -- this is not a computation failure, it means the search ceiling was too low or the target itself is unreachable. ssizeRNA 1.3.3 has one exception: an extremely low ceiling can raise `argument is of length zero` before constructing that `NA` result. Normalize only that exact package error to the same unreachable outcome, while allowing all other errors through. `check.power` returns `fdr_bh_ave = NaN` when the average number of BH discoveries is zero across simulations -- **a NaN true FDR means zero discoveries, not "FDR unknown."**
 
 1. If `ssize` is `NA`: raise `maxN` (e.g. 30 -> 200 -> 1000) and re-run before concluding anything.
 2. If it is still `NA` at a practically fundable `maxN` (a few hundred), report the achieved power at that `maxN` instead of a sample size — do not print `NA` as the answer.
 3. As a fallback, sweep the fold change upward at the affordable `n` until power reaches the target, and report that **minimum detectable fold change** instead of a sample size (a 1.2-fold target at 90% power can be unreachable at any fundable n — see Anticipated Reviewer Pushback).
 
 ```r
-n <- res$ssize[, "ssize"]
-if (is.na(n)) stop("no n <= maxN reaches the target; raise maxN or revise fc/dispersion")
+safe_ssize <- function(call) tryCatch(call(), error = function(e) {
+  if (identical(conditionMessage(e), "argument is of length zero")) return(NULL)
+  stop(e)
+})
+res <- safe_ssize(function() ssizeRNA_single(..., maxN = maxN))
+n <- if (is.null(res)) NA_real_ else res$ssize[, "ssize"]
+if (length(n) != 1L || is.na(n)) {
+  stop(sprintf("no n <= %d reaches the target; raise maxN or revise fc/dispersion", maxN))
+}
 ```
 
 State the seed and the `sims`/`nsims` count alongside any reported n or power. None of these estimators are deterministic without `set.seed()`: `check.power`'s average power moved between 0.1015 and 0.1098 across unseeded calls at `sims = 20` in prior testing.
@@ -257,23 +247,13 @@ The "minimum" columns are floors that assume low dispersion and large effects; t
 
 **Ethics/protocol note for human-donor cohorts:** when sizing tumor-vs-normal, disease-vs-control or other human-donor studies, the replicate count -- including the 10-20% failure margin above -- must match what the approved IRB/ethics protocol specifies for that cohort. Recruiting additional donors purely to cover the failure margin has its own consent and recruitment implications; a power calculation justifies the number but does not by itself authorize recruiting it.
 
-## Common Errors
-
-| Error / symptom | Cause | Solution |
-|-----------------|-------|----------|
-| Over-stated power | technical reps counted as n | collapse to biological units |
-| Underpowered at n=3 | convention not calculation | size to >=6 (or pilot-driven) |
-| scRNA-seq DE does not replicate | sized on cells | size on donors (pseudobulk) |
-| Planned n off by a large factor | guessed CV | estimate dispersion from pilot |
-| Study fails after sample loss | no failure margin | add 10-20% extra units |
-
 ## Anticipated Reviewer Pushback
 
 | Pushback | Response |
 |----------|----------|
 | "Why this n?" | smallest n reaching marginal power >= 0.8 at FDR 0.05 for the minimum meaningful FC; power curve provided |
 | "Where did dispersion come from?" | estimated from pilot (DESeq2); literature value used only as a cross-check |
-| "Is n=3 enough?" | no; >=6 is Schurch 2016's floor for recovery over a realistic FC spectrum, but the fixed-FC calculation for this specific target fold change can require far more (n in the mid-40s to 74, depending on the assumed mean count, at 1.5-fold in this Skill's own example) — quote the fixed-FC number, not just the floor |
+| "Is n=3 enough?" | no; quote both the Schurch floor and the fixed-FC calculation for this target fold change (see the note under Quantitative Thresholds) — the fixed-FC number is the on-target power claim |
 | "Why so many donors for scRNA-seq?" | population DE power scales with donors, not cells (Squair 2021) |
 | "Technical replicates?" | collapsed to biological units; they add no biological degrees of freedom |
 

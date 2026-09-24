@@ -24,6 +24,10 @@ hmmscan --cut_ga --domtblout query.domtbl --cpu 4 "${HMM}" "${QUERY}" > query.hm
 
 echo
 echo "=== Per-protein Pfam domain summary ==="
+if ! grep -qv '^#' query.domtbl; then
+    echo "No Pfam-A domains found above the gathering threshold."
+    exit 0
+fi
 awk '!/^#/ {print $4"\t"$1"\t"$2"\t"$7"\t"$8}' query.domtbl
 echo
 echo "Columns: query_name | pfam_name | pfam_acc | full_evalue | full_score"

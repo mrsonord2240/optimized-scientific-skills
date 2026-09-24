@@ -61,6 +61,11 @@ the 4-6 sgRNAs *per gene* needed for a stable per-gene Z.
 
 ## Run drugZ on a Drug-Modifier Screen
 
+**Input:** tab-separated count matrix, guide ID in the first column, `GENE` second, then one column per
+sample (extra columns such as `T0` are ignored unless named in `-c`/`-x`). Vehicle and drug arms must
+share the same time point (Day 14 vehicle vs Day 14 drug). Check library coverage and replicate concordance first (`screen-qc`, `mageck count`). Helper libraries for the snippets below:
+`pandas numpy scipy statsmodels matplotlib`.
+
 **Goal:** Quantify per-gene sensitizing and suppressor effects from a chemogenomic screen.
 
 **Approach:** Run `drugz.py` with vehicle and drug sample columns; output per-gene sumZ, normZ, and direction-specific p-values + FDR.
@@ -73,13 +78,16 @@ cd drugz
 # Vehicle (DMSO or carrier) replicates: Veh_r1, Veh_r2, Veh_r3
 # Drug-treated replicates: Drug_r1, Drug_r2, Drug_r3
 
+# -i input counts (tab-separated); -o output file; -c vehicle samples, -x drug samples (comma-separated)
+# -r OPTIONAL comma-delimited GENE NAMES to exclude (not a file path; see references/reference-gene-removal.md)
+# -p pseudocount (default 5; raise for low-count screens)
 python drugz.py \
-    -i counts.txt \                       # input read-count file (tab-separated)
-    -o drugz_output.txt \                  # output file
-    -c Veh_r1,Veh_r2,Veh_r3 \              # control samples (comma-separated)
-    -x Drug_r1,Drug_r2,Drug_r3 \           # treated samples (comma-separated)
-    -r RPS3,RPL11,EIF3A \                  # OPTIONAL: comma-delimited GENE NAMES to exclude (not a file path)
-    -p 5                                   # pseudocount (default 5)
+    -i counts.txt \
+    -o drugz_output.txt \
+    -c Veh_r1,Veh_r2,Veh_r3 \
+    -x Drug_r1,Drug_r2,Drug_r3 \
+    -r RPS3,RPL11,EIF3A \
+    -p 5
 
 # Output: drugz_output.txt with columns:
 #   GENE, sumZ, numObs, normZ, pval_synth, rank_synth, fdr_synth, pval_supp, rank_supp, fdr_supp
@@ -138,27 +146,15 @@ for DOSE in low mid high; do
 done
 ```
 
-Then aggregate. A dose-consistent hit is one that keeps the same sign at every tested dose and
-reaches FDR < 0.05 at the highest dose; report the others as dose-inconsistent rather than dropping
-them silently:
+Then aggregate. **Dose consistency rule:** a dose-consistent hit keeps the same `normZ` sign at every
+tested dose and reaches FDR < 0.05 at the highest dose; report the others as dose-inconsistent rather
+than dropping them silently. `|normZ|` growing with dose is supporting evidence, not a requirement
+(saturation at the top dose is common); `scripts/dose_consistent_hits.py` applies the rule:
 
-```python
-import pandas as pd
-
-def dose_consistent_hits(dose_files, top_dose, fdr=0.05, direction='synth'):
-    """dose_files: {'low': 'drugz_low.txt', 'mid': ..., 'high': ...}; top_dose: key of the highest dose.
-
-    A hit is dose-consistent if normZ has the same sign at every dose and passes FDR at the top dose.
-    """
-    frames = {d: pd.read_csv(f, sep='\t').set_index('GENE') for d, f in dose_files.items()}
-    normz = pd.DataFrame({d: f['normZ'] for d, f in frames.items()}).dropna()
-    sign_ok = (normz.gt(0).all(axis=1)) | (normz.lt(0).all(axis=1))
-    top = frames[top_dose]
-    passes = top['fdr_%s' % direction] < fdr
-    hits = normz[sign_ok & passes.reindex(normz.index).fillna(False)].copy()
-    hits['normZ_top_dose'] = top['normZ'].reindex(hits.index)
-    hits['monotonic'] = (normz.abs().diff(axis=1).iloc[:, 1:] >= 0).all(axis=1)  # |normZ| grows with dose
-    return hits.sort_values('normZ_top_dose')
+```bash
+# DOSE=FILE pairs, low to high; --top-dose names the highest dose. Also importable: from dose_consistent_hits import dose_consistent_hits
+python scripts/dose_consistent_hits.py --top-dose high low=drugz_low.txt mid=drugz_mid.txt high=drugz_high.txt
+# add --direction supp for suppressors, --fdr 0.05 (default), --out hits.tsv
 ```
 
 **For multi-condition drug-screens** (time × drug × cell-line), use MAGeCK MLE with explicit design matrix instead -- MLE handles multi-factorial; drugZ does not.
@@ -177,86 +173,18 @@ def dose_consistent_hits(dose_files, top_dose, fdr=0.05, direction='synth'):
 | Synergy / antagonism detection | Limited (per-drug calling only) | YES (interaction term in MLE) |
 | Small effect sizes (LFC <0.5) | Highest sensitivity | Lower sensitivity |
 | Heavy selection (>40% guides change) | OK | Norm needs control sgRNAs |
+| Essentiality plus drug effect | drugZ for the drug effect | BAGEL2 for essentiality |
 
-**Dose consistency rule:** same sign of `normZ` at every tested dose and FDR < 0.05 at the highest dose. Report `|normZ|` increasing with dose as supporting evidence, not as a requirement -- saturation at the top dose is common.
+Dose consistency: see the rule in "Drug-Dose and Time-Course Designs". Failure symptoms (no hits, essentials dominating, unstable or dose-blind hits, crashes): `references/failure-modes.md`.
 
 **Reconciliation:** For simple drug-modifier screens with one drug and one vehicle, run both drugZ and MAGeCK MLE; hits called by both are high confidence; drugZ-only hits at low LFC need orthogonal validation (drug + arrayed validation).
 
-## Removing Reference Genes from the Analysis
+## Reference Files
 
-**Goal:** Keep reference essential or control genes from inflating the Z-score null distribution.
-
-**Approach:** `-r` takes a **comma-delimited list of gene symbols, not a file path** (`drugz.py` does
-`args.remove_genes.split(',')`). Passing a filename removes nothing and still exits 0. The named genes
-are dropped from the input before any Z-scoring, so they also disappear from the output file: `-r` is
-an exclusion, not a re-weighting.
-
-```bash
-# Inline list
-python drugz.py \
-    -i counts.txt \
-    -o drugz_clean.txt \
-    -c Veh_r1,Veh_r2 \
-    -x Drug_r1,Drug_r2 \
-    -r RPS3,RPL11,EIF3A,POLR2A,CDK1
-```
-
-```bash
-# From a reference set: take the first column, skip the header, join with commas.
-# CEGv2.txt (hart-lab/bagel) is tab-separated with a header (GENE, HGNC_ID, ENTREZ_ID);
-# joining its raw lines gives tokens like "AARS<TAB>HGNC:20<TAB>16", which match no gene
-# and silently exclude nothing.
-CEG=$(tail -n +2 CEGv2.txt | cut -f1 | paste -sd, -)
-python drugz.py -i counts.txt -o drugz_clean.txt -c Veh_r1,Veh_r2 -x Drug_r1,Drug_r2 -r "$CEG"
-```
-
-**Verify the exclusion happened** -- the tool cannot tell you it matched nothing:
-
-```bash
-# genes in the unfiltered output but not the filtered one; should equal the number you excluded
-comm -23 <(cut -f1 drugz_output.txt | sort) <(cut -f1 drugz_clean.txt | sort) | wc -l
-```
-
-**When to use:** If pilot drugZ runs show many essential genes appearing as "sensitizers" purely
-because they drop out under any condition, removing them gives a cleaner drug-specific signal.
-
-## Failure Modes
-
-### drugZ shows no synthetic-lethal hits despite known sensitizing genes
-
-**Trigger:** Comparing drug vs Day-0 instead of drug vs vehicle.
-**Mechanism:** Day-0 comparison conflates drug effect with normal-culture proliferation; essential genes drop in both conditions, masking drug-specific sensitization.
-**Symptom:** PARPi screen shows no sensitization at BRCA1/BRCA2 despite expected biology.
-**Fix:** Re-run with vehicle samples passed to `-c`. The drug-vs-vehicle is the canonical comparison.
-
-### High false-positive rate among essential genes
-
-**Trigger:** Essential genes drop out in both vehicle and drug arms; small relative shift gives misleadingly high Z.
-**Mechanism:** drugZ's Z-score is symmetric; essential genes drop in both arms but slightly more in drug -> "synthetic lethal" call.
-**Symptom:** Hit list dominated by RPS, RPL, EIF essentials.
-**Fix:** Use `-r` with a comma-delimited list of essential gene names to exclude (see "Removing Reference Genes"), then check that the excluded genes really are missing from the output; or filter the output post-hoc.
-
-### Unstable hits across libraries or sub-samples
-
-**Trigger:** Insufficient sgRNAs per gene; small effect sizes.
-**Mechanism:** drugZ's per-gene sumZ depends on enough sgRNAs to be stable; with 3-4 sgRNAs/gene, single-guide noise drives the ranking.
-**Symptom:** Top hits move when you re-sequence, sub-sample replicates, or switch library.
-**Note:** Re-running drugZ on the same input cannot show this. drugZ has no sampling step and no seed: identical input gives a byte-identical output file, so a rerun is not a stability check.
-**Fix:** Use a 6+ sgRNAs/gene library (Avana, Dolcetto); check stability by holding out a replicate or bootstrapping the guides yourself; or use MAGeCK MLE.
-
-### drugZ ignores dose information
-
-**Trigger:** Multi-dose screen analyzed at highest dose only.
-**Mechanism:** drugZ doesn't model dose; running at one dose loses the dose-response information.
-**Symptom:** Hits at high dose may be dose-specific (not true responders).
-**Fix:** Run drugZ at each dose; require consistency across doses for high-confidence hits.
-
-### Drug-target gene appears as "suppressor"
-
-**Trigger:** Loss of drug target reduces drug binding, increasing drug resistance.
-**Mechanism:** Real biology -- drug target itself is a resistance gene from a KO perspective.
-**Symptom:** Drug-target gene like PARP1 appears in suppressor list for PARPi screen.
-**Fix:** Expected biology. Annotate the drug target separately. The suppressor list is correct.
+| File | Read when |
+|------|-----------|
+| `references/reference-gene-removal.md` | Excluding essential or control genes with `-r`: building the gene list from CEGv2, verifying the exclusion happened |
+| `references/failure-modes.md` | A run gives no hits, hits dominated by essentials, unstable hits, dose-blind results, the drug target in the suppressor list, or low replicate concordance / a crashed run |
 
 ## Quantitative Thresholds
 
@@ -269,17 +197,19 @@ because they drop out under any condition, removing them gives a cleaner drug-sp
 | Min sgRNAs per gene for stable Z | 4-6 | Below this, Z varies between runs |
 | Vehicle replicates needed | 3+ | For stable Z null distribution |
 | Drug replicates needed | 3+ | For per-gene sumZ stability |
+| Replicate Pearson within an arm | > 0.85 | Pre-drugZ QC; below it, see "Low replicate concordance" in `references/failure-modes.md` |
 
 ## Common Errors
 
 | Error / symptom | Cause | Solution |
 |-----------------|-------|----------|
 | No hits | Wrong control samples (Day-0 instead of vehicle) | Re-run with vehicle |
-| Hits dominated by essentials | Essentials inflate null | Use `-r` with a comma-list of CEGv2 |
+| Hits dominated by essentials | Essentials inflate null | Use `-r` with a comma-list of CEGv2 (`references/reference-gene-removal.md`) |
 | Unstable hits across runs | Too few sgRNAs/gene | Use 6+ sgRNAs/gene library |
 | Drug-target appears in suppressor | Real biology | Annotate separately |
 | MAGeCK and drugZ disagree | Different statistical sensitivity | drugZ more sensitive; trust for chemogenomic |
 | Inconsistent between doses | Real dose effect | Require consistency across doses |
+| `IndexError: single positional indexer is out-of-bounds` | `--half_window_size` too large for the total guide count (needs about 4x) | Set `--half_window_size` to about 1/4 of total guides; see "Library size vs `--half_window_size`" |
 
 ## References
 

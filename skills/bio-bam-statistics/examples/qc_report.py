@@ -8,7 +8,8 @@
 import pysam
 import sys
 
-# Longest insert size kept in the summary (samtools stats default, `-i 8000`); not a 1000 bp library limit
+# Templates >= this are dropped from the insert summary (samtools stats -i 8000 counts them at 8000 instead,
+# so the means differ on long-insert libraries); not a 1000 bp library limit
 MAX_INSERT = 8000
 
 def pct(part, whole):
@@ -44,7 +45,10 @@ def qc_report(bam_path, reference=None):
                 if read.is_duplicate:
                     s['duplicate'] += 1
     except (OSError, ValueError, NotImplementedError) as e:
-        hint = ' (CRAM cannot be decoded without its reference: pass the FASTA as 2nd argument)' if is_cram and not reference else ''
+        hint = ''
+        if is_cram:
+            hint = (' (check that the reference FASTA is the one the CRAM was written against: see the htslib MD5 message above)'
+                    if reference else ' (CRAM cannot be decoded without its reference: pass the FASTA as 2nd argument)')
         sys.exit(f'qc_report.py: cannot read {bam_path}: {e}{hint}')
 
     passed = s['primary'] - s['qcfail']

@@ -78,7 +78,11 @@ python SMulTiXcan.py \
 # S-MultiXcan returns one p per gene (across all tissues jointly); pvalue is column 'pvalue'.
 # Resolve its column index from the header instead of assuming $NF, since SMulTiXcan also
 # emits z_min/z_max/eigen_*/tmi/status columns after pvalue.
-awk -F',' 'NR==1 { for (i=1; i<=NF; i++) if ($i == "pvalue") pcol = i; print; next }
+# SMulTiXcan.py hard-codes `sep="\t"` in its own to_csv() call regardless of the `--output`
+# filename's extension (confirmed 2026-09-21: a real run's 'joint_multitissue.csv' is
+# tab-separated) -- an awk `-F','` filter here silently returns zero rows on real output,
+# not an error. Filter on tab.
+awk -F'\t' 'NR==1 { for (i=1; i<=NF; i++) if ($i == "pvalue") pcol = i; print; next }
            pcol && $pcol != "" && $pcol+0 < 2.3e-6' joint_multitissue.csv > joint_multitissue_sig.csv
 
 echo 'S-PrediXcan + S-MultiXcan pipeline complete.'

@@ -109,7 +109,7 @@ universe_ids <- unique(bg_map$ENTREZID)
 
 **Goal:** Collapse the redundant ancestor lineage so one biological signal is one entry, not a dozen.
 
-**Approach:** `simplify()` removes terms whose semantic similarity to a kept term exceeds the cutoff. It operates on ONE ontology (GOSemSim defines similarity within a single DAG), so run BP/MF/CC separately and simplify each - it does NOT de-redundify an `ont='ALL'` object.
+**Approach:** `simplify()` removes terms whose semantic similarity to a kept term exceeds the cutoff. Similarity is defined within ONE ontology (a single DAG), never across BP/MF/CC. Calling it on an `ont='ALL'` object is fine: `simplify()` dispatches on `x@ontology == 'GOALL'` to clusterProfiler's internal `simplify_ALL()`, which splits by `ONTOLOGY`, simplifies each ontology separately and rbinds them (checked on clusterProfiler 4.14.6: a 36-term BP15/CC13/MF8 object came back as 15 terms spanning all three, BP7/CC4/MF4). On an older version, confirm with `selectMethod('simplify', 'enrichResult')` and `exists('simplify_ALL', asNamespace('clusterProfiler'))` before relying on it; if it is absent, split by ontology and simplify each.
 
 ```r
 ego_bp <- enrichGO(gene_list, universe = universe_ids, OrgDb = org.Hs.eg.db, keyType = 'ENTREZID', ont = 'BP', readable = TRUE)
@@ -124,17 +124,57 @@ ego_bp <- simplify(ego_bp, cutoff = 0.7, by = 'p.adjust', select_fun = min, meas
 
 **Approach:** DE-detection power scales with read count, which scales with transcript length and expression, so the foreground is enriched for long genes - and RPKM/TMM normalization does NOT fix it (it corrects abundance, not detection power). GOseq fits a probability weighting function (PWF) over the bias variable and tests with the Wallenius noncentral hypergeometric (Young 2010). The input is a NAMED 0/1 vector over ALL tested genes; goseq returns UNADJUSTED p-values, so apply BH afterward.
 
+**Pinned hg38 route (verified on Bioconductor 3.20):** `goseq 1.58.0`, `GenomicFeatures 1.58.0`, `TxDb.Hsapiens.UCSC.hg38.knownGene 3.20.0`, and `org.Hs.eg.db 3.20.0`. Install the TxDb as well as goseq, and keep the identifiers aligned: this route accepts **ENSEMBL** IDs in `de$gene_id`, maps them to Entrez IDs, computes exon-union lengths from the local hg38 TxDb, and builds the GO category map from the local OrgDb. It makes no UCSC request at runtime.
+
+Preflight: `de$gene_id` must be Ensembl gene IDs (without version suffixes such as `.15`), at least 10 tested genes must map to both the TxDb and GO, and the conversion rate must be reported. Stop and resolve an ID/build mismatch rather than silently dropping most genes.
+
 ```r
+library(clusterProfiler)
+library(org.Hs.eg.db)
 library(goseq)
 
-all_genes <- de$gene_id[!is.na(de$pvalue)]
-de_genes  <- as.integer(all_genes %in% sig_genes)   # named binary vector over the tested set
-names(de_genes) <- all_genes
+required <- c('goseq', 'GenomicFeatures', 'TxDb.Hsapiens.UCSC.hg38.knownGene', 'org.Hs.eg.db')
+missing <- required[!vapply(required, requireNamespace, logical(1), quietly = TRUE)]
+if (length(missing)) stop('Install the pinned GOseq prerequisites first: ', paste(missing, collapse = ', '))
 
-pwf <- nullp(de_genes, 'hg38', 'ensGene')           # fits the length PWF; inspect the fit plot
-go  <- goseq(pwf, 'hg38', 'ensGene', method = 'Wallenius')   # default; 'Hypergeometric' ignores bias (= standard ORA)
-go$padj <- p.adjust(go$over_represented_pvalue, method = 'BH')   # goseq does NOT BH-correct internally
+all_genes <- sub('\\..*$', '', as.character(de$gene_id[!is.na(de$pvalue)]))  # ENSEMBL, no version suffix
+sig_genes <- sub('\\..*$', '', as.character(de$gene_id[de$padj < 0.05 & abs(de$log2FoldChange) > 1]))
+
+id_map <- bitr(all_genes, fromType = 'ENSEMBL', toType = 'ENTREZID', OrgDb = org.Hs.eg.db)
+id_map <- id_map[!duplicated(id_map$ENSEMBL) & !duplicated(id_map$ENTREZID), ]
+conversion_rate <- nrow(id_map) / length(unique(all_genes))
+message(sprintf('ENSEMBL -> ENTREZID: %d/%d (%.1f%%)', nrow(id_map), length(unique(all_genes)), 100 * conversion_rate))
+if (conversion_rate < 0.85) warning('More than 15% of tested genes failed ID conversion; resolve the annotation/build mismatch.')
+
+de_genes <- as.integer(id_map$ENSEMBL %in% sig_genes)  # named 0/1 vector over the tested, mapped genes
+names(de_genes) <- id_map$ENTREZID
+
+txdb <- getExportedValue('TxDb.Hsapiens.UCSC.hg38.knownGene', 'TxDb.Hsapiens.UCSC.hg38.knownGene')
+exons_by_gene <- GenomicFeatures::exonsBy(txdb, by = 'gene')
+bias_data <- vapply(exons_by_gene, function(exons) sum(IRanges::width(GenomicRanges::reduce(exons))), numeric(1))
+keep <- names(de_genes) %in% names(bias_data)
+de_genes <- de_genes[keep]
+bias_data <- bias_data[names(de_genes)]
+if (length(de_genes) < 10L || anyNA(bias_data) || any(bias_data <= 0)) stop('Too few valid hg38 TxDb length records after mapping; check that IDs and genome build are hg38.')
+
+go_map <- AnnotationDbi::select(org.Hs.eg.db, keys = names(de_genes), keytype = 'ENTREZID', columns = 'GO')
+go_map <- go_map[!is.na(go_map$GO), c('ENTREZID', 'GO')]
+go_genes <- intersect(names(de_genes), unique(go_map$ENTREZID))
+go_annotation_rate <- length(go_genes) / length(de_genes)
+message(sprintf('TxDb-mapped genes with GO annotations: %d/%d (%.1f%%)', length(go_genes), length(de_genes), 100 * go_annotation_rate))
+if (length(go_genes) < 10L) stop('Too few genes have local GO annotations after mapping; check the ID namespace.')
+if (go_annotation_rate < 0.85) warning('More than 15% of TxDb-mapped genes lack GO annotations; resolve the annotation mismatch before interpreting enrichment.')
+de_genes <- de_genes[go_genes]
+bias_data <- bias_data[names(de_genes)]
+gene2cat <- split(go_map$ENTREZID, go_map$GO)  # local GO term -> Entrez gene map; no network lookup
+if (!length(gene2cat)) stop('No local GO annotations remain after mapping; check the ID namespace.')
+
+pwf <- nullp(de_genes, bias.data = bias_data, plot.fit = FALSE)  # length PWF from the local hg38 TxDb
+go  <- goseq(pwf, gene2cat = gene2cat, method = 'Wallenius')      # no implicit genome/id download
+go$padj <- p.adjust(go$over_represented_pvalue, method = 'BH')    # goseq does NOT BH-correct internally
 ```
+
+**Fallback for another organism or release:** do not use `nullp(de_genes, 'hg38', 'ensGene')` as a shortcut; it can attempt a network lookup and is not a self-contained hg38 route. Supply `bias.data` as a positive, named gene-length vector in the SAME identifier namespace as `de_genes`, and supply `gene2cat` as a local GO-term-to-gene list. Record the TxDb/OrgDb versions and the post-mapping gene count.
 
 GSEA on a length-neutral ranking statistic (the moderated t / Wald z) is largely immune to this bias - one more reason to consider gsea for RNA-seq.
 
@@ -163,7 +203,7 @@ Swap the OrgDb: `org.Mm.eg.db` (mouse), `org.Dr.eg.db` (zebrafish), `org.Sc.sgd.
 ## Per-Method Failure Modes
 
 ### Whole-genome or default universe
-**Trigger:** omitting `universe=`, or passing the genome when the assay measured fewer genes. **Mechanism:** N defaults to all annotated genes, inflating the denominator with genes that never could have been selected. **Symptom:** a confident table where tissue-restricted / lowly-expressed-gene terms dominate. **Fix:** set `universe=` to the tested-gene set, map foreground and universe identically, report N.
+**Trigger:** omitting `universe=`, or passing the genome when the assay measured fewer genes. **Mechanism:** N defaults to all annotated genes, inflating the denominator with genes that never could have been selected. **Symptom:** spurious terms for tissue-restricted / lowly-expressed genes; the effect scales with list size and background mismatch - on null 150-gene lists against a 12k-gene universe, omitting `universe=` added at most one marginal term (p.adjust 0.033) and often none (checked on clusterProfiler 4.14.6), and the bias grows with the mismatch between the genome and the tested set. **Fix:** set `universe=` to the tested-gene set, map foreground and universe identically, report N.
 
 ### p read without fold enrichment (term-size trap)
 **Trigger:** ranking results by p.adjust alone. **Mechanism:** a 2000-gene term has enormous power at tiny fold enrichment; p scales with term size. **Symptom:** vague broad terms ("cellular process") top the list, specific terms buried. **Fix:** read the `FoldEnrichment` column ((k/n)/(M/N)) alongside p.adjust; trim extremes with minGSSize=10, maxGSSize=500.
@@ -179,9 +219,6 @@ Swap the OrgDb: `org.Mm.eg.db` (mouse), `org.Dr.eg.db` (zebrafish), `org.Sc.sgd.
 
 ### pvalueCutoff misread as raw-p filter
 **Trigger:** concluding "no significant terms" when strong raw p exists. **Mechanism:** `pvalueCutoff` filters p.adjust, not pvalue. **Symptom:** an empty table despite plausible signal. **Fix:** inspect with `pvalueCutoff=1, qvalueCutoff=1`, then judge on p.adjust.
-
-### simplify on ont='ALL'
-**Trigger:** calling `simplify()` on an `ont='ALL'` object. **Mechanism:** semantic similarity is defined within ONE ontology, not across BP/MF/CC. **Symptom:** no error and no warning - `simplify()` silently returns only the first ontology's terms (BP) and drops MF/CC entirely (checked on clusterProfiler 4.14.6: a 36-term BP+CC+MF object came back as 15 terms, all BP). **Fix:** run BP/MF/CC separately and simplify each.
 
 ## Quantitative Thresholds
 
@@ -204,7 +241,6 @@ Swap the OrgDb: `org.Mm.eg.db` (mouse), `org.Dr.eg.db` (zebrafish), `org.Sc.sgd.
 | Empty result table | `pvalueCutoff` filters p.adjust; or universe too large; or IDs lost | set cutoffs to 1 to inspect; fix the universe; check conversion rate |
 | Vague broad terms dominate | ranking by p alone (term-size trap) | read fold enrichment; trim with minGSSize/maxGSSize |
 | Many redundant ancestor terms | GO-DAG true-path propagation | `simplify()` per ontology, or topGO weight01 |
-| simplify silently returns BP only on an `ont='ALL'` object | similarity is per-ontology; no error is raised, MF/CC are dropped | run BP/MF/CC separately |
 | Description column shows IDs not names | not readable | `readable=TRUE` or `setReadable(ego, OrgDb, 'ENTREZID')` |
 | Tested MF when expecting BP | enrichGO default `ont='MF'` | set `ont` explicitly every call |
 

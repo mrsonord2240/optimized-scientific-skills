@@ -77,13 +77,13 @@ Tell the AI agent what to do:
 1. Identify experimental architecture (direct-capture vs CROP-seq vs Perturb-CITE vs Multiome)
 2. Verify sgRNA library prep matches architecture
 3. Standard scRNA QC: gene counts, UMI counts, mitochondrial %, doublet detection (Scrublet)
-4. sgRNA assignment per cell (threshold ≥10 reads); compute assignment rate
+4. sgRNA assignment per cell; compute assignment rate
 5. Flag multiplets (cells with 2+ sgRNAs); decide to filter or analyze as combinatorial
 6. Standard normalization (scanpy: total + log1p; or scran)
 7. Apply Mixscape escaper filtering with NTC controls and K=20 nearest neighbors
-8. Verify KO retention rate (strongly guide-dependent; Papalexi 2021 saw 39-92% across four guides against one gene)
+8. Verify KO retention rate (strongly guide-dependent -- see SKILL.md's Quantitative Thresholds)
 9. Per-perturbation DE via SCEPTRE (low-MOI variant if applicable) with covariates (n_genes, n_umi, channel)
-10. Permutation FDR with 1,000+ iterations
+10. Permutation FDR (see SKILL.md's Quantitative Thresholds)
 11. Aggregate per-perturbation signatures; pathway enrichment
 12. For genome-scale: cluster perturbations by effect profiles
 13. Output: per-pert DE tables, perturbation cluster heatmap, pathway analysis
@@ -95,7 +95,7 @@ Tell the AI agent what to do:
 
 ## Validation Checklist
 
-Check the run against SKILL.md's Quantitative Thresholds table (sgRNA assignment, multiplet rate, Mixscape KO retention, cells per perturbation, NTC representation) and Common Errors table (SCEPTRE vs MAST, channel batch as a covariate).
+See SKILL.md's Quantitative Thresholds and Common Errors tables.
 
 ## Related Skills
 

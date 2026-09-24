@@ -19,6 +19,10 @@ Valid drift correction requires QC injections that bracket the samples at both e
 If code throws ImportError, AttributeError, or TypeError, introspect the installed
 package and adapt the example to match the actual API rather than retrying.
 
+Install: `BiocManager::install(c("pmp", "statTarget", "sva", "structToolbox"))` and `install.packages(c("imputeLCMD", "missForest", "matrixStats"))`.
+
+Inputs: a feature/peak table (features x samples) plus sample metadata with injection order, batch, biological group and sample type (QC / blank / sample / dilution). Decide before processing whether the matrix is urine, plasma/serum or tissue (this dictates the normalization method) and whether groups were randomized across batches.
+
 # Metabolomics Normalization and QC
 
 **"Normalize my metabolomics data and correct for batch effects"** -> Filter junk features by QC quality, correct within-batch drift against injection order, normalize per-sample dilution, and impute by missingness mechanism -- each step verified against held-out QCs, not just QC clustering.
@@ -48,7 +52,7 @@ TIC normalization does not handle drift, and -- because of closure -- can spread
 | 0 | Exclude conditioning injections | Pre-equilibrium signal warps a LOESS edge and corrupts RSD/blank filters | manual (drop first ~8 QC) |
 | 1 | Blank filter -> detection-rate filter | Removes background/contaminant and mostly-absent features before any model trains on them | `filter_peaks_by_blank`, `filter_peaks_by_fraction` (pmp) |
 | 2 | Within-batch drift correction | Flattens order-dependent trend per feature before cross-sample comparison | `QCRSC` (pmp), `shiftCor` (statTarget) |
-| 3 | QC RSD / D-ratio filter | Drift correction *should* improve RSD; filter after so reproducibility reflects corrected data (report both stages) | `filter_peaks_by_rsd` (pmp), `dratio_filter` (structToolbox) |
+| 3 | QC RSD / D-ratio filter | Drift correction *should* improve RSD; filter after so reproducibility reflects corrected data (report both stages, and always state the data stage a CV was computed on) | `filter_peaks_by_rsd` (pmp), `dratio_filter` (structToolbox) |
 | 4 | Between-batch alignment | QC-anchored offsets removed after within-batch drift is flat | median-of-QC / batchCorr |
 | 5 | Missing-value imputation | Filter aggressively first, then impute only the sparse residual holes by mechanism | `mv_imputation` (pmp), `impute.QRILC`, `missForest` |
 | 5a | -- QRILC's own log2/2^x round-trip | `impute.QRILC` requires log-scale input; this is local to the call, not a promotion of step 7 | see Impute section below |
@@ -56,6 +60,8 @@ TIC normalization does not handle drift, and -- because of closure -- can spread
 | 7 | Transformation + scaling | Defers to metabolomics/statistical-analysis | `glog_transformation` (pmp) |
 
 Detection-rate filtering must precede imputation: never impute a feature that is 90% missing, which would fabricate 90% of it.
+
+Untargeted intensities are within-study and relative; reach for a reference material or a targeted assay before any cross-study claim.
 
 ## Decision Tree -- Sample Normalization by Matrix
 
@@ -91,23 +97,11 @@ Flexible ML methods (SERRF/RF/adversarial) win on large complex cohorts but are 
 **Approach:** Compute per-feature QC RSD and the robust D-ratio (technical SD / biological SD), then apply a boolean mask. Lead with D-ratio: CV alone is matrix-blind, scoring a precisely-measured-but-flat feature as good and a noisy-but-biologically-huge feature as bad.
 
 ```r
-library(matrixStats)
-
-robust_dratio_filter <- function(data, is_qc, dratio_max = 0.5, rsd_max = 0.3) {
-    qc <- as.matrix(data[is_qc, ])
-    bio <- as.matrix(data[!is_qc, ])
-    # MAD-based (robust) form, because MS intensities are right-skewed
-    sd_qc <- colMads(qc, na.rm = TRUE)
-    sd_bio <- colMads(bio, na.rm = TRUE)
-    dratio <- sd_qc / sd_bio
-    rsd <- colSds(qc, na.rm = TRUE) / colMeans(qc, na.rm = TRUE)
-    keep <- dratio <= dratio_max & rsd <= rsd_max
-    keep[is.na(keep)] <- FALSE
-    message(sprintf('D-ratio<=%.2f & RSD<=%.0f%%: kept %d / %d features',
-                    dratio_max, rsd_max * 100, sum(keep), ncol(data)))
-    data[, keep]
-}
+source('scripts/robust_dratio_filter.R')   # samples in ROWS, features in COLUMNS
+kept <- robust_dratio_filter(data, is_qc, dratio_max = 0.5, rsd_max = 0.3)   # MAD-based D-ratio and QC RSD
 ```
+
+CLI: `Rscript scripts/robust_dratio_filter.R peaks.csv out.csv [type_col] [qc_label] [dratio_max] [rsd_max]`.
 
 ## Correct Within-Batch Drift (QC-RSC)
 
@@ -150,13 +144,15 @@ library(pmp)
 normalized <- pqn_normalisation(df = feature_matrix, classes = sample_class,
                                 qc_label = 'QC')
 
-# Per-sample factor for the phenotype-correlation guardrail below: pqn_normalisation() does not
+# Per-sample factor for the phenotype-correlation guardrail after this block: pqn_normalisation() does not
 # return it as a visible top-level result, but it computes and stores it. For a plain-matrix `df`
 # (as above), it lands in the flags attribute; for a SummarizedExperiment `df`, use colData()
 # instead. Verified: `normalized * pqn_factor == feature_matrix` to floating-point precision.
 pqn_factor <- attr(normalized, 'flags')[, 'pqn_coef']         # plain matrix input
 # pqn_factor <- SummarizedExperiment::colData(normalized)$pqn_coef   # SummarizedExperiment input
 ```
+
+**Guardrail:** the PQN factor should track dilution, not phenotype. Test factor-vs-group with a permutation test (shuffle group labels, 999 times, compare to the observed correlation), not a fixed |r| cutoff, which trips from noise alone at typical n (~40); `examples/normalize_data.R` shows it end to end on synthetic data. A calibrated test still trips ~5% of the time on clean data, so a single TRIPPED verdict is a prompt to check, not proof of over-normalization: corroborate that the factor tracks a measured dilution quantity (osmolality/SG, mass) before concluding normalization is eating the effect.
 
 ## Impute by Missingness Mechanism
 
@@ -182,7 +178,7 @@ rf_imputed <- missForest(sample_by_feature_matrix, maxiter = 10, ntree = 100)$xi
 
 Half-min imputation collapses the imputed subset's variance to zero, understating SE and inflating false significance -- prefer QRILC/GSimp, which draw a distribution of plausible low values. Re-run key results under >=2 imputation methods; if headline metabolites flip, the finding lives in the imputation.
 
-**Verify after every QRILC call:** `stopifnot(min(qrilc_imputed, na.rm = TRUE) >= 0)`. If this fails, the log2/2^x round-trip above was skipped or a non-QRILC path fed it raw intensities.
+**Verify around every QRILC call:** `stopifnot(min(feature_matrix, na.rm = TRUE) > 0)` before the `log2()` and `stopifnot(min(qrilc_imputed, na.rm = TRUE) >= 0)` after. If the second fails, the log2/2^x round-trip above was skipped or a non-QRILC path fed it raw intensities.
 
 ## Per-Method Failure Modes
 
@@ -233,6 +229,7 @@ Thresholds are conventions, not laws: choose them a priori, report each one, and
 | `mv_imputation` errors on `method='sm'` | Small-value method is `'sv'`, not `'sm'` | Use `method='sv'` (also valid: `knn`, `rf`, `bpca`, `mn`, `md`) |
 | QRILC output is malformed | `impute.QRILC` returns a list, not a matrix; expects features in rows | Index `[[1]]`; transpose so features are rows |
 | QRILC imputed values are negative | Called on raw (non-log) intensities -- QRILC's truncated-normal model is only valid on log-scale data | `log2()` before the call, `2^x` back-transform after (see Impute section); assert `min(imputed) >= 0` |
+| `NA/NaN/Inf in 'y'` from `impute.QRILC` | A feature has a non-positive value before the `log2()` (log2 gives NaN/-Inf), usually a division by a near-zero trend in an earlier drift-correction step; QRILC fails loudly, not silently | Check `min(feature_matrix, na.rm = TRUE) > 0` before imputing; fix the upstream step (or set non-positive values to NA and filter/impute them) |
 | `QCRSC` output is all-NA for a batch | QC count in that batch is below `minQC`; pmp silently returns NA instead of erroring | Check `rowSums(!is.na(result)) == 0` (features in rows, pmp convention) immediately after every `QCRSC` call; below-`minQC` batches need the coarse median-of-QC fallback, not `QCRSC` |
 | MetaboAnalystR `Normalization` errors | `SanityCheckData(mSet)` not run first | Call `SanityCheckData` -> `ReplaceMin` -> `Normalization` in order |
 | Correction made data worse | Span overfit / weak-in-QC features corrected / order confounded with biology | Back off span, exclude weak-in-QC features, check randomization |

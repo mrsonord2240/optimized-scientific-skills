@@ -56,7 +56,12 @@ if __name__ == '__main__':
         sys.exit(1)
 
     path = sys.argv[1]
-    limit = int(sys.argv[2]) if len(sys.argv) > 2 else 10
+    try:
+        limit = int(sys.argv[2]) if len(sys.argv) > 2 else 10
+    except ValueError:
+        print(f'Error: limit must be an integer, got {sys.argv[2]!r}', file=sys.stderr)
+        print('Usage: view_bam.py <input.sam|bam|cram> [limit] [reference.fa]', file=sys.stderr)
+        sys.exit(1)
     reference = sys.argv[3] if len(sys.argv) > 3 else None
     try:
         view_bam(path, limit, reference)

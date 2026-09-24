@@ -6,16 +6,7 @@ Decision-grade quality control for pooled CRISPR screens. Covers six bottleneck 
 
 ## Prerequisites
 
-```bash
-conda install -c bioconda mageck   # not on PyPI
-pip install pandas numpy scipy matplotlib seaborn scikit-learn
-# MAGeCK QC dashboard
-conda install -c bioconda -c conda-forge mageck-vispr
-# R dashboard (optional)
-R -e "remotes::install_github('WubingZhang/MAGeCKFlute')"   # removed from Bioconductor at 3.22
-```
-
-Required inputs: MAGeCK count output (`screen.count.txt`), plasmid-pool counts (separate file or first sample), known copy-number profile per cell line (from WGS / SNP-array / ASCAT / matched cell-line database), and CEGv2 / NEGv1 reference gene sets (CEGv2 from Hart 2017, NEGv1 from Hart 2014; `hart-lab/bagel` repository).
+Install commands and required inputs: see SKILL.md, "Install and Inputs".
 
 ## Quick Start
 
@@ -61,43 +52,6 @@ Tell the AI agent what to audit:
 ### MOI Verification
 
 > "Verify infection MOI: from the titration plate (8 wells with 1:2 serial dilution), interpolate the infection efficiency at the volume used in the screen. Compute Poisson P(≥2 sgRNAs/cell) at the resulting MOI."
-
-## What the Agent Will Do
-
-1. Identify each sequencing-sample stage (plasmid, Day 0, selection, endpoint) from metadata
-2. Run library_representation() per sample: % zero, % low-count, skew ratio
-3. Compute Gini per sample with stage-specific thresholds
-4. Compute replicate Pearson on log-counts and Spearman on raw ranks per condition
-5. Compute CEGv2 PR-AUC at the endpoint timepoint, vs Day-0 or plasmid
-6. Verify MOI from titration data or qPCR of integrated copies
-7. Detect copy-number artifact via gene-level LFC vs copy-number correlation
-8. Run PCA to visualize sample clustering (condition vs batch)
-9. Generate composite quality score and per-sample grade
-10. Recommend downstream hit-calling method based on quality grade (high quality -> MAGeCK MLE or Chronos; low quality -> RRA or drugZ; cancer-line -> Chronos with CN correction; in-vivo -> bottleneck-adjusted thresholds)
-
-## Tips
-
-- Plasmid-pool sequencing (Gini <0.1, ≥99% guide detection at >25 reads/guide) is non-negotiable; everything downstream is normalized against this baseline. A screen with un-sequenced plasmid pool is uninterpretable.
-- The single most diagnostic metric is CEGv2 PR-AUC; if it passes >0.7 the screen has biology even if individual sample metrics look weak. If it fails <0.5, no remediation in software will fix it -- the screen has no essentiality signal.
-- For drug screens, expect Gini to drift up (endpoint Gini 0.3-0.5) as biology drives selection; this is normal. Compare vs vehicle, not Day 0, for any chemogenomic interpretation.
-- Cancer-cell-line screens with focal amplification ALWAYS require copy-number correction. Apply CRISPRcleanR / Chronos / CERES preemptively; the Aguirre/Munoz copy-number artifact is universal, not conditional.
-- MOI 0.3 is non-negotiable; there is no analytical correction for high-MOI confounding. Re-run rather than try to model around it.
-- "Passing" QC at each stage is necessary but not sufficient; the final gate is essentialome PR-AUC.
-- High Pearson with low Spearman = a few outlier guides dominate; switch hit calling to RRA or drugZ which use ranks.
-- For CRISPRi/a, expect lower per-gene PR-AUC than Cas9 because not all essentials respond to knockdown the way they do to knockout; calibrate against the DepMap CRISPRi sub-essentialome rather than CEGv2.
-
-## QC Decision Reference
-
-| Stage | Primary metric | Pass | Action if fail |
-|-------|----------------|------|----------------|
-| Plasmid | Gini, skew | <0.1, <2 | Re-clone or re-amplify |
-| Day 0 | Pearson with plasmid | >0.9 | Diagnose infection issue |
-| Endpoint | Replicate Pearson | >=0.8 (MAGeCK-VISPR floor) | Drop outlier replicate |
-| Biology | CEGv2 PR-AUC | >0.7 | Cas9 selection / timepoint / TSS |
-| CN | Spearman LFC vs CN | abs(ρ) <0.10 pre-correction fail; abs(ρ) <0.05 post-correction target | CRISPRcleanR / Chronos |
-| CN | Amplified vs diploid mean LFC | gap > -0.5 (focal amplicons barely move ρ) | CRISPRcleanR / Chronos |
-| Depth | Reads/sgRNA | >300 | Re-sequence |
-| MOI | Poisson P(≥2) | <5% | Re-infect |
 
 ## Related Skills
 

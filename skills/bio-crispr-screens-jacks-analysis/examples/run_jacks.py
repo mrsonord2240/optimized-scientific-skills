@@ -31,14 +31,17 @@ def prepare_input_files(counts_file, output_prefix):
 def run_jacks_analysis(counts_file, guidemap_file, replicatemap_file, output_prefix, jacks_dir):
     '''Run JACKS via its CLI. jacks_dir is the cloned JACKS/jacks/ folder holding run_JACKS.py;
     the replicate map needs a Control column naming each sample's control sample.'''
+    import os
     import subprocess
 
+    # The subprocess runs with cwd=jacks_dir, so relative input/output paths must be
+    # resolved against the caller's cwd first, or JACKS looks for them inside jacks_dir instead.
     cmd = [
         sys.executable, 'run_JACKS.py',      # lives in JACKS/jacks/; there is no jacks.run_JACKS module
-        counts_file,
-        replicatemap_file,
-        guidemap_file,
-        '--outprefix', output_prefix,
+        os.path.abspath(counts_file),
+        os.path.abspath(replicatemap_file),
+        os.path.abspath(guidemap_file),
+        '--outprefix', os.path.abspath(output_prefix),
         '--ctrl_sample_hdr', 'Control'
     ]
 

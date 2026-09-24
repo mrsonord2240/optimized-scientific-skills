@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide covers estimating the minimum number of biological replicates (or cells and donors) for a target power at a target false discovery rate across genomics assays: bulk RNA-seq, scRNA-seq, ChIP-seq, ATAC-seq, methylation, and proteomics. The central principle is that sample size counts biological units, not measurements: technical replicates reduce measurement noise but add no degrees of freedom for biological inference, and for single-cell studies the number of donors, not cells, sets the power for population-level differential expression. The guide stresses estimating dispersion from pilot data rather than guessing a coefficient of variation, and treats the familiar "n=3" as a publication convention rather than a calculation. See `SKILL.md` for setup, code, thresholds, and failure modes.
+Estimates the minimum number of biological replicates (or donors) for a target power at a target false discovery rate across genomics assays (bulk RNA-seq, scRNA-seq, ChIP/ATAC-seq, methylation, proteomics). See `SKILL.md` for setup, code, thresholds, and failure modes.
 
 ## Quick Start
 

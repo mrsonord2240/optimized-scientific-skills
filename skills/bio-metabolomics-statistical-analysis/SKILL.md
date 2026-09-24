@@ -18,6 +18,10 @@ Before using code patterns, verify installed versions match. If versions differ:
 If code throws ImportError, AttributeError, or TypeError, introspect the installed
 package and adapt the example to match the actual API rather than retrying.
 
+Install: `pip install scipy statsmodels numpy pandas matplotlib scikit-learn`; in R `BiocManager::install("ropls")` and `install.packages(c("mixOmics", "lme4", "qvalue"))`. Paths below (`scripts/`, `examples/`) are relative to this Skill's directory.
+
+Before any group test, settle: the scaling (Pareto vs unit-variance is a hypothesis, not a default), whether the normalization imposed closure (total-area/PQN), technical vs biological zeros, and the experimental unit (the subject, not the injection).
+
 # Metabolomics Statistical Analysis
 
 **"Tell me which metabolites separate my groups"** -> run an honest univariate test with dependence-aware FDR AND a permutation-validated multivariate model, then reconcile the two.
@@ -69,22 +73,22 @@ van den Berg 2006: on real data autoscale and range recovered biologically meani
 
 ```r
 library(ropls)
-# feature_matrix must be NA-free (opls() does not tolerate missingness) -- impute upstream,
-# see metabolomics/normalization-qc; a real LC-MS peak table is rarely NA-free on its own.
+# feature_matrix (features x samples) must be NA-free (opls() does not tolerate missingness) --
+# impute upstream, see metabolomics/normalization-qc; a real LC-MS peak table is rarely NA-free on its own.
 # scaleC default is "standard" (unit-variance/autoscale), NOT Pareto -- set explicitly
 pca <- opls(t(feature_matrix), scaleC = 'pareto', fig.pdfC = 'none', info.txtC = 'none')
 scores <- getScoreMN(pca)               # samples x components
 getSummaryDF(pca)                       # R2X(cum) per component
 # Tight pooled-QC clustering in the center = trustworthy run; QC scatter = analytical variance dominates
+```
 
-# Hotelling T2 multivariate outlier check (ropls exposes no ready accessor for this --
-# pca@suppLs$outlierDF is NULL for a plain PCA fit; compute it directly from the scores):
-A <- ncol(scores); N <- nrow(scores)
-lambda <- apply(scores, 2, function(col) sum(col^2) / (N - 1))     # per-component variance
-t2 <- rowSums(sweep(scores^2, 2, lambda, '/'))                     # per-sample Hotelling T2
-t2_crit95 <- A * (N - 1) / (N - A) * qf(0.95, A, N - A)            # 95% F-based critical value
-outliers <- rownames(scores)[t2 > t2_crit95]                       # samples beyond the ellipse
-# For a plotted version instead: plot(pca, typeVc = 'outlier') (score + orthogonal distance plot).
+Hotelling T2 multivariate outlier check: ropls exposes no ready accessor (`pca@suppLs$outlierDF` is NULL for a plain PCA fit), so it is computed from the scores by `scripts/pca_hotelling.R` (checked on MTBLS79 and on synthetic data with planted outliers). For a plotted version: `plot(pca, typeVc = 'outlier')`.
+
+```bash
+Rscript scripts/pca_hotelling.R peaks.csv pareto 0.05 t2.csv   # peaks.csv: features x samples, NA-free; prints R2X, T2 critical value, flagged samples
+```
+```r
+source('scripts/pca_hotelling.R'); hotelling_t2(scores, alpha = 0.05)   # $t2, $crit, $outliers from the scores above
 ```
 
 ## Permutation-Validated PLS-DA / OPLS-DA
@@ -93,33 +97,14 @@ outliers <- rownames(scores)[t2 > t2_crit95]                       # samples bey
 
 **Approach:** Fit with an explicit scaling, raise `permI` far above the default of 20, and read `pQ2`/`pR2Y` -- a model whose true Q2 sits inside the permutation cloud is indistinguishable from chance.
 
+ropls's own cross-validated significance test on the first predictive component can reject it and silently return a 0-row summaryDF / empty model -- with `info.txtC = 'none'` this produces NO warning or error, yet `class(model)` still reads "opls" and `getVipVn()` returns a length-0 vector instead of erroring (about 40% of runs at n=40, p=300). ALWAYS check `nrow(getSummaryDF())` before trusting a fit. `fit_discriminant_guarded()` in `examples/metabolomics_stats.R` does this: OPLS-DA, then PLS-DA (`orthoI = 0`, same predictive power, no orthogonal-component gate) if the summary is empty, then `stop()` if that is empty too. See "OPLS-DA silently returns an empty model" in Common Errors.
+
 ```r
 library(ropls)
+source('examples/metabolomics_stats.R')   # defines fit_discriminant_guarded() only; the demo runs under Rscript
 group <- factor(sample_info$group)
 
-# ropls's own cross-validated significance test on the first predictive component can
-# reject it and silently return a 0-row summaryDF / empty model -- with info.txtC='none'
-# this produces NO warning or error, yet class(model) still reads "opls" and getVipVn()
-# returns a length-0 vector instead of erroring. Measured at ~40% of runs in a p>>n
-# metabolomics-shaped regime (n=40, p=300); ALWAYS check nrow(getSummaryDF()) before
-# trusting a fit. See "OPLS-DA silently returns an empty model" in Common Errors.
-fit_discriminant_guarded <- function(x, y, scaleC, permI = 1000, crossvalI = 7) {
-    m <- opls(x, y, predI = 1, orthoI = NA, scaleC = scaleC, permI = permI,
-              crossvalI = crossvalI, fig.pdfC = 'none', info.txtC = 'none')
-    if (nrow(getSummaryDF(m)) > 0) return(list(model = m, type = 'OPLS-DA'))
-    # Empty OPLS-DA: fall back to PLS-DA (orthoI=0), which has identical predictive power
-    # (see below) and does not carry the same orthogonal-component significance gate --
-    # verified 0/30 failures on both signal-bearing and pure-noise synthetic data at this
-    # n/p (see the Skill's fix log).
-    m2 <- opls(x, y, predI = 1, orthoI = 0, scaleC = scaleC, permI = permI,
-               crossvalI = crossvalI, fig.pdfC = 'none', info.txtC = 'none')
-    if (nrow(getSummaryDF(m2)) > 0) return(list(model = m2, type = 'PLS-DA (OPLS-DA fallback)'))
-    stop('Neither OPLS-DA nor the PLS-DA fallback produced a usable model: the first ',
-         'predictive component was not significant under ropls\' own cross-validated ',
-         'criterion. Report that no multivariate separation was detected -- do not force a model.')
-}
-
-# OPLS-DA: 1 predictive + auto orthogonal; permI default 20 is too few for a reliable pQ2 -> >=1000
+# permI default 20 is too few for a reliable pQ2 -> >=1000
 fit <- fit_discriminant_guarded(t(feature_matrix), group, scaleC = 'pareto', permI = 1000)
 oplsda <- fit$model
 cat('Model type actually fit:', fit$type, '\n')   # report this -- it is not always OPLS-DA
@@ -127,6 +112,8 @@ summ <- getSummaryDF(oplsda)            # R2X(cum), R2Y(cum), Q2(cum), pre, ort,
 vip_pred <- getVipVn(oplsda)            # predictive VIP (Galindo-Prieto 2014); orthoL=TRUE for orthogonal
 # Claim is licensed only if Q2 high AND pQ2 small. R2Y alone proves nothing.
 ```
+
+`Rscript examples/metabolomics_stats.R` runs the full demo (real, permuted-label and unit-variance fits, Pareto-vs-UV top-10 VIP overlap); three double-CV fits at `permI = 1000` took about 30 minutes on a loaded shared machine; `PERM_I=100 Rscript examples/metabolomics_stats.R` gives a coarser pQ2 (granularity 1/`PERM_I`) for a smoke test.
 
 PLS-DA is `orthoI = 0`. OPLS-DA has identical predictive power to PLS-DA -- it is a coordinate rotation, not a better model; the orthogonal block often encodes a confounder (inspect what correlates with it). DQ2 (Westerhuis 2008b) is the discriminant-appropriate figure of merit when Q2 penalizes correct-side over-predictions.
 
@@ -148,24 +135,12 @@ PLS-DA is `orthoI = 0`. OPLS-DA has identical predictive power to PLS-DA -- it i
 **Approach:** Match the test to the design, compute log2 fold change as a difference of group means on transformed data, then apply BH explicitly (defaults are not BH in either language).
 
 ```python
-import numpy as np
-import pandas as pd
-from scipy.stats import ttest_ind
-from statsmodels.stats.multitest import multipletests
-
-logged = np.log2(intensities.replace(0, np.nan))   # transform before testing
-pvals, lfc = [], []
-for feat in logged.index:
-    a = logged.loc[feat, case].dropna().values
-    b = logged.loc[feat, ctrl].dropna().values
-    if len(a) >= 3 and len(b) >= 3:
-        pvals.append(ttest_ind(a, b, equal_var=False)[1])   # Welch: scipy defaults to Student
-        lfc.append(a.mean() - b.mean())                     # geometric-mean ratio on log scale
-    else:
-        pvals.append(np.nan); lfc.append(np.nan)
-res = pd.DataFrame({'feature': logged.index, 'log2fc': lfc, 'pval': pvals}).dropna(subset=['pval'])
+# full runnable pipeline (Welch loop, BH, hit table, volcano): examples/metabolomics_differential.py
+logged = np.log2(intensities.replace(0, np.nan))                # transform before testing
+p = ttest_ind(a, b, equal_var=False)[1]                         # Welch: scipy defaults to Student
+lfc = a.mean() - b.mean()                                       # difference of log-means = geometric-mean ratio
 # statsmodels default is 'hs' (Holm-Sidak); R p.adjust default is 'holm' -- ALWAYS pass BH explicitly
-res['padj'] = multipletests(res['pval'], method='fdr_bh')[1]
+padj = multipletests(pvals, method='fdr_bh')[1]
 ```
 
 BH controls FDR under independence and PRDS; positively-correlated metabolomics features roughly satisfy PRDS, so BH is valid but conservative -- but closure-induced negative correlations (after total-area/PQN normalization) fall outside the clean case, where a permutation FDR sidesteps the dependence assumptions. The effective number of independent tests is far below the feature count (one compound = many adducts/isotopologues/fragments); use an effective-number-of-tests correction (Peluso 2021) rather than Bonferroni-on-features, and collapse features to compounds before counting "how many metabolites changed."
@@ -176,13 +151,7 @@ BH controls FDR under independence and PRDS; positively-correlated metabolomics 
 
 **Approach:** Plot log2 fold change vs -log10(p), with the FDR cutoff annotated (raw p on the axis is fine only if the FDR line is drawn).
 
-```python
-import matplotlib.pyplot as plt
-hit = (res['padj'] < 0.05) & (res['log2fc'].abs() > 1)   # 2-fold + FDR 5%
-plt.scatter(res['log2fc'], -np.log10(res['pval']), c=np.where(hit, 'firebrick', 'gray'), s=12, alpha=0.6)
-plt.axhline(-np.log10(0.05), ls='--'); plt.axvline(1, ls='--'); plt.axvline(-1, ls='--')
-plt.xlabel('log2 fold change'); plt.ylabel('-log10(p)')
-```
+`examples/metabolomics_differential.py` draws it: hit = `padj < 0.05` and `|log2fc| > 1` (2-fold + FDR 5%), -log10(p) on the y axis with dashed lines at p = 0.05 and log2fc = +/-1.
 
 ## Per-Method Failure Modes
 
@@ -202,7 +171,7 @@ plt.xlabel('log2 fold change'); plt.ylabel('-log10(p)')
 - **Trigger:** BH or Bonferroni applied as if the features were independent.
 - **Mechanism:** Pathway co-regulation plus adducts/isotopologues/fragments make features strongly correlated; one signal lights up its whole cluster, and closure (after sample-wise normalization) injects negative correlations.
 - **Symptom:** A "200 significant metabolites" list that encodes a handful of independent signals; over-conservative threshold from Bonferroni-on-features.
-- **Fix:** Effective-number-of-tests or permutation FDR (Peluso 2021); collapse features to compounds before counting hits; report independent-signal counts.
+- **Fix:** Effective-number-of-tests or permutation FDR (Peluso 2021); collapse features to compounds before counting hits; report independent-signal counts. The compound-level BH count still has a non-zero false-discovery rate by construction (an audit run at n=25/group with 90 compounds gave 1 false compound among the collapsed hits) -- report it as FDR-controlled, never as "0 false hits".
 
 ### Log with zeros / detection-rate confound
 - **Trigger:** Half-min (or zero) imputation followed by log, especially when detection rate differs between groups.
@@ -236,7 +205,7 @@ effect size?") if one exists.
 
 | Error / symptom | Cause | Solution |
 |-----------------|-------|----------|
-| OPLS-DA silently returns an empty model (`getSummaryDF()` has 0 rows, `getVipVn()` returns length 0, no warning even under `options(warn=1)`) | `orthoI = NA`'s internal CV significance test rejected the first predictive component; `info.txtC = 'none'` suppresses the message that would otherwise say so (observed in ~40% of runs at n=40/p=300) | Use the `fit_discriminant_guarded()` pattern above: check `nrow(getSummaryDF(m)) > 0`, fall back to PLS-DA (`orthoI = 0`) if empty, and `stop()` loudly if that also fails -- never read R2/Q2/VIP off an unchecked fit |
+| OPLS-DA silently returns an empty model (`getSummaryDF()` has 0 rows, `getVipVn()` returns length 0, no warning even under `options(warn=1)`) | `orthoI = NA`'s internal CV significance test rejected the first predictive component; `info.txtC = 'none'` suppresses the message that would otherwise say so (observed in ~40% of runs at n=40/p=300) | Use `fit_discriminant_guarded()` (`examples/metabolomics_stats.R`): check `nrow(getSummaryDF(m)) > 0`, fall back to PLS-DA (`orthoI = 0`) if empty, and `stop()` loudly if that also fails -- never read R2/Q2/VIP off an unchecked fit |
 | Model "significant" yet noise | `permI = 20` (ropls default) | Set `permI >= 1000`; read `pQ2`/`pR2Y` from `getSummaryDF` |
 | Wrong scaling shipped silently | `scaleC` default is `"standard"` (UV), not Pareto | Set `scaleC = 'pareto'` (or the intended scaling) explicitly; report it |
 | PLS-DA vs OPLS-DA "function not found" | type is set by `orthoI`, not a separate function | `orthoI = 0` -> PLS; `orthoI = NA` -> OPLS; `predI = 1` for 2-class |

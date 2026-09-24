@@ -3,7 +3,7 @@
 ## Overview
 Work with reference genomes including indexing FASTA files, extracting sequences, creating sequence dictionaries, and generating consensus sequences from alignments.
 
-Commands, options, contig-naming tables, error messages and Python code live in `SKILL.md`; the guide only lists what to ask for. Install notes are under "Version Compatibility" there.
+Commands, options, contig-naming tables, error messages and Python code live in `SKILL.md` and its `references/` files; the guide only lists what to ask for. Install notes are under "Version Compatibility" there.
 
 ## Quick Start
 Tell your AI agent what you want to do:

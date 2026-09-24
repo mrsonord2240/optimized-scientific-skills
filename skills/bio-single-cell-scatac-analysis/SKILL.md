@@ -9,7 +9,9 @@ author: GPTomics
 
 ## Version Compatibility
 
-Reference examples tested with: Signac 1.13+, Seurat 5.0+, ArchR 1.0+
+Reference examples tested with: Signac 1.13+, Seurat 5.0+, ArchR 1.0+. Checked on Signac 1.17.1 (Seurat 5.5.0, R 4.4.3).
+
+Signac 1.17.x deprecates `NucleosomeSignal()` and `TSSEnrichment()` in favor of `ATACqc()`. The two old calls still run and fill `nucleosome_signal` / `TSS.enrichment`, but warn. `ATACqc()` is not a drop-in swap: it needs the external `fragtk` binary (`fragtk.path=`). Use the old calls when `fragtk` is absent; if a later Signac release removes them (as 1.17.0 removed `RunChromVAR()`), switch to `ATACqc()`.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - R: `packageVersion('<pkg>')` then `?function_name` to verify parameters
@@ -18,16 +20,30 @@ Before using code patterns, verify installed versions match. If versions differ:
 If code throws ImportError, AttributeError, or TypeError, introspect the installed
 package and adapt the example to match the actual API rather than retrying.
 
+## Install
+
+```r
+install.packages('Signac')
+BiocManager::install(c('EnsDb.Hsapiens.v86', 'BSgenome.Hsapiens.UCSC.hg38', 'chromVAR', 'motifmatchr', 'JASPAR2020', 'TFBSTools', 'scDblFinder', 'biovizBase'))   # biovizBase is required by GetGRangesFromEnsDb()
+devtools::install_github('GreenleafLab/ArchR')   # large on-disk workflows
+```
+
+```bash
+pip install snapatac2 scanpy   # Python alternative, >1M cells (the SnapATAC2 example imports scanpy)
+```
+
+MACS2 or MACS3 must be on PATH for peak calling. Peaks, fragments, the EnsDb annotation, and the BSgenome must all be on the same genome build; a mismatch is silently wrong (no crash).
+
 # scATAC-seq Analysis
 
 **"Analyze my single-cell ATAC-seq data"** -> Process fragments, QC on chromatin signal, reduce dimensions with TF-IDF/LSI, cluster, call consensus peaks per cell type, and score TF motif activity.
-- R: `Signac::CreateChromatinAssay()` -> `RunTFIDF()` -> `FindTopFeatures()` -> `RunSVD()` -> `RunChromVAR()`
+- R: `Signac::CreateChromatinAssay()` -> `RunTFIDF()` -> `FindTopFeatures()` -> `RunSVD()` -> `scripts/run_chromvar.R`
 - R (large data, on-disk): `ArchR::createArrowFiles()` -> `addIterativeLSI()` -> `addReproduciblePeakSet()`
 - Python (scverse, >1M cells): `snapatac2.pp.add_tile_matrix()` -> `tl.spectral()` -> `tl.macs3()`
 
 ## Governing Principle
 
-A zero in the cell-by-peak matrix is epistemically ambiguous: it can mean "closed in this cell" (biology) or "accessible but no Tn5 fragment captured here" (sampling). With ~2 DNA copies per diploid locus and shallow per-cell coverage, sampling dominates the zeros. The matrix is near-binary by sampling statistics, not by biology; underlying accessibility is continuous but observed as a Bernoulli-like draw.
+A zero in the cell-by-peak matrix is epistemically ambiguous: it can mean "closed in this cell" (biology) or "accessible but no Tn5 fragment captured here" (sampling). With ~2 DNA copies per diploid locus and shallow per-cell coverage, sampling dominates the zeros. The matrix is near-binary by sampling statistics, not by biology (about 1-10% of peaks are non-zero per cell, versus 10-45% of genes in scRNA-seq); underlying accessibility is continuous but observed as a Bernoulli-like draw.
 
 Binarization is now disfavored. Among non-zero entries the count (1 vs 2 vs >2) is informative, and collapsing to 1 discards it (Martens 2024). Model fragment counts with a count likelihood (Paired-Insertion Counting, SnapATAC2; PoissonVI), never read counts (PCR noise). Caveat: the extra information lives in the count=2 tier, so the benefit scales with sequencing depth; binarized analyses of shallow data are leaving little on the table, deep data more.
 
@@ -49,6 +65,10 @@ Framework choice is an infrastructure decision (language, memory, multimodal nee
 | muon + scanpy | Python, MuData | Multimodal Python container (RNA+ATAC) | Not ATAC-optimized for the heaviest steps |
 
 R<->Python interop (reticulate, zellkonverter, sceasy) loses information (ChromatinAssay slots, ArchR HDF5 do not round-trip); plan to stay in one ecosystem. Verify the current best-practice default against installed docs before committing.
+
+**ArchR flow (large, on-disk, ~1M cells).** `createArrowFiles(filterTSS=4, filterFrags=1000, addTileMat=TRUE, addGeneScoreMat=TRUE)` -> `ArchRProject()` -> `filterDoublets()` -> `addIterativeLSI(useMatrix='TileMatrix')` -> `addClusters()` -> `addUMAP()` -> `addGroupCoverages()` -> `addReproduciblePeakSet(pathToMacs2=...)` -> `addPeakMatrix()`. Motifs: `addMotifAnnotations(motifSet='cisbp')` + `peakAnnoEnrichment()` (set `background='bgdPeaks'` for a GC-fair test; default `'all'` is not GC-matched). Deviations: `addBgdPeaks()` + `addDeviationsMatrix()`. `filterTSS=4`/`filterFrags=1000` are human-tuned defaults whose numeric value depends on the TSS set and are not transferable.
+
+**SnapATAC2 flow (Python, >1M cells, backed AnnData).** `pp.import_data()` -> `metrics.tsse()` -> `pp.add_tile_matrix(bin_size=500, counting_strategy='paired-insertion')` (operationalizes the anti-binarization evidence) -> `pp.select_features()` -> `tl.spectral()` (graph-Laplacian, SD-weighted, sidesteps the LSI "drop component 1" step) -> `pp.knn()` -> `tl.leiden()` -> `tl.macs3()` + `tl.merge_peaks()`. Use `distance_metric='cosine'` for spectral; `'jaccard'` without subsampling is a memory trap. Runnable version: `examples/scatac_workflow.py`; Signac version: `examples/signac_workflow.R`.
 
 ## Matrix Type: Tile vs Peak vs Gene Activity
 
@@ -74,6 +94,8 @@ DepthCor(obj, n = 10)                      # per-component Pearson correlation w
 ```
 
 Component 1 captures depth ~90% of the time but the rule is symptom-based: compute each component's depth correlation (`DepthCor`, or ArchR `corCutOff = 0.75`) and drop whichever exceed the threshold. ArchR `addIterativeLSI()` recomputes LSI on variable features across clustering passes to reduce depth/batch artifacts. A reviewer flags blind `dims = 2:30` with no depth-correlation diagnostic.
+
+Alternative embeddings: SnapATAC2 spectral (SD-weighted, no manual component drop); cisTopic/LDA when interpretable cis-regulatory topics are wanted; PeakVI/PoissonVI for deep generative models with explicit depth modeling.
 
 ## Clustering on LSI
 
@@ -120,34 +142,14 @@ da <- FindMarkers(obj, ident.1 = 'cluster1', ident.2 = 'cluster2',
 
 **Approach:** Attach motif matches, then compute deviations against a GC- and accessibility-matched background; rank with z-scores, never raw deviations.
 
-```r
-library(JASPAR2020); library(TFBSTools); library(motifmatchr)
-library(BSgenome.Hsapiens.UCSC.hg38)
-library(chromVAR); library(SummarizedExperiment); library(BiocParallel)
-register(SerialParam())   # chromVAR/motifmatchr default to a multicore backend unsupported on Windows
-
-pfm <- getMatrixSet(JASPAR2020, opts = list(collection = 'CORE', tax_group = 'vertebrates', all_versions = FALSE))
-obj <- AddMotifs(obj, genome = BSgenome.Hsapiens.UCSC.hg38, pfm = pfm)
-
-# Signac::RunChromVAR() was removed in Signac 1.17.0 (chromVAR became unavailable in Bioconductor
-# 3.23, per Signac's own NEWS.md) -- call chromVAR's own lower-level API directly instead; this is
-# the same sequence RunChromVAR used to wrap, and runs on any Signac version.
-se <- SummarizedExperiment(assays = list(counts = as.matrix(GetAssayData(obj, assay = 'peaks', layer = 'counts'))),
-                            rowRanges = granges(obj[['peaks']]))
-se <- addGCBias(se, genome = BSgenome.Hsapiens.UCSC.hg38)
-motif_ix <- matchMotifs(pfm, se, genome = BSgenome.Hsapiens.UCSC.hg38)
-set.seed(1)                                        # getBackgroundPeaks() samples background peaks at
-                                                    # random and is NOT internally seeded -- omitting
-                                                    # this makes chromVAR's differential-motif calls and
-                                                    # rankings change from run to run on identical input
-bg_peaks <- getBackgroundPeaks(se)                 # GC- and accessibility-matched background
-dev <- computeDeviations(object = se, annotations = motif_ix, background_peaks = bg_peaks)
-obj[['chromvar']] <- CreateAssayObject(data = deviationScores(dev))   # background-normalized z-scores
-
-DefaultAssay(obj) <- 'chromvar'
-diff_motifs <- FindMarkers(obj, ident.1 = 'cluster1', ident.2 = 'cluster2',
-                           mean.fxn = rowMeans, fc.name = 'avg_diff')
+```bash
+# In a WSL shell, from this skill directory, after activating an isolated R environment:
+Rscript scripts/run_chromvar.R /mnt/c/path/to/obj.rds /mnt/c/path/to/out_prefix cluster1 cluster2
 ```
+
+On Windows, run this command in a supported isolated WSL/Linux R environment rather than a native wrapper when the native R session does not exit cleanly after loading Signac. The isolated environment must contain the packages listed in Install. Use WSL paths (for example, `/mnt/c/...`) for both the input RDS and output prefix, and first verify `library(Signac); q('no', status = 0)` returns zero; do not use a wrapper that writes outputs but terminates with an access violation.
+
+`scripts/run_chromvar.R` adds JASPAR2020 CORE vertebrate motifs (`AddMotifs`), then runs chromVAR's own `addGCBias` / `matchMotifs` / `getBackgroundPeaks` / `computeDeviations` (`Signac::RunChromVAR()` was removed in Signac 1.17.0 because chromVAR became unavailable in Bioconductor 3.23, per Signac's NEWS.md). It calls `set.seed(1)` before `getBackgroundPeaks()`, which samples backgrounds at random and is not internally seeded; omitting it makes motif rankings change between identical reruns. It registers `SerialParam()` because the default multicore backend is unsupported on Windows. Output: a `chromvar` assay of background-normalized z-scores in `<out_prefix>_obj.rds`, and `FindMarkers(mean.fxn = rowMeans, fc.name = 'avg_diff')` results in `<out_prefix>_diff_motifs.csv`.
 
 chromVAR's deviation is meaningful only against a GC- and accessibility-matched background; an unmatched background manufactures apparent enrichment for GC-rich motifs (most TF motifs are GC-rich). Use z-scores (background-normalized) for cross-motif ranking, raw deviations are not comparable across motifs. Motif != TF: paralogous TFs share near-identical motifs, so an enriched motif implicates a family, not a factor; motif presence != occupancy; and a footprint (TOBIAS, needs pseudobulk) is stronger occupancy evidence than motif-in-peak. Disambiguate with TF expression (Multiome) before claiming "TF X drives this program".
 

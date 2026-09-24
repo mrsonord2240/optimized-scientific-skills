@@ -103,7 +103,7 @@ presso <- mr_presso(
     BetaOutcome = 'beta.outcome', BetaExposure = 'beta.exposure',
     SdOutcome = 'se.outcome', SdExposure = 'se.exposure',
     OUTLIERtest = TRUE, DISTORTIONtest = TRUE,
-    data = dat, NbDistribution = 10000, SignifThreshold = 0.05
+    data = dat[dat$mr_keep, ], NbDistribution = 10000, SignifThreshold = 0.05  # drop mr_keep = FALSE palindromes
 )
 cat('\n--- MR-PRESSO ---\n')
 # MRPRESSO coerces Pvalue from numeric to a character string (e.g. "<2e-04") whenever the
@@ -117,6 +117,14 @@ cat('Global RSSobs:', signif(presso$`MR-PRESSO results`$`Global Test`$RSSobs, 3)
 if (!is.null(presso$`MR-PRESSO results`$`Distortion Test`)) {
     distortion_p <- presso$`MR-PRESSO results`$`Distortion Test`$Pvalue
     cat('Distortion p:', if (is.numeric(distortion_p)) signif(distortion_p, 3) else distortion_p, '\n')
+}
+# Outlier SNPs: `Outlier Test` is NULL unless the global test is significant, and its Pvalue is
+# ALREADY Bonferroni-adjusted (raw p x nrow(dat)), possibly a string like "<3e-04". MRPRESSO's own
+# rule is adjusted P <= SignifThreshold; do not divide 0.05 by nrow(dat) again.
+outlier_test <- presso$`MR-PRESSO results`$`Outlier Test`
+if (!is.null(outlier_test)) {
+    p_adj <- suppressWarnings(as.numeric(sub('^<', '', outlier_test$Pvalue)))
+    cat('Outlier SNPs:', paste(dat[rownames(outlier_test)[which(p_adj <= 0.05)], 'SNP'], collapse = ', '), '\n')
 }
 
 # Steiger directionality with Lutz 2022 confounder caveat: heuristic only, not definitive
@@ -134,6 +142,6 @@ cat('Exposure SNPs:', nrow(dat), '| Mean F:', round(mean(exposure_dat$f_stat), 1
 cat('Primary IVW beta:', signif(primary$b[primary$method == 'Inverse variance weighted'], 3),
     '| p:', signif(primary$pval[primary$method == 'Inverse variance weighted'], 3), '\n')
 cat('Egger intercept p:', signif(pleio$pval, 3),
-    '| MR-PRESSO global p:', signif(presso$`MR-PRESSO results`$`Global Test`$Pvalue, 3), '\n')
+    '| MR-PRESSO global p:', presso_p_fmt, '\n')
 
 file.remove('exposure.tsv', 'outcome.tsv')

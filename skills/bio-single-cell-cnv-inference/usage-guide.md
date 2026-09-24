@@ -4,20 +4,6 @@
 
 This skill infers large-scale copy-number alterations from tumor single-cell or single-nucleus RNA-seq by treating averaged expression over genomic windows as a proxy for DNA copy number. It separates malignant from normal cells and calls subclones at chromosome-arm / large-segment (~5 Mb) resolution. It covers reference-based expression smoothing (inferCNV), reference-free segmentation (copyKAT, SCEVAN), and haplotype-aware allele-plus-expression inference (Numbat). It is distinct from DNA/WES-based copy-number (copy-number/cnvkit-analysis), which measures DNA read depth and resolves focal events.
 
-## Prerequisites
-
-```r
-# inferCNV (Bioconductor)
-BiocManager::install('infercnv')
-
-# copyKAT and SCEVAN (GitHub)
-remotes::install_github('navinlabcode/copykat')
-remotes::install_github('AntonioDeFalco/SCEVAN')
-
-# Numbat (CRAN); preprocessing also needs cellsnp-lite and Eagle2 on the PATH
-install.packages('numbat')
-```
-
 ## Quick Start
 
 Tell your AI agent what you want to do:
@@ -45,30 +31,9 @@ Tell your AI agent what you want to do:
 > "My immune cells are being called aneuploid - what went wrong with my reference?"
 > "Run CNV inference per patient instead of on my integrated cross-patient object"
 
-## What the Agent Will Do
+## Details
 
-1. Confirm the analysis is per sample / per patient, never on a cross-patient integrated object (tumor karyotypes are patient-private)
-2. Decide reference-based vs reference-free by whether confident non-malignant cells are annotated in the sample
-3. Decide expression-only vs allele-aware by whether subclone resolution or copy-neutral LOH matters and whether a BAM is available
-4. For reference-based inferCNV, assemble the counts matrix, annotation file, and gene-ordering file and name the normal groups
-5. Run the chosen method with droplet-appropriate parameters, denoising, and (inferCNV) the HMM
-6. Classify cells as malignant vs normal and validate the call with lineage markers, mutations, or allele evidence, not the CNV heatmap alone
-7. Treat subclone calls as hypotheses and reconcile expression-only calls against allele-aware (Numbat) or DNA evidence
-
-## Tips
-
-- **The reference is everything** - a tumor-contaminated or mismatched normal reference fabricates CNVs in every other cell; pick confident in-sample non-malignant lineages.
-- **Run per patient** - integrating across patients before inference erases the patient-private CNV signal the analysis depends on.
-- **Expression is a proxy, not DNA** - resolution is chromosome-arm (~5 Mb); for focal amplifications and deletions use DNA-based copy-number (copy-number/cnvkit-analysis).
-- **Absence of CNV is not normality** - CNV-quiet and low-grade tumors look flat; confirm malignancy with allele evidence or markers.
-- **Malignant calling is a clustering decision** - support it with orthogonal evidence, since the CNV heatmap alone is a noisy hypothesis.
-- **Use cutoff 0.1 for droplet data** - 10x is sparse; reserve cutoff 1 for full-length Smart-seq in inferCNV.
-- **Anchor copyKAT when mostly aneuploid** - pass known-normal barcodes via norm.cell.names so it can find a diploid baseline.
-- **Watch cell-cycle stripes** - proliferating cells create banding that mimics CNV; account for cycle and denoise.
-- **Use enough reference cells** - tens to hundreds, not a handful, or the noisy baseline mean fabricates CNVs everywhere.
-- **Match reference and tumor sex** - X-inactivation compensates most chrX expression, but an opposite-sex (external/shipped/pooled) reference still fabricates a uniform sex-chromosome CNV via chrY presence/absence, XIST, and escape genes; match sexes or drop the sex chromosomes.
-- **Distrust HLA and Ig/TCR segments** - high, variable expression at MHC (6p) and immunoglobulin/TCR loci mimics CNV segments that track lineage, not copy number.
-- **Balanced WGD looks copy-neutral** - per-cell normalization hides a uniform doubling from every expression method; confirm ploidy with allele or DNA evidence.
+Install commands, thresholds, failure modes and interpretation live in `SKILL.md` (Install, Threshold and parameter reference, Common Errors).
 
 ## Related Skills
 

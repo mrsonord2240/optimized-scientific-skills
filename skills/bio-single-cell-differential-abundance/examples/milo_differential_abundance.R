@@ -6,10 +6,13 @@ library(miloR)
 library(SingleCellExperiment)
 library(dplyr)
 
+# makeNhoods samples neighborhoods at random: set a seed and report it with k/prop.
+set.seed(42)
 milo <- Milo(sce)
 
 # k and d set neighborhood size; prop samples representative neighborhoods.
 # k=30 balances power against resolution; refined sampling reduces redundant nhoods.
+# Milo is under-powered at ~700-850 cells/sample: confirm with a cluster-based test (propeller/scCODA).
 milo <- buildGraph(milo, k = 30, d = 30, reduced.dim = 'PCA')
 milo <- makeNhoods(milo, prop = 0.1, k = 30, d = 30, refined = TRUE, reduced_dims = 'PCA')
 

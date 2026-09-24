@@ -26,25 +26,26 @@ def search_geo(term, study_type='gse', organism=None, gds_type=None, max_results
 
 
 def detect_super_series(gse):
-    '''Check the SOFT family file for !Series_relation. Returns (super_of, sub_of).'''
+    '''Check the SOFT family file for !Series_relation. Returns {'super_of': [...], 'sub_of': ...}.'''
     prefix = gse[:-3] + 'nnn'
     url = f'https://ftp.ncbi.nlm.nih.gov/geo/series/{prefix}/{gse}/soft/{gse}_family.soft.gz'
+    super_of, sub_of = [], None
     try:
+        # Streamed: a family file holds every sample (GSE122288's is ~490 MB); the relation lines
+        # are in the header, so stop at the first ^PLATFORM / ^SAMPLE.
         with urllib.request.urlopen(url, timeout=30) as resp:
-            data = resp.read()
+            with gzip.GzipFile(fileobj=resp, mode='rb') as fb:
+                f = io.TextIOWrapper(fb, encoding='utf-8', errors='replace')
+                for line in f:
+                    if line.startswith(('^PLATFORM', '^SAMPLE')):
+                        break
+                    if line.startswith('!Series_relation'):
+                        if 'SuperSeries of' in line:
+                            super_of.append(line.split('SuperSeries of: ')[1].strip())
+                        elif 'SubSeries of' in line:
+                            sub_of = line.split('SubSeries of: ')[1].strip()
     except Exception as e:
         return {'super_of': [], 'sub_of': None, 'error': str(e)}
-    super_of, sub_of = [], None
-    with gzip.GzipFile(fileobj=io.BytesIO(data), mode='rb') as fb:
-        f = io.TextIOWrapper(fb, encoding='utf-8', errors='replace')
-        for line in f:
-            if line.startswith('^SAMPLE'):
-                break
-            if line.startswith('!Series_relation'):
-                if 'SuperSeries of' in line:
-                    super_of.append(line.split('SuperSeries of: ')[1].strip())
-                elif 'SubSeries of' in line:
-                    sub_of = line.split('SubSeries of: ')[1].strip()
     return {'super_of': super_of, 'sub_of': sub_of}
 
 

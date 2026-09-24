@@ -2,7 +2,14 @@
 
 Self-contained: synthesizes a small protein matrix with one deliberately low-loaded
 sample and one contaminant row, then runs experiment-level QC the way the skill mandates.
-Writes nothing to disk.'''
+Writes nothing to disk.
+
+Expected output (seeded, identical on every run; checked on pandas 3.0.5, numpy 2.5.3, scikit-learn 1.9.1):
+  Flagged loading failures (>2x low): ['ctrl_3']        (ctrl_3 fold_vs_median 0.30, 287 of 400 quantified)
+  Contaminant fraction of summed intensity: 4.4%; rows after contaminant removal: 400 (was 401)
+  Replicate r (log2) 0.973-0.975 for every surviving pair; median CV ctrl 14.0%, treat 17.3%
+  Missingness present-fraction low-abundance=0.86 high-abundance=1.00
+  PCA variance explained 36.8% / 22.3% / 21.3%; PC1 ~ condition p=0.0003'''
 # Reference: pandas 2.2+, numpy 1.26+, scikit-learn 1.4+ | Verify API if version differs
 import numpy as np
 import pandas as pd

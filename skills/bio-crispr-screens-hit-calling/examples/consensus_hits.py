@@ -22,7 +22,7 @@ merged['bagel_hit'] = merged['BF'] > 6
 # Sanity-check that the two hit sets actually overlap more than chance would predict --
 # a hit-set pair with no enrichment is the statistical signature of merging results
 # from non-comparable experimental designs (e.g. two different comparisons), not a
-# real method disagreement. See SKILL.md's Failure Modes: "Consensus across 3 methods
+# real method disagreement. See references/failure-modes.md: "Consensus across 3 methods
 # is empty".
 n = len(merged)
 a = merged['mageck_hit'].fillna(False)

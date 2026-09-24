@@ -61,8 +61,10 @@ run_mediation <- function(dat, gene_col, covars = c('age', 'sex', 'pc1', 'pc2'))
   med_form <- as.formula(paste(gene_col, '~ genotype +', covar_str))
   out_form <- as.formula(paste('disease ~ genotype +', gene_col, '+', covar_str))
 
-  med_mod <- lm(med_form, data = dat)
-  out_mod <- glm(out_form, data = dat, family = binomial)
+  # bootstrap mediate() re-evaluates each model's call; bake the formula and data into
+  # the call with bquote() so it does not look up local variables (med_form, out_form)
+  med_mod <- eval(bquote(lm(.(med_form), data = .(dat))))
+  out_mod <- eval(bquote(glm(.(out_form), data = .(dat), family = binomial)))
 
   result <- mediate(med_mod, out_mod, treat = 'genotype', mediator = gene_col,
                     boot = TRUE, sims = 500)

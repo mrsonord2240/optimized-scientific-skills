@@ -2,7 +2,7 @@
 
 ## Overview
 
-Use the NCBI Datasets v2 CLI (launched 2023, current as of 2024) for genome and gene-centric bulk workflows. Encodes the defection rule (use Datasets for genome/gene; E-utilities for PubMed/SRA/custom queries), the `--dehydrated` flag for cloud-friendly parallel pulls, JSON-lines output + `dataformat` conversion to TSV, automatic MD5 verification, and the choice between `--reference` (one per species) vs full set.
+Use the NCBI Datasets v2 CLI (launched 2023, current as of 2024) for genome and gene-centric bulk workflows. Encodes the defection rule (use Datasets for genome/gene; E-utilities for PubMed/SRA/custom queries), the `--dehydrated` flag for cloud-friendly parallel pulls, JSON-lines output + `dataformat` conversion to TSV, download-time zip checksum validation and a post-aria2c size check (`rehydrate` does not verify existing files), and the choice between `--reference` (one per species) vs full set.
 
 See SKILL.md's Installation and Version Compatibility sections for setup and the installed-version
 check (this doc was checked against 18.37.0).
@@ -19,7 +19,7 @@ check (this doc was checked against 18.37.0).
 
 ### Single-assembly download
 
-> "Download the human GRCh38 reference assembly (GCF_000001405.40) via Datasets CLI. Include genome,gff3,gtf,protein,cds. Datasets verifies MD5 automatically -- no manual checksum step needed."
+> "Download the human GRCh38 reference assembly (GCF_000001405.40) via Datasets CLI. Include genome,gff3,gtf,protein,cds. `datasets download` validates the zip checksum -- no manual md5sum step needed."
 
 ### Bulk download via --dehydrated
 
@@ -35,7 +35,7 @@ check (this doc was checked against 18.37.0).
 
 ### Datasets vs E-utilities decision
 
-> "I need 100 reference genomes. Don't loop EFetch -- use datasets download genome accession ... It's 5-50x faster, handles checksums, and parallelizes within one ZIP. For PubMed or SRA reads, stay with E-utilities -- Datasets doesn't cover those."
+> "I need 100 reference genomes. Don't loop EFetch -- use datasets download genome accession ... It's 5-50x faster, validates checksums, and parallelizes within one ZIP. For PubMed or SRA reads, stay with E-utilities -- Datasets doesn't cover those."
 
 The agent decision flow (scope check, `summary` vs `download`, `dataformat` field lookup,
 `--dehydrated` threshold, `--reference`, `--api-key`) and all tips/gotchas live in SKILL.md -- see

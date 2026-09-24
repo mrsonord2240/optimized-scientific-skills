@@ -8,7 +8,7 @@ The agent will pick the appropriate method based on the experimental scenario: n
 
 ## Prerequisites
 
-See SKILL.md "Tool Install Notes" for the exact install command per tool (coloc, susieR, HyPrColoc, SMR, eCAVIAR, PWCoCo, SharePro_coloc, moloc, plus the ggplot2/patchwork/data.table plotting deps). LD reference panel extraction via plink2 is in SKILL.md "LD Matrix Construction for coloc.susie".
+See SKILL.md "Tool Install Notes" for the exact install command per tool (coloc, susieR, HyPrColoc, SMR, eCAVIAR, PWCoCo, SharePro_coloc, moloc, plus the ggplot2/patchwork/data.table plotting deps). LD reference panel extraction via plink2 is in `references/coloc-susie.md` ("LD Matrix Construction for coloc.susie").
 
 ## Quick Start
 
@@ -91,7 +91,7 @@ For a methods or supplementary description in plain prose:
 
 A high PP.H4 (>= 0.75) supports a shared-causal-variant interpretation. A high PP.H3 supports distinct causal variants in linkage. PP.H0 / PP.H1 / PP.H2 indicate the locus is underpowered for at least one trait. Always report all five posteriors, not PP.H4 alone.
 
-Worked harmonisation code + pitfalls, the PWCoCo conditional CLI recipe, and the lead-SNP-swap operational steps now live in SKILL.md (Allele Harmonisation, PWCoCo, and Lead-SNP swap and window bias sections respectively) -- see there rather than duplicating here.
+Worked harmonisation code + pitfalls, the PWCoCo conditional CLI recipe, and the lead-SNP-swap operational steps now live in `references/allele-harmonisation.md`, `references/pwcoco.md` and `references/lead-snp-swap.md` respectively -- see there rather than duplicating here.
 
 ## Related Skills
 

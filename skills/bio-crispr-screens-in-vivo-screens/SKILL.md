@@ -19,6 +19,8 @@ Every design pattern in this Skill involves live-animal tumor implantation, tamo
 
 Reference examples tested with: MAGeCK 0.5.9+, MAGeCK-VISPR 0.5.6+, pandas 2.2+, numpy 1.26+.
 
+Install: `conda install -c bioconda mageck` (not on PyPI); `pip install pandas numpy scipy statsmodels`.
+
 Before using code patterns, verify installed versions match. If versions differ:
 - CLI: `mageck --version`
 - Reference focused libraries: Manguso 2017, Chen 2015, public Addgene aliquots
@@ -122,6 +124,8 @@ mageck count \
     --output-prefix in_vivo_screen
 ```
 
+**Windows path note (checked on MAGeCK 0.5.9.5):** run this from the data directory with relative filenames, as shown above. Absolute Windows paths containing a backslash immediately followed by an uppercase letter that forms a Python regex escape (most commonly `\Users\...`) crash `mageck count`'s own QC-report writer with `re.error: bad escape \U`, after counting has already completed correctly — the crash is in report generation, not counting. Forward slashes (`C:/Users/...`) avoid it entirely if an absolute path is unavoidable.
+
 ## Hit Calling for In Vivo
 
 **Goal:** Identify per-gene fitness effects despite high inter-animal variability.
@@ -150,27 +154,10 @@ mageck mle \
 
 **Per-animal RRA + meta-analysis:**
 
-```python
-import pandas as pd
+Run `mageck test` on each animal vs plasmid, then combine the per-animal `gene_summary.txt` files with Stouffer's Z, using `neg|p-value` clipped to keep `norm.ppf` finite and negated so positive z means stronger depletion:
 
-# Run mageck test on each animal vs plasmid
-# Combine with Stouffer's Z method
-from scipy.stats import norm
-
-def meta_analyze_animals(per_animal_results):
-    '''per_animal_results: list of MAGeCK gene_summary.txt per animal.'''
-    merged = pd.concat([df.assign(animal=i) for i, df in enumerate(per_animal_results)])
-    grouped = merged.groupby('id')
-    meta = grouped.apply(lambda g: pd.Series({   # pandas 2.2+: pass include_groups=False
-        'mean_neg_score': g['neg|score'].mean(),
-        # clip to keep norm.ppf finite at p=0; negate so positive z = stronger depletion,
-        # matching examples/per_animal_meta_analysis.py
-        'stouffer_z': -norm.ppf(g['neg|p-value'].clip(1e-10, 1 - 1e-10)).sum() / (len(g) ** 0.5),
-        # nominal p, not per-animal FDR -- see "Compound hit-calling threshold" below
-        'animals_at_nominal_p05': (g['neg|p-value'] < 0.05).sum(),
-        'n_animals': len(g)
-    }))
-    return meta.sort_values('stouffer_z')
+```bash
+python examples/per_animal_meta_analysis.py   # edit animal_files at the top; writes in_vivo_meta_hits.tsv and in_vivo_meta_all.tsv
 ```
 
 **Compound hit-calling threshold:** call a gene a hit when **meta-FDR < 0.05 AND >=50% of animals individually reach nominal per-animal p < 0.05** (same direction). Use per-animal **nominal** p, not per-animal FDR, for the consistency arm: per-animal FDR-correction demands more power than typical in vivo cohorts provide (5-10 animals against a gene universe of hundreds-thousands), and requiring it can silently report zero hits on a screen with an obvious, strong meta-signal.
@@ -184,7 +171,7 @@ Verified against a synthetic 6-animal / 60-gene in vivo dataset with 5 planted t
 **Trigger:** Implanted cells lack sufficient library complexity; a few clones dominate the tumor.
 **Mechanism:** Inter-animal stochasticity in cell engraftment creates founder effects.
 **Symptom:** Per-animal hit lists vary dramatically; no genes appear across all animals.
-**Fix:** Use focused library to maintain coverage; increase animals per condition (n=10+); use CRISPR-StAR to delay bottleneck.
+**Fix:** Use focused library to maintain coverage; increase animals per condition (n=10+; more animals is new animal work, so confirm the approved protocol covers the cohort size, see Ethical & Regulatory Requirements); use CRISPR-StAR to delay bottleneck.
 
 ### Tumor DNA extraction yields no sgRNA reads
 
@@ -212,14 +199,14 @@ Verified against a synthetic 6-animal / 60-gene in vivo dataset with 5 planted t
 **Trigger:** Limited animals per condition (n=3-5); each has high variance.
 **Mechanism:** Per-animal clonal dynamics produce different sgRNA distributions; no consistent signal across few animals.
 **Symptom:** MAGeCK p-values inflated; FDR uncalibrated.
-**Fix:** Increase animals per condition to 10+; use meta-analysis across animals (Stouffer); validate top hits in arrayed format with n=10 mice each.
+**Fix:** Increase animals per condition to 10+; use meta-analysis across animals (Stouffer); validate top hits in arrayed format with n=10 mice each (new animal cohort: needs its own IACUC approval, see Ethical & Regulatory Requirements).
 
 ### Tumor heterogeneity destroys screen signal
 
 **Trigger:** Spontaneously arising mutations in some tumor regions create non-clonal heterogeneity.
 **Mechanism:** Tumor heterogeneity is genuine biology; not all cells in tumor are descendants of original engrafted cells.
 **Symptom:** Per-region sequencing shows different sgRNA distributions within same tumor.
-**Fix:** Sample multiple tumor regions; or use whole-tumor genomic DNA pooling (averages out heterogeneity).
+**Fix:** Sample multiple tumor regions; or use whole-tumor genomic DNA pooling (averages out heterogeneity). For metastasis screens, each metastatic site is a separate selection event; analyze per site.
 
 ## Quantitative Thresholds
 
@@ -230,10 +217,22 @@ Verified against a synthetic 6-animal / 60-gene in vivo dataset with 5 planted t
 | Library size for in vivo focused | 3,000-15,000 sgRNAs | Maintainable coverage |
 | Coverage at endpoint | ≥50x, ideally 100-200x | Lower than in vitro 500x |
 | Animals per condition | 10+ for hit-calling; 5 minimum | Inter-animal variability |
-| Animals per condition for arrayed validation | 10 | Tighter signal needed |
+| Animals per condition for arrayed validation | 10 | Tighter signal needed; a new animal cohort, confirm IACUC coverage first (Ethical & Regulatory Requirements) |
 | In vivo CEGv2 PR-AUC | >0.4 (context-dependent) | Lower than in vitro 0.7 |
 | Late tumor sgRNA-per-gene | ~3.93 mean | Scheidmann 2022 (CTC-derived breast-cancer xenograft; model-dependent) |
 | Days to harvest (tumor) | 12-21 days post-implant | Time for selection to manifest |
+| Depth vs breadth | n=10 mice at 100x coverage beats n=3 at 500x | More animals matter more than depth per animal |
+
+## Validation Checklist
+
+- [ ] IACUC or equivalent approval covers the screen and any follow-up cohort (arrayed validation, extra animals): see Ethical & Regulatory Requirements
+- [ ] Library size matches bottleneck math
+- [ ] Cas9+ cells selected before infection
+- [ ] Plasmid pool sequenced as baseline
+- [ ] n >= 10 animals per condition (5 minimum)
+- [ ] MAGeCK MLE with animal-as-batch covariate, or per-animal RRA + meta-analysis
+- [ ] Cross-validation with a matched in vitro screen, to separate cell-intrinsic hits from tumor-microenvironment-dependent ones
+- [ ] Arrayed validation of top hits in a matched cohort (new animal work: approval first)
 
 ## Common Errors
 
@@ -244,6 +243,7 @@ Verified against a synthetic 6-animal / 60-gene in vivo dataset with 5 planted t
 | Low CEGv2 PR-AUC | Context-specific essentialome | Use in vivo-specific reference set |
 | Low mapping rate | Wrong sequencing primers | Verify library lentiviral architecture |
 | Coverage at endpoint <50x | Implantation bottleneck | Increase cells implanted; focused library |
+| `mageck count` crashes with `re.error: bad escape \U` | Absolute Windows path (e.g. `C:\Users\...`) passed to `--list-seq`/`--fastq`/`--output-prefix`; counting already finished, crash is in QC-report writing | Run from the data directory with relative filenames, or use forward slashes in the path |
 
 ## References
 

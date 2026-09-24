@@ -5,7 +5,7 @@ public, unauthenticated. Verified live 2026-09-18. Stdlib only (urllib + json) -
 `requests`/`pandas` dependency required to run this.
 
 Query pre-computed Open Targets L2G (locus-to-gene) scores for a GWAS credible set,
-using the "modern" Platform query shape documented in this Skill's SKILL.md
+using the "modern" Platform query shape documented in this Skill's references/opentargets-l2g.md
 (credibleSet -> l2GPredictions -> rows { target, score, features, shapBaseValue }).
 
 Usage:
@@ -104,7 +104,7 @@ def main():
           f"summed distance-feature SHAP={distance_shap:.4f}, summed QTL-coloc SHAP={qtl_shap:.4f}")
     if distance_shap > 0 and qtl_shap <= 0:
         print("-> distance-dominated call: treat as a weaker, distance-only candidate "
-              "(see SKILL.md 'Nearest-gene assumption fails').")
+              "(see references/failure-modes.md, 'Nearest-gene assumption fails').")
 
 
 if __name__ == "__main__":

@@ -64,9 +64,13 @@ if (length(detected) > 0) {
 }
 
 # --- Distortion test ---
+# When OUTLIERtest finds 0 outliers (as on this file's own set.seed(42), n=30, 3-outlier
+# setup), MRPRESSO returns Pvalue as an empty/NULL value here, not a scalar NA -- a bare
+# `!is.na(distortion_p)` on that is length-zero and crashes `if()` with "missing value
+# where TRUE/FALSE needed". Reproduced by running this exact file end-to-end.
 distortion_p <- presso$`MR-PRESSO results`$`Distortion Test`$Pvalue
-cat('\nDistortion test p-value:', distortion_p, '\n')
-if (!is.na(distortion_p) && distortion_p < 0.05) {
+cat('\nDistortion test p-value:', if (length(distortion_p) > 0) distortion_p else NA, '\n')
+if (length(distortion_p) > 0 && !is.na(distortion_p) && distortion_p < 0.05) {
   cat('Outliers significantly distorted the causal estimate\n')
 }
 

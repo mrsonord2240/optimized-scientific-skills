@@ -2,8 +2,8 @@
 # Reference: BAGEL2 2.0 (hart-lab/bagel, build 115) | Verify API if version differs
 #
 # BAGEL2 essentiality analysis end-to-end:
-# 1. Compute per-sgRNA fold changes from counts
-# 2. Compute per-gene Bayes Factors using CEGv2/NEGv1 reference sets
+# 1. Compute per-sgRNA fold changes from counts (+ pre-flight reference check)
+# 2. Compute per-gene Bayes Factors using CEGv2/NEGv1 reference sets (+ post-run NaN check)
 # 3. Precision-recall analysis to calibrate BF threshold
 
 set -euo pipefail
@@ -34,6 +34,9 @@ BAGEL.py fc \
     -c "$CONTROL" \
     --min-reads 30                          # default is 0; 30 is a common convention
 
+# === PRE-FLIGHT: reference genes present, -e/-n not swapped (exits 1 on failure) ===
+python "$(dirname "$0")/check_bagel_inputs.py" pre     "$OUTDIR/foldchange.foldchange" "$CEG" "$NEG" "$TREATMENT"
+
 # === STEP 2: BAYES FACTORS ===
 # bagel bf: per-gene BF via summed log-likelihood ratios
 # Default resampling is 10-fold cross-validation; -b -NB switches to bootstrapping
@@ -45,6 +48,9 @@ BAGEL.py bf \
     -c "$TREATMENT" \
     -s "$SEED" \
     -b -NB 1000                             # -s: fixed seed, required for reproducible calls
+
+# === POST-RUN: BF column must not be mostly NaN (exits 1 on failure) ===
+python "$(dirname "$0")/check_bagel_inputs.py" post "$OUTDIR/bayes_factor.txt"
 
 # === STEP 3: PRECISION-RECALL CURVE ===
 # Empirically calibrate BF threshold against CEGv2
@@ -59,7 +65,8 @@ BAGEL.py pr \
 # which pairs BF >=6 with FDR <=3% and BF >3 with FDR <5%); stricter BF cutoffs are
 # BAGEL convention, not a published FDR mapping. Regenerate precision/recall per
 # screen with BAGEL.py pr rather than assuming fixed values.
-# BF <-6 indicates candidate tumor suppressor (negative selection)
+# BF <-6 is a tumor-suppressor candidate only in a screen designed for enrichment;
+# in a dropout screen negative BF is noise (see SKILL.md, interpret_bagel screen_type).
 
 echo "BAGEL2 analysis complete. Outputs in $OUTDIR/"
 echo "  - foldchange.foldchange: per-sgRNA LFCs"

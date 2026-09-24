@@ -9,7 +9,9 @@ author: GPTomics
 
 ## Version Compatibility
 
-Reference examples tested with: MSstats 4.14.2, MSnbase 2.32.0, iq 2.0.1, numpy 2.5.3, pandas 3.0.5 (checked 2026-09-15)
+Reference examples tested with: MSstats 4.14.2, MSnbase 2.32.0, iq 2.0.1, numpy 2.5.3, pandas 3.0.5 (checked 2026-09-21)
+
+Install: `pip install numpy pandas`; in R `BiocManager::install(c('MSstats', 'MSnbase'))` and `install.packages('iq')`.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - Python: `pip show <package>` then `help(module.function)` to check signatures
@@ -58,11 +60,11 @@ Scope: this skill OWNS converting peptide/PSM/reporter signal into a normalized 
 | Label-free, need MaxLFQ outside MaxQuant | `iq::maxLFQ()` | the real algorithm; median centering is NOT MaxLFQ |
 | Label-free DIA matrix | -> dia-analysis | DIA-NN MaxLFQ at fragment level is owned there |
 | TMT, accuracy critical | SPS-MS3 acquisition + reporter extraction | co-isolation rejected at the instrument; software cannot fully undo compression |
-| TMT, single plex only | MS2 reporters + sample-loading normalization | within-plex ratios are stable |
-| TMT, multiple plexes | sample-loading THEN IRS bridge (Plubell 2017) | absolute reporter intensities are NOT comparable across runs without a reference channel |
-| SILAC ratios | verify labeling efficiency + Arg->Pro first | unchecked, both bias every ratio invisibly |
+| TMT, single plex only | MS2 reporters + sample-loading normalization (`references/tmt_isobaric.md`) | within-plex ratios are stable |
+| TMT, multiple plexes | sample-loading THEN IRS bridge (Plubell 2017; `references/tmt_isobaric.md`) | absolute reporter intensities are NOT comparable across runs without a reference channel |
+| SILAC ratios | verify labeling efficiency + Arg->Pro first (`references/silac.md`) | unchecked, both bias every ratio invisibly |
 | Absolute copy number | proteomic ruler or Top3 + standard | iBAQ is within-sample rank only |
-| AP-MS / affinity-enrichment pulldown | do NOT median/SL/IRS-normalize; control subtraction (SAINT/CompPASS/CRAPome) | an enrichment is not a balanced proteome; data-internal normalization erases the bait signal |
+| AP-MS / affinity-enrichment pulldown | do NOT median/SL/IRS-normalize; control subtraction (SAINT/CompPASS/CRAPome; `references/affinity_enrichment.md`) | an enrichment is not a balanced proteome; data-internal normalization erases the bait signal |
 | Which summarizer? | run >=2 (TMP and MaxLFQ) and compare | this is the highest-leverage, invisible choice |
 
 Default when uncertain: label-free DDA -> `MSstats::dataProcess` with `summaryMethod='TMP'`, `normalization='equalizeMedians'`; report the summarizer alongside results and sanity-check against `iq::maxLFQ()`.
@@ -75,29 +77,10 @@ Default when uncertain: label-free DDA -> `MSstats::dataProcess` with `summaryMe
 
 **Approach:** Read the MaxQuant tables with quoting off (protein names contain apostrophes), reformat to MSstats input, then `dataProcess` applies median equalization and Tukey median polish (robust to outlier peptides, 50% breakdown). With `MBimpute = FALSE` there is no censored-value model; `MBimpute = TRUE` is MSstats' AFT imputation of censored features (the only censoring route in MSstats; `groupComparison` has none). Otherwise model missingness downstream (proDA/msqrob2 in differential-abundance).
 
-```r
-library(MSstats)
-
-# quote = '' and comment.char = '': MaxQuant text fields contain apostrophes (5'-nucleotidase); default
-# quoting silently truncates the table with only an 'EOF within quoted string' warning
-evidence <- read.table('evidence.txt', sep = '\t', header = TRUE, quote = '', comment.char = '')
-protein_groups <- read.table('proteinGroups.txt', sep = '\t', header = TRUE, quote = '', comment.char = '')
-stopifnot(nrow(evidence) == length(readLines('evidence.txt')) - 1)  # every data line was read
-
-maxquant_input <- MaxQtoMSstatsFormat(
-    evidence = evidence,
-    proteinGroups = protein_groups,
-    annotation = read.csv('annotation.csv')
-)
-
-# TMP = Tukey median polish. MBimpute = FALSE: no censoring model (censoredInt has no effect), and on/off
-# proteins later come out of groupComparison as log2FC -Inf / issue 'oneConditionMissing'.
-# MBimpute = TRUE is the AFT censored-imputation route (censoredInt = 'NA' marks NA intensities as censored).
-processed <- dataProcess(maxquant_input, normalization = 'equalizeMedians',
-                         summaryMethod = 'TMP', censoredInt = 'NA', MBimpute = FALSE)
-
-protein_abundance <- processed$ProteinLevelData
+```bash
+Rscript scripts/msstats_summarize.R evidence.txt proteinGroups.txt annotation.csv protein_abundance.csv   # optional 5th arg: TRUE = MBimpute
 ```
+The script reads the tables with `quote = ''` and checks the row count, then runs `MaxQtoMSstatsFormat` and `dataProcess(normalization = 'equalizeMedians', summaryMethod = 'TMP', censoredInt = 'NA', MBimpute = FALSE)`; on/off proteins come out of `groupComparison` as log2FC `-Inf` / issue `oneConditionMissing` when `MBimpute = FALSE`. It writes `ProteinLevelData`.
 
 ### Run the real MaxLFQ (not median centering)
 
@@ -105,21 +88,15 @@ protein_abundance <- processed$ProteinLevelData
 
 **Approach:** Call `iq::maxLFQ()`, which implements the Cox 2014 maximal peptide-ratio least-squares step. It does NOT perform delayed normalization, so run-level loading offsets pass straight into the estimates: median-normalize each run's peptide log2 intensities first. `maxLFQ()` takes ONE protein's matrix, so a whole table goes through `preprocess` -> `create_protein_list` -> `create_protein_table`. Per-sample median centering of the protein matrix shares only the name and silently gives a different answer.
 
+```bash
+Rscript scripts/maxlfq_iq.R peptide_long.csv protein_maxlfq.csv   # columns protein, ion, run, intensity (RAW)
+```
+Runs `preprocess(median_normalization = TRUE)` -> `create_protein_list` -> `create_protein_table(method = 'maxLFQ')` and writes the proteins x samples `$estimate`. `maxLFQ()` solves per-protein least squares only within CONNECTED sample sets; a non-empty `$annotation` marks proteins whose samples are NOT on one common scale, and those are listed in `<out>.disconnected.txt`.
+
+One protein at a time, in R:
 ```r
 library(iq)
-
-# peptide_long: one row per peptide ion per run, RAW intensities (protein, ion, run, intensity)
-norm <- preprocess(peptide_long, primary_id = 'protein', secondary_id = 'ion', sample_id = 'run',
-                   intensity_col = 'intensity', median_normalization = TRUE, pdf_out = NULL)
-protein_list  <- create_protein_list(norm)    # one run-normalized log2 matrix per protein
-protein_table <- create_protein_table(protein_list, method = 'maxLFQ')
-protein_matrix <- protein_table$estimate      # proteins x samples
-
-# maxLFQ solves per-protein least squares only within CONNECTED sample sets; a non-empty annotation
-# marks proteins whose samples split into groups that are NOT on one common scale
-disconnected <- rownames(protein_matrix)[nzchar(protein_table$annotation)]
-
-# one protein at a time: rows = peptide ions, columns = samples, values = RUN-NORMALIZED log2 intensities
+# protein_list from create_protein_list(); rows = peptide ions, columns = samples, values = RUN-NORMALIZED log2 intensities
 result <- maxLFQ(protein_list[[1]])
 # $estimate is an UNNAMED vector in the input column order; name it or samples silently transpose
 protein_estimate <- setNames(result$estimate, colnames(protein_list[[1]]))
@@ -140,153 +117,17 @@ sample_medians = log_int.median(axis=0)
 normalized = log_int - sample_medians + sample_medians.median()
 ```
 
-## Isobaric (TMT/iTRAQ) Quantification
+Runnable with asserted output: `examples/lfq_normalization.py` (median centering, sample-loading + IRS, the SILAC pilot checks and the AP-MS scorer on seeded data).
 
-### Extract and impurity-correct reporter ions
+## Reference Files
 
-**Goal:** Pull TMT reporter intensities from spectra and correct cross-channel isotope bleed.
+Read only the file the request needs; the LFQ/MSstats/MaxLFQ core, decision tree, failure modes, thresholds and Common Errors stay here.
 
-**Approach:** Read spectra on disk, `quantify` the reporter region, then `purityCorrect` with a LOT-SPECIFIC impurity matrix from the reagent Certificate of Analysis. `readMSnSet` reads an already-quantified text matrix and does NOT extract reporters.
-
-```r
-library(MSnbase)
-
-raw <- readMSData('experiment.mzML', mode = 'onDisk')
-# method='max' for centroided spectra; reporters=TMT10 defines the 126-131 reporter m/z.
-# TMTpro 16plex uses reporters = TMT16 (126..134N); MSnbase 2.32.0 has no TMT18 set.
-quant <- quantify(raw, reporters = TMT10, method = 'max')
-
-# edit = FALSE: the default edit = TRUE calls edit(M) and blocks under Rscript / on a cluster.
-# x = is a MANUFACTURER TEMPLATE and MSnbase ships templates only for x = 4, 6, 8, 10; any other x
-# (TMTpro 16) falls through to an unnamed diag(x) and stops with "length of 'dimnames' [1] not equal
-# to array extent". REPLACE with lot-specific Certificate of Analysis values -- for TMTpro the only route:
-# imp <- makeImpuritiesMatrix(filename = 'lot_coa.csv', edit = FALSE)  # layout as MSnbase extdata
-#   TMT6plexPurityCorrections.csv: one row per channel, one column per neighbour OFFSET
-#   (-n/2..-1, +1..+n/2) in percent, so a 16plex CoA needs 16 offset columns
-imp <- makeImpuritiesMatrix(x = 10, edit = FALSE)
-quant <- purityCorrect(quant, imp)
-```
-
-### Bridge multiple TMT plexes with IRS
-
-**Goal:** Make reporter intensities comparable across separate TMT runs.
-
-**Approach:** Absolute reporter intensities for the same protein differ 2-5x between plexes because each plex samples a random point on the elution profile. Sample-loading normalization fixes within-run loading; the Internal Reference Scaling bridge (Plubell 2017) then pins each plex's pooled reference channel to a common per-protein value. Order: SL, then IRS. A protein whose reference is 0 or missing in any plex cannot be bridged: mask and report it rather than letting it become Inf/NaN. Check the bridge on the NON-reference channels (IRS forces the reference channels equal by construction).
-
-```python
-import numpy as np
-import pandas as pd
-
-# protein_psm_sums: protein x channel, summed PSM reporter ions; one reference channel per plex
-def sample_loading_normalize(plex):
-    target = plex.sum(axis=0).mean()    # common target = mean column sum within the plex
-    return plex * (target / plex.sum(axis=0))
-
-def irs_scale(plexes, ref_cols):
-    refs = pd.concat([p[ref] for p, ref in zip(plexes, ref_cols)], axis=1)
-    refs = refs.where(refs > 0)    # a 0 or missing reference cannot anchor the bridge
-    unbridged = refs.index[refs.isna().any(axis=1)]
-    if len(unbridged):
-        print(f'IRS: {len(unbridged)} proteins lack a reference in >=1 plex; set to NaN: {list(unbridged[:10])}')
-    geomean = np.exp(np.log(refs).mean(axis=1, skipna=False))    # per-protein geometric mean of references
-    out = []
-    for i, p in enumerate(plexes):
-        factor = geomean / refs.iloc[:, i]    # per-protein per-plex scaling factor
-        out.append(p.mul(factor, axis=0))
-    return out
-```
-
-## SILAC Quantification
-
-**Goal:** Compute heavy/light ratios while preserving on/off biology and flagging label artifacts.
-
-**Approach:** A protein present only in the heavy channel may be the interesting biology (or a detection-limit dropout), so do not discard it -- but keep it in a presence flag, not as +/-Inf inside the ratio matrix, where it turns pandas SDs into NaN and stops `eBayes(trend=TRUE, robust=TRUE)`. Verify labeling efficiency (>=95%, target 97-98%) on a heavy-only pilot and assess Arg->Pro conversion before trusting any ratio -- both bias every ratio in the same direction, so neither shows up as extra scatter.
-
-### Check labeling efficiency and Arg->Pro first
-```python
-import numpy as np, pandas as pd
-
-def silac_labeling_efficiency(pilot, heavy='Intensity H', light='Intensity L'):
-    '''Incorporation on a HEAVY-ONLY pilot (cells grown in heavy medium, NOTHING mixed in): every
-    light ion there is unlabeled protein. pilot = the pilot's peptide table (MaxQuant evidence.txt).'''
-    h = pd.to_numeric(pilot[heavy], errors='coerce').fillna(0.0)
-    l = pd.to_numeric(pilot[light], errors='coerce').fillna(0.0)
-    ok = (h + l) > 0
-    if not ok.any():
-        raise ValueError('no peptide has signal in either channel -- wrong columns or wrong file')
-    per_pep = h[ok] / (h[ok] + l[ok])
-    eff = float(h[ok].sum() / (h[ok] + l[ok]).sum())    # intensity-weighted = the number to report
-    # A 1:1 forward mix of these cells does NOT read log2 H/L = 0: the unincorporated (1 - eff) of
-    # the heavy sample is counted in the LIGHT channel, so H/L = eff / (2 - eff) -- -0.20 at 93%.
-    return {'n_peptides': int(ok.sum()), 'incorporation': round(eff, 4),
-            'median_peptide_incorporation': round(float(per_pep.median()), 4),
-            'peptides_below_95pct': int((per_pep < 0.95).sum()),
-            'expected_log2_HL_bias_at_1to1': round(float(np.log2(eff / (2 - eff))), 4),
-            'pass_95pct': bool(eff >= 0.95)}
-
-def arg_to_pro_shift(peptides, seq='Sequence', ratio='Ratio H/L'):
-    '''Arg->Pro drains the heavy channel once per proline, so log2 H/L falls with PROLINE COUNT.
-    The dose slope is what makes this specific -- a flat offset is incomplete labeling instead.
-    Direct route: re-search the pilot with Pro6 variable and take I(Pro6)/(I(Pro6)+I(Pro0)).'''
-    r = np.log2(pd.to_numeric(peptides[ratio], errors='coerce'))
-    npro = peptides[seq].astype(str).str.count('P')
-    ok = np.isfinite(r)
-    r, npro = r[ok], npro[ok]
-    slope = float(np.polyfit(npro, r, 1)[0]) if npro.nunique() > 1 else float('nan')
-    return {'n_pro_free': int((npro == 0).sum()), 'n_pro_containing': int((npro > 0).sum()),
-            'median_log2_HL_pro_free': round(float(r[npro == 0].median()), 4),
-            'log2_HL_slope_per_proline': round(slope, 4),
-            'conversion_per_proline': round(float(1 - 2 ** slope), 4)}
-```
-
-### Ratios that keep on/off biology
-```python
-import numpy as np
-
-# Arg10/Lys8 is the common pairing (avoids overlap with the +6 isotope envelope)
-SILAC_SHIFTS = {'Arg10': 10.008269, 'Lys8': 8.014199, 'Arg6': 6.020129, 'Lys6': 6.020129}
-
-def silac_log2_ratio(heavy, light):
-    '''Vectorized over arrays/Series: log2 H/L (NaN unless both channels quantified) plus a presence flag.'''
-    heavy, light = np.asarray(heavy, dtype=float), np.asarray(light, dtype=float)
-    h, l = heavy > 0, light > 0    # NaN compares False
-    with np.errstate(divide='ignore', invalid='ignore'):
-        ratio = np.where(h & l, np.log2(heavy / light), np.nan)
-    presence = np.select([h & l, h, l], ['both', 'H-only', 'L-only'], default='none')    # report H-only/L-only separately
-    return ratio, presence
-```
-
-## AP-MS / Affinity-Enrichment Scoring
-
-**Goal:** Rank prey in a pulldown by enrichment over NEGATIVE-CONTROL IPs, not by abundance or by ratio to the input lysate.
-
-**Approach:** A pulldown is deliberately non-representative, so no data-internal normalization (median, sample-loading, IRS) applies, and the input lysate is not a control -- sticky background (ribosome, chaperones, tubulin, keratin) binds the beads in the pulldown and is diluted in the input, so "top N over input" returns background. The control IP is the only thing that separates a bead binder from an interactor. Require reproducible detection across bait replicates and enrichment over control, and floor absent controls at the run's detection limit so bait-only prey score finitely instead of `+Inf`.
-
-```python
-import numpy as np, pandas as pd
-
-def score_vs_control_ips(ip, bait_cols, ctrl_cols, fc_cutoff=2.0, min_bait_reps=None):
-    '''ip: prey x replicate RAW intensities or spectral counts; 0/NaN = not detected. Prey never
-    seen in any bait IP get a NaN enrichment (nothing was measured) and are never called.'''
-    L = np.log2(ip[list(bait_cols) + list(ctrl_cols)].replace(0, np.nan).astype(float))
-    if min_bait_reps is None:
-        min_bait_reps = len(bait_cols)          # default: every bait replicate, reproducibility first
-    n_bait, n_ctrl = L[bait_cols].notna().sum(axis=1), L[ctrl_cols].notna().sum(axis=1)
-    Lf = L.copy()
-    Lf[ctrl_cols] = Lf[ctrl_cols].fillna(L[ctrl_cols].min())      # per-control-run detection floor
-    enrich = Lf[bait_cols].mean(axis=1) - Lf[ctrl_cols].mean(axis=1)
-    worst = Lf[bait_cols].min(axis=1) - Lf[ctrl_cols].max(axis=1)  # weakest bait rep vs best control
-    out = pd.DataFrame({'n_bait': n_bait, 'n_ctrl': n_ctrl,
-                        'log2_enrichment': enrich, 'worst_case_log2': worst})
-    out['interactor'] = (n_bait >= min_bait_reps) & ((n_ctrl == 0) | (enrich >= fc_cutoff))
-    return out.sort_values('log2_enrichment', ascending=False)
-```
-
-This fold-change/presence score is the honest ceiling for ONE bait with a few controls. For a
-probability rather than a cutoff use SAINTexpress (spectral counts, `interaction`/`prey`/`bait`
-files -> AvgP, report BFDR <= 0.01-0.05) or CompPASS WD scores across a bait MATRIX; both need
-several independent baits, or the CRAPome as an external control set, before their statistics mean
-anything. Feed them counts or raw intensities -- never a median/SL/IRS-normalized matrix.
+| File | Read when |
+|---|---|
+| `references/tmt_isobaric.md` | TMT/iTRAQ reporter extraction, lot-specific impurity correction (incl. TMTpro CoA route), sample-loading + IRS bridging of multiple plexes |
+| `references/silac.md` | SILAC: labeling-efficiency and Arg->Pro checks on a heavy-only pilot, log2 H/L ratios that keep on/off proteins |
+| `references/affinity_enrichment.md` | AP-MS / affinity-enrichment / proximity-labeling pulldown: scoring prey against negative-control IPs |
 
 ## Per-Method Failure Modes
 
@@ -318,7 +159,7 @@ anything. Feed them counts or raw intensities -- never a median/SL/IRS-normalize
 **Trigger:** Pro-containing peptides or a labeling efficiency below ~95%.
 **Mechanism:** Cells convert heavy Arg to heavy Pro (+6 Da), splitting Pro-peptide signal and underestimating the heavy channel; residual light masquerades as down-regulation.
 **Symptom:** Ratios biased toward light, worse for Pro-rich proteins; invisible without a check.
-**Fix:** Proline supplementation, measure conversion per cell line, verify >=95% incorporation on a heavy-only pilot -- `silac_labeling_efficiency` and `arg_to_pro_shift` above compute both.
+**Fix:** Proline supplementation, measure conversion per cell line, verify >=95% incorporation on a heavy-only pilot -- `silac_labeling_efficiency` and `arg_to_pro_shift` in `references/silac.md` compute both.
 
 ### SILAC on/off proteins discarded as NaN
 **Trigger:** Returning NaN whenever either channel is zero.
@@ -336,7 +177,7 @@ anything. Feed them counts or raw intensities -- never a median/SL/IRS-normalize
 **Trigger:** Median/sample-loading/IRS normalization applied to an affinity-purification or biotin-enrichment pulldown.
 **Mechanism:** Data-internal normalization assumes most signal is an unchanging background; a successful pulldown is deliberately non-representative (bait plus a few interactors over background), so equalizing medians or loading rescales away the enrichment being measured.
 **Symptom:** Real interactors flattened toward background; bait abundance dominates the axis of variation.
-**Fix:** Do not data-internal-normalize an enrichment; score against negative-control pulldowns with `score_vs_control_ips` above (SAINTexpress/CompPASS/CRAPome for a probability) or normalize to bait abundance.
+**Fix:** Do not data-internal-normalize an enrichment; score against negative-control pulldowns with `score_vs_control_ips` in `references/affinity_enrichment.md` (SAINTexpress/CompPASS/CRAPome for a probability) or normalize to bait abundance.
 
 ## Quantitative Thresholds
 

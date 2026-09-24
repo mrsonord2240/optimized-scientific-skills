@@ -15,6 +15,8 @@ Before using code patterns, verify installed versions match. If versions differ:
 - Python: `pip show biopython geoparse` then introspect signatures
 - R: `packageVersion('GEOquery')`
 
+Text encoding differs by language on Windows (checked 2026-09-21, Python 3.12 / R 4.4.3): Python's default follows the locale (`cp1252` here, unless `PYTHONUTF8=1`) while R's was UTF-8. GEO SOFT and matrix files contain UTF-8, so in Python always pass `encoding='utf-8', errors='replace'` to `gzip.open(..., 'rt')`, whatever the R side does.
+
 If the GSE structure doesn't match expectations (missing fields, malformed series matrix), re-fetch from FTP directly and inspect the SOFT or MINiML file as source of truth.
 
 # GEO Data
@@ -43,14 +45,14 @@ Entrez.api_key = 'optional'
 
 ## Workflow
 
-1. Search gds db with field-qualified terms (`gse[Entry Type]`, `Homo sapiens[Organism]`, `expression profiling by high throughput sequencing[GDS Type]`).
+1. Search gds db with field-qualified terms (`gse[Entry Type]`, `Homo sapiens[Organism]`, `expression profiling by high throughput sequencing[GDS Type]`); code in `references/entrez-search-and-links.md`.
 2. For any GSE returned, check `!Series_relation` in SOFT to detect SuperSeries before pulling.
 3. Pick the right download path: series matrix for fast-and-trusting; supplementary files for raw Affymetrix / submitter counts; SRA-link for RNA-seq raw FASTQ.
 4. Read `!Sample_data_processing` to surface what's actually in the series matrix.
-5. For R-side analyses, recommend GEOquery (Bioconductor) over GEOparse for supplementary file reliability.
-6. For SRA hand-off, use pysradb to resolve GSE -> SRP -> SRR; pass run list to sra-data skill.
-7. Warn on stale GEOmetadb usage; recommend pysradb / Entrez gds.
-8. For ArrayExpress accessions (E-MTAB-*), use the new BioStudies URL.
+5. For R-side analyses, recommend GEOquery (Bioconductor) over GEOparse for supplementary file reliability; see `references/geoparse-geoquery.md`.
+6. For SRA hand-off, use pysradb to resolve GSE -> SRP -> SRR (`references/entrez-search-and-links.md`); pass run list to sra-data skill.
+7. Warn on stale GEOmetadb usage; recommend pysradb / Entrez gds (`references/legacy-and-formats.md`).
+8. For ArrayExpress accessions (E-MTAB-*), use the new BioStudies URL (`references/legacy-and-formats.md`).
 
 ## GEO record taxonomy
 
@@ -90,7 +92,7 @@ Symmetric trap: a paper may cite a SubSeries (`SubSeries of: GSEsuper`) where th
 |---|---|---|
 | "I want expression values; submitter normalization is fine" | Series matrix (`GSE_series_matrix.txt.gz`) | Trust submitter's normalization |
 | "I want raw Affymetrix CEL files and to do my own RMA" | Supplementary files (`suppl/`) | Re-normalize locally |
-| "I want raw RNA-seq FASTQ" | pysradb `gse_to_srp -> srp_to_srr` (Entrez gds->sra ELink unreliable) | Always raw; processed at submitter is rarely re-usable |
+| "I want raw RNA-seq FASTQ" | pysradb `gse_to_srp -> srp_to_srr` (Entrez gds->sra ELink unreliable; code in `references/entrez-search-and-links.md`) | Always raw; processed at submitter is rarely re-usable |
 | "I want submitter-provided counts (RNA-seq)" | Supplementary files (usually a `*_counts.txt.gz`) | Trust at risk; submitter pipelines vary |
 | "I want a curated subset across many studies" | Use ArchS4 (https://archs4.org) or recount3 | Curated re-processing |
 
@@ -115,214 +117,39 @@ A series matrix (`GSE12345_series_matrix.txt.gz`) is a header (sample metadata a
 - The header has `!Sample_characteristics_ch1` rows that hold the metadata of interest — these are submitter-formatted strings, often inconsistent within one series.
 - `!Sample_data_processing` can be **entirely absent**, not just terse (e.g. GSE470 has zero such lines) — always read it via `metadata.get('!Sample_data_processing', [])`, never direct key access, and treat an empty result as "field not provided," not "no processing was done."
 
-## SOFT vs MINiML
-
-| Format | Content | Parser support |
-|---|---|---|
-| **SOFT** (`*_family.soft.gz`) | Plain-text, key=value style | GEOparse (Python), GEOquery (R), Entrez Direct |
-| **MINiML** (`*_family.xml.tgz`) | XML-structured | GEOparse, GEOquery, custom XML |
-
-Both contain the same content. SOFT is the legacy, MINiML the XML successor. GEOparse handles SOFT well; for very large series (1000+ samples) MINiML's XML structure is slower to parse.
-
-## GEOparse vs GEOquery
-
-| Aspect | GEOparse (Python) | GEOquery (R/Bioconductor) |
-|---|---|---|
-| Maturity | OK; some known supplementary-file fetch issues since ~2022 | Mature; Bioconductor-supported |
-| Output | `GEOparse.GSE` object with `gsms`, `gpls`, `metadata` dicts | `ExpressionSet` or list per platform |
-| Supplementary files | `gse.download_supplementary_files()` (sometimes flakey) | `getGEOSuppFiles(gse)` (more reliable) |
-| Integration | Pandas DataFrames | Bioconductor ecosystem |
-| When | Python-first pipelines | R-first / use ExpressionSet downstream |
-
-For production GEO workflows in R, GEOquery is the stable choice. For Python, GEOparse is the only option but verify file counts after download.
-
-## GEOmetadb status
-
-GEOmetadb (Zhu 2008) was a SQLite mirror of GEO metadata enabling fast SQL queries. **Unmaintained since 2020**; downloads still work but data is stale. Modern replacement: pysradb (`pysradb gse_to_srp`, `pysradb metadata`) covers most of the GEO->SRA mapping; for full GEO queries fall back to Entrez gds.
-
-## ArrayExpress -> BioStudies migration (2020)
-
-ArrayExpress (EMBL-EBI's microarray archive, mirroring GEO) was migrated into BioStudies in 2020. Old `E-MTAB-####` accessions still resolve but the API moved:
-
-| Old (pre-2020) | New (BioStudies) |
-|---|---|
-| `https://www.ebi.ac.uk/arrayexpress/...` | `https://www.ebi.ac.uk/biostudies/...` |
-| ArrayExpress REST | BioStudies REST: `https://www.ebi.ac.uk/biostudies/api/v1/...` |
-
-For new workflows, use BioStudies. For legacy ArrayExpress URLs in old papers, redirect via BioStudies.
-
 ## Code patterns
-
-### Search GEO for studies matching a query
-
-**Goal:** Find GSE accessions matching keywords + organism + study type.
-
-**Approach:** ESearch on `gds` db with field-qualified terms; filter to `gse[Entry Type]`; summarize with ESummary.
-
-**Reference (BioPython 1.83+):**
-```python
-from Bio import Entrez
-import time
-
-Entrez.email = 'researcher@institution.edu'
-
-
-def search_geo(term, study_type='gse', organism=None, max_results=50):
-    full_term = f'{term} AND {study_type}[Entry Type]'
-    if organism:
-        full_term += f' AND {organism}[Organism]'
-    h = Entrez.esearch(db='gds', term=full_term, retmax=max_results)
-    s = Entrez.read(h); h.close()
-    if not s['IdList']:
-        return []
-    h = Entrez.esummary(db='gds', id=','.join(s['IdList']))
-    summaries = Entrez.read(h); h.close()
-    return summaries
-
-
-for s in search_geo('breast cancer RNA-seq', organism='Homo sapiens', max_results=10):
-    # Surface SuperSeries
-    relation = s.get('summary', '')
-    is_super = 'SuperSeries' in str(relation)
-    print(f"  {s['Accession']:12} {s['n_samples']:>4} samples  {'[SuperSeries]' if is_super else '':12}  {s['title'][:60]}")
-```
 
 ### Detect SuperSeries before pulling data
 
 **Goal:** Avoid mixing platforms by detecting SuperSeries structure first.
 
-**Approach:** Download SOFT family file and read `!Series_relation` keys.
+**Approach:** Stream the SOFT family file and read the `!Series_relation` keys in its header (stops at the first `^PLATFORM`; family files can be hundreds of MB).
 
-```python
-import gzip
-import urllib.request
-
-
-def check_super_or_sub_series(gse):
-    prefix = gse[:-3] + 'nnn'
-    url = f'https://ftp.ncbi.nlm.nih.gov/geo/series/{prefix}/{gse}/soft/{gse}_family.soft.gz'
-    urllib.request.urlretrieve(url, f'{gse}.soft.gz')
-    super_of = []
-    sub_of = None
-    with gzip.open(f'{gse}.soft.gz', 'rt', encoding='utf-8', errors='replace') as f:
-        for line in f:
-            if line.startswith('!Series_relation'):
-                if 'SuperSeries of' in line:
-                    super_of.append(line.split('SuperSeries of: ')[1].strip())
-                elif 'SubSeries of' in line:
-                    sub_of = line.split('SubSeries of: ')[1].strip()
-            if line.startswith('^SAMPLE'):
-                break   # Speed: don't read past header
-    return {'super_of': super_of, 'sub_of': sub_of}
-
-
-print(check_super_or_sub_series('GSE346738'))
+```bash
+python scripts/geo_series.py relation GSE346738
 # {'super_of': ['GSE283260', 'GSE346737'], 'sub_of': None}  -> SuperSeries; process subseries separately
-# (checked live 2026-09-19; SuperSeries status drifts as submitters restructure series, re-verify before relying on a fixed example)
+# (checked live 2026-09-21; SuperSeries status drifts as submitters restructure series, re-verify before relying on a fixed example)
 ```
+
+As a library: `from geo_series import check_super_or_sub_series` (returns `{'super_of': [...], 'sub_of': ...}`).
 
 ### Download series matrix with submitter caveat
 
-```python
-import gzip
-import pandas as pd
-
-
-def download_series_matrix(gse):
-    prefix = gse[:-3] + 'nnn'
-    url = f'https://ftp.ncbi.nlm.nih.gov/geo/series/{prefix}/{gse}/matrix/{gse}_series_matrix.txt.gz'
-    urllib.request.urlretrieve(url, f'{gse}_matrix.txt.gz')
-    return f'{gse}_matrix.txt.gz'
-
-
-def parse_series_matrix(path):
-    metadata = {}
-    with gzip.open(path, 'rt', encoding='utf-8', errors='replace') as f:
-        for line in f:
-            if line.startswith('!series_matrix_table_begin'):
-                break
-            if line.startswith('!'):
-                key, *vals = line.rstrip('\n').split('\t')
-                metadata[key] = [v.strip('"') for v in vals]
-        expr = pd.read_csv(f, sep='\t', index_col=0, comment='!')
-    # Series matrix values are whatever submitter chose -- check metadata['!Sample_data_processing']
-    return metadata, expr
-
-
-meta, expr = parse_series_matrix(download_series_matrix('GSE123456'))
-print('Sample-level data processing notes:')
-for note in set(meta.get('!Sample_data_processing', [])):
-    print(f'  - {note}')
+```bash
+python scripts/geo_series.py matrix GSE470
+# GSE470: 12625 features x 12 samples; then every distinct !Sample_data_processing note (none for GSE470)
+python scripts/geo_series.py selftest   # offline regression test: non-ASCII fixtures, encoding= on every gzip.open 'rt'
 ```
 
-### Link GEO Series to SRA runs (preferred path: pysradb)
+As a library: `from geo_series import download_series_matrix, parse_series_matrix`; `parse_series_matrix(path)` returns `(metadata, expr)`, where `metadata` maps each `!` header key to its list of values.
 
-```python
-from pysradb import SRAweb
+## Reference Files
 
-
-def gse_to_srr(gse):
-    db = SRAweb()
-    srp_df = db.gse_to_srp(gse)
-    if srp_df.empty:
-        return []
-    srp = srp_df['study_accession'].iloc[0]
-    srr_df = db.srp_to_srr(srp)
-    return srr_df['run_accession'].tolist()
-
-
-srrs = gse_to_srr('GSE123456')
-print(f'GSE123456 -> {len(srrs)} SRR runs')
-```
-
-### GEOparse: full Series download
-
-```python
-import GEOparse
-
-
-def get_gse(gse_id, dest='./geo_cache'):
-    gse = GEOparse.get_GEO(geo=gse_id, destdir=dest)
-    print(f'{gse_id}: {len(gse.gsms)} samples, {len(gse.gpls)} platforms')
-    for gsm_name, gsm in list(gse.gsms.items())[:3]:
-        print(f'  {gsm_name}: {gsm.metadata.get("title", ["?"])[0]}')
-    return gse
-
-
-# Supplementary files (raw data) -- verify file count manually after
-gse = get_gse('GSE123456')
-gse.download_supplementary_files(directory='./geo_cache')
-```
-
-### R: GEOquery (more reliable supplementary download)
-
-```r
-# Reference: Bioconductor GEOquery 2.70+ | Verify API if version differs
-library(GEOquery)
-
-gse <- getGEO('GSE123456', GSEMatrix = TRUE)
-length(gse)             # one ExpressionSet per platform
-head(pData(gse[[1]]))   # sample metadata
-head(exprs(gse[[1]]))   # expression matrix (submitter-normalized -- verify processing notes)
-
-# Raw / supplementary files
-supp_dir <- getGEOSuppFiles('GSE123456', baseDir = './geo_cache')
-list.files(rownames(supp_dir))
-```
-
-### Find datasets by PubMed citation
-
-```python
-def geo_from_pubmed(pmid):
-    h = Entrez.elink(dbfrom='pubmed', db='gds', id=pmid)
-    r = Entrez.read(h); h.close()
-    if not r[0]['LinkSetDb']:
-        return []
-    gds_ids = [l['Id'] for l in r[0]['LinkSetDb'][0]['Link']]
-    h = Entrez.esummary(db='gds', id=','.join(gds_ids))
-    summaries = Entrez.read(h); h.close()
-    return summaries
-```
+| File | Read when |
+|---|---|
+| `references/entrez-search-and-links.md` | Searching `gds` with field-qualified terms, resolving GSE -> SRP -> SRR with pysradb, or finding GEO datasets from a PMID |
+| `references/geoparse-geoquery.md` | Choosing between GEOparse and GEOquery, or downloading a full Series or supplementary files in Python or R |
+| `references/legacy-and-formats.md` | Choosing SOFT vs MINiML, handling GEOmetadb pipelines, or old ArrayExpress (E-MTAB-*) URLs |
 
 ## Failure modes
 
@@ -374,10 +201,6 @@ def geo_from_pubmed(pmid):
 |---|---|---|
 | Empty IdList for `gse[entry_type]` | Wrong field name | Use `gse[Entry Type]` (case-sensitive) |
 | Matrix file has no expression data | SuperSeries with no aggregate matrix | Pull per-SubSeries matrices |
-| Submitter "normalized" matrix gives different result than paper | Hidden submitter transforms | Re-process from raw |
-| 404 on ArrayExpress URL | Migrated to BioStudies | Use new BioStudies URL |
-| GEOparse missing CEL files | Known flake | Use R GEOquery or direct FTP |
-| GEOmetadb-based pipeline missing recent series | DB unmaintained | Switch to pysradb / Entrez |
 
 ## References
 

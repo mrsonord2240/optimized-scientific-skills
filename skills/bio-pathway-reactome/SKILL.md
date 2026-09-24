@@ -63,12 +63,12 @@ Second load-bearing fact: **only human is curated; every non-human pathway is or
 | Parent and child both enriched on the same genes | report the deepest significant node; ancestors = context | nesting double-counts; they are ONE finding |
 | Compare pathways BETWEEN conditions / across omics / scRNA clusters | ReactomeGSA (`perform_reactome_analysis`/`analyse_sc_clusters`) | ReactomePA is single-list; the hosted service is comparative |
 | Non-human within the 7 ReactomePA organisms | set `organism=`; flag results as orthology-inferred | the projection is a hypothesis, not curation |
-| Species beyond the 7 (bacteria, plant, etc.) | web AnalysisService / ReactomeGSA, not ReactomePA | reactome.db maps only 7 organisms |
+| Species beyond the 7 documented (bacteria, plant, etc.) | web AnalysisService / ReactomeGSA, not ReactomePA | the documented `organism` values are 7, and reactome.db has no plant pathways |
 | Deeper metabolic coverage wanted | supplement with KEGG -> kegg-pathways | KEGG remains the deeper metabolic resource |
 | The ORA-vs-GSEA decision itself, or null/benchmark theory | -> the category README | the cross-database method-selection fork lives there |
 | The DE list / ranking statistic itself | -> differential-expression/de-results | upstream, not enrichment |
 
-ReactomePA's `organism` accepts exactly seven values: human, rat, mouse, celegans, yeast, zebrafish, fly. This is a reactome.db mapping ceiling, NOT a Reactome ceiling - the database projects to ~14-20 species and the web AnalysisService covers them; do not conflate the two.
+ReactomePA documents seven `organism` values: human, rat, mouse, celegans, yeast, zebrafish, fly. That is a ReactomePA ceiling, NOT a Reactome ceiling: reactome.db holds pathways for 16 species (checked on reactome.db 1.89.0, by the species prefix of `reactomePATHID2NAME`; no plants, one bacterium), and the web AnalysisService covers more. Do not conflate the two. Under the hood `organism` is resolved to an `org.*.db` package by `ReactomePA:::getDb` (about 22 names, e.g. chicken, arabidopsis) that must be installed; only the seven are documented, so treat any other name as untested. Mouse checked end to end on ReactomePA 1.50.0 with `org.Mm.eg.db` 3.20.0 installed: a planted mouse pathway (R-MMU, 34 genes plus 40 random genes) came back rank 1 (`p.adjust` 2e-72).
 
 ## Over-Representation Analysis (enrichPathway)
 
@@ -189,7 +189,7 @@ Use ReactomePA for "is this one list over-represented / coordinately changed"; u
 **Trigger:** quoting "Reactome says pathway X, p=..." without naming the tool. **Mechanism:** ReactomePA pins to the installed reactome.db snapshot while the web tool tracks the current quarterly release, and their default backgrounds and identifier-projection differ. **Symptom:** a collaborator's reactome.org p-values differ from the local ones on the same list. **Fix:** state the tool, the release/reactome.db version, and the background; do not treat the two as interchangeable.
 
 ### Assuming arbitrary-organism support
-**Trigger:** passing a bacterial or plant `organism`. **Mechanism:** reactome.db maps only 7 organisms for ReactomePA. **Symptom:** an unsupported-organism error. **Fix:** for species beyond the 7, use the web AnalysisService or ReactomeGSA.
+**Trigger:** passing a bacterial or plant `organism`, or any non-human `organism` without its OrgDb. **Mechanism:** the help page documents 7 values; `organism` is resolved to an `org.*.db` package that is loaded at call time, and reactome.db has no plant pathways. **Symptom:** `object 'org.At.tair.db' not found` (or `org.Mm.eg.db` for mouse) when the OrgDb is absent; a name `getDb` does not know (e.g. `'ecoli'`) fails with a cryptic `unable to find an inherited method for function 'keys'` error, not a clear unsupported-organism message (both checked on ReactomePA 1.50.0). **Fix:** install the OrgDb for a documented organism; for species beyond the 7, use the web AnalysisService or ReactomeGSA.
 
 ## Quantitative Thresholds
 
@@ -215,7 +215,7 @@ Use ReactomePA for "is this one list over-represented / coordinately changed"; u
 | viewPathway did not open a browser | it draws a LOCAL ggraph plot | `browseURL('https://reactome.org/PathwayBrowser/#/<id>')` for the web diagram |
 | Different p-values than reactome.org | release skew + different universe between local db and web service | name the tool, reactome.db version, and background |
 | gsePathway results change each run | no `set.seed` before the permutation | set a fixed seed |
-| Unsupported-organism error | organism outside the 7 reactome.db maps | use the web AnalysisService / ReactomeGSA |
+| `object 'org.Xx.eg.db' not found`, or a `keys` method error | the `org.*.db` package for `organism` is not installed, or the name is not one `getDb` knows | install the OrgDb for a documented organism; species beyond the 7 -> web AnalysisService / ReactomeGSA |
 
 ## Practice Boundaries
 

@@ -9,16 +9,21 @@ import scanpy as sc
 # Requires clone_id or barcode in obs
 adata = sc.read_h5ad('lineage_traced.h5ad')
 
-# Standard preprocessing
-sc.pp.normalize_total(adata)
-sc.pp.log1p(adata)
-sc.pp.pca(adata)
-sc.pp.neighbors(adata)
-sc.tl.umap(adata)
+# CoSpar needs a precomputed PCA and 2-D embedding (initialize_adata_object only warns when they are
+# missing; the crash comes later as KeyError: 'X_emb'). Compute them on a log-normalized copy so
+# adata.X stays raw counts, which CoSpar expects.
+emb = adata.copy()
+sc.pp.normalize_total(emb)
+sc.pp.log1p(emb)
+sc.pp.pca(emb)
+sc.pp.neighbors(emb)
+sc.tl.umap(emb)
 
 # CoSpar expects time_info, state_info, and a clonal matrix X_clone on the AnnData
-# initialize_adata_object wires those fields into the object CoSpar operates on
-adata = cs.pp.initialize_adata_object(adata, X_clone=adata.obsm['X_clone'], time_info=adata.obs['time_info'])
+# initialize_adata_object wires those fields into the object CoSpar operates on.
+# data_des must be unique per dataset: CoSpar caches similarity matrices on disk under it.
+adata = cs.pp.initialize_adata_object(adata, X_clone=adata.obsm['X_clone'], time_info=adata.obs['time_info'],
+                                      X_pca=emb.obsm['X_pca'], X_emb=emb.obsm['X_umap'], data_des='my_dataset')
 
 # Infer the transition map jointly from clones at multiple timepoints and state similarity
 # smooth_array applies multi-scale smoothing; results land in adata.uns['transition_map']

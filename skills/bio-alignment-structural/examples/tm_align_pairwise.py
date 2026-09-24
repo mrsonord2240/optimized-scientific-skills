@@ -8,6 +8,7 @@ robust to TM-align release versions.
 # | Verify CLI flags if version differs
 
 import subprocess
+import sys
 
 def tm_align(reference_pdb, mobile_pdb, output_prefix=None, multimer=False):
     '''output_prefix is a prefix, not a file name: the tools write <output_prefix>.pdb (full-atom
@@ -69,7 +70,8 @@ def interpret_tmscore(tm, length=None):
     return 'statistically random'
 
 if __name__ == '__main__':
-    result = tm_align('reference.pdb', 'mobile.pdb', output_prefix='superposed')
+    # usage: python tm_align_pairwise.py REFERENCE.pdb MOBILE.pdb
+    result = tm_align(sys.argv[1], sys.argv[2], output_prefix='superposed')
     tm_whole = min(result['tm1'], result['tm2'])  # normalised by the longer chain: whole-chain fold call
     print(f'TM-score normalised by chain 1 (mobile): {result["tm1"]:.3f}')
     print(f'TM-score normalised by chain 2 (reference): {result["tm2"]:.3f}')

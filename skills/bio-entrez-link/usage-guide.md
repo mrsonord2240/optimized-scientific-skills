@@ -18,7 +18,7 @@ See SKILL.md's "Required Setup" for install and `Entrez.email`/`api_key` setup, 
 
 ### Picking the right linkname
 
-> "For gene UID 672, get the linked proteins using linkname='gene_protein_refseq' so we get the 1-5 curated isoforms instead of the 500-protein all-proteins variant."
+> "For gene UID 672, get the linked proteins using linkname='gene_protein_refseq' so we get the RefSeq isoforms only instead of the larger all-proteins variant."
 
 ### Enumerating link options
 

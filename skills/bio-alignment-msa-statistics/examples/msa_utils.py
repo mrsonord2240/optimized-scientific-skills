@@ -17,7 +17,12 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
-STOCKHOLM_EXTENSIONS = ('.sto', '.stk', '.stockholm')
+FORMAT_BY_EXTENSION = {
+    '.sto': 'stockholm', '.stk': 'stockholm', '.stockholm': 'stockholm',
+    '.aln': 'clustal', '.clw': 'clustal', '.clustal': 'clustal',
+    '.phy': 'phylip-relaxed', '.phylip': 'phylip-relaxed',
+    '.nex': 'nexus', '.nexus': 'nexus',
+}
 
 # Robinson & Robinson 1991 PNAS 88:8880 (values as tabulated by NCBI BLAST); sums to 1.0.
 ROBINSON_BACKGROUND = {
@@ -35,21 +40,28 @@ def example_path(default_name):
 
 
 def guess_format(path):
-    ''''stockholm' for .sto/.stk/.stockholm files, otherwise 'fasta'.'''
-    return 'stockholm' if path.lower().endswith(STOCKHOLM_EXTENSIONS) else 'fasta'
+    '''AlignIO format from the extension (see FORMAT_BY_EXTENSION), 'fasta' otherwise. Pass fmt= to
+    load_alignment for anything else. hmmalign A2M is ragged and cannot be read by AlignIO (see alignment-io).'''
+    return FORMAT_BY_EXTENSION.get(os.path.splitext(path)[1].lower(), 'fasta')
 
 
 def is_nucleotide(alignment, min_fraction=0.9):
-    '''True when >= min_fraction of the non-gap characters are A/C/G/T/U/N (any case).'''
+    '''True when >= min_fraction of the non-gap characters are A/C/G/T/U/N (any case), or when >= 50% are
+    and the rest are IUPAC nucleotide ambiguity codes (R Y S W K M B D H V): DNA with 12% R/Y/S/W/K/M is
+    still DNA, while protein has only ~30% A/C/G/T/N and ~66% of the full IUPAC set, so it never passes.
+    Check the result with pick_background()'s label, and override by choosing the background yourself.'''
     text = ''.join(str(r.seq) for r in alignment).upper().replace('-', '').replace('.', '').replace('~', '')
     if not text:
         return False
-    return sum(text.count(c) for c in 'ACGTUN') / len(text) >= min_fraction
+    core = sum(text.count(c) for c in 'ACGTUN') / len(text)
+    ambiguity = sum(text.count(c) for c in 'RYSWKMBDHV') / len(text)
+    return core >= min_fraction or (core >= 0.5 and core + ambiguity >= 0.98)
 
 
 def normalize_alignment(alignment, upper=True, u_to_t=False):
     '''Copy of `alignment` with '.' and '~' gaps turned into '-', letters upper-cased (upper=True)
-    and, for RNA (u_to_t=True), U turned into T.'''
+    and, for RNA (u_to_t=True), U turned into T. upper=False keeps case (A2M/A3M: lower case marks insert
+    columns; hmmalign A2M is ragged and cannot be loaded by AlignIO, see alignment/alignment-io).'''
     records = []
     for record in alignment:
         seq = str(record.seq).replace('.', '-').replace('~', '-')

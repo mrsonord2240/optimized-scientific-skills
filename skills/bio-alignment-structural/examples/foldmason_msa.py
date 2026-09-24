@@ -12,6 +12,7 @@ stem), so the row count exceeds the file count for multi-chain files.
 
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 def foldmason_msa(structures, result_prefix, tmp_dir='tmp/', refine_iters=100, report_mode=1, refine_seed=42):
@@ -59,7 +60,8 @@ def per_column_lddt(json_path, n_columns):
     return scores
 
 if __name__ == '__main__':
-    structures = sorted(Path('structures').glob('*.pdb'))
+    # usage: python foldmason_msa.py [STRUCTURE_DIR]   (default: ./structures)
+    structures = sorted(Path(sys.argv[1] if len(sys.argv) > 1 else 'structures').glob('*.pdb'))
     print(f'Aligning {len(structures)} structures with Foldmason...')
 
     outputs = foldmason_msa(structures, 'family_msa', refine_iters=100, report_mode=2)

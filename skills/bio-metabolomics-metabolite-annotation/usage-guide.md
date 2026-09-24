@@ -6,13 +6,7 @@ Metabolite annotation turns untargeted LC-MS/MS features (m/z, RT, MS/MS) into n
 
 ## Prerequisites
 
-```bash
-pip install matchms
-# SIRIUS 6 (in-silico formula/structure/class): https://v6.docs.sirius-ms.io/ (free academic account/license)
-# MetFrag (transparent in-silico fragmenter): MetFragCommandLine.jar
-```
-
-Conceptual prerequisites: a feature table from upstream preprocessing (metabolomics/xcms-preprocessing or metabolomics/msdial-preprocessing) with ion families already collapsed (adducts, isotopes, in-source fragments); the ion mode and expected adducts; and the distinction between annotation (a hypothesis with a level) and identification (Level 1, an in-house standard).
+Install notes and tool versions are in SKILL.md (Version Compatibility). You need a feature table from upstream preprocessing (metabolomics/xcms-preprocessing or metabolomics/msdial-preprocessing) with ion families already collapsed, and the ion mode and expected adducts.
 
 ## Quick Start
 
@@ -40,23 +34,7 @@ Tell your AI agent what you want to do:
 > "Check whether any of these annotations claim a specific isomer that MS/MS cannot resolve."
 > "Before pathway analysis, flag features whose ambiguous candidate sets would inflate enrichment."
 
-## What the Agent Will Do
-
-1. Confirm ion families are collapsed and the adduct is assigned before inferring any neutral mass.
-2. Match MS/MS against a library (matchms), enforcing both a score and a matched-peak floor.
-3. Run in-silico tools (SIRIUS formula/structure/class, MetFrag) for features without library spectra.
-4. Treat formula and class as more trustworthy than top-1 structure; require COSMIC FDR for confident structures.
-5. Assign each annotation an MSI/Schymanski level, capping at Level 2 without an in-house standard.
-6. Carry annotation uncertainty (candidate sets, levels) into downstream analysis rather than laundering it into facts.
-
-## Tips
-
-- A name with no confidence level is incomplete -- reject annotations that do not state one.
-- High cosine on few peaks is noise; always pair the score with a matched-peak count.
-- The same feature maps to many isomers SIRIUS/CSI:FingerID cannot separate -- a top-1 structure is Level 3 by default.
-- Only an in-house authentic standard, same method, earns Level 1; literature/external RT and great in-silico scores do not.
-- Database choice biases the answer: the truly novel metabolite is absent from your database by definition.
-- Network/analogue edges mean "related to," not "is" -- propagated names are Level 3 scaffold hypotheses.
+The method, tool choice, thresholds and failure modes are in SKILL.md.
 
 ## Related Skills
 

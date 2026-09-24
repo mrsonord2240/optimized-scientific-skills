@@ -10,9 +10,9 @@ author: GPTomics
 
 ## Version Compatibility
 
-Reference examples tested with: BioPython 1.83+, matplotlib 3.8+. Rich-figure alternatives: ggtree 3.12+ / treeio 1.28+ / ggtreeExtra 1.14+ (Bioconductor), ete4 4.x (Python), iTOL v6 (web), FigTree (desktop).
+Install: `pip install biopython matplotlib` (Python); ggtree, treeio, ggtreeExtra via Bioconductor and `ape` via CRAN (R). Reference examples tested with: BioPython 1.83+ (checked on 1.88), matplotlib 3.8+. Rich-figure alternatives: ggtree 3.12+ / treeio 1.28+ / ggtreeExtra 1.14+ (Bioconductor), ete4 4.x (Python), iTOL v6 (web), FigTree (desktop).
 
-ggtree 3.14.0 with ggplot2 4.0.3 (checked 2026-09): rectangular, circular and fan layouts and `geom_range` work; `slanted`, `equal_angle`, `daylight` and `ape` layouts and `geom_tiplab(align = TRUE)` fail (`could not find function "is.waive"`). `gheatmap()` is call-dependent: a plain `gheatmap(ggtree(tr), df)` succeeds, but calling it after prior geoms plus `new_scale_fill()` in a composite figure can fail (reproduced here: `` `new_geom_point_g_gtree()` requires the following missing aesthetics: x ``). Fallbacks: `ape::plot.phylo(type = 'unrooted')` for unrooted views, `ggtreeExtra::geom_fruit` instead of `gheatmap` -- the reliable choice for composite/multi-layer figures, or pin ggplot2 < 4. ETE4 did not build from pip on Windows / Python 3.12; ete3 renders headlessly only with PyQt5 and `QT_QPA_PLATFORM=offscreen` and then drew no tip text -- prefer ggtree for headless CI figures.
+ggtree 3.14.0 with ggplot2 4.0.3 (checked 2026-09): rectangular, circular and fan layouts and `geom_range` work; `slanted`, `equal_angle`, `daylight` and `ape` layouts and `geom_tiplab(align = TRUE)` fail (`could not find function "is.waive"`). `gheatmap()` is call-dependent: a plain `gheatmap(ggtree(tr), df)` succeeds, but calling it after prior geoms plus `new_scale_fill()` in a composite figure can fail (reproduced here: `` `new_geom_point_g_gtree()` requires the following missing aesthetics: x ``). Fallbacks: `ape::plot.phylo(type = 'unrooted')` for unrooted views (recipe in `references/ggtree-ape-recipes.md`), `ggtreeExtra::geom_fruit` instead of `gheatmap` -- the reliable choice for composite/multi-layer figures, or pin ggplot2 < 4. ETE4 did not build from pip on Windows / Python 3.12; ete3 renders headlessly only with PyQt5 and `QT_QPA_PLATFORM=offscreen` and then drew no tip text -- prefer ggtree for headless CI figures.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - Python: `pip show biopython` then `help(Phylo.draw)` to check signatures
@@ -54,7 +54,7 @@ The central decision is which drawing tool to reach for, and it is coupled to th
 | iTOL v6 (web) | Letunic 2024 | rectangular, circular, unrooted, very large trees; tab-delimited dataset templates for color strips, heatmaps, bars, binary symbols, clade collapse; SVG/PDF/PNG/EPS export | large trees and template-based metadata with no code; collaborative web-driven polished figures |
 | FigTree (desktop GUI) | Rambaut (software) | rectangular, polar, radial; reads BEAST NEXUS node annotations to display HPD bars and posterior on screen; manual rotate/collapse/color | interactive inspection of a single BEAST/MrBayes tree before scripting the final figure; not reproducible, use for exploration not the pipeline |
 
-Decision rule: large tree or no-code web annotation -> iTOL v6. Publication figure with metadata, dual support, HPD bars, or aligned heatmaps -> ggtree + treeio (+ ggtreeExtra for circular rings). Programmatic styling of thousands of nodes or NCBI-taxonomy annotation -> ETE4. Fast topology look from a Python script -> Bio.Phylo. Interactive rooting/inspection of one BEAST tree -> FigTree, then move the reproducible figure to ggtree. The recurring mistake is defaulting to Bio.Phylo because the pipeline is Python, then discovering it cannot draw a circular layout, place a heatmap, or show the BEAST HPD bars that are the whole point.
+Decision rule: large tree or no-code web annotation -> iTOL v6. Publication figure with metadata, dual support, HPD bars, or aligned heatmaps -> ggtree + treeio (+ ggtreeExtra for circular rings). Programmatic styling of thousands of nodes or NCBI-taxonomy annotation -> ETE4. Fast topology look from a Python script -> Bio.Phylo (code: `references/bio-phylo-recipes.md`; ggtree/ape code: `references/ggtree-ape-recipes.md`). Interactive rooting/inspection of one BEAST tree -> FigTree, then move the reproducible figure to ggtree. The recurring mistake is defaulting to Bio.Phylo because the pipeline is Python, then discovering it cannot draw a circular layout, place a heatmap, or show the BEAST HPD bars that are the whole point.
 
 ## What Each Layout Reveals and Hides
 
@@ -68,134 +68,12 @@ Decision rule: large tree or no-code web annotation -> iTOL v6. Publication figu
 
 Circular is still a ROOTED tree bent into a ring (center = root = past); unrooted/radial explicitly refuses a root. Presenting an unrooted radial tree and narrating "X is basal" is a contradiction.
 
-## Bio.Phylo + matplotlib Recipes
+## Reference Files
 
-Quick text and ASCII inspection, no figure needed:
+Read the file for the tool you are drawing with; everything else (choices, thresholds, failure modes, Common Errors) stays in this file.
 
-```python
-from Bio import Phylo
-
-tree = Phylo.read('tree.nwk', 'newick')
-print(tree)                  # indented text summary
-Phylo.draw_ascii(tree)       # ASCII-art diagram, useful in a terminal or log
-```
-
-Draw to a vector file (always pass an axes and `do_show=False` for headless/scripted use):
-
-```python
-from Bio import Phylo
-import matplotlib.pyplot as plt
-
-tree = Phylo.read('tree.nwk', 'newick')
-tree.ladderize()             # legibility only; ordering carries NO phylogenetic meaning -- say so in the caption
-
-fig, ax = plt.subplots(figsize=(10, 8))
-Phylo.draw(tree, axes=ax, do_show=False)
-ax.set_title('Phylogenetic tree (phylogram, branch length = subs/site)')
-fig.savefig('tree.pdf', bbox_inches='tight')   # vector: text and lines stay sharp at any size
-plt.close(fig)
-```
-
-Label tips, and show support with its measure named (never a bare integer):
-
-```python
-def tip_only(clade):
-    return clade.name if clade.is_terminal() else ''
-
-import re
-
-for clade in tree.get_nonterminals():            # IQ-TREE -B + --alrt: '88.5/92' stays in clade.name, confidence None
-    if clade.confidence is None and clade.name and re.fullmatch(r'[\d.]+/[\d.]+', clade.name):
-        clade.sh_alrt, clade.ufboot = (float(v) for v in clade.name.split('/'))   # SH-aLRT / UFBoot (last)
-        clade.name = None                        # otherwise the default label_func prints the raw string
-
-def support_label(clade):
-    # the measure MUST be stated in the legend/caption
-    if clade.is_terminal():
-        return ''
-    if getattr(clade, 'ufboot', None) is not None:
-        return f'{clade.sh_alrt:.0f}/{clade.ufboot:.0f}'
-    return f'{clade.confidence:.0f}' if clade.confidence is not None else ''
-
-if not any(support_label(c) for c in tree.get_nonterminals()):
-    print('WARNING: no internal clade has readable support -- the figure will show none')
-fig, ax = plt.subplots(figsize=(12, 10))
-Phylo.draw(tree, axes=ax, do_show=False, label_func=tip_only, branch_labels=support_label)
-ax.set_title('Node support: SH-aLRT (%) / UFBoot (%)')   # name the measure(s) the file actually holds
-fig.savefig('supported_tree.svg', bbox_inches='tight')
-plt.close(fig)
-```
-
-Color branches by group (set `.color` on the MRCA clade; descendants inherit it). ROOT FIRST: `common_ancestor` on an arbitrarily-rooted Newick read (the common case -- IQ-TREE etc. write an unrooted trifurcation) can return a basal node spanning nearly the whole tree instead of the intended clade, so root on an outgroup (tree-manipulation) before calling it, and check the returned tip set:
-
-```python
-import re
-
-tree.root_with_outgroup({'name': 'OutA'}, {'name': 'OutB'})   # root BEFORE any common_ancestor call -- see tree-manipulation
-
-intended_tips = {'Homo_sapiens', 'Pan_troglodytes', 'Gorilla_gorilla', 'Pongo_abelii'}   # the clade you actually mean
-mrca = tree.common_ancestor({'name': 'Homo_sapiens'}, {'name': 'Pongo_abelii'})
-mrca_tips = set(t.name for t in mrca.get_terminals())
-if mrca_tips != intended_tips:                 # FAIL LOUDLY -- do not silently color the wrong clade
-    raise ValueError(f'MRCA gave {sorted(mrca_tips)}, not the intended clade {sorted(intended_tips)} '
-                      f'-- check the outgroup/rooting and the tip names passed to common_ancestor')
-mrca.color = 'red'
-
-for clade in tree.get_nonterminals():          # clear raw support strings so they are not drawn as node labels
-    if clade.name and re.fullmatch(r'[\d.]+/[\d.]+', clade.name):
-        clade.name = None
-
-fig, ax = plt.subplots(figsize=(10, 8))
-Phylo.draw(tree, axes=ax, do_show=False)       # as_phyloxml() is needed only to EXPORT colors to phyloXML
-fig.savefig('colored_tree.pdf', bbox_inches='tight')
-plt.close(fig)
-```
-
-Scale the panel to tip count so labels stay legible, keeping the branch-length axis (Bio.Phylo has no scale-bar artist, so the x axis IS the scale):
-
-```python
-n_tips = len(tree.get_terminals())
-if n_tips > 150:
-    print('>~150 tips: switch to a circular layout or strips/rings (ggtree, iTOL) instead of a taller panel')
-height = min(max(8, n_tips * 0.25), 40)         # ~0.25 in/tip keeps ~6-8 pt labels from colliding; capped
-
-fig, ax = plt.subplots(figsize=(10, height))
-Phylo.draw(tree, axes=ax, do_show=False)
-ax.set_yticks([])                               # hide only the meaningless y ticks and spines
-ax.spines[['left', 'top', 'right']].set_visible(False)
-fig.savefig('scaled_tree.pdf', bbox_inches='tight')
-plt.close(fig)
-```
-
-For circular/fan/unrooted layouts, metadata heatmaps, dual support, or BEAST HPD bars, Bio.Phylo cannot help -- route to ggtree + treeio (R), ETE4, or iTOL.
-
-## ggtree + treeio Recipe (R)
-
-A composite publication figure -- IQ-TREE support kept as columns, rooted, dual support labeled, and a metadata ring -- checked on ggtree 3.14.0 / treeio 1.30.0 / ggtreeExtra 1.16.0 / ggplot2 4.0.3:
-
-```r
-suppressPackageStartupMessages({library(treeio); library(ggtree); library(ggtreeExtra); library(ggplot2)})
-
-iq <- read.iqtree('tree.treefile')          # keeps SH-aLRT/UFBoot as columns instead of text stuck in a label
-
-root_keep <- function(td, outgroup) {       # treeio root() can renumber tip labels to "1","2",... -- restore by index
-  r <- treeio::root(td, outgroup = outgroup, edgelabel = TRUE)
-  if (all(grepl('^[0-9]+$', r@phylo$tip.label))) r@phylo$tip.label <- td@phylo$tip.label[as.integer(r@phylo$tip.label)]
-  r
-}
-iq_r <- root_keep(iq, c('OutA', 'OutB'))    # root BEFORE labeling or coloring -- same root-first rule as the Bio.Phylo recipe above
-
-p <- ggtree(iq_r, size = 0.4) +
-  geom_tiplab(size = 2.6, offset = 0.003) +
-  geom_nodelab(aes(label = ifelse(is.na(UFboot), '', paste0(SH_aLRT, '/', UFboot))), size = 2, hjust = 1.1, vjust = -0.5) +
-  geom_treescale(width = 0.02, fontsize = 2.4)
-
-meta <- data.frame(label = iq_r@phylo$tip.label, trait = seq_along(iq_r@phylo$tip.label))   # replace with real metadata
-p2 <- p + geom_fruit(data = meta, geom = geom_tile, mapping = aes(y = label, fill = trait), pwidth = 0.06, offset = 0.08)
-ggsave('fig.pdf', p2, width = 180, height = 150, units = 'mm')
-```
-
-Use `geom_fruit` (ggtreeExtra) for the metadata ring, not `gheatmap` -- see the Version Compatibility note above on `gheatmap`'s composite-pipeline failure. `groupOTU(tree, list(...), group_name = 'grp')` + `aes(color = grp)` colors branches by predefined clade membership rather than one MRCA at a time; checked here via `ggplot_build()` segment colours that the stem edge into a defined group is colored by that group, not left on the parent's/ungrouped default -- root first here too, for the same reason the Bio.Phylo color recipe roots first.
+- `references/bio-phylo-recipes.md` -- Bio.Phylo + matplotlib code: ASCII/text view, vector export, tip labels and named support (IQ-TREE `SH-aLRT/UFBoot` parsing), color-by-MRCA with the root-first guard, tip-count panel scaling with the 200-tip hard cap. Read for any quick Python figure.
+- `references/ggtree-ape-recipes.md` -- R code: ggtree + treeio composite figure (`read.iqtree`, root with edge labels, dual support, `geom_fruit` ring, `groupOTU`) and the base-R `ape` unrooted view with scale bar. Read for publication figures, metadata, or when ggtree layouts fail.
 
 ## Per-Method Failure Modes
 
@@ -263,9 +141,9 @@ Lock the branch-length scale; do not let the figure engine non-uniformly stretch
 | Figure not saving / blank | `do_show=True` opens a window instead of writing | pass `do_show=False`, then `fig.savefig(...)` |
 | Branch colors not appearing | color set on a tip or the wrong clade | set `clade.color` on the MRCA clade (inherits to descendants); `as_phyloxml()` is only needed for phyloXML export |
 | Color covers far more of the tree than the intended clade | `common_ancestor` called before rooting, so the MRCA of two intended-clade tips is the basal node of an arbitrarily-rooted read | root on an outgroup (tree-manipulation) first, then compare `mrca.get_terminals()` against the tip set you meant and raise if they don't match, before coloring |
-| Support labels missing on an IQ-TREE tree | `SH-aLRT/UFBoot` label kept in `clade.name`, `confidence` None | parse `clade.name` as in the support recipe; warn when no clade has support |
+| Support labels missing on an IQ-TREE tree | `SH-aLRT/UFBoot` label kept in `clade.name`, `confidence` None | parse `clade.name` as in the support recipe (`references/bio-phylo-recipes.md`). That recipe only warns when no clade has support (a tree with no support values is legitimate and still draws correctly), whereas the MRCA-tip check raises (it would silently color the wrong clade) |
 | HPD bars shifted off the annotated interval | ggtree `geom_range` default `center = 'auto'` | `geom_range('height_0.95_HPD', center = 'height')` |
-| Labels overlap into a black band | too many tips for rectangular layout | increase panel height, rotate labels, or switch to circular/iTOL |
+| Labels overlap into a black band | too many tips for rectangular layout | increase panel height (capped at 40 in) or rotate labels; the scaled-panel recipe raises past 200 tips -- switch to ggtree circular/iTOL |
 | "Basal" claim on a radial tree | narrated an unrooted layout as if rooted | root explicitly (tree-manipulation) and show the root before any directional claim |
 | Support number misread | bare integer with no measure stated | label the measure(s) and order; collapse sub-threshold nodes to polytomies |
 | `Phylo.draw` has no circular option | Bio.Phylo is rectangular-only | use ggtree `layout='circular'`, ETE4, or iTOL |

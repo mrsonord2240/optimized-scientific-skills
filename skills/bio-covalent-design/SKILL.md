@@ -9,7 +9,7 @@ author: GPTomics
 
 ## Version Compatibility
 
-Reference examples tested with: RDKit 2024.09+, OpenEye / AutoDock Vina 1.2+ (for covalent extensions), GOLD (commercial), DOCKovalent (web service), HCovDock 1.0+.
+Reference examples tested with: RDKit 2024.09+, OpenEye / AutoDock Vina 1.2+ (for covalent extensions), GOLD (commercial), DOCKovalent (web service, covalent.docking.org), HCovDock 1.0+ (standalone installation). Install RDKit with `pip install rdkit`.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - Python: `pip show rdkit` then `help(rdkit.Chem)` to check signatures
@@ -47,6 +47,7 @@ Cysteine is frequently targeted because its thiol/thiolate can be nucleophilic a
 |---------|----------------|------------|---------------|----------------|
 | Acrylamide | `[CX3](=[OX1])([NX3])[CX3]=[CX3]` | Moderate (Michael acceptor) | Usually irreversible | Often Cys-directed |
 | Chloroacetamide | `[CX3](=[OX1])([NX3])[CH2]Cl` | High (SN2) | Irreversible | Often Cys-directed |
+| Iodoacetamide (ABPP probes) | `[CX3](=[OX1])([NX3])[CH2][I]` | High (SN2) | Irreversible | Often Cys-directed |
 | α-haloketone | `[CX3](=O)C[F,Cl,Br]` | Very high | Irreversible | Yes (but reactive) |
 | Vinyl sulfone | `S(=O)(=O)C=C` | Moderate (Michael) | Irreversible | Yes |
 | Sulfonyl fluoride | `S(=O)(=O)F` | Moderate | Irreversible | Lys/Tyr/Ser |
@@ -115,6 +116,8 @@ Do not assign a universal GSH half-life from the warhead name alone. Substitutio
 
 For open-source covalent docking, **HCovDock** (2023) is the modern alternative; **DOCKovalent** is the longstanding standard.
 
+**AutoDock 4 covalent, verified runnable (checked 2026-09-21):** the "flexible side chain" method (Bianco G, Forli S, Goodsell DS, Olson AJ, *Protein Sci.* 2016, DOI 10.1002/pro.2733) models the covalent ligand as a flexible receptor residue and docks it with unmodified AutoDock4/AutoGrid4 (`autogrid4 -p <target>.gpf -l <target>.glg`, then `autodock4 -p <ligand>_<target>.dpf -l <ligand>_<target>.dlg`) against `unbound_energy 0.0` in the DPF. Scripps ships AutoDock 4.2.6 Windows binaries (autodock.scripps.edu/download-autodock4) and a covalent-docking tutorial with scripts and a worked PDB 3UPO example (autodock.scripps.edu/resources/covalent-docking); re-running that example's pre-built inputs here reproduced its reference result (best pose -10.73 vs. the shipped -10.74 kcal/mol). Generating the GPF/DPF and flexible-receptor PDBQT for a new target needs MGLTools/AutoDockTools (`prepare_receptor4.py`, `prepare_flexreceptor4.py`, `prepare_gpf4.py`, `prepare_dpf4.py`). The official Scripps Windows installer is an old self-extractor that will not unpack non-interactively, but **bioconda ships a working Linux build** (`bioconda::mgltools` 1.5.7): `micromamba create -n mgltools -c bioconda -c conda-forge mgltools=1.5.7`, run under WSL. **Verified 2026-09-22**: `pythonsh $(which prepare_receptor4.py) -r receptor.pdb -o receptor.pdbqt -A hydrogens` ran clean on the 3PTB fixture (exit 0, 2015-atom PDBQT with Gasteiger charges assigned) — this is a real turnkey pipeline, not engine-only.
+
 ## Example: KRAS G12C Inhibitor Design Workflow
 
 **Goal:** Decorate a co-crystal scaffold with a cysteine-targeting warhead and rank candidates by covalent efficiency.
@@ -156,25 +159,7 @@ For ranking warheads without wet-lab data:
 
 **Approach:** Parse the SMILES, locate the acrylamide substructure, and count neighbors on the alpha carbon outside the matched warhead. This count is not a LUMO estimate or a stand-alone reactivity prediction; substituent electronics and the rest of the molecule must be considered, and reactivity should be measured.
 
-```python
-def acrylamide_alpha_substitution_count(smi):
-    mol = Chem.MolFromSmiles(smi)
-    if mol is None:
-        return None
-    acryl_pat = Chem.MolFromSmarts(
-        '[CX3:1](=[OX1:2])([NX3:3])[CX3:4]=[CX3:5]'
-    )
-    matches = mol.GetSubstructMatches(acryl_pat, uniquify=True)
-    if not matches:
-        return None
-    alpha_query_idx = next(
-        atom.GetIdx() for atom in acryl_pat.GetAtoms()
-        if atom.GetAtomMapNum() == 4
-    )
-    alpha_c = mol.GetAtomWithIdx(matches[0][alpha_query_idx])
-    n_subs = len([n for n in alpha_c.GetNeighbors() if n.GetIdx() not in matches[0]])
-    return n_subs
-```
+Run `python scripts/acrylamide_alpha_substitution.py '<smiles>' ...` (or import `acrylamide_alpha_substitution_count` from it); it prints the count, or `None` for an unparsable SMILES or no acrylamide.
 
 For a reactivity model, use experimentally measured rates or a validated quantum-chemical workflow; a single frontier-orbital energy is not sufficient on its own.
 

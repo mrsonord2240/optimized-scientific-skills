@@ -25,6 +25,7 @@ effect <- rep(1, n_features)
 effect[1:20] <- 1.5
 
 # Per-feature monotonic drift vs injection order, strong enough that correction genuinely helps.
+# Multiplicative (exp) so intensities stay positive: a linear 1 + slope * order goes negative.
 drift_slope <- rnorm(n_features, mean = 0, sd = 0.02)
 
 # Per-sample dilution (random, unrelated to group) -- the quantity PQN should recover.
@@ -33,7 +34,7 @@ dilution <- setNames(2^rnorm(n_total, sd = 0.4), seq_len(n_total))
 dilution[as.character(order_qc)] <- 1
 
 build_sample <- function(inj_order, fold) {
-    drift <- 1 + drift_slope * inj_order
+    drift <- exp(drift_slope * inj_order)
     noise <- 2^rnorm(n_features, sd = 0.1)
     true_abundance * fold * drift * noise * dilution[as.character(inj_order)]
 }
@@ -45,7 +46,8 @@ inj <- integer(n_total)
 
 for (i in seq_len(n_bio)) {
     o <- order_bio[i]
-    fold <- ifelse(group[i] == 'case', effect, 1)
+    # NOT ifelse(): a length-1 test returns effect[1] alone, applying 1.5x to every feature
+    fold <- if (group[i] == 'case') effect else rep(1, n_features)
     mat[o, ] <- build_sample(o, fold)
     sample_group[o] <- group[i]
     inj[o] <- o
@@ -158,6 +160,8 @@ mat_norm <- pqn$data
 # correlation means the normalization is eating the biological effect. A FIXED |r| > 0.3 cutoff
 # is noise-sensitive at typical study sizes (a real run at n=40 tripped from estimator noise
 # alone with a true correlation of 0); use a permutation test instead, which scales with n.
+# A calibrated test still trips ~5% of the time on clean data, so one TRIPPED verdict is a prompt
+# to check, not proof: corroborate with the factor-vs-true-dilution / measured-quantity correlation.
 factor_dilution_cor <- suppressWarnings(cor(pqn$factors[bio_rows], dilution[bio_rows]))
 group_bin <- as.integer(sample_group[bio_rows] == 'case')
 factor_group_cor <- suppressWarnings(cor(pqn$factors[bio_rows], group_bin))
@@ -170,7 +174,7 @@ perm_cor <- replicate(n_perm, {
     suppressWarnings(cor(pqn$factors[bio_rows], sample(group_bin)))
 })
 perm_p <- (sum(abs(perm_cor) >= abs(factor_group_cor)) + 1) / (n_perm + 1)
-verdict <- if (perm_p < 0.05) 'TRIPPED: group effect in the PQN factor unlikely under label-shuffling (p < 0.05); normalize to a measured external quantity instead' else 'ok: factor-vs-group correlation is not distinguishable from label-shuffling noise'
+verdict <- if (perm_p < 0.05) 'TRIPPED: group effect in the PQN factor unlikely under label-shuffling (p < 0.05); ~5% of clean runs trip by chance, so corroborate (factor should track a measured dilution quantity) before switching to a measured external quantity' else 'ok: factor-vs-group correlation is not distinguishable from label-shuffling noise'
 cat(sprintf('PQN factor vs group: r=%.3f, permutation p=%.3f (%s)\n',
             factor_group_cor, perm_p, verdict))
 

@@ -3,7 +3,7 @@
 Replaces GUIDANCE2, whose stand-alone package can no longer be downloaded. Pipeline (MUSCLE 5.3):
 
     muscle -align seqs.fa -stratified -output ens.efa          # ensemble of replicate alignments
-    muscle -maxcc ens.efa -output maxcc.afa                    # stderr ends "best <name>", e.g. acb.2
+    muscle -maxcc ens.efa -output maxcc.afa                    # stderr has a "best <name>" line, e.g. acb.2
     muscle -addconfseq ens.efa -output ens_cc.efa              # adds two digit-rows (CC) per replicate
     python muscle5_column_confidence.py ens_cc.efa acb.2 0.9 masked.fa
 
@@ -56,6 +56,8 @@ def mask_by_confidence(alignment, cc, min_cc):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) < 3:
+        sys.exit('usage: python muscle5_column_confidence.py ens_cc.efa <replicate-name> [min_cc out.fa]')
     efa, name = sys.argv[1], sys.argv[2]
     alignment, cc = read_replicate(efa, name)
     print(f'{len(alignment)} sequences x {len(cc)} columns; mean CC {sum(cc) / len(cc):.3f}')

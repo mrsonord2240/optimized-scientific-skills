@@ -34,7 +34,9 @@ sc.pp.normalize_total(adata, target_sum=1e4)
 sc.pp.log1p(adata)
 adata.layers['log_normalized'] = adata.X.copy()
 sc.pp.highly_variable_genes(adata, n_top_genes=2000)
-sc.tl.pca(adata, use_highly_variable=True)
+sc.tl.pca(adata, mask_var='highly_variable')   # scanpy >=1.12: `use_highly_variable` is deprecated;
+                                               # mask_var='highly_variable' is its exact replacement
+                                               # (verified: byte-identical X_pca on papalexi_2021)
 
 # === MIXSCAPE ESCAPER FILTERING ===
 # Compute perturbation signature: cell_expression - mean(K NTC neighbors)
@@ -54,14 +56,15 @@ ms.mixscape(
     adata=adata,
     pert_key='gene_target',                     # pert_key (modern pertpy API)
     control='NT',
-    new_class_name='mixscape_class_global',
+    new_class_name='mixscape_class',            # per-gene labels ('<gene> KO'/'<gene> NP'/'NT'); the
+                                                # bare KO/NP/NT call goes to 'mixscape_class_global'
 )
 # Defaults to layer='X_pert' from previous step
 
 # Retain KO cells + NTC controls for DE
 adata_filtered = adata[adata.obs['mixscape_class_global'] != 'NP'].copy()
 print(f'Cells after Mixscape filtering: {adata_filtered.n_obs}')
-ko_pct = (adata_filtered.obs['mixscape_class_global'] == 'KO').mean()
+ko_pct = (adata.obs['mixscape_class_global'] == 'KO').sum() / (adata.obs['gene_target'] != 'NT').sum()
 print(f'KO retention rate among perturbed: {ko_pct:.1%}')
 
 # === DIFFERENTIAL EXPRESSION ===
