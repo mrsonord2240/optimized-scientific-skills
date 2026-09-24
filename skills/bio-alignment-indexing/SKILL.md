@@ -45,16 +45,21 @@ Create indices for random access to alignment files using samtools and pysam.
 | GRCm39 (mouse) | 195 Mbp | BAI |
 | GRCz11 (zebrafish), TAIR10 (Arabidopsis) | 78 Mbp / 30 Mbp | BAI |
 | Wheat IWGSC (Triticum aestivum) | ~830 Mbp (chr3B) | **CSI** |
-| Pine, fir, axolotl, sugar pine | up to 2^31-1 bp (BAM limit) | **CSI** (`-c`); a contig above 2^31-1 bp cannot be stored in BAM at all |
+| Assembled pine / fir scaffolds | usually below 537 Mbp | BAI if the longest scaffold is at or below the BAI limit; check the `.fai` |
+| Axolotl chromosome arms | above 537 Mbp | **CSI** (`-c`) |
 | Long-read assembly with very large contigs | varies | check `cut -f2 ref.fa.fai \| sort -nr \| head -1` |
 
-Contigs above 537 Mbp (wheat, axolotl, sugar pine): use the default CSI.
+Index choice follows the **longest contig**, not total genome size. For a reference you received, check it directly:
+```bash
+cut -f2 ref.fa.fai | sort -nr | head -1
+```
+Contigs above 537 Mbp (for example wheat chromosomes or axolotl chromosome arms): use the default CSI.
 ```bash
 samtools index -c file.bam    # min_shift 14, depth auto-sized: worked on 830 Mbp and 2.0 Gbp contigs (samtools 1.24)
 ```
 - BAI on a contig >2^29 bp **fails loudly** and writes no `.bai`: `Region ... cannot be stored in a bai index. Try using a csi index`, exit 1.
 - Do not raise `-m` for reach: depth is sized from the longest `@SQ`, and `-m` only coarsens the smallest bin (`-m 18` gave depth 4 = 2^30 on an 830 Mbp contig, not 2^33).
-- BAM stores positions as int32: a contig longer than 2^31-1 bp (2.147 Gbp) fails at write time (`Positional data is too large for BAM format`). Split the reference before aligning; no index option fixes this.
+- BAM stores positions as int32: the header can declare a longer contig, but a read positioned beyond 2^31-1 bp (2.147 Gbp) cannot be written (`Positional data is too large for BAM format`). Split that reference before aligning; no index option fixes this.
 
 ## samtools index
 
@@ -139,6 +144,7 @@ with pysam.AlignmentFile('input.cram', 'rc', reference_filename='ref.fa') as cra
 ```
 - Without a reachable reference `samtools view` prints no records (`Failed to populate reference`), pysam raises `OSError: truncated file`, but `samtools view -c` still counts.
 - `@SQ UR:` often points at the original machine's path; pass `-T`/`reference_filename` or set `REF_PATH`.
+- `REF_PATH` is an MD5 reference cache, not a directory containing `genome.fasta`: it must resolve files named from the `@SQ M5` checksum (for example, populate `REF_CACHE=cache/%2s/%2s/%s`). `-T ref.fa` is the simple route.
 - pysam `get_index_statistics()` silently returns 0 for CRAM; use `samtools idxstats input.cram` or `pysam.idxstats('input.cram')`.
 
 ## pysam Python Alternative
@@ -306,24 +312,40 @@ with pysam.FastaFile('reference.fa') as ref:
 
 ## Index Staleness
 
-If the BAM was modified after indexing, the index points to wrong file offsets and region queries fail or return wrong reads (`The index file is older than the data file`, then `Invalid BGZF header`). Test every index that exists, not just `.bai`, and delete them all before re-indexing, because a stale `.csi` beats a fresh `.bai`:
+If the BAM was modified after indexing, the index points to wrong file offsets and region queries fail or return wrong reads (`The index file is older than the data file`, then `Invalid BGZF header`). Test every index that exists, not just `.bai`, and delete them all before re-indexing, because a stale `.csi` beats a fresh `.bai`. This is an mtime check only: after a restore that preserves timestamps, or if an index is truncated but newer, compare `samtools idxstats` with `samtools view -c` before trusting it.
 ```bash
 ensure_index() {   # ensure_index file.bam|file.cram [extra samtools-index options, e.g. -@ 4]
     local f=$1; shift
-    local stem=${f%.*} idx have=0 stale=0 flag=
-    for idx in "$f.csi" "$stem.csi" "$f.bai" "$stem.bai" "$f.crai" "$stem.crai"; do
+    local stem=${f%.*} idx have=0 stale=0 csi=0 min_shift=14
+    local -a candidates
+    case $f in
+        *.bam)  candidates=("$f.csi" "$stem.csi" "$f.bai" "$stem.bai") ;;
+        *.cram) candidates=("$f.crai" "$stem.crai") ;;
+        *) printf 'Expected a .bam or .cram file: %s\n' "$f" >&2; return 2 ;;
+    esac
+    for idx in "${candidates[@]}"; do
         [ -e "$idx" ] || continue
         have=1
         [ "$f" -nt "$idx" ] && stale=1
-        case $idx in *.csi) flag=-c ;; esac      # keep CSI if the BAM had CSI
+        case $idx in
+            *.csi) csi=1
+                    # CSI is BGZF-compressed; decompressed bytes 5-8 store min_shift.
+                    min_shift=$(bgzip -cd "$idx" | od -An -j4 -N4 -tu4 | tr -d '[:space:]')
+                    [ -n "$min_shift" ] || min_shift=14 ;;
+        esac
     done
     if [ $have = 0 ] || [ $stale = 1 ]; then
-        rm -f "$f.csi" "$stem.csi" "$f.bai" "$stem.bai" "$f.crai" "$stem.crai"
-        samtools index $flag "$@" "$f"
+        rm -f "${candidates[@]}"
+        if [ $csi = 1 ]; then
+            samtools index -c -m "$min_shift" "$@" "$f"  # preserve an existing CSI bin size
+        else
+            samtools index "$@" "$f"
+        fi
     fi
 }
 
-for f in *.bam; do ensure_index "$f"; done     # batch: indexes only what is missing or stale
+shopt -s nullglob
+for f in *.bam; do ensure_index "$f"; done     # an empty directory is a successful no-op
 ```
 
 ## Contig-Naming Sanity Check

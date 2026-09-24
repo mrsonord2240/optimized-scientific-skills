@@ -41,7 +41,6 @@ def parse_region(region, references):
     ('HLA-A*01:01:01:01:1-1500', or braced '{HLA-A*01:01:01:01}:1-1500').
     pysam's own fetch(region=...) rejects all of these.
     '''
-    region = region.replace(',', '')
     braced = re.fullmatch(r'\{(.+)\}(?::(.*))?', region)
     if braced:
         contig, coords = braced.group(1), braced.group(2) or ''
@@ -53,9 +52,18 @@ def parse_region(region, references):
         raise ValueError(f'unknown contig {contig!r} (names are case-sensitive; chr1 != 1)')
     start, _, end = coords.partition('-')
     try:
-        return contig, (int(start) - 1 if start else None), (int(end) if end else None)
+        # Coordinate commas are separators; commas in a contig name are not.
+        start = start.replace(',', '')
+        end = end.replace(',', '')
+        start0 = 0 if start == '0' else (int(start) - 1 if start else None)
+        end0 = int(end) if end else None
     except ValueError:
         raise ValueError(f'malformed coordinates {coords!r}') from None
+    if start0 is not None and start0 < 0:
+        raise ValueError('start must be 0 or a positive 1-based coordinate')
+    if start0 is not None and end0 is not None and start0 >= end0:
+        raise ValueError('start after end')
+    return contig, start0, end0
 
 
 def fetch_region(path, region, reference=None):
@@ -73,7 +81,7 @@ def fetch_region(path, region, reference=None):
                 count += 1
                 strand = '-' if read.is_reverse else '+'
                 print(f'{read.query_name}\t{read.reference_start + 1}\t{strand}')
-        except OSError as e:
+        except (OSError, ValueError) as e:
             hint = ' -- a CRAM needs its reference: pass --reference ref.fa' if mode == 'rc' and not reference else ''
             sys.exit(f'Read failed: {e}{hint}')
 

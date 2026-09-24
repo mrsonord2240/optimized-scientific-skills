@@ -193,7 +193,7 @@ else:
 
 Hard gates from [[screen-qc]]:
 - Plasmid Gini <0.1; endpoint <0.3 (or <0.55 for heavy drug screens)
-- Replicate Pearson on log-counts >0.85
+- Replicate Pearson on log-counts >=0.8 (MAGeCK-VISPR floor); >0.85 acceptable
 - CEGv2 PR-AUC >0.7 against the Hart 2017 reference essential gene set (community convention, not a threshold defined in that paper)
 - Reads per sgRNA per sample >=300 (DepMap convention)
 
@@ -273,8 +273,14 @@ BAGEL.py bf -i experiment.foldchange -o bayes_factor.txt -e CEGv2.txt -n NEGv1.t
 
 ```bash
 mageck mle --count-table experiment.count.txt --design-matrix design.txt \
-    --output-prefix timecourse_mle --norm-method median
+    --output-prefix timecourse_mle --norm-method median --permutation-round 10
 ```
+
+`mageck mle` defaults to only two permutation rounds. For any primary `fdr` call near
+0.05, use at least `--permutation-round 10` (the installed MAGeCK 0.5.9.5 help's own
+suggestion), then re-check borderline genes or cross-check `wald-fdr`; do not treat a
+default-round boundary call as stable. See [[mageck-analysis]]'s “Permutation-Round
+Sensitivity” section for the measured HAP1 TKOv3 example and interpretation.
 
 ### 6c. Drug-modifier (drugZ)
 
@@ -384,6 +390,11 @@ MAGeCKFlute R package provides one-shot FluteRRA / FluteMLE dashboards with KEGG
 | jacks_out_gene_JACKS_results.txt | JACKS | Gene effect + sgRNA efficacy |
 | tier_consensus.csv | Custom aggregation | Tier-1/2/3 hits across methods |
 
+For a compact, runnable MAGeCK count -> RRA -> hit-extraction reference, see
+[`examples/crispr_pipeline.sh`](examples/crispr_pipeline.sh). Adapt its library, FASTQ,
+and sample-label variables to the design selected above; it is an RRA reference, not a
+replacement for the QC and design-choice gates in this Skill.
+
 ## Common Errors
 
 | Symptom | Cause | Fix |
@@ -394,6 +405,7 @@ MAGeCKFlute R package provides one-shot FluteRRA / FluteMLE dashboards with KEGG
 | "Everything significant at FDR<0.01" | Heavy selection breaks median normalization (>40% guides change) | Switch to `--norm-method control` on NTCs, or BAGEL2 |
 | Underpowered / method mismatch | RRA on a time course; single-line Chronos | Pick method by design (fork table); RRA fails multi-condition, Chronos is overkill single-line |
 | Distorted NB mean-variance | Batch pre-corrected with ComBat on counts | Add batch as a MAGeCK MLE covariate instead |
+| Borderline MLE `fdr` changes after rerunning | `mageck mle` defaulted to 2 permutation rounds | Re-run with `--permutation-round 10`, compare borderline calls (and `wald-fdr`), then validate discordant genes orthogonally; see [[mageck-analysis]] |
 | Novel hits from a failed screen | CEGv2 essentials did not deplete (PR-AUC < 0.7) | The screen failed selection; no hit is trustworthy regardless of p-value |
 | Tier consensus changes between identical reruns | BAGEL2 `bf` run unseeded (clock-based default `-s`) | Always pass a fixed `-s` (Step 6a); see [[bagel-essentiality]]'s Reproducibility section |
 

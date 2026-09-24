@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "cf49634bbedaea7d5f5c0fda81526343d40e3e62"
+      "staging_commit": "a0f8d0973ab151551a4e9d5f4fece9badf26d1bb"
     }
   },
   "skills": [
@@ -79,11 +79,11 @@
     {
       "id": "bio-alignment-indexing",
       "upstream_path": "alignment-files/alignment-indexing",
-      "score": 85,
-      "grade": "Limited Release",
+      "score": 95,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-20",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-alignment-indexing.md",
       "fix_pass": "done",
       "reaudit": "not needed",
@@ -93,29 +93,32 @@
         "fetch_regions.py",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-alignment-io",
       "upstream_path": "alignment/alignment-io",
-      "score": 87,
-      "grade": "Limited Release",
+      "score": 94,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-20",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-alignment-io.md",
       "fix_pass": "done",
       "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
+        "a2m-a3m.md",
         "batch_convert.py",
         "convert_formats.py",
+        "maf-coordinates.md",
         "read_alignment.py",
         "slice_alignment.py",
+        "stockholm-streaming.md",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-alignment-msa-parsing",
@@ -3433,11 +3436,11 @@
     {
       "id": "bio-workflows-crispr-screen-pipeline",
       "upstream_path": "workflows/crispr-screen-pipeline",
-      "score": 85,
-      "grade": "Limited Release",
+      "score": 93,
+      "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-16",
+      "audited_on": "2026-09-24",
       "fix_log": "fixes/bio-workflows-crispr-screen-pipeline.md",
       "fix_pass": "done",
       "reaudit": "not needed",
@@ -3446,7 +3449,7 @@
         "SKILL.md",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-workflows-metabolomics-pipeline",
