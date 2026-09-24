@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "8c75e1f43322680fe5a66901463abab8dda8ae8c"
+      "staging_commit": "9807004e7c7f3e2c18b236db63044ddfde577ea0"
     }
   },
   "skills": [
@@ -1232,6 +1232,32 @@
         "SKILL.md"
       ],
       "marketplace_ready": false
+    },
+    {
+      "id": "bio-data-visualization-sequence-logos",
+      "upstream_path": "data-visualization/sequence-logos",
+      "score": 94,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-23",
+      "fix_log": "fixes/bio-data-visualization-sequence-logos.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "aligned_motif.fa",
+        "ctcf_aligned.fa",
+        "gata1_aligned.fa",
+        "phospho_aligned.fa",
+        "relative_entropy_logo.R",
+        "rest_aligned.fa",
+        "seqlogo_phd.R",
+        "test_relative_entropy_logo.R",
+        "usage-guide.md"
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-differential-expression-deseq2-basics",

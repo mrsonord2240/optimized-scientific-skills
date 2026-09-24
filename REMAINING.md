@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**391 remaining** across 52 folders. 156 are already refined and live in `skills/`.
+**391 remaining** across 52 folders. 157 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 156 refined, 14 audited and excluded, 1 out of scope, 391 remaining.
+The source tree holds 562 Skills: 157 refined, 13 audited and excluded, 1 out of scope, 391 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -45,7 +45,7 @@ The source tree holds 562 Skills: 156 refined, 14 audited and excluded, 1 out of
 | tcr-bcr-analysis | 6 | 0 |
 | temporal-genomics | 6 | 0 |
 | chemoinformatics | 5 | 15 |
-| data-visualization | 5 | 1 |
+| data-visualization | 5 | 2 |
 | differential-expression | 5 | 1 |
 | epidemiological-genomics | 5 | 0 |
 | epitranscriptomics | 5 | 0 |
@@ -141,7 +141,6 @@ fixed.
 | `bio-data-visualization-multipanel-figures` | 71 | Beta Only | 0 |
 | `bio-data-visualization-network-visualization` | 74 | Beta Only | 0 |
 | `bio-data-visualization-oncoprint-mutation-matrices` | 73 | Beta Only | 0 |
-| `bio-data-visualization-sequence-logos` | 69 | Beta Only | 1 |
 | `bio-data-visualization-statistical-annotation` | 71.2 | Beta Only | 0 |
 | `bio-data-visualization-upset-plots` | 70.4 | Beta Only | 0 |
 | `bio-data-visualization-volcano-and-ma-plots` | 76 | Beta Only | 0 |

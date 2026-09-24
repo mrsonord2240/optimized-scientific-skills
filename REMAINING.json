@@ -4,8 +4,8 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 156,
-    "audited_and_excluded": 14,
+    "refined": 157,
+    "audited_and_excluded": 13,
     "out_of_scope": 1,
     "remaining": 391
   },
@@ -1608,8 +1608,8 @@
       "deployable": false,
       "open_p0": 0,
       "audited_on": "2026-09-20",
-      "fix_log": null,
-      "fix_pass": "needed",
+      "fix_log": "fixes/bio-data-visualization-distribution-plots.md",
+      "fix_pass": "done",
       "reaudit": "not needed"
     },
     {
@@ -1691,18 +1691,6 @@
       "grade": "Beta Only",
       "deployable": false,
       "open_p0": 0,
-      "audited_on": "2026-09-20",
-      "fix_log": null,
-      "fix_pass": "needed",
-      "reaudit": "not needed"
-    },
-    {
-      "id": "bio-data-visualization-sequence-logos",
-      "upstream_path": "data-visualization/sequence-logos",
-      "score": 69,
-      "grade": "Beta Only",
-      "deployable": false,
-      "open_p0": 1,
       "audited_on": "2026-09-20",
       "fix_log": null,
       "fix_pass": "needed",
