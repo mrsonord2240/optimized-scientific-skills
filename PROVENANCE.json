@@ -9,7 +9,7 @@
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "9807004e7c7f3e2c18b236db63044ddfde577ea0"
+      "staging_commit": "7c99875a8c05afcf629d12f3519843e52900061e"
     }
   },
   "skills": [
@@ -1234,6 +1234,25 @@
       "marketplace_ready": false
     },
     {
+      "id": "bio-data-visualization-lollipop-protein-maps",
+      "upstream_path": "data-visualization/lollipop-protein-maps",
+      "score": 93,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-24",
+      "fix_log": "fixes/bio-data-visualization-lollipop-protein-maps.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "lollipop_phd.R",
+        "usage-guide.md"
+      ],
+      "marketplace_ready": true
+    },
+    {
       "id": "bio-data-visualization-sequence-logos",
       "upstream_path": "data-visualization/sequence-logos",
       "score": 94,
@@ -1255,6 +1274,26 @@
         "rest_aligned.fa",
         "seqlogo_phd.R",
         "test_relative_entropy_logo.R",
+        "usage-guide.md"
+      ],
+      "marketplace_ready": true
+    },
+    {
+      "id": "bio-data-visualization-upset-plots",
+      "upstream_path": "data-visualization/upset-plots",
+      "score": 93,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-24",
+      "fix_log": "fixes/bio-data-visualization-upset-plots.md",
+      "fix_pass": "done",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "upset_gene_sets.R",
+        "upset_python.py",
         "usage-guide.md"
       ],
       "marketplace_ready": true
