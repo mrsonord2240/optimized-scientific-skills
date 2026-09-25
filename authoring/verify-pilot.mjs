@@ -1,5 +1,5 @@
 // Provider preflight; never grants Marketplace approval or executes Skill code.
-// Usage: node authoring/verify-pilot.mjs --marketplace <clone> --audit <clone>
+// Usage: node authoring/verify-pilot.mjs --marketplace <clone> --audit <clone> [--intake <generated-json>]
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
 const { values } = parseArgs({ options: {
-  marketplace: { type: 'string' }, audit: { type: 'string' },
+  marketplace: { type: 'string' }, audit: { type: 'string' }, intake: { type: 'string' },
 } });
 assert(values.marketplace && values.audit, '--marketplace and --audit are required');
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -39,7 +39,7 @@ const intakeArgs = configs.flatMap(config => ['--manifest', config, '--source', 
 const generated = JSON.parse(execFileSync(process.execPath,
   [path.resolve(values.marketplace, 'scripts/intake-skill.mjs'), ...intakeArgs],
   { cwd: values.marketplace, maxBuffer: 8 * 1024 * 1024 }));
-const localIntake = path.join(base, 'intake-review-input.json');
+const localIntake = values.intake ? path.resolve(values.intake) : path.join(base, 'intake-review-input.json');
 if (existsSync(localIntake)) {
   const saved = JSON.parse(readFileSync(localIntake));
   assert.deepEqual(generated, saved, 'Saved intake evidence differs from current official intake');

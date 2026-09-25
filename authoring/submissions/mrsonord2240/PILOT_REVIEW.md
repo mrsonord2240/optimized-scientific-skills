@@ -2,7 +2,7 @@
 
 This directory contains the provider-side material for the first 20-Skill
 Marketplace pilot. The source packages are pinned to commit
-`bcb030eb6734ca27d14d1ad41f890238058e6ef9` of
+`2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db` of
 `https://github.com/mrsonord2240/optimized-scientific-skills`.
 
 The files have deliberately separate responsibilities:
@@ -10,10 +10,11 @@ The files have deliberately separate responsibilities:
 - Each Skill directory contains the strict Marketplace `release.config.json`.
   Do not add provider-only fields to those files; the Marketplace schema rejects
   unknown fields.
-- `intake-review-input.json` is the unapproved output of the Marketplace intake
-  command. It records the exact manifest/content hashes, file counts, package
-  sizes, license expression, and license-evidence hashes for the pinned source
-  commit. It is evidence input, not approval.
+- `intake-review-input.json`, when generated locally, is unapproved Marketplace
+  intake output and is not committed. It may refer to an older source pin; pass
+  a freshly generated file to the verifier with `--intake`. Current verified
+  metrics are embedded under `package_evidence` below. Intake is evidence input,
+  not approval.
 - `pilot-review-evidence.json` records provenance, reproducible external-audit
   links, runtime dependencies, declared input/output contracts, bundled
   executables, review scope, unresolved limitations, and provider check results.
@@ -56,8 +57,8 @@ separate spec and standards agents to check the prepared evidence.
 
 1. Release configs: complete for all 20 pilot Skills.
 2. Required release fields: complete and accepted by Marketplace intake.
-3. Package and license hashes: complete in `intake-review-input.json` for the
-   pinned source commit.
+3. Package and license hashes: regenerated with official Marketplace intake and
+   embedded in `pilot-review-evidence.json` for the pinned source commit.
 4. Review records: provider reviewer, date, scope, results and limitations are
    recorded per Skill; AIPOCH reviewer/date/score remain pending.
 5. GPTomics provenance and modification attribution: recorded.
@@ -69,9 +70,10 @@ separate spec and standards agents to check the prepared evidence.
    lock or evidence of clean installation of every optional route.
 8. Input/output/limitation/script cross-check: static checks completed for all
    20; selected synthetic execution covers 15. The two source findings are
-   resolved; one checked Windows R route retains a documented platform-specific
-   failure alongside a passing WSL route. Full functional verification remains
-   incomplete.
+   corrected and re-tested, but all three changed Skills require independent
+   re-audit before their Marketplace-ready state can be restored. One checked
+   Windows R route retains a documented platform-specific failure alongside a
+   passing WSL route. Full functional verification remains incomplete.
 
 ## Local syntax checks
 
@@ -120,14 +122,18 @@ it warns that MNP/mixed records are dropped. Its scoped synthetic test passed.
 The corrected Skill files are committed and all 20 release manifests, official
 intake records and provider evidence are refreshed against the new source pin.
 Five Skills still have no new functional execution in this pass; that remaining
-coverage gap is explicit and does not imply those Skills are broken.
+coverage gap is explicit and does not imply those Skills are broken. Repository
+provenance now marks `bio-proteomics-data-import`,
+`bio-single-cell-cell-annotation`, and `bio-vcf-statistics` as
+`reaudit: needed` and `marketplace_ready: false`; the pilot is not ready for
+Marketplace submission until an independent re-audit clears those states.
 
 ## Reproduce provider checks
 
 Run from this provider repository with trusted local clones available:
 
 ```powershell
-node authoring/verify-pilot.mjs --marketplace F:/OpenScience/marketplace-intake/openscience-skill-marketplace --audit F:/optimizing-agent-science-skills
+node authoring/verify-pilot.mjs --marketplace F:/OpenScience/marketplace-intake/openscience-skill-marketplace --audit F:/optimizing-agent-science-skills --intake C:/path/to/refreshed-intake-review-input.json
 node authoring/smoke-pilot.mjs --python python --rscript C:/R/bin/x64/Rscript.exe
 ```
 
