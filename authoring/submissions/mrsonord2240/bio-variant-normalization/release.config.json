@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "bio-variant-normalization",
+  "version": "1.0.0",
+  "category": "Data Analysis",
+  "source": {
+    "repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+    "path": "skills/bio-variant-normalization"
+  },
+  "license_files": [
+    "LICENSE",
+    "skills/bio-variant-normalization/SKILL.md"
+  ]
+}

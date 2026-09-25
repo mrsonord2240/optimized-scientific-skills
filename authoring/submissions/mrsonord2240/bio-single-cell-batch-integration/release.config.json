@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "bio-single-cell-batch-integration",
+  "version": "1.0.0",
+  "category": "Data Analysis",
+  "source": {
+    "repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+    "path": "skills/bio-single-cell-batch-integration"
+  },
+  "license_files": [
+    "LICENSE",
+    "skills/bio-single-cell-batch-integration/SKILL.md"
+  ]
+}
