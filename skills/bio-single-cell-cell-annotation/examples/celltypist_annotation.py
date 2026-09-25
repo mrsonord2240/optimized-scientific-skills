@@ -1,5 +1,6 @@
 # Reference: pandas 2.2+, scanpy 1.10+, scikit-learn 1.4+ | Verify API if version differs
 import argparse
+from pathlib import Path
 
 import scanpy as sc
 import celltypist
@@ -25,10 +26,17 @@ adata.X = adata.layers['counts'].copy()
 sc.pp.normalize_total(adata, target_sum=1e4)
 sc.pp.log1p(adata)
 
-# Keep model acquisition separate from execution so a review or production run
-# cannot silently perform a network download. Pre-cache the named model or pass
-# a local model file with --model.
-model = celltypist.models.Model.load(model=args.model)
+# Resolve the model without CellTypist's model-index helpers: Model.load() may
+# consult and populate the default cache when it receives a bare model name.
+# Passing an existing explicit path keeps acquisition separate from execution.
+model_path = Path(args.model).expanduser()
+if not model_path.is_file():
+    model_path = Path(celltypist.models.models_path) / args.model
+if not model_path.is_file():
+    raise FileNotFoundError(
+        f"CellTypist model is not cached: {args.model}. Download it separately or pass an existing file with --model."
+    )
+model = celltypist.models.Model.load(model=model_path.resolve().as_posix())
 predictions = celltypist.annotate(
     adata,
     model=model,

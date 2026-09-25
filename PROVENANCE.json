@@ -2561,7 +2561,7 @@
       "fix_log": "fixes/bio-proteomics-data-import.md",
       "fix_pass": "done",
       "category": "Data Analysis",
-      "reaudit": "not needed",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
@@ -2571,7 +2571,7 @@
         "load_maxquant_qfeatures.R",
         "usage-guide.md"
       ],
-      "marketplace_ready": true
+      "marketplace_ready": false
     },
     {
       "id": "bio-proteomics-dia-analysis",
@@ -3021,12 +3021,13 @@
       "fix_log": "fixes/bio-single-cell-cell-annotation.md",
       "fix_pass": "done",
       "category": "Data Analysis",
-      "reaudit": "not needed",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
-        "SKILL.md"
+        "SKILL.md",
+        "celltypist_annotation.py"
       ],
-      "marketplace_ready": true
+      "marketplace_ready": false
     },
     {
       "id": "bio-single-cell-cell-communication",
@@ -3584,13 +3585,14 @@
       "fix_log": "fixes/bio-vcf-statistics.md",
       "fix_pass": "done",
       "category": "Data Analysis",
-      "reaudit": "not needed",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
-        "usage-guide.md"
+        "usage-guide.md",
+        "vcf_stats.py"
       ],
-      "marketplace_ready": true
+      "marketplace_ready": false
     },
     {
       "id": "bio-virtual-screening",

@@ -1,6 +1,7 @@
 import pathlib
 import runpy
 import sys
+import tempfile
 import types
 import unittest
 
@@ -63,7 +64,7 @@ class Predictions:
 
 class CellTypistContractTests(unittest.TestCase):
     def run_example(self, adata):
-        calls = {"normalize_total": [], "log1p": [], "annotate": []}
+        calls = {"normalize_total": [], "log1p": [], "annotate": [], "model_load": []}
 
         scanpy = types.ModuleType("scanpy")
         scanpy.read_h5ad = lambda _path: adata
@@ -81,11 +82,6 @@ class CellTypistContractTests(unittest.TestCase):
             return Predictions(value)
 
         celltypist = types.ModuleType("celltypist")
-        celltypist.models = types.SimpleNamespace(
-            download_models=reject_download,
-            Model=types.SimpleNamespace(load=lambda **_kwargs: object()),
-        )
-        celltypist.annotate = annotate
 
         pyplot = types.ModuleType("matplotlib.pyplot")
         pyplot.subplots = lambda *_args, **_kwargs: (object(), [object(), object()])
@@ -95,25 +91,37 @@ class CellTypistContractTests(unittest.TestCase):
         matplotlib = types.ModuleType("matplotlib")
         matplotlib.pyplot = pyplot
 
-        replacements = {
-            "scanpy": scanpy,
-            "celltypist": celltypist,
-            "matplotlib": matplotlib,
-            "matplotlib.pyplot": pyplot,
-        }
-        previous = {name: sys.modules.get(name) for name in replacements}
-        old_argv = sys.argv
-        try:
-            sys.modules.update(replacements)
-            sys.argv = [str(SCRIPT)]
-            runpy.run_path(str(SCRIPT), run_name="__main__")
-        finally:
-            sys.argv = old_argv
-            for name, value in previous.items():
-                if value is None:
-                    sys.modules.pop(name, None)
-                else:
-                    sys.modules[name] = value
+        with tempfile.TemporaryDirectory() as model_cache:
+            model_file = pathlib.Path(model_cache) / "Immune_All_Low.pkl"
+            model_file.touch()
+            celltypist.models = types.SimpleNamespace(
+                models_path=model_cache,
+                download_models=reject_download,
+                Model=types.SimpleNamespace(
+                    load=lambda **kwargs: calls["model_load"].append(kwargs) or object()
+                ),
+            )
+            celltypist.annotate = annotate
+
+            replacements = {
+                "scanpy": scanpy,
+                "celltypist": celltypist,
+                "matplotlib": matplotlib,
+                "matplotlib.pyplot": pyplot,
+            }
+            previous = {name: sys.modules.get(name) for name in replacements}
+            old_argv = sys.argv
+            try:
+                sys.modules.update(replacements)
+                sys.argv = [str(SCRIPT)]
+                runpy.run_path(str(SCRIPT), run_name="__main__")
+            finally:
+                sys.argv = old_argv
+                for name, value in previous.items():
+                    if value is None:
+                        sys.modules.pop(name, None)
+                    else:
+                        sys.modules[name] = value
 
         return calls
 
@@ -126,6 +134,8 @@ class CellTypistContractTests(unittest.TestCase):
         self.assertEqual(calls["log1p"], [adata])
         self.assertEqual(len(calls["annotate"]), 1)
         self.assertEqual(calls["annotate"][0][1]["over_clustering"], "leiden")
+        self.assertEqual(len(calls["model_load"]), 1)
+        self.assertIn("/", calls["model_load"][0]["model"])
 
     def test_rejects_missing_required_analysis_state(self):
         cases = {

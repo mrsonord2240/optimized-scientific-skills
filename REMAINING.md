@@ -79,6 +79,9 @@ Changed in staging after their latest audit, so the score below describes earlie
 
 | skill | score at last audit | audited on |
 | --- | ---: | --- |
+| `bio-proteomics-data-import` | 95 | 2026-09-24 |
+| `bio-single-cell-cell-annotation` | 94 | 2026-09-24 |
+| `bio-vcf-statistics` | 94 | 2026-09-24 |
 
 ## Audited and excluded
 
