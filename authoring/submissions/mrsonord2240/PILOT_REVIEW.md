@@ -2,7 +2,7 @@
 
 This directory contains the provider-side material for the first 20-Skill
 Marketplace pilot. The source packages are pinned to commit
-`524cbb7ce83008e2e037bed0bb1cd04fc61dcb82` of
+`bcb030eb6734ca27d14d1ad41f890238058e6ef9` of
 `https://github.com/mrsonord2240/optimized-scientific-skills`.
 
 The files have deliberately separate responsibilities:
@@ -68,8 +68,10 @@ separate spec and standards agents to check the prepared evidence.
    reference resources, downloads and models. This is not a tested environment
    lock or evidence of clean installation of every optional route.
 8. Input/output/limitation/script cross-check: static checks completed for all
-   20; selected synthetic execution covers 13. Three Skills have open source or
-   runtime findings below. Full functional verification remains incomplete.
+   20; selected synthetic execution covers 15. The two source findings are
+   resolved; one checked Windows R route retains a documented platform-specific
+   failure alongside a passing WSL route. Full functional verification remains
+   incomplete.
 
 ## Local syntax checks
 
@@ -84,36 +86,41 @@ The verifier confirms every local packaged file equals its pinned Git blob,
 allowing these syntax results to be associated with the submitted source.
 Syntax checks alone do not establish functional correctness.
 
-## Functional checks and open findings
+## Functional checks and resolved findings
 
-Sixteen offline checks across 13 Skills produced 15 passes and one failure.
+Nineteen offline checks across 15 Skills produced 18 passes and one failure.
 Each run used an isolated copy of its package. Full command arguments, source
 script hash, stdout, stderr and exit code are stored under each Skill's
 `provider_review.runtime_checks`. Python demos, Scanpy preprocessing/clustering,
 R MaxLFQ, BAM filtering/validation, VCF normalization and germline hard-filtering
 passed their stated checks. This exercises only the named routes and fixtures.
 
-The remaining findings are explicit holds for review:
+The three prior findings were handled as follows:
 
 - `bio-proteomics-data-import`: QFeatures produced the expected cleaned matrix
   summary, then Windows R 4.6.1 exited with `3221225477` (`0xC0000005`, access
-  violation). WSL R is available but does not have QFeatures installed. The
-  Python route passed. The source of the native crash remains undiagnosed.
-- `bio-single-cell-cell-annotation`: the bundled CellTypist example does not
-  validate its CP10K-log1p/UMAP prerequisites and does not use the documented
-  seeded over-clustering setup. It also needs an external model. This route
-  was not executed.
-- `bio-vcf-statistics`: the Python example skips valid `QUAL=0` values when
-  computing the mean and counts only the first ALT for multiallelic Ti/Tv.
-  These are source findings; the example was not executed because cyvcf2 is
-  absent from the checked environments.
+  violation). Native debugger isolation located the failing teardown in
+  `cli.dll`, after the Skill route completed. The same example and fixture ran
+  cleanly in WSL R 4.5.2, Bioconductor 3.22, QFeatures 1.20.0 and cli 3.6.6.
+  The Windows failure remains a declared platform limitation; a zero exit code
+  is required even when expected output was printed.
+- `bio-single-cell-cell-annotation`: the example now validates retained counts,
+  seeded Leiden labels and UMAP; rebuilds CP10K-log1p input; uses the seeded
+  labels for majority voting; and loads only a local or cached model. A real
+  CellTypist 1.7.1 run with cached `Immune_All_Low.pkl` completed on an 80-cell,
+  1,000-gene synthetic AnnData and wrote the annotated H5AD, counts CSV and PNG.
+- `bio-vcf-statistics`: the example now includes valid `QUAL=0` observations and
+  counts every alternate allele for Ti/Tv. Unit regressions pass, and a WSL
+  cyvcf2 0.31.4 fixture produced three transitions, one transversion and mean
+  QUAL 10.0 from values 0, 20 and missing.
 
 The variant-filtering shell example's SNV/indel-only boundary is also recorded:
 it warns that MNP/mixed records are dropped. Its scoped synthetic test passed.
 
-No source Skill files were changed in this review, so the submission remains
-pinned to the original selected bytes. Resolving a source finding requires a
-new source commit, refreshed release configs/intake hashes and new review.
+The corrected Skill files are committed and all 20 release manifests, official
+intake records and provider evidence are refreshed against the new source pin.
+Five Skills still have no new functional execution in this pass; that remaining
+coverage gap is explicit and does not imply those Skills are broken.
 
 ## Reproduce provider checks
 

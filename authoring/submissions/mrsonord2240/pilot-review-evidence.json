@@ -3,7 +3,7 @@
   "pilot_id": "mrsonord2240-preliminary-20",
   "submitted_source": {
     "repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-    "commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+    "commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
     "package_metrics": "intake-review-input.json"
   },
   "original_source": {
@@ -27,7 +27,7 @@
     "No pilot Skill declares Stata as a runtime.",
     "No pilot Skill requires a container image; containers are therefore explicitly empty in every record.",
     "Upstream audit scores below come from PROVENANCE.json and the pinned external audit repository. AIPOCH scores remain null until independent review.",
-    "Every Skill has a provider-side static contract cross-check. All alternate workflows have not been executed; AIPOCH review remains pending. Open source findings are recorded without changing the pinned submission.",
+    "Provider-side source findings were resolved at the submitted commit and re-tested. A Windows R cli.dll teardown failure remains explicitly documented alongside a clean WSL QFeatures run; AIPOCH review remains pending.",
     "Pinned upstream reports refer to mrsonord2240/bioSkills commits. Their byte equivalence to the submitted optimized-scientific-skills packages is unverified. Sixteen reports explicitly record auditor_independent=false; four leave independence unspecified."
   ],
   "skills": [
@@ -135,9 +135,9 @@
       },
       "package_evidence": {
         "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
         "source_path": "skills/bio-alignment-filtering",
-        "manifest_sha256": "edc63be8a74cb60470b8fc6efdcca4985d0f08e54a185cf143d4522790c3b823",
+        "manifest_sha256": "727b2a6b67b3d6981f34b3690dc3710c02be9cd33c3a231c121ac4f3cad4cc83",
         "content_sha256": "693d50c362ccef6081e6fb40db76df582e15585c45f84480f45cce65dbf7e126",
         "file_count": 9,
         "total_bytes": 31381,
@@ -184,7 +184,7 @@
             "stdout": "Kept: 160\nRemoved: 40\n\nIndexing output...\n",
             "stderr": "",
             "environment": "WSL science",
-            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+            "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9"
           },
           {
             "id": "bio-alignment-filtering",
@@ -204,7 +204,7 @@
             "stdout": "",
             "stderr": "",
             "environment": "WSL science",
-            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+            "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9"
           }
         ]
       }
@@ -322,9 +322,9 @@
       },
       "package_evidence": {
         "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
         "source_path": "skills/bio-alignment-msa-statistics",
-        "manifest_sha256": "f045adbe4e2f68832af41e2db787980c4b4f6ab37cddb8a42cdb5fa2730b8abb",
+        "manifest_sha256": "90b8c85d080643f5f5803bdb735ee0ea1f13b5d6307e015fd4b1649a1b0c7e00",
         "content_sha256": "eeadefcb5110e3fbff1062f98b2b631d7ac6e1c340e134315387a7f2a3ad7c96",
         "file_count": 22,
         "total_bytes": 72697,
@@ -373,7 +373,7 @@
             "stdout": "OK  PID1-PID4 (function and vectorized) = 80.0 / 100.0 / 80.0 / 66.7 %\r\nOK  undefined identity (all-gap sequence) is NaN, average ignores it\r\nOK  conservation, min_occupancy NaN rule, centred profile window\r\nOK  Shannon entropy\r\nOK  information content: unknown letters dropped and renormalised, DNA IC of a conserved column = 2.0 bits\r\nOK  PSSM with background-weighted pseudocount\r\nOK  Kimura distance 0.4393\r\nOK  substitution counts D-N 2, K-R 1\r\nOK  DNA: Ti/Tv 4/2 (N pairs excluded), IC 1.082 and 2.000 bits\r\nOK  normalisation: lower case, \".\" / \"~\" gaps, U -> T\r\nOK  Capra-Singh JSD: closed-form column values, gap penalty, neighbour smoothing\r\nOK  alignment_score -12, sum_of_pairs 78, all-gap columns leave both unchanged\r\nOK  is_nucleotide: shipped DNA/protein, IUPAC-rich DNA still DNA, protein never DNA\r\nOK  guess_format: Stockholm / Clustal / PHYLIP / Nexus / FASTA\r\nOK  Kimura: finite below p = 0.85, inf from 0.85\r\nOK  gap_statistics: totals, gap-free columns, gappiest sequence\r\n\r\nAll checks passed.\r\n",
             "stderr": "",
             "environment": "Windows",
-            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+            "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9"
           }
         ]
       }
@@ -486,9 +486,9 @@
       },
       "package_evidence": {
         "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
         "source_path": "skills/bio-alignment-pairwise",
-        "manifest_sha256": "b7734981fe5311e9f10ad6dc8d99133f3ef047336755473c7dbd2323f9bcfa7a",
+        "manifest_sha256": "2e7757b5e8263b49524bd5aa8b8a41bd6d2252f01cd99b8b2bddfd207a7f0855",
         "content_sha256": "be1b84b29cf9aa4b53c1f9d6100f1477e5a81548ff96fd163aa7e82c81dc6806",
         "file_count": 14,
         "total_bytes": 41530,
@@ -537,7 +537,7 @@
             "stdout": "Observed: 23.0  Empirical p-value: 0.1449\r\n",
             "stderr": "",
             "environment": "Windows",
-            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+            "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9"
           }
         ]
       }
@@ -651,9 +651,9 @@
       },
       "package_evidence": {
         "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
         "source_path": "skills/bio-alignment-trimming",
-        "manifest_sha256": "1a0b27bb6abc34c69a1eb72ff26dc80e2083b57eb898d6dd5734446a450a8f39",
+        "manifest_sha256": "203d6eb6ed973da8ad3e4ec08ad1b18f304ce9d6035f76f038c5471565d3ab0b",
         "content_sha256": "f28a52fe6598d9589462ac3b50d3a36075bfe3571ec11e4900138d6207280ce9",
         "file_count": 8,
         "total_bytes": 45968,
@@ -792,9 +792,9 @@
       },
       "package_evidence": {
         "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
         "source_path": "skills/bio-alignment-validation",
-        "manifest_sha256": "faa9e241049e9ee26e6407ccbefa3208f23a577c7fa138f0f1088bd71bdd9e25",
+        "manifest_sha256": "fa7313cf8f07a4b279c054cf74da3a3168a225fadfbd5c25ea0896adfb9575b1",
         "content_sha256": "b63904a1933db33652e4a1d51faa28fab5ab2f7c706137daa3c7167d9776496f",
         "file_count": 5,
         "total_bytes": 36687,
@@ -838,7 +838,7 @@
             "stdout": "=== Alignment Validation (all 200 primary records) ===\n\n--- Mapping ---\nMapped: 200 (100.00%)\nUnmapped: 0 (0.00%)\n\n--- Pairing ---\nNo mapped paired reads (single-end or unpaired): proper pairing not graded\n\n--- Insert Size ---\nNo proper pairs with a positive template length\n\n--- Strand Balance ---\nForward: 100, Reverse: 100\nForward fraction F/(F+R): 0.500\n\n--- MAPQ (mapped primary reads) ---\nMean MAPQ: 50.0\nMAPQ >= 30: 80.0%\n\n--- Quality Summary ---\nMapping rate: PASS\nStrand balance: PASS\nMean MAPQ: PASS\nAll metrics within normal range\n",
             "stderr": "",
             "environment": "WSL science",
-            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+            "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9"
           }
         ]
       }
@@ -902,7 +902,7 @@
         "unresolved_limitations": [
           "Vendor RAW conversion, statistical testing, batch correction, and imputation are outside this Skill.",
           "Quantification column semantics and decoy/contaminant conventions remain search-engine specific.",
-          "qfeatures-windows-process-crash: expected output was produced, but the native process failed; runtime verification remains unresolved."
+          "Windows R 4.6.1 can exit with 0xC0000005 in cli.dll teardown after correct output in the checked environment; WSL R 4.5.2 with QFeatures 1.20.0 completed cleanly."
         ]
       },
       "runtime_dependencies": {
@@ -948,28 +948,29 @@
           "examples/load_maxquant_qfeatures.R",
           "examples/load_maxquant.py"
         ],
-        "cross_check_status": "completed_with_open_runtime_findings",
+        "cross_check_status": "completed_with_documented_platform_limitation",
         "findings": [
           {
             "id": "qfeatures-windows-process-crash",
-            "status": "open",
+            "status": "documented_platform_limitation",
             "severity": "runtime",
             "paths": [
-              "examples/load_maxquant_qfeatures.R"
+              "examples/load_maxquant_qfeatures.R",
+              "SKILL.md:297"
             ],
-            "finding": "Windows R 4.6.1 returned the expected cleaned matrix summary but exited with code 3221225477 (0xC0000005 access violation). WSL R is installed but QFeatures is absent there.",
-            "required_action": "Reproduce in a compatible isolated R/Bioconductor environment and require a clean process exit. Do not infer a Skill-code defect from this environment-specific crash alone."
+            "finding": "The checked Windows R 4.6.1 environment produces the correct matrix and then exits 0xC0000005 in cli.dll teardown; the same Skill route exits zero in WSL.",
+            "required_action": "Require a zero process exit. Use a clean compatible R library or WSL/Linux when the Windows cli.dll teardown failure is present."
           }
         ]
       },
       "package_evidence": {
         "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
         "source_path": "skills/bio-proteomics-data-import",
-        "manifest_sha256": "46dcd2a0e8aa8d18f19e40815e71571eb709c95890d71eabcb8fc706b5b6432d",
-        "content_sha256": "c51326bc4fd0b409a0327475c70d281ce681a830a621588398ba253cdb2e74f3",
+        "manifest_sha256": "2173f0eee6653eb1cab0d66080696df733e7c38c42041af50759c5e70498a722",
+        "content_sha256": "3c2b2222ec8873587947faab28975d89b922c4c3007fca8a99fb036bcb000a4f",
         "file_count": 6,
-        "total_bytes": 40768,
+        "total_bytes": 41187,
         "license_expression": "MIT",
         "license_files": [
           {
@@ -978,13 +979,13 @@
           },
           {
             "path": "skills/bio-proteomics-data-import/SKILL.md",
-            "sha256": "93b9f40a84ed746ff34ab9308add8fd9b5606021fb28a9dd7987c0690d7ef06f"
+            "sha256": "5404f98b9abc9b4f0b6ae33d4139ad2f49f4c7a89233e9e3a1ca4f3ae025e991"
           }
         ]
       },
       "provider_review": {
         "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
-        "reviewed_on": "2026-09-24",
+        "reviewed_on": "2026-09-25",
         "review_scope": [
           "package_bytes",
           "license_and_attribution",
@@ -992,7 +993,7 @@
           "semantic_contract"
         ],
         "static_review_status": "completed_with_declared_limitations",
-        "runtime_status": "failed_runtime_check",
+        "runtime_status": "selected_smoke_checks_passed_with_windows_runtime_limitation",
         "runtime_checks": [
           {
             "id": "bio-proteomics-data-import",
@@ -1019,7 +1020,7 @@
             "stdout": "MaxQuant rows: read=14, after bookkeeping=11, quantified=11\r\nleading_protein leading_gene  LFQ intensity S1  LFQ intensity S2\r\n         P00001        GENE1         26.423422         26.349421\r\n         P00002        GENE2         25.838459         25.764459\r\n         P00003        GENE3         25.253497         25.179496\r\n         P00004        GENE4         24.575425         24.501424\r\n         P00005        GENE5         23.838459         23.764459\r\n         P00006        GENE6         23.101494               NaN\r\n         P00007        GENE7         22.253497               NaN\r\n         P00008        GENE8         20.931569               NaN\r\n         P00009        GENE9         19.931569               NaN\r\n         P00010       GENE10         19.194603               NaN\r\n         P12345        GENEA         23.516531         23.391000\r\nMissing: 22.7% | abundance-vs-missingness corr: -0.84 (negative => MNAR)\r\n",
             "stderr": "",
             "environment": "Windows",
-            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+            "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9"
           },
           {
             "id": "bio-proteomics-data-import",
@@ -1043,7 +1044,31 @@
             "stdout": "QFeatures log2 LFQ: 2 protein groups x 2 samples | -Inf: FALSE\r\n",
             "stderr": "Checking arguments.\r\nLoading data as a 'SummarizedExperiment' object.\r\nFormatting sample annotations (colData).\r\nFormatting data as a 'QFeatures' object.\r\n'Reverse' found in 1 out of 1 assay(s).'Potential.contaminant' found in 1 out of 1 assay(s).'Only.identified.by.site' found in 1 out of 1 assay(s).\r\n",
             "environment": "Windows",
-            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+            "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9"
+          },
+          {
+            "id": "bio-proteomics-data-import",
+            "script": "examples/load_maxquant_qfeatures.R",
+            "command": "WSL science /usr/bin/Rscript",
+            "args": [
+              "--vanilla",
+              "examples/load_maxquant_qfeatures.R",
+              "proteinGroups.txt"
+            ],
+            "status": "passed",
+            "exit_code": 0,
+            "error": null,
+            "checks": [
+              {
+                "expected": "QFeatures log2 LFQ: 2 protein groups x 2 samples | -Inf: FALSE",
+                "passed": true
+              }
+            ],
+            "source_sha256": "5c2d6a749ab6d5dc1d3d9152bff12c85226ca5b381b3a62cf14c80be8b835470",
+            "stdout": "QFeatures log2 LFQ: 2 protein groups x 2 samples | -Inf: FALSE\n",
+            "stderr": "Checking arguments.\nLoading data as a 'SummarizedExperiment' object.\nFormatting sample annotations (colData).\nFormatting data as a 'QFeatures' object.\n'Reverse' found in 1 out of 1 assay(s).'Potential.contaminant' found in 1 out of 1 assay(s).'Only.identified.by.site' found in 1 out of 1 assay(s).\n",
+            "environment": "WSL science; R 4.5.2; Bioconductor 3.22; QFeatures 1.20.0; cli 3.6.6; isolated /tmp/qfeatures-wsl-lib",
+            "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9"
           }
         ]
       }
@@ -1164,9 +1189,9 @@
       },
       "package_evidence": {
         "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
         "source_path": "skills/bio-proteomics-peptide-identification",
-        "manifest_sha256": "407a09d3d18d32bcf09e20fce9e7b08845ccd1ac7c237cfdedf8e57c1ff5b3f2",
+        "manifest_sha256": "32dbd660dfa6bb7a6caa8663aaa011976d633e60bee63706153fa35df25049d8",
         "content_sha256": "699b7c0bde8b44d443328ca2c77ea750d1e229387b04bdafdc2b5e4566c7229c",
         "file_count": 12,
         "total_bytes": 56443,
@@ -1215,7 +1240,7 @@
             "stdout": "Targets: 2445, Decoys: 1555 (concatenated 1:1 search)\r\nTarget PSMs at q <= 0.01: 481\r\nWorst PEP inside the 1%-FDR list: 0.047\r\nTarget PSMs at PEP <= 0.01: 289 (per-PSM cutoff is far stricter than the same q-value)\r\n",
             "stderr": "",
             "environment": "Windows",
-            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+            "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9"
           }
         ]
       }
@@ -1330,9 +1355,9 @@
       },
       "package_evidence": {
         "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
         "source_path": "skills/bio-proteomics-protein-inference",
-        "manifest_sha256": "5471039dffed625e75b4275b3964d31809330a1353ec836f563ac600ac15deda",
+        "manifest_sha256": "535b64a623171b1354fd0eb09ef7b6cb2d6d723ec3f435f145a536638b2f03a5",
         "content_sha256": "33045ccb909cfdde6a81fcd8686a888c185484121ae78647833198f44111493a",
         "file_count": 10,
         "total_bytes": 49231,
@@ -1385,7 +1410,7 @@
             "stdout": "Parsimony kept 7 groups out of 8 candidate groups\r\nDropped (subsumable): ['P_C']\r\nWARNING: only 3 decoy groups; the protein FDR estimate is not meaningful\r\n\r\nProtein groups passing 1% picked-group FDR: 2\r\nleading_protein   accessions  n_peptides  n_unique_peptides  is_decoy   qvalue\r\n            P_A        [P_A]           4                  2     False 0.000000\r\n            P_E [P_E, P_E-2]           3                  3     False 0.000000\r\n      DECOY_P_D  [DECOY_P_D]           2                  2      True 0.333333\r\n            P_B        [P_B]           2                  1     False 0.333333\r\n",
             "stderr": "",
             "environment": "Windows",
-            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+            "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9"
           }
         ]
       }
@@ -1509,9 +1534,9 @@
       },
       "package_evidence": {
         "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
         "source_path": "skills/bio-proteomics-spectral-libraries",
-        "manifest_sha256": "57f280bd8f3c2cf2c76c9de938883d1a1de7f4879bfe587c928fbc4d20e688b3",
+        "manifest_sha256": "b9cee9ca09ccbc62fc00889da0b2b13e99e5b37206cf756a5336b141d0f95fa5",
         "content_sha256": "2154d2acfcf1080ba05fadef15136c6db14cd6aa27cfb02970afeb2cb69a6839",
         "file_count": 8,
         "total_bytes": 35527,
@@ -1564,7 +1589,7 @@
             "stdout": "iRT calibration: RT = 0.179 * iRT + 5.035, R^2 = 1.000\r\nMerged library stats: {'precursors': 3, 'proteins': 2, 'transitions_per_precursor': 6.0}\r\nCharge-2 and charge-3 of LGGNEQVTR both retained: True\r\n",
             "stderr": "",
             "environment": "Windows",
-            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+            "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9"
           }
         ]
       }
@@ -1678,9 +1703,9 @@
       },
       "package_evidence": {
         "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
         "source_path": "skills/bio-proteomics-quantification",
-        "manifest_sha256": "f36ccc48337ccc75e759fbfe37126790aea2f00a12db0f955b780bc849b01563",
+        "manifest_sha256": "5141398885cf54d03ecd7b20885779c5fa38437a55925c8ef11681f5b342ac78",
         "content_sha256": "33c2be1e3e076d868bf75f4961313e788876789bbbbe57939c985b1b3ad52a01",
         "file_count": 10,
         "total_bytes": 56076,
@@ -1729,7 +1754,7 @@
             "stdout": "Missing values: 17.2%\r\nSample medians before centering: [19.71 20.69 19.56 20.15 19.11 20.45]\r\nSample medians after centering:  [19.93 19.93 19.93 19.93 19.93 19.93]\r\nProteins after >=50% valid filter: 200\r\nIRS: 1 proteins lack a reference in >=1 plex; set to NaN: ['P000']\r\nNon-reference plex offset (median log2 B-A): SL only +0.951, after IRS -0.019\r\nSILAC pilot: incorporation 0.93 (planted 0.93), Arg->Pro per proline 0.08 (planted 0.08)\r\nAP-MS: called 5; interactors 5/5, sticky binders called 0/10\r\nAP-MS: control runs with no data, excluded: ['ctrl3']\r\nmin_bait_reps: prey00 called strict=False, min_bait_reps=2 -> True\r\n",
             "stderr": "",
             "environment": "Windows",
-            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+            "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9"
           },
           {
             "id": "bio-proteomics-quantification",
@@ -1754,7 +1779,7 @@
             "stdout": "proteins: 4 | samples: 3 | disconnected: 0 \r\n",
             "stderr": "Concatenating secondary ids...\r\n\r\nRemoving low intensities...\r\n\r\nMedian normalization ...\r\n\r\n# proteins = 4, # samples = 3\r\nCompleted.\r\nCompleted.\r\n",
             "environment": "Windows",
-            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+            "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9"
           }
         ]
       }
@@ -1884,9 +1909,9 @@
       },
       "package_evidence": {
         "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
         "source_path": "skills/bio-single-cell-batch-integration",
-        "manifest_sha256": "11c774679908c3978795c9d357f3a7b7e6f05e39823f6ce93c389e73f8e6f96f",
+        "manifest_sha256": "1d30be0116ea7717ea12a21807fed17969b9dfbdc2ca1c8e53c330e036f97601",
         "content_sha256": "2ef930037fc33a804e6ea60a28dd8d0e92443722e2d97cffc11622e8584c3e1d",
         "file_count": 10,
         "total_bytes": 30128,
@@ -2031,9 +2056,9 @@
       },
       "package_evidence": {
         "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
         "source_path": "skills/bio-single-cell-clustering",
-        "manifest_sha256": "e407fb1d36e939d4794d7f33b8bc0fa4004f72e192e8c0bf1acf038660d52a32",
+        "manifest_sha256": "ae95a4464aefdcdf9ba4eda02fba3bde3cf41bc92b10930238a257adeba1f4ed",
         "content_sha256": "3d57ac5742da2bb9fd41a265f913c1d1fe9e026917e7fa139c0862ef3581ce24",
         "file_count": 5,
         "total_bytes": 27140,
@@ -2083,7 +2108,7 @@
             "stdout": "Loaded 180 cells\r\nFound 1 clusters\r\nleiden\r\n0    180\r\nName: count, dtype: int64\r\nSaved clustered data\r\nSYNTHETIC_CLUSTER_ASSERTIONS_OK\r\n",
             "stderr": "examples/cluster_scanpy.py:10: FutureWarning: Argument `save` is deprecated and will be removed in a future version. Use `sc.pl.plot(show=False).figure.savefig()` instead.\r\n  sc.pl.pca_variance_ratio(adata, n_pcs=50, save='_variance.png')\r\nWARNING: saving figure to file figures\\pca_variance_ratio_variance.png\r\nC:\\Users\\User\\AppData\\Roaming\\Python\\Python314\\site-packages\\scanpy\\plotting\\_utils.py:393: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown\r\n  plt.show()\r\nexamples/cluster_scanpy.py:19: FutureWarning: Argument `save` is deprecated and will be removed in a future version. Use `sc.pl.plot(show=False).figure.savefig()` instead.\r\n  sc.pl.umap(adata, color='leiden', save='_clusters.png')\r\nWARNING: saving figure to file figures\\umap_clusters.png\r\nC:\\Users\\User\\AppData\\Roaming\\Python\\Python314\\site-packages\\scanpy\\plotting\\_utils.py:393: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown\r\n  plt.show()\r\n",
             "environment": "Windows",
-            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+            "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9"
           }
         ]
       }
@@ -2206,9 +2231,9 @@
       },
       "package_evidence": {
         "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
         "source_path": "skills/bio-single-cell-preprocessing",
-        "manifest_sha256": "45e2d256c43c1ca586186600ab7fd4e382e9ede64b5b868e8425b763237ebef8",
+        "manifest_sha256": "e75213ec10b8c87dab80d2b00928ff2e9a90db3bf99d688654e7965b1a1b87a0",
         "content_sha256": "b7943b6a32ea2e65f1200ae6816c3af9eaf42b347f7a33960a83186065f643bb",
         "file_count": 4,
         "total_bytes": 31634,
@@ -2258,7 +2283,7 @@
             "stdout": "Raw: 180 cells, 3000 genes\r\nlog1p_total_counts: median=7.521, MAD=0.103\r\nlog1p_n_genes_by_counts: median=6.891, MAD=0.062\r\npct_counts_in_top_20_genes: median=8.051, MAD=0.335\r\npct_counts_mt: median=0.906, MAD=0.136\r\nFiltered: 172 cells, 2587 genes\r\nHVGs: 2000\r\nSaved preprocessed data\r\nSYNTHETIC_PREPROCESS_ASSERTIONS_OK\r\n",
             "stderr": "",
             "environment": "Windows",
-            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+            "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9"
           }
         ]
       }
@@ -2390,9 +2415,9 @@
       },
       "package_evidence": {
         "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
         "source_path": "skills/bio-single-cell-scatac-analysis",
-        "manifest_sha256": "6b8b9729ec8dd4a4a5203bc1f09ecd3cdee6a14eda053021ee1bfce3e8edc95c",
+        "manifest_sha256": "01f510d706a89c4028ed9ac600e079e31e477dfb2386e856045c151546190594",
         "content_sha256": "cb51658881483f0039102526a36c9022bf02603485fe4daea83b1df972975872",
         "file_count": 5,
         "total_bytes": 32381,
@@ -2480,8 +2505,7 @@
         ],
         "unresolved_limitations": [
           "Reference-based labels inherit reference taxonomy and domain shift; unexpected cells are not automatically novel types.",
-          "Confidence thresholds are model- and dataset-specific and require rejection calibration.",
-          "celltypist-example-contract: The example does not validate normalization or UMAP availability and uses automatic over-clustering without the explicit seeded labels documented in SKILL.md."
+          "Confidence thresholds are model- and dataset-specific and require rejection calibration."
         ]
       },
       "runtime_dependencies": {
@@ -2529,9 +2553,9 @@
       },
       "contract": {
         "inputs": [
-          "query single-cell expression object",
-          "compatible annotated reference or pretrained model",
-          "CellTypist example requires CP10K-log1p data with gene symbols and precomputed UMAP in adata_processed.h5ad"
+          "query single-cell AnnData retaining raw counts in layers[\"counts\"]",
+          "seeded Leiden over-clustering in obs[\"leiden\"] and precomputed UMAP in obsm[\"X_umap\"]",
+          "compatible locally cached CellTypist model"
         ],
         "outputs": [
           "cell-level predicted labels",
@@ -2541,30 +2565,30 @@
           "examples/celltypist_annotation.py",
           "examples/singler_annotation.R"
         ],
-        "cross_check_status": "completed_with_open_source_findings",
+        "cross_check_status": "completed_source_findings_resolved",
         "findings": [
           {
             "id": "celltypist-example-contract",
-            "status": "open",
+            "status": "resolved",
             "severity": "medium",
             "paths": [
-              "examples/celltypist_annotation.py:6",
-              "examples/celltypist_annotation.py:11",
-              "SKILL.md:77"
+              "examples/celltypist_annotation.py:17",
+              "examples/celltypist_annotation.py:31",
+              "examples/celltypist_annotation.py:36"
             ],
-            "finding": "The example does not validate normalization or UMAP availability and uses automatic over-clustering without the explicit seeded labels documented in SKILL.md.",
-            "required_action": "Align the example with the documented normalization, embedding and seeded over-clustering contract, then test a local cached model without network side effects."
+            "finding": "The example now validates retained counts, seeded Leiden labels and UMAP, constructs CP10K-log1p input, uses the seeded labels for majority voting, and loads only a local or cached model.",
+            "required_action": "Resolved by the submitted source and a cached-model smoke test."
           }
         ]
       },
       "package_evidence": {
         "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
         "source_path": "skills/bio-single-cell-cell-annotation",
-        "manifest_sha256": "a158b92f20ab08b685d13f5577e5b95c02a777c2d18c16e89a3ba87ea7fb8b04",
-        "content_sha256": "d58f2ab73655d752aac4705afc055fb019f62196a5ddbb47303de7847637898d",
+        "manifest_sha256": "2e71a5e23bcc31e6ec6bd0071d57fb7742fed6f653d73901a819194e6cabed76",
+        "content_sha256": "961bbe482968ee1ccab83791b05e16c82eb585a92881c8a5eec758082643521c",
         "file_count": 4,
-        "total_bytes": 21185,
+        "total_bytes": 22415,
         "license_expression": "MIT",
         "license_files": [
           {
@@ -2579,16 +2603,58 @@
       },
       "provider_review": {
         "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
-        "reviewed_on": "2026-09-24",
+        "reviewed_on": "2026-09-25",
         "review_scope": [
           "package_bytes",
           "license_and_attribution",
           "runtime_dependencies",
           "semantic_contract"
         ],
-        "static_review_status": "findings_open",
-        "runtime_status": "not_executed_in_this_pass",
-        "runtime_checks": []
+        "static_review_status": "completed_with_declared_limitations",
+        "runtime_status": "selected_smoke_checks_passed",
+        "runtime_checks": [
+          {
+            "id": "bio-single-cell-cell-annotation",
+            "script": "examples/celltypist_annotation.py",
+            "command": "python",
+            "args": [
+              "-B",
+              "skills/bio-single-cell-cell-annotation/examples/celltypist_annotation.py",
+              "--input",
+              "C:/Users/User/AppData/Local/Temp/celltypist-smoke-20260925/clustered.h5ad",
+              "--model",
+              "C:/Users/User/.celltypist/data/models/Immune_All_Low.pkl",
+              "--output",
+              "C:/Users/User/AppData/Local/Temp/celltypist-smoke-20260925/adata_annotated.h5ad",
+              "--figure",
+              "C:/Users/User/AppData/Local/Temp/celltypist-smoke-20260925/celltypist_annotation.png",
+              "--counts-output",
+              "C:/Users/User/AppData/Local/Temp/celltypist-smoke-20260925/cell_type_counts.csv"
+            ],
+            "status": "passed",
+            "exit_code": 0,
+            "error": null,
+            "checks": [
+              {
+                "expected": "Prediction done!",
+                "passed": true
+              },
+              {
+                "expected": "Majority voting done!",
+                "passed": true
+              },
+              {
+                "expected": "Low confidence cells:",
+                "passed": true
+              }
+            ],
+            "source_sha256": "39bee3d1bcb2828c4f650e231ba88aa30ecb6560c53757df3312ad3ee27526e6",
+            "stdout": "Low confidence cells: 0 (0.0%)\r\n",
+            "stderr": "C:\\Users\\User\\AppData\\Local\\Temp\\celltypist-review-20260925\\celltypist\\classifier.py:11: FutureWarning: `__version__` is deprecated, use `importlib.metadata.version('scanpy')` instead\r\n  from scanpy import __version__ as scv\r\n\\U0001f52c Input data has 80 cells and 1000 genes\r\n\\U0001f517 Matching reference genes in the model\r\n\\U0001f9ec 1000 features used for prediction\r\n\\u2696\\ufe0f Scaling input data\r\n\\U0001f58b\\ufe0f Predicting labels\r\n\\u2705 Prediction done!\r\n\\U0001f5f3\\ufe0f Majority voting the predictions\r\n\\u2705 Majority voting done!\r\n",
+            "environment": "Windows; Python 3.14.5; CellTypist 1.7.1; Scanpy 1.12.4; cached Immune_All_Low.pkl; synthetic 80-cell x 1000-gene AnnData",
+            "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9"
+          }
+        ]
       }
     },
     {
@@ -2705,9 +2771,9 @@
       },
       "package_evidence": {
         "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
         "source_path": "skills/bio-variant-annotation",
-        "manifest_sha256": "0ed3529feedce5e2f9dc8cdd36003122ddeb6eb7e8c064572221e3a8c8667609",
+        "manifest_sha256": "dddc14ca94f89acd1caf35c2c10b435ca51123921d4751390a38ad95933cc3d2",
         "content_sha256": "c503d95f1e9177d977a49ea174f0b5af998eb6e64e4e65ad55c9658a74537d6c",
         "file_count": 3,
         "total_bytes": 46935,
@@ -2840,9 +2906,9 @@
       },
       "package_evidence": {
         "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
         "source_path": "skills/bio-variant-normalization",
-        "manifest_sha256": "9b0912c4700f8121a209a53db53d7378a52eb394e24e85f3faa1855fc8f5236f",
+        "manifest_sha256": "702efe00c2a685174df7b44392e7383d6f78c2f17a649e740ab4ca1efa74732a",
         "content_sha256": "15c6b67425781566d05b11d4d595de0245a7047f44a26bbe6d72be9bf5a76f88",
         "file_count": 3,
         "total_bytes": 40339,
@@ -2887,7 +2953,7 @@
             "stdout": "\n=== Normalization Complete ===\nInput:  input.vcf\nOutput: normalized.vcf.gz\n\nRecords before:                    2\nRecords after split+left-align:    3\nRecords after full (with atomize): 4\nExtra records from atomization:    1\n\nThe difference counts the MNP and complex records that bcftools-only norm leaves\nintact but vt-style decomposition splits into atoms. Standardize one tool +\nflags across every cohort compared, or these become false private variants.\n",
             "stderr": "Lines   total/split/joined/realigned/mismatch_removed/dup_removed/skipped:\t2/1/0/0/0/0/0\nLines   total/split/joined/realigned/mismatch_removed/dup_removed/skipped:\t2/1/0/0/0/0/0\nLines   total/split/joined/realigned/mismatch_removed/dup_removed/skipped:\t3/0/0/0/0/0/0\nLines   total/split/joined/realigned/mismatch_removed/dup_removed/skipped:\t4/0/0/0/0/0/0\n",
             "environment": "WSL science",
-            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+            "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9"
           }
         ]
       }
@@ -2991,9 +3057,9 @@
       },
       "package_evidence": {
         "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
         "source_path": "skills/bio-vcf-basics",
-        "manifest_sha256": "9cfc46821dad23296b93849819936d0a5643f522ecfebacea12463f00e17904a",
+        "manifest_sha256": "b35b00200e713eb635a6935021527d8063c91f80c46ef74183d07923377c23de",
         "content_sha256": "9c74b149dd1df5f709a15c0695d9c0d599cdd35beed0c65e0f1502d99d5f6f65",
         "file_count": 3,
         "total_bytes": 27472,
@@ -3081,9 +3147,7 @@
         ],
         "unresolved_limitations": [
           "Expected Ti/Tv, heterozygosity, HWE, and missingness depend on assay, ancestry, filters, genomic context, and disease design.",
-          "VCF-level contamination signals are screening indicators; dedicated BAM/CRAM methods are needed for measurement.",
-          "vcf-example-zero-quality: The truthiness check skips valid QUAL=0 values, biasing mean QUAL.",
-          "vcf-example-multiallelic: The example counts only ALT[0] for Ti/Tv and cannot represent all alternate alleles at a multiallelic SNP."
+          "VCF-level contamination signals are screening indicators; dedicated BAM/CRAM methods are needed for measurement."
         ]
       },
       "runtime_dependencies": {
@@ -3133,38 +3197,38 @@
         "bundled_executables": [
           "examples/vcf_stats.py"
         ],
-        "cross_check_status": "completed_with_open_source_findings",
+        "cross_check_status": "completed_source_findings_resolved",
         "findings": [
           {
             "id": "vcf-example-zero-quality",
-            "status": "open",
+            "status": "resolved",
             "severity": "medium",
             "paths": [
-              "examples/vcf_stats.py:40"
+              "examples/vcf_stats.py:44"
             ],
-            "finding": "The truthiness check skips valid QUAL=0 values, biasing mean QUAL.",
-            "required_action": "Use an explicit missing-value check and test QUAL=0 together with nonzero and missing quality."
+            "finding": "QUAL=0 is now counted as observed while missing QUAL remains excluded.",
+            "required_action": "Resolved by the submitted source, regression test, and cyvcf2 fixture run."
           },
           {
             "id": "vcf-example-multiallelic",
-            "status": "open",
+            "status": "resolved",
             "severity": "medium",
             "paths": [
-              "examples/vcf_stats.py:26"
+              "examples/vcf_stats.py:28"
             ],
-            "finding": "The example counts only ALT[0] for Ti/Tv and cannot represent all alternate alleles at a multiallelic SNP.",
-            "required_action": "Declare and enforce a biallelic input boundary or compute an explicitly defined per-allele statistic."
+            "finding": "Ti/Tv now counts every alternate allele in a multiallelic SNP record.",
+            "required_action": "Resolved by the submitted source, regression test, and cyvcf2 fixture run."
           }
         ]
       },
       "package_evidence": {
         "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
         "source_path": "skills/bio-vcf-statistics",
-        "manifest_sha256": "493a5481aed185c57da5676753708a8122c8ec25b86a3f69c2f6c2be575ecdc3",
-        "content_sha256": "86ba88c26643dc1cc22d74138c09127e2dfa4276c8f6508e1d1de0879e94f684",
+        "manifest_sha256": "cc54f36ffc45508a7acbb99ed6e4540d12b685bec6f3810f8fbd9f18c1c77c53",
+        "content_sha256": "8d029e98cb5a1cf11588392135b08255d74ae3a682bfe63432cba7e2c9b21731",
         "file_count": 3,
-        "total_bytes": 36546,
+        "total_bytes": 36795,
         "license_expression": "MIT",
         "license_files": [
           {
@@ -3179,16 +3243,49 @@
       },
       "provider_review": {
         "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
-        "reviewed_on": "2026-09-24",
+        "reviewed_on": "2026-09-25",
         "review_scope": [
           "package_bytes",
           "license_and_attribution",
           "runtime_dependencies",
           "semantic_contract"
         ],
-        "static_review_status": "findings_open",
-        "runtime_status": "not_executed_in_this_pass",
-        "runtime_checks": []
+        "static_review_status": "completed_with_declared_limitations",
+        "runtime_status": "selected_smoke_checks_passed",
+        "runtime_checks": [
+          {
+            "id": "bio-vcf-statistics",
+            "script": "examples/vcf_stats.py",
+            "command": "WSL science /usr/bin/python3",
+            "args": [
+              "-B",
+              "examples/vcf_stats.py",
+              "vcf_stats.vcf"
+            ],
+            "status": "passed",
+            "exit_code": 0,
+            "error": null,
+            "checks": [
+              {
+                "expected": "Transitions:       3",
+                "passed": true
+              },
+              {
+                "expected": "Transversions:     1",
+                "passed": true
+              },
+              {
+                "expected": "Mean QUAL:         10.0",
+                "passed": true
+              }
+            ],
+            "source_sha256": "029b94bad4f4446004d22693942aa1977d1a417b7b6a2c873cf157c541347b39",
+            "stdout": "=== VCF Statistics ===\nTotal variants:    3\n  SNPs:            3\n  Indels:          0\n  Other:           0\n\nPASS variants:     2\nFiltered:          1\n\nTransitions:       3\nTransversions:     1\nTi/Tv ratio:       3.00\n\nMean QUAL:         10.0\n",
+            "stderr": "",
+            "environment": "WSL science; Python 3.14.4; cyvcf2 0.31.4; synthetic multiallelic/QUAL=0 fixture",
+            "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9"
+          }
+        ]
       }
     },
     {
@@ -3318,9 +3415,9 @@
       },
       "package_evidence": {
         "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
-        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
         "source_path": "skills/bio-variant-calling-filtering-best-practices",
-        "manifest_sha256": "87ed8545d7f49f8ad7e5d7a8a7e85a855a944e1c9e40845657c50d3c5fe95c1f",
+        "manifest_sha256": "4f132f8802af88162909b8a7b4b18efb3b682a8d7e164a475b6d0cab75e3ab54",
         "content_sha256": "334cd8c408c93b1667cad06eca3422c3604653fbb3e6cf589ad197d5507a630b",
         "file_count": 3,
         "total_bytes": 34141,
@@ -3364,7 +3461,7 @@
             "stdout": "=== Splitting SNPs and Indels (their error processes and thresholds differ) ===\n=== Filtering SNPs ===\n=== Filtering Indels ===\n=== Merging filtered variants ===\n=== Statistics (before / after) ===\nSN\t0\tnumber of samples:\t0\nSN\t0\tnumber of records:\t3\nSN\t0\tnumber of no-ALTs:\t0\nSN\t0\tnumber of SNPs:\t2\nSN\t0\tnumber of MNPs:\t0\nSN\t0\tnumber of indels:\t1\nSN\t0\tnumber of others:\t0\nSN\t0\tnumber of multiallelic sites:\t0\nSN\t0\tnumber of multiallelic SNP sites:\t0\nTSTV\t0\t1\t1\t1.00\t1\t1\t1.00\n\nSN\t0\tnumber of samples:\t0\nSN\t0\tnumber of records:\t2\nSN\t0\tnumber of no-ALTs:\t0\nSN\t0\tnumber of SNPs:\t1\nSN\t0\tnumber of MNPs:\t0\nSN\t0\tnumber of indels:\t1\nSN\t0\tnumber of others:\t0\nSN\t0\tnumber of multiallelic sites:\t0\nSN\t0\tnumber of multiallelic SNP sites:\t0\nTSTV\t0\t1\t0\t0.00\t1\t0\t0.00\n\nTi/Tv ratio: 0.00 (expected ~2.0-2.1 for WGS, ~3.0-3.3 for exomes)\nOutput: filtered_all_filtered.vcf.gz\n",
             "stderr": "Checking the headers and starting positions of 2 files\nWriting to /tmp/bcftools.txfxJt\nMerging 1 temporary files\nDone\nCleaning\n",
             "environment": "WSL science",
-            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+            "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9"
           }
         ]
       }
@@ -3372,7 +3469,7 @@
   ],
   "provider_review": {
     "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
-    "reviewed_on": "2026-09-24",
+    "reviewed_on": "2026-09-25",
     "review_scope": [
       "Exact package and license hashes recomputed using Marketplace intake",
       "All 68 bundled executable paths and local bytes compared with pinned Git source",
@@ -3382,10 +3479,11 @@
     ],
     "unresolved_limitations": [
       "This is a scoped provider preflight, not Marketplace maintainer approval or a full independent scientific audit.",
-      "Seven Skills have no new functional execution in this pass; passing smoke checks cover only the named workflows.",
+      "Five Skills have no new functional execution in this pass; passing smoke checks cover only the named workflows.",
+      "The checked Windows R 4.6.1 QFeatures route has a documented cli.dll teardown failure; the WSL route passes with a clean exit.",
       "Scientific redistribution scope and final AIPOCH score/approval remain for Marketplace review."
     ],
-    "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+    "source_commit": "bcb030eb6734ca27d14d1ad41f890238058e6ef9",
     "upstream_audit_commit": "0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5",
     "marketplace_tool_commit": "e751844be4ade3e4d997ea4dbc63a0b81cf6ff75",
     "syntax_checks": {
@@ -3395,10 +3493,10 @@
       "status": "passed"
     },
     "functional_checks": {
-      "total": 16,
-      "passed": 15,
+      "total": 19,
+      "passed": 18,
       "failed": 1,
-      "skills_exercised": 13
+      "skills_exercised": 15
     },
     "marketplace_checks": {
       "intake_records": 20,
@@ -3427,7 +3525,18 @@
         "python_versions": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
         "pysam_version": "0.24.1",
         "samtools_version": "samtools 1.22.1",
-        "bcftools_version": "bcftools 1.22"
+        "bcftools_version": "bcftools 1.22",
+        "cyvcf2_version": "0.31.4",
+        "rscript_version": "R 4.5.2",
+        "qfeatures_version": "1.20.0",
+        "cli_version": "3.6.6"
+      },
+      {
+        "platform": "Windows",
+        "python_versions": "3.14.5",
+        "scanpy_version": "1.12.4",
+        "celltypist_version": "1.7.1",
+        "model": "cached Immune_All_Low.pkl"
       }
     ]
   }
