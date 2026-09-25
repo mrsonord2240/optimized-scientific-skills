@@ -1,0 +1,3434 @@
+{
+  "schema_version": 1,
+  "pilot_id": "mrsonord2240-preliminary-20",
+  "submitted_source": {
+    "repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+    "package_metrics": "intake-review-input.json"
+  },
+  "original_source": {
+    "repository": "https://github.com/GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "author": "GPTomics",
+    "license": "MIT"
+  },
+  "external_audit": {
+    "repository": "https://github.com/mrsonord2240/optimizing-agent-science-skills",
+    "commit": "0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5",
+    "classification": "upstream audit evidence; not AIPOCH review evidence"
+  },
+  "review_scope_definitions": {
+    "package_bytes": "Match the release config, intake hashes, file count, total bytes, and license-evidence hashes to the exact submitted commit.",
+    "license_and_attribution": "Verify MIT evidence, GPTomics authorship, upstream path and commit, and mrsonord2240 modification attribution.",
+    "runtime_dependencies": "Verify every required or optional runtime, package, CLI, API, database, model, container, hardware condition, and version-sensitive route.",
+    "semantic_contract": "Verify declared inputs, outputs, limitations, and bundled executables agree with SKILL.md and one another."
+  },
+  "pilot_wide_notes": [
+    "No pilot Skill declares Stata as a runtime.",
+    "No pilot Skill requires a container image; containers are therefore explicitly empty in every record.",
+    "Upstream audit scores below come from PROVENANCE.json and the pinned external audit repository. AIPOCH scores remain null until independent review.",
+    "Every Skill has a provider-side static contract cross-check. All alternate workflows have not been executed; AIPOCH review remains pending. Open source findings are recorded without changing the pinned submission.",
+    "Pinned upstream reports refer to mrsonord2240/bioSkills commits. Their byte equivalence to the submitted optimized-scientific-skills packages is unverified. Sixteen reports explicitly record auditor_independent=false; four leave independence unspecified."
+  ],
+  "skills": [
+    {
+      "id": "bio-alignment-filtering",
+      "intake_record": "bio-alignment-filtering@1.0.0",
+      "provenance": {
+        "upstream_path": "alignment-files/alignment-filtering",
+        "original_author": "GPTomics",
+        "modification_status": "modified",
+        "modification_evidence": [
+          "PROVENANCE.json",
+          "fixes/bio-alignment-filtering.md"
+        ],
+        "modified_by": "mrsonord2240"
+      },
+      "upstream_audit": {
+        "score": 96,
+        "audited_on": "2026-09-23",
+        "audit_path": "audits/skills/bio-alignment-filtering",
+        "fix_log": "fixes/bio-alignment-filtering.md",
+        "evidence": {
+          "report_path": "audits/skills/bio-alignment-filtering/mrsonord2240-bioSkills@6c71f04/report.json",
+          "report_sha256": "ab8d4c2ce5ebdc9e260e5fe521e5524bb67e812197eca259682073c767d1239e",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-alignment-filtering/mrsonord2240-bioSkills@6c71f04/report.json",
+          "record_path": "audits/skills/bio-alignment-filtering/mrsonord2240-bioSkills@6c71f04/record.json",
+          "record_sha256": "95d2a96c813ab8d79ee751211f92900d02a34b065404c242d947c01c345b00d7",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-alignment-filtering/mrsonord2240-bioSkills@6c71f04/record.json",
+          "fix_log_sha256": "f8cad3b76fa4e34a9a2e84cbdb8dc9031c5fd6d8cc80b4deb9e348a1447c6718",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-alignment-filtering.md",
+          "audited_source": {
+            "repository": "mrsonord2240/bioSkills",
+            "commit": "6c71f04151377fe0d412ece85d9dc52cdccdf747",
+            "path": "alignment-files/alignment-filtering",
+            "author": "GPTomics",
+            "author_url": "https://github.com/GPTomics",
+            "license": "MIT",
+            "modified_by": "Samuel Nord",
+            "fork_of": {
+              "repository": "GPTomics/bioSkills",
+              "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+            },
+            "url": "https://github.com/mrsonord2240/bioSkills/tree/6c71f04151377fe0d412ece85d9dc52cdccdf747/alignment-files/alignment-filtering"
+          },
+          "auditor_independent": false,
+          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+        }
+      },
+      "aipoch_review": {
+        "status": "pending_independent_review",
+        "reviewed_by": null,
+        "reviewed_on": null,
+        "score": null,
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "unresolved_limitations": [
+          "MAPQ meaning and safe thresholds are aligner-specific.",
+          "Read-level filters can orphan mates; region queries require an index and CRAM output requires the matching reference."
+        ]
+      },
+      "runtime_dependencies": {
+        "languages": [
+          "Python 3 for pysam routes",
+          "Bash for match_read_count.sh"
+        ],
+        "python_packages": [
+          "pysam >=0.22 (checked 0.24.1)"
+        ],
+        "r_packages": [],
+        "cli_tools": [
+          "samtools >=1.19 (checked 1.24)",
+          "awk and standard Unix core utilities (including cp, cut, sort, uniq) for shell routes"
+        ],
+        "services_apis": [],
+        "databases_reference_data": [
+          "optional BED regions",
+          "matching FASTA for CRAM"
+        ],
+        "external_models": [],
+        "containers": [],
+        "hardware": [],
+        "declaration_scope": "Named dependencies from bundled executables and documented routes; optional alternatives are not all required together. Versions are source-declared compatibility claims, not a newly tested environment lock."
+      },
+      "contract": {
+        "inputs": [
+          "SAM/BAM/CRAM alignments",
+          "optional regions, read groups, names, or target counts"
+        ],
+        "outputs": [
+          "filtered BAM/CRAM/SAM",
+          "read counts and validation summaries"
+        ],
+        "bundled_executables": [
+          "examples/filter_bam.py",
+          "scripts/filter_by_bed.py",
+          "scripts/match_read_count.sh",
+          "scripts/subsample_pysam.py"
+        ],
+        "cross_check_status": "static_cross_check_completed_runtime_coverage_partial",
+        "findings": []
+      },
+      "package_evidence": {
+        "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_path": "skills/bio-alignment-filtering",
+        "manifest_sha256": "edc63be8a74cb60470b8fc6efdcca4985d0f08e54a185cf143d4522790c3b823",
+        "content_sha256": "693d50c362ccef6081e6fb40db76df582e15585c45f84480f45cce65dbf7e126",
+        "file_count": 9,
+        "total_bytes": 31381,
+        "license_expression": "MIT",
+        "license_files": [
+          {
+            "path": "LICENSE",
+            "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+          },
+          {
+            "path": "skills/bio-alignment-filtering/SKILL.md",
+            "sha256": "872aa3ffb8d154dbf3c01e6b2c6c46b230f9f231257aa3c79aed3512da08cc64"
+          }
+        ]
+      },
+      "provider_review": {
+        "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+        "reviewed_on": "2026-09-24",
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "static_review_status": "completed_with_declared_limitations",
+        "runtime_status": "selected_smoke_checks_passed",
+        "runtime_checks": [
+          {
+            "id": "bio-alignment-filtering",
+            "script": "examples/filter_bam.py",
+            "args": [
+              "/usr/bin/python3",
+              "-B",
+              "examples/filter_bam.py",
+              "smoke.bam",
+              "filtered.bam",
+              "-q",
+              "30"
+            ],
+            "status": "passed",
+            "exit_code": 0,
+            "error": null,
+            "source_sha256": "699f309a3742b4028f0149fb78e7200b43902caba82b5f57024c71c13cb8a19c",
+            "stdout": "Kept: 160\nRemoved: 40\n\nIndexing output...\n",
+            "stderr": "",
+            "environment": "WSL science",
+            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+          },
+          {
+            "id": "bio-alignment-filtering",
+            "script": "scripts/filter_by_bed.py",
+            "args": [
+              "/usr/bin/python3",
+              "-B",
+              "scripts/filter_by_bed.py",
+              "smoke.bam",
+              "smoke.bed",
+              "regions.bam"
+            ],
+            "status": "passed",
+            "exit_code": 0,
+            "error": null,
+            "source_sha256": "270bb5cd56767f7e19a07fffae7a2a47fe017a5d28fced39aa4df8e7619498e7",
+            "stdout": "",
+            "stderr": "",
+            "environment": "WSL science",
+            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bio-alignment-msa-statistics",
+      "intake_record": "bio-alignment-msa-statistics@1.0.0",
+      "provenance": {
+        "upstream_path": "alignment/msa-statistics",
+        "original_author": "GPTomics",
+        "modification_status": "modified",
+        "modification_evidence": [
+          "PROVENANCE.json",
+          "fixes/bio-alignment-msa-statistics.md"
+        ],
+        "modified_by": "mrsonord2240"
+      },
+      "upstream_audit": {
+        "score": 97,
+        "audited_on": "2026-09-22",
+        "audit_path": "audits/skills/bio-alignment-msa-statistics",
+        "fix_log": "fixes/bio-alignment-msa-statistics.md",
+        "evidence": {
+          "report_path": "audits/skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@f3a7a62/report.json",
+          "report_sha256": "b39c7c86bd83831a96fbad74cd6ad74693f466b4e10777b07b97c6e1bffb11ab",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@f3a7a62/report.json",
+          "record_path": "audits/skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@f3a7a62/record.json",
+          "record_sha256": "7c5a514425c25bb4a3c7df867f5a5575d0db1c262ac461d3efca7cd25bfd3df2",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@f3a7a62/record.json",
+          "fix_log_sha256": "ea8b5c6eb7f156d1ed78b8ab07a0881288673fc4689f9b777984dd31283c179f",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-alignment-msa-statistics.md",
+          "audited_source": {
+            "repository": "mrsonord2240/bioSkills",
+            "commit": "f3a7a62091e42f6e98653b5b626de94c6f7bfff7",
+            "path": "alignment/msa-statistics",
+            "author": "GPTomics",
+            "author_url": "https://github.com/GPTomics",
+            "license": "MIT",
+            "modified_by": "Samuel Nord",
+            "fork_of": {
+              "repository": "GPTomics/bioSkills",
+              "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+            },
+            "url": "https://github.com/mrsonord2240/bioSkills/tree/f3a7a62091e42f6e98653b5b626de94c6f7bfff7/alignment/msa-statistics"
+          },
+          "auditor_independent": false,
+          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+        }
+      },
+      "aipoch_review": {
+        "status": "pending_independent_review",
+        "reviewed_by": null,
+        "reviewed_on": null,
+        "score": null,
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "unresolved_limitations": [
+          "Examples require Bio.AlignIO MultipleSeqAlignment semantics, not the newer Bio.Align Alignment object.",
+          "Exploratory distance corrections do not replace publication-grade model selection."
+        ]
+      },
+      "runtime_dependencies": {
+        "languages": [
+          "Python 3",
+          "optional R for pwalign identity comparison"
+        ],
+        "python_packages": [
+          "Biopython >=1.83 (checked 1.88)",
+          "numpy >=1.26 (checked 2.0.2)"
+        ],
+        "r_packages": [
+          "optional Bioconductor pwalign"
+        ],
+        "cli_tools": [
+          "optional ModelTest-NG, IQ-TREE2, or EMBOSS distmat for publication-grade distance work"
+        ],
+        "services_apis": [],
+        "databases_reference_data": [
+          "input multiple-sequence alignments and optional background distributions"
+        ],
+        "external_models": [
+          "optional substitution and distance models selected by the analyst"
+        ],
+        "containers": [],
+        "hardware": [],
+        "declaration_scope": "Named dependencies from bundled executables and documented routes; optional alternatives are not all required together. Versions are source-declared compatibility claims, not a newly tested environment lock."
+      },
+      "contract": {
+        "inputs": [
+          "FASTA, Stockholm, Clustal, PHYLIP, or Nexus multiple-sequence alignments"
+        ],
+        "outputs": [
+          "identity matrices",
+          "conservation, entropy, gap, substitution, PSSM, and distance statistics"
+        ],
+        "bundled_executables": [
+          "examples/alignment_scores.py",
+          "examples/capra_singh_jsd.py",
+          "examples/conservation_profile.py",
+          "examples/entropy_analysis.py",
+          "examples/gap_statistics.py",
+          "examples/identity_matrix.py",
+          "examples/kimura_protein_distance.py",
+          "examples/msa_utils.py",
+          "examples/pssm.py",
+          "examples/selftest.py",
+          "examples/substitution_counts.py"
+        ],
+        "cross_check_status": "static_cross_check_completed_runtime_coverage_partial",
+        "findings": []
+      },
+      "package_evidence": {
+        "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_path": "skills/bio-alignment-msa-statistics",
+        "manifest_sha256": "f045adbe4e2f68832af41e2db787980c4b4f6ab37cddb8a42cdb5fa2730b8abb",
+        "content_sha256": "eeadefcb5110e3fbff1062f98b2b631d7ac6e1c340e134315387a7f2a3ad7c96",
+        "file_count": 22,
+        "total_bytes": 72697,
+        "license_expression": "MIT",
+        "license_files": [
+          {
+            "path": "LICENSE",
+            "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+          },
+          {
+            "path": "skills/bio-alignment-msa-statistics/SKILL.md",
+            "sha256": "bd4b393018045449cfb35077f196a5bfdd4c3c9af2c483f070db24e3b58a794f"
+          }
+        ]
+      },
+      "provider_review": {
+        "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+        "reviewed_on": "2026-09-24",
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "static_review_status": "completed_with_declared_limitations",
+        "runtime_status": "selected_smoke_checks_passed",
+        "runtime_checks": [
+          {
+            "id": "bio-alignment-msa-statistics",
+            "script": "examples/selftest.py",
+            "command": "python",
+            "args": [
+              "-B",
+              "examples/selftest.py"
+            ],
+            "status": "passed",
+            "exit_code": 0,
+            "error": null,
+            "checks": [
+              {
+                "expected": "All checks passed.",
+                "passed": true
+              }
+            ],
+            "source_sha256": "c5b58a759eae4ef405d439c4298dd94696a8c4f5a87e79f3e4e81ae4b3c742e3",
+            "stdout": "OK  PID1-PID4 (function and vectorized) = 80.0 / 100.0 / 80.0 / 66.7 %\r\nOK  undefined identity (all-gap sequence) is NaN, average ignores it\r\nOK  conservation, min_occupancy NaN rule, centred profile window\r\nOK  Shannon entropy\r\nOK  information content: unknown letters dropped and renormalised, DNA IC of a conserved column = 2.0 bits\r\nOK  PSSM with background-weighted pseudocount\r\nOK  Kimura distance 0.4393\r\nOK  substitution counts D-N 2, K-R 1\r\nOK  DNA: Ti/Tv 4/2 (N pairs excluded), IC 1.082 and 2.000 bits\r\nOK  normalisation: lower case, \".\" / \"~\" gaps, U -> T\r\nOK  Capra-Singh JSD: closed-form column values, gap penalty, neighbour smoothing\r\nOK  alignment_score -12, sum_of_pairs 78, all-gap columns leave both unchanged\r\nOK  is_nucleotide: shipped DNA/protein, IUPAC-rich DNA still DNA, protein never DNA\r\nOK  guess_format: Stockholm / Clustal / PHYLIP / Nexus / FASTA\r\nOK  Kimura: finite below p = 0.85, inf from 0.85\r\nOK  gap_statistics: totals, gap-free columns, gappiest sequence\r\n\r\nAll checks passed.\r\n",
+            "stderr": "",
+            "environment": "Windows",
+            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bio-alignment-pairwise",
+      "intake_record": "bio-alignment-pairwise@1.0.0",
+      "provenance": {
+        "upstream_path": "alignment/pairwise-alignment",
+        "original_author": "GPTomics",
+        "modification_status": "modified",
+        "modification_evidence": [
+          "PROVENANCE.json",
+          "fixes/bio-alignment-pairwise.md"
+        ],
+        "modified_by": "mrsonord2240"
+      },
+      "upstream_audit": {
+        "score": 94,
+        "audited_on": "2026-09-23",
+        "audit_path": "audits/skills/bio-alignment-pairwise",
+        "fix_log": "fixes/bio-alignment-pairwise.md",
+        "evidence": {
+          "report_path": "audits/skills/bio-alignment-pairwise/mrsonord2240-bioSkills@d45a647/report.json",
+          "report_sha256": "4982d03befb1df019e91262922269ba1455ef6341e90d8d9d4c055059ddd0664",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-alignment-pairwise/mrsonord2240-bioSkills@d45a647/report.json",
+          "record_path": "audits/skills/bio-alignment-pairwise/mrsonord2240-bioSkills@d45a647/record.json",
+          "record_sha256": "559c4294cf259085ca3bd172275bd8402caadfc3f2f4dba9d9c8037c0423c00f",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-alignment-pairwise/mrsonord2240-bioSkills@d45a647/record.json",
+          "fix_log_sha256": "00eb5d3a8658788d05593f5a0bac98c85349dcd5f89c97febc37142123df7025",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-alignment-pairwise.md",
+          "audited_source": {
+            "repository": "mrsonord2240/bioSkills",
+            "commit": "d45a6478bc0f0450f101b6c394415998d7151899",
+            "path": "alignment/pairwise-alignment",
+            "author": "GPTomics",
+            "author_url": "https://github.com/GPTomics",
+            "license": "MIT",
+            "modified_by": "Samuel Nord",
+            "fork_of": {
+              "repository": "GPTomics/bioSkills",
+              "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+            },
+            "url": "https://github.com/mrsonord2240/bioSkills/tree/d45a6478bc0f0450f101b6c394415998d7151899/alignment/pairwise-alignment"
+          },
+          "auditor_independent": false,
+          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+        }
+      },
+      "aipoch_review": {
+        "status": "pending_independent_review",
+        "reviewed_by": null,
+        "reviewed_on": null,
+        "score": null,
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "unresolved_limitations": [
+          "Pairwise dynamic programming is not the right route for database-scale search or remote-homology discovery.",
+          "Score and percent-identity comparability depend on the stated mode, matrix, and gap convention."
+        ]
+      },
+      "runtime_dependencies": {
+        "languages": [
+          "Python 3",
+          "optional R"
+        ],
+        "python_packages": [
+          "Biopython 1.88",
+          "optional parasail 1.3.4, edlib 1.3.9, pywfa 0.5.1, or mappy 2.31 for alternative routes"
+        ],
+        "r_packages": [
+          "optional Bioconductor pwalign 1.2.0"
+        ],
+        "cli_tools": [
+          "optional EMBOSS 6.6.0 needle/water",
+          "optional BLAST+ 2.17.0 for score cross-checks"
+        ],
+        "services_apis": [],
+        "databases_reference_data": [
+          "two nucleotide or protein sequences",
+          "optional substitution matrices"
+        ],
+        "external_models": [],
+        "containers": [],
+        "hardware": [],
+        "declaration_scope": "Named dependencies from bundled executables and documented routes; optional alternatives are not all required together. Versions are source-declared compatibility claims, not a newly tested environment lock."
+      },
+      "contract": {
+        "inputs": [
+          "two DNA, RNA, or protein sequences",
+          "alignment mode and scoring parameters"
+        ],
+        "outputs": [
+          "optimal alignment(s)",
+          "alignment score, coordinates, and optional percent identity/significance estimates"
+        ],
+        "bundled_executables": [
+          "examples/alignment_from_file.py",
+          "examples/empirical_pvalue.py",
+          "examples/global_alignment.py",
+          "examples/local_alignment.py",
+          "examples/protein_alignment.py"
+        ],
+        "cross_check_status": "static_cross_check_completed_runtime_coverage_partial",
+        "findings": []
+      },
+      "package_evidence": {
+        "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_path": "skills/bio-alignment-pairwise",
+        "manifest_sha256": "b7734981fe5311e9f10ad6dc8d99133f3ef047336755473c7dbd2323f9bcfa7a",
+        "content_sha256": "be1b84b29cf9aa4b53c1f9d6100f1477e5a81548ff96fd163aa7e82c81dc6806",
+        "file_count": 14,
+        "total_bytes": 41530,
+        "license_expression": "MIT",
+        "license_files": [
+          {
+            "path": "LICENSE",
+            "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+          },
+          {
+            "path": "skills/bio-alignment-pairwise/SKILL.md",
+            "sha256": "d97ab041a0a716de9d4d0465f4c006a462f8af61444b3df58a9560fb375f6edf"
+          }
+        ]
+      },
+      "provider_review": {
+        "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+        "reviewed_on": "2026-09-24",
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "static_review_status": "completed_with_declared_limitations",
+        "runtime_status": "selected_smoke_checks_passed",
+        "runtime_checks": [
+          {
+            "id": "bio-alignment-pairwise",
+            "script": "examples/empirical_pvalue.py",
+            "command": "python",
+            "args": [
+              "-B",
+              "examples/empirical_pvalue.py"
+            ],
+            "status": "passed",
+            "exit_code": 0,
+            "error": null,
+            "checks": [
+              {
+                "expected": "Empirical p-value:",
+                "passed": true
+              }
+            ],
+            "source_sha256": "5acc5d6c72e8d5a9311a37f761d4f057a813acbf7001b92d4caac0f0fd2627cf",
+            "stdout": "Observed: 23.0  Empirical p-value: 0.1449\r\n",
+            "stderr": "",
+            "environment": "Windows",
+            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bio-alignment-trimming",
+      "intake_record": "bio-alignment-trimming@1.0.0",
+      "provenance": {
+        "upstream_path": "alignment/alignment-trimming",
+        "original_author": "GPTomics",
+        "modification_status": "modified",
+        "modification_evidence": [
+          "PROVENANCE.json",
+          "fixes/bio-alignment-trimming.md"
+        ],
+        "modified_by": "mrsonord2240"
+      },
+      "upstream_audit": {
+        "score": 96,
+        "audited_on": "2026-09-24",
+        "audit_path": "audits/skills/bio-alignment-trimming",
+        "fix_log": "fixes/bio-alignment-trimming.md",
+        "evidence": {
+          "report_path": "audits/skills/bio-alignment-trimming/mrsonord2240-bioSkills@c5bda09/report.json",
+          "report_sha256": "ee20533b6a2dc436c9290e6a7a985504f5a547d898f42cee3bbb3af19a553013",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-alignment-trimming/mrsonord2240-bioSkills@c5bda09/report.json",
+          "record_path": "audits/skills/bio-alignment-trimming/mrsonord2240-bioSkills@c5bda09/record.json",
+          "record_sha256": "16a960ff9405fe8f47d1cceb60f70943d0b42727356aa80b749d17738d87959e",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-alignment-trimming/mrsonord2240-bioSkills@c5bda09/record.json",
+          "fix_log_sha256": "6fb4c1350d55f284a08a4012d433691132785a1bc545255318c521dc7ebac34e",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-alignment-trimming.md",
+          "audited_source": {
+            "repository": "mrsonord2240/bioSkills",
+            "commit": "c5bda09627a2d9f0bfc2222bfcef06249772f0a2",
+            "path": "alignment/alignment-trimming",
+            "author": "GPTomics",
+            "author_url": "https://github.com/GPTomics",
+            "license": "MIT",
+            "modified_by": "Samuel Nord",
+            "fork_of": {
+              "repository": "GPTomics/bioSkills",
+              "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+            },
+            "url": "https://github.com/mrsonord2240/bioSkills/tree/c5bda09627a2d9f0bfc2222bfcef06249772f0a2/alignment/alignment-trimming"
+          },
+          "auditor_independent": null,
+          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+        }
+      },
+      "aipoch_review": {
+        "status": "pending_independent_review",
+        "reviewed_by": null,
+        "reviewed_on": null,
+        "score": null,
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "unresolved_limitations": [
+          "The correct trimming strategy depends on the downstream inference goal; aggressive trimming can remove biological signal.",
+          "Automatic trimAl modes should be named explicitly for audit-grade reproducibility."
+        ]
+      },
+      "runtime_dependencies": {
+        "languages": [
+          "Python 3",
+          "Java for BMGE/MACSE",
+          "Perl for HMMcleaner"
+        ],
+        "python_packages": [
+          "Biopython >=1.83",
+          "ClipKIT 2.14.0 when installed as Python package"
+        ],
+        "r_packages": [],
+        "cli_tools": [
+          "ClipKIT 2.14.0",
+          "trimAl 1.4.1",
+          "BMGE 1.12 or 2.0",
+          "Divvier >=1.01",
+          "HMMcleaner/Bio::MUST::Apps::HmmCleaner",
+          "optional MACSE 2.07 and PAML 4.10.10 for selection-aware routes"
+        ],
+        "services_apis": [],
+        "databases_reference_data": [
+          "multiple-sequence alignment"
+        ],
+        "external_models": [],
+        "containers": [],
+        "hardware": [],
+        "declaration_scope": "Named dependencies from bundled executables and documented routes; optional alternatives are not all required together. Versions are source-declared compatibility claims, not a newly tested environment lock."
+      },
+      "contract": {
+        "inputs": [
+          "protein, DNA, or codon multiple-sequence alignment",
+          "downstream-goal-specific trimming mode"
+        ],
+        "outputs": [
+          "trimmed or split alignment",
+          "column mask/log for reproducibility"
+        ],
+        "bundled_executables": [
+          "examples/bmge_trim.py",
+          "examples/clipkit_trim.py",
+          "examples/divvier_split.py",
+          "examples/trimal_modes.py"
+        ],
+        "cross_check_status": "static_cross_check_completed_runtime_coverage_partial",
+        "findings": []
+      },
+      "package_evidence": {
+        "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_path": "skills/bio-alignment-trimming",
+        "manifest_sha256": "1a0b27bb6abc34c69a1eb72ff26dc80e2083b57eb898d6dd5734446a450a8f39",
+        "content_sha256": "f28a52fe6598d9589462ac3b50d3a36075bfe3571ec11e4900138d6207280ce9",
+        "file_count": 8,
+        "total_bytes": 45968,
+        "license_expression": "MIT",
+        "license_files": [
+          {
+            "path": "LICENSE",
+            "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+          },
+          {
+            "path": "skills/bio-alignment-trimming/SKILL.md",
+            "sha256": "e8061c8416180d7b3722e591a831736bc73c7740b32bbf05ca3fe4496066be81"
+          }
+        ]
+      },
+      "provider_review": {
+        "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+        "reviewed_on": "2026-09-24",
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "static_review_status": "completed_with_declared_limitations",
+        "runtime_status": "not_executed_in_this_pass",
+        "runtime_checks": []
+      }
+    },
+    {
+      "id": "bio-alignment-validation",
+      "intake_record": "bio-alignment-validation@1.0.0",
+      "provenance": {
+        "upstream_path": "alignment-files/alignment-validation",
+        "original_author": "GPTomics",
+        "modification_status": "modified",
+        "modification_evidence": [
+          "PROVENANCE.json",
+          "fixes/bio-alignment-validation.md"
+        ],
+        "modified_by": "mrsonord2240"
+      },
+      "upstream_audit": {
+        "score": 95,
+        "audited_on": "2026-09-24",
+        "audit_path": "audits/skills/bio-alignment-validation",
+        "fix_log": "fixes/bio-alignment-validation.md",
+        "evidence": {
+          "report_path": "audits/skills/bio-alignment-validation/mrsonord2240-bioSkills@173fd90/report.json",
+          "report_sha256": "dd0262491e34d29511ddbb4cca784891313bf52cb17ccf4824a5faa65bf95d0a",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-alignment-validation/mrsonord2240-bioSkills@173fd90/report.json",
+          "record_path": "audits/skills/bio-alignment-validation/mrsonord2240-bioSkills@173fd90/record.json",
+          "record_sha256": "a91d39b11b59385187fd6b8bab9655e85f6b81b00278a658a4b414bf951663c6",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-alignment-validation/mrsonord2240-bioSkills@173fd90/record.json",
+          "fix_log_sha256": "142b7f7e7aec06d9d7b38f8cda1c36d37f8d7ba1bc7c772a126b6b3ab85a47ec",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-alignment-validation.md",
+          "audited_source": {
+            "repository": "mrsonord2240/bioSkills",
+            "commit": "173fd9097151633f9d7658826e094440f902e495",
+            "path": "alignment-files/alignment-validation",
+            "author": "GPTomics",
+            "author_url": "https://github.com/GPTomics",
+            "license": "MIT",
+            "modified_by": "Samuel Nord",
+            "fork_of": {
+              "repository": "GPTomics/bioSkills",
+              "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+            },
+            "url": "https://github.com/mrsonord2240/bioSkills/tree/173fd9097151633f9d7658826e094440f902e495/alignment-files/alignment-validation"
+          },
+          "auditor_independent": false,
+          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+        }
+      },
+      "aipoch_review": {
+        "status": "pending_independent_review",
+        "reviewed_by": null,
+        "reviewed_on": null,
+        "score": null,
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "unresolved_limitations": [
+          "Expected strand, insert-size, GC, and pairing metrics are assay-specific.",
+          "Reference identity is definitive only when M5 hashes are present; otherwise validation is limited to sequence names and lengths."
+        ]
+      },
+      "runtime_dependencies": {
+        "languages": [
+          "Python 3",
+          "Java for Picard",
+          "optional R/Rscript for Picard charts",
+          "Bash for the shell workflow"
+        ],
+        "python_packages": [
+          "pysam >=0.22",
+          "numpy >=1.26",
+          "matplotlib >=3.8"
+        ],
+        "r_packages": [],
+        "cli_tools": [
+          "samtools >=1.19",
+          "Picard >=3.1",
+          "optional VerifyBamID2 2.0.3, somalier 0.3.5, deepTools 4.0.0, and RSeQC 5.0.4",
+          "awk, grep, sed, head, and standard Unix core utilities for shell recipes"
+        ],
+        "services_apis": [],
+        "databases_reference_data": [
+          "matching reference FASTA/dictionary",
+          "optional VerifyBamID2 population resource",
+          "optional BED12 gene model for RSeQC"
+        ],
+        "external_models": [],
+        "containers": [],
+        "hardware": [],
+        "declaration_scope": "Named dependencies from bundled executables and documented routes; optional alternatives are not all required together. Versions are source-declared compatibility claims, not a newly tested environment lock."
+      },
+      "contract": {
+        "inputs": [
+          "BAM/CRAM alignment",
+          "matching reference and optional sample/library metadata"
+        ],
+        "outputs": [
+          "integrity, mapping, pairing, insert-size, GC, strand, contamination, and identity QC metrics",
+          "optional plots"
+        ],
+        "bundled_executables": [
+          "examples/validate_alignment.py",
+          "examples/validate_alignment.sh"
+        ],
+        "cross_check_status": "static_cross_check_completed_runtime_coverage_partial",
+        "findings": []
+      },
+      "package_evidence": {
+        "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_path": "skills/bio-alignment-validation",
+        "manifest_sha256": "faa9e241049e9ee26e6407ccbefa3208f23a577c7fa138f0f1088bd71bdd9e25",
+        "content_sha256": "b63904a1933db33652e4a1d51faa28fab5ab2f7c706137daa3c7167d9776496f",
+        "file_count": 5,
+        "total_bytes": 36687,
+        "license_expression": "MIT",
+        "license_files": [
+          {
+            "path": "LICENSE",
+            "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+          },
+          {
+            "path": "skills/bio-alignment-validation/SKILL.md",
+            "sha256": "25158bd0323386b8ffcdf2231ab75f06eed7af87da04e5b97aebafb465a281a7"
+          }
+        ]
+      },
+      "provider_review": {
+        "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+        "reviewed_on": "2026-09-24",
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "static_review_status": "completed_with_declared_limitations",
+        "runtime_status": "selected_smoke_checks_passed",
+        "runtime_checks": [
+          {
+            "id": "bio-alignment-validation",
+            "script": "examples/validate_alignment.py",
+            "args": [
+              "/usr/bin/python3",
+              "-B",
+              "examples/validate_alignment.py",
+              "smoke.bam"
+            ],
+            "status": "passed",
+            "exit_code": 0,
+            "error": null,
+            "source_sha256": "902a9ff448d04b8b08206f145e7d9353e1638c1ba033f4019a6b0251e2bf4349",
+            "stdout": "=== Alignment Validation (all 200 primary records) ===\n\n--- Mapping ---\nMapped: 200 (100.00%)\nUnmapped: 0 (0.00%)\n\n--- Pairing ---\nNo mapped paired reads (single-end or unpaired): proper pairing not graded\n\n--- Insert Size ---\nNo proper pairs with a positive template length\n\n--- Strand Balance ---\nForward: 100, Reverse: 100\nForward fraction F/(F+R): 0.500\n\n--- MAPQ (mapped primary reads) ---\nMean MAPQ: 50.0\nMAPQ >= 30: 80.0%\n\n--- Quality Summary ---\nMapping rate: PASS\nStrand balance: PASS\nMean MAPQ: PASS\nAll metrics within normal range\n",
+            "stderr": "",
+            "environment": "WSL science",
+            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bio-proteomics-data-import",
+      "intake_record": "bio-proteomics-data-import@1.0.0",
+      "provenance": {
+        "upstream_path": "proteomics/data-import",
+        "original_author": "GPTomics",
+        "modification_status": "modified",
+        "modification_evidence": [
+          "PROVENANCE.json",
+          "fixes/bio-proteomics-data-import.md"
+        ],
+        "modified_by": "mrsonord2240"
+      },
+      "upstream_audit": {
+        "score": 95,
+        "audited_on": "2026-09-24",
+        "audit_path": "audits/skills/bio-proteomics-data-import",
+        "fix_log": "fixes/bio-proteomics-data-import.md",
+        "evidence": {
+          "report_path": "audits/skills/bio-proteomics-data-import/mrsonord2240-bioSkills@622dadd/report.json",
+          "report_sha256": "f19d2e213d60dc4117fc3e082f121013f0de98994e2d9ca4cd92229c208aa4e2",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-proteomics-data-import/mrsonord2240-bioSkills@622dadd/report.json",
+          "record_path": "audits/skills/bio-proteomics-data-import/mrsonord2240-bioSkills@622dadd/record.json",
+          "record_sha256": "ff9c769adb18146f76b1471517833d39fd266c5b7127817d0ce71f7e5a570824",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-proteomics-data-import/mrsonord2240-bioSkills@622dadd/record.json",
+          "fix_log_sha256": "6feb2bd386928dd321ae2fcddcfd737fca373243ca3cdbda55c03b8b22879e39",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-proteomics-data-import.md",
+          "audited_source": {
+            "repository": "mrsonord2240/bioSkills",
+            "commit": "622daddbf14af58b9a83bdae2d586133ba35b2a6",
+            "path": "proteomics/data-import",
+            "author": "GPTomics",
+            "author_url": "https://github.com/GPTomics",
+            "license": "MIT",
+            "modified_by": "Samuel Nord",
+            "fork_of": {
+              "repository": "GPTomics/bioSkills",
+              "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+            },
+            "url": "https://github.com/mrsonord2240/bioSkills/tree/622daddbf14af58b9a83bdae2d586133ba35b2a6/proteomics/data-import"
+          },
+          "auditor_independent": false,
+          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+        }
+      },
+      "aipoch_review": {
+        "status": "pending_independent_review",
+        "reviewed_by": null,
+        "reviewed_on": null,
+        "score": null,
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "unresolved_limitations": [
+          "Vendor RAW conversion, statistical testing, batch correction, and imputation are outside this Skill.",
+          "Quantification column semantics and decoy/contaminant conventions remain search-engine specific.",
+          "qfeatures-windows-process-crash: expected output was produced, but the native process failed; runtime verification remains unresolved."
+        ]
+      },
+      "runtime_dependencies": {
+        "languages": [
+          "Python 3",
+          "optional R"
+        ],
+        "python_packages": [
+          "pyOpenMS 3.5.0",
+          "pandas 3.0.5",
+          "numpy 2.5.3",
+          "a pandas Parquet engine such as pyarrow for DIA-NN report.parquet"
+        ],
+        "r_packages": [
+          "Bioconductor Spectra and QFeatures for current R routes",
+          "MSnbase >=2.28 for maintenance-mode compatibility"
+        ],
+        "cli_tools": [
+          "external vendor-RAW-to-mzML converter when input is not open format"
+        ],
+        "services_apis": [],
+        "databases_reference_data": [
+          "mzML/mzXML spectra",
+          "MaxQuant proteinGroups.txt",
+          "DIA-NN report.parquet"
+        ],
+        "external_models": [],
+        "containers": [],
+        "hardware": [],
+        "declaration_scope": "Named dependencies from bundled executables and documented routes; optional alternatives are not all required together. Versions are source-declared compatibility claims, not a newly tested environment lock."
+      },
+      "contract": {
+        "inputs": [
+          "mzML/mzXML spectra or MaxQuant/DIA-NN result tables"
+        ],
+        "outputs": [
+          "in-memory spectra or cleaned abundance tables",
+          "missingness diagnostics"
+        ],
+        "bundled_executables": [
+          "examples/inspect_mzml.py",
+          "examples/load_diann.py",
+          "examples/load_maxquant_qfeatures.R",
+          "examples/load_maxquant.py"
+        ],
+        "cross_check_status": "completed_with_open_runtime_findings",
+        "findings": [
+          {
+            "id": "qfeatures-windows-process-crash",
+            "status": "open",
+            "severity": "runtime",
+            "paths": [
+              "examples/load_maxquant_qfeatures.R"
+            ],
+            "finding": "Windows R 4.6.1 returned the expected cleaned matrix summary but exited with code 3221225477 (0xC0000005 access violation). WSL R is installed but QFeatures is absent there.",
+            "required_action": "Reproduce in a compatible isolated R/Bioconductor environment and require a clean process exit. Do not infer a Skill-code defect from this environment-specific crash alone."
+          }
+        ]
+      },
+      "package_evidence": {
+        "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_path": "skills/bio-proteomics-data-import",
+        "manifest_sha256": "46dcd2a0e8aa8d18f19e40815e71571eb709c95890d71eabcb8fc706b5b6432d",
+        "content_sha256": "c51326bc4fd0b409a0327475c70d281ce681a830a621588398ba253cdb2e74f3",
+        "file_count": 6,
+        "total_bytes": 40768,
+        "license_expression": "MIT",
+        "license_files": [
+          {
+            "path": "LICENSE",
+            "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+          },
+          {
+            "path": "skills/bio-proteomics-data-import/SKILL.md",
+            "sha256": "93b9f40a84ed746ff34ab9308add8fd9b5606021fb28a9dd7987c0690d7ef06f"
+          }
+        ]
+      },
+      "provider_review": {
+        "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+        "reviewed_on": "2026-09-24",
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "static_review_status": "completed_with_declared_limitations",
+        "runtime_status": "failed_runtime_check",
+        "runtime_checks": [
+          {
+            "id": "bio-proteomics-data-import",
+            "script": "examples/load_maxquant.py",
+            "command": "python",
+            "args": [
+              "-B",
+              "examples/load_maxquant.py"
+            ],
+            "status": "passed",
+            "exit_code": 0,
+            "error": null,
+            "checks": [
+              {
+                "expected": "read=14, after bookkeeping=11, quantified=11",
+                "passed": true
+              },
+              {
+                "expected": "MNAR",
+                "passed": true
+              }
+            ],
+            "source_sha256": "a3acc98c77d655461bb4b9f20d5c6450d3e8c8d5987fa1fe1e944019df4871ef",
+            "stdout": "MaxQuant rows: read=14, after bookkeeping=11, quantified=11\r\nleading_protein leading_gene  LFQ intensity S1  LFQ intensity S2\r\n         P00001        GENE1         26.423422         26.349421\r\n         P00002        GENE2         25.838459         25.764459\r\n         P00003        GENE3         25.253497         25.179496\r\n         P00004        GENE4         24.575425         24.501424\r\n         P00005        GENE5         23.838459         23.764459\r\n         P00006        GENE6         23.101494               NaN\r\n         P00007        GENE7         22.253497               NaN\r\n         P00008        GENE8         20.931569               NaN\r\n         P00009        GENE9         19.931569               NaN\r\n         P00010       GENE10         19.194603               NaN\r\n         P12345        GENEA         23.516531         23.391000\r\nMissing: 22.7% | abundance-vs-missingness corr: -0.84 (negative => MNAR)\r\n",
+            "stderr": "",
+            "environment": "Windows",
+            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+          },
+          {
+            "id": "bio-proteomics-data-import",
+            "script": "examples/load_maxquant_qfeatures.R",
+            "command": "C:/R/bin/x64/Rscript.exe",
+            "args": [
+              "--vanilla",
+              "examples/load_maxquant_qfeatures.R",
+              "smoke-proteinGroups.txt"
+            ],
+            "status": "failed",
+            "exit_code": 3221225477,
+            "error": null,
+            "checks": [
+              {
+                "expected": "QFeatures log2 LFQ: 2 protein groups x 2 samples | -Inf: FALSE",
+                "passed": true
+              }
+            ],
+            "source_sha256": "5c2d6a749ab6d5dc1d3d9152bff12c85226ca5b381b3a62cf14c80be8b835470",
+            "stdout": "QFeatures log2 LFQ: 2 protein groups x 2 samples | -Inf: FALSE\r\n",
+            "stderr": "Checking arguments.\r\nLoading data as a 'SummarizedExperiment' object.\r\nFormatting sample annotations (colData).\r\nFormatting data as a 'QFeatures' object.\r\n'Reverse' found in 1 out of 1 assay(s).'Potential.contaminant' found in 1 out of 1 assay(s).'Only.identified.by.site' found in 1 out of 1 assay(s).\r\n",
+            "environment": "Windows",
+            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bio-proteomics-peptide-identification",
+      "intake_record": "bio-proteomics-peptide-identification@1.0.0",
+      "provenance": {
+        "upstream_path": "proteomics/peptide-identification",
+        "original_author": "GPTomics",
+        "modification_status": "modified",
+        "modification_evidence": [
+          "PROVENANCE.json",
+          "fixes/bio-proteomics-peptide-identification.md"
+        ],
+        "modified_by": "mrsonord2240"
+      },
+      "upstream_audit": {
+        "score": 95,
+        "audited_on": "2026-09-22",
+        "audit_path": "audits/skills/bio-proteomics-peptide-identification",
+        "fix_log": "fixes/bio-proteomics-peptide-identification.md",
+        "evidence": {
+          "report_path": "audits/skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@0f447a7/report.json",
+          "report_sha256": "69024897bab6567834136de4bffd788413422d58e90a7a29007412355a7a3a3e",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@0f447a7/report.json",
+          "record_path": "audits/skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@0f447a7/record.json",
+          "record_sha256": "afd8707fda14443f85c87d18d953d6830379aa4c5d43add55b09f9d3c68ac5c7",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@0f447a7/record.json",
+          "fix_log_sha256": "e7c5f1540c65162915ad711f6d1d4386f3083083dc4a912372f27504bfa7d983",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-proteomics-peptide-identification.md",
+          "audited_source": {
+            "repository": "mrsonord2240/bioSkills",
+            "commit": "0f447a7a628052aac81acecb85c3d52d442a974a",
+            "path": "proteomics/peptide-identification",
+            "author": "GPTomics",
+            "author_url": "https://github.com/GPTomics",
+            "license": "MIT",
+            "modified_by": "Samuel Nord",
+            "fork_of": {
+              "repository": "GPTomics/bioSkills",
+              "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+            },
+            "url": "https://github.com/mrsonord2240/bioSkills/tree/0f447a7a628052aac81acecb85c3d52d442a974a/proteomics/peptide-identification"
+          },
+          "auditor_independent": false,
+          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+        }
+      },
+      "aipoch_review": {
+        "status": "pending_independent_review",
+        "reviewed_by": null,
+        "reviewed_on": null,
+        "score": null,
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "unresolved_limitations": [
+          "FDR is valid only for the ranked list and target-decoy competition actually used.",
+          "Protein grouping, protein-level FDR, PTM localization, DIA scoring, and intensity quantification are outside this Skill."
+        ]
+      },
+      "runtime_dependencies": {
+        "languages": [
+          "Python 3",
+          "Java 17 for MS-GF+",
+          "Bash for examples/dda_search.sh"
+        ],
+        "python_packages": [
+          "pyOpenMS 3.5.0",
+          "pandas >=2.2",
+          "numpy >=1.26"
+        ],
+        "r_packages": [],
+        "cli_tools": [
+          "Sage 0.14.6",
+          "Comet 2026.02 rev.2",
+          "MS-GF+ v2024.03.26",
+          "Percolator 3.09.0",
+          "OpenMS 3.5.0 DecoyDatabase",
+          "optional ProteoWizard msconvert or ThermoRawFileParser",
+          "awk, grep, sed and standard Unix core utilities for shell recipes"
+        ],
+        "services_apis": [],
+        "databases_reference_data": [
+          "MS/MS spectra",
+          "target protein FASTA plus contaminants and decoys"
+        ],
+        "external_models": [
+          "Percolator rescoring model trained on the submitted target/decoy feature table"
+        ],
+        "containers": [],
+        "hardware": [],
+        "declaration_scope": "Named dependencies from bundled executables and documented routes; optional alternatives are not all required together. Versions are source-declared compatibility claims, not a newly tested environment lock."
+      },
+      "contract": {
+        "inputs": [
+          "MS/MS spectra",
+          "search parameters and target/decoy protein database"
+        ],
+        "outputs": [
+          "peptide-spectrum matches",
+          "PEP/q-values and FDR-filtered peptide identifications"
+        ],
+        "bundled_executables": [
+          "examples/dda_search.sh",
+          "examples/fdr_filtering.py",
+          "examples/separate_search_fdr.py",
+          "scripts/pyopenms_fdr.py",
+          "scripts/pyopenms_search.py",
+          "scripts/table_fdr.py"
+        ],
+        "cross_check_status": "static_cross_check_completed_runtime_coverage_partial",
+        "findings": []
+      },
+      "package_evidence": {
+        "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_path": "skills/bio-proteomics-peptide-identification",
+        "manifest_sha256": "407a09d3d18d32bcf09e20fce9e7b08845ccd1ac7c237cfdedf8e57c1ff5b3f2",
+        "content_sha256": "699b7c0bde8b44d443328ca2c77ea750d1e229387b04bdafdc2b5e4566c7229c",
+        "file_count": 12,
+        "total_bytes": 56443,
+        "license_expression": "MIT",
+        "license_files": [
+          {
+            "path": "LICENSE",
+            "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+          },
+          {
+            "path": "skills/bio-proteomics-peptide-identification/SKILL.md",
+            "sha256": "74a6c8389cc45a112e35c7b04db8127c94e2c2394baaf76430819a72d01230c7"
+          }
+        ]
+      },
+      "provider_review": {
+        "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+        "reviewed_on": "2026-09-24",
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "static_review_status": "completed_with_declared_limitations",
+        "runtime_status": "selected_smoke_checks_passed",
+        "runtime_checks": [
+          {
+            "id": "bio-proteomics-peptide-identification",
+            "script": "examples/fdr_filtering.py",
+            "command": "python",
+            "args": [
+              "-B",
+              "examples/fdr_filtering.py"
+            ],
+            "status": "passed",
+            "exit_code": 0,
+            "error": null,
+            "checks": [
+              {
+                "expected": "Target PSMs at q <= 0.01:",
+                "passed": true
+              }
+            ],
+            "source_sha256": "9dcc86f7f20ae485ffc748571eb52b56f80d5f28b865825f97ac31387e96a50e",
+            "stdout": "Targets: 2445, Decoys: 1555 (concatenated 1:1 search)\r\nTarget PSMs at q <= 0.01: 481\r\nWorst PEP inside the 1%-FDR list: 0.047\r\nTarget PSMs at PEP <= 0.01: 289 (per-PSM cutoff is far stricter than the same q-value)\r\n",
+            "stderr": "",
+            "environment": "Windows",
+            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bio-proteomics-protein-inference",
+      "intake_record": "bio-proteomics-protein-inference@1.0.0",
+      "provenance": {
+        "upstream_path": "proteomics/protein-inference",
+        "original_author": "GPTomics",
+        "modification_status": "modified",
+        "modification_evidence": [
+          "PROVENANCE.json",
+          "fixes/bio-proteomics-protein-inference.md"
+        ],
+        "modified_by": "mrsonord2240"
+      },
+      "upstream_audit": {
+        "score": 95,
+        "audited_on": "2026-09-22",
+        "audit_path": "audits/skills/bio-proteomics-protein-inference",
+        "fix_log": "fixes/bio-proteomics-protein-inference.md",
+        "evidence": {
+          "report_path": "audits/skills/bio-proteomics-protein-inference/mrsonord2240-bioSkills@2e41419/report.json",
+          "report_sha256": "a930f82858436d3576983ce79dd99423eb3edcf25802ff0a788f0e691cd2bcb2",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-proteomics-protein-inference/mrsonord2240-bioSkills@2e41419/report.json",
+          "record_path": "audits/skills/bio-proteomics-protein-inference/mrsonord2240-bioSkills@2e41419/record.json",
+          "record_sha256": "95fc31e953d604900c28d111ff0634c9a79d207c0ce253a08561e06450bba17e",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-proteomics-protein-inference/mrsonord2240-bioSkills@2e41419/record.json",
+          "fix_log_sha256": "754d54d501097bb887d930f8c1cf04fcdccc4767175d0abd06c8372305519e35",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-proteomics-protein-inference.md",
+          "audited_source": {
+            "repository": "mrsonord2240/bioSkills",
+            "commit": "2e41419be0f5d52378d18ce545c162a611006a93",
+            "path": "proteomics/protein-inference",
+            "author": "GPTomics",
+            "author_url": "https://github.com/GPTomics",
+            "license": "MIT",
+            "modified_by": "Samuel Nord",
+            "fork_of": {
+              "repository": "GPTomics/bioSkills",
+              "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+            },
+            "url": "https://github.com/mrsonord2240/bioSkills/tree/2e41419be0f5d52378d18ce545c162a611006a93/proteomics/protein-inference"
+          },
+          "auditor_independent": false,
+          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+        }
+      },
+      "aipoch_review": {
+        "status": "pending_independent_review",
+        "reviewed_by": null,
+        "reviewed_on": null,
+        "score": null,
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "unresolved_limitations": [
+          "Protein identity is underdetermined by shared peptides and must be reported as groups.",
+          "Uniqueness, leading-protein choice, and FDR are database- and inference-method-relative."
+        ]
+      },
+      "runtime_dependencies": {
+        "languages": [
+          "Python 3"
+        ],
+        "python_packages": [
+          "pyOpenMS 3.5.0",
+          "pandas >=2.2",
+          "optional picked_group_fdr (kusterlab) for large-data alternative"
+        ],
+        "r_packages": [],
+        "cli_tools": [
+          "Percolator 3.09.0",
+          "OpenMS Epifany",
+          "Philosopher 5.1.0 for TPP-derived command routes"
+        ],
+        "services_apis": [],
+        "databases_reference_data": [
+          "peptide identifications",
+          "the exact searched target/decoy FASTA",
+          "optional absent-species entrapment proteome"
+        ],
+        "external_models": [
+          "EPIFANY Bayesian inference model",
+          "ProteinProphet/Philosopher probability model when that route is selected"
+        ],
+        "containers": [],
+        "hardware": [],
+        "declaration_scope": "Named dependencies from bundled executables and documented routes; optional alternatives are not all required together. Versions are source-declared compatibility claims, not a newly tested environment lock."
+      },
+      "contract": {
+        "inputs": [
+          "PSM/peptide identifications with scores or probabilities",
+          "exact search database and decoy convention"
+        ],
+        "outputs": [
+          "protein groups with leading proteins",
+          "protein- or group-level q-values/FDR"
+        ],
+        "bundled_executables": [
+          "examples/protein_groups.py",
+          "scripts/epifany_inference.py",
+          "scripts/group_proteins_pyopenms.py",
+          "scripts/picked_group_fdr.py"
+        ],
+        "cross_check_status": "static_cross_check_completed_runtime_coverage_partial",
+        "findings": []
+      },
+      "package_evidence": {
+        "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_path": "skills/bio-proteomics-protein-inference",
+        "manifest_sha256": "5471039dffed625e75b4275b3964d31809330a1353ec836f563ac600ac15deda",
+        "content_sha256": "33045ccb909cfdde6a81fcd8686a888c185484121ae78647833198f44111493a",
+        "file_count": 10,
+        "total_bytes": 49231,
+        "license_expression": "MIT",
+        "license_files": [
+          {
+            "path": "LICENSE",
+            "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+          },
+          {
+            "path": "skills/bio-proteomics-protein-inference/SKILL.md",
+            "sha256": "dbd7133032944a3648f4627e44daa866481590e7a4436b750d0fe0f1d7d4a663"
+          }
+        ]
+      },
+      "provider_review": {
+        "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+        "reviewed_on": "2026-09-24",
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "static_review_status": "completed_with_declared_limitations",
+        "runtime_status": "selected_smoke_checks_passed",
+        "runtime_checks": [
+          {
+            "id": "bio-proteomics-protein-inference",
+            "script": "examples/protein_groups.py",
+            "command": "python",
+            "args": [
+              "-B",
+              "examples/protein_groups.py"
+            ],
+            "status": "passed",
+            "exit_code": 0,
+            "error": null,
+            "checks": [
+              {
+                "expected": "Parsimony kept 7 groups out of 8",
+                "passed": true
+              },
+              {
+                "expected": "Protein groups passing 1% picked-group FDR: 2",
+                "passed": true
+              }
+            ],
+            "source_sha256": "d00678a3f22b92cbb43b243385eb061bebb7858c8673d49cd1e9d9990cbf40c1",
+            "stdout": "Parsimony kept 7 groups out of 8 candidate groups\r\nDropped (subsumable): ['P_C']\r\nWARNING: only 3 decoy groups; the protein FDR estimate is not meaningful\r\n\r\nProtein groups passing 1% picked-group FDR: 2\r\nleading_protein   accessions  n_peptides  n_unique_peptides  is_decoy   qvalue\r\n            P_A        [P_A]           4                  2     False 0.000000\r\n            P_E [P_E, P_E-2]           3                  3     False 0.000000\r\n      DECOY_P_D  [DECOY_P_D]           2                  2      True 0.333333\r\n            P_B        [P_B]           2                  1     False 0.333333\r\n",
+            "stderr": "",
+            "environment": "Windows",
+            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bio-proteomics-spectral-libraries",
+      "intake_record": "bio-proteomics-spectral-libraries@1.0.0",
+      "provenance": {
+        "upstream_path": "proteomics/spectral-libraries",
+        "original_author": "GPTomics",
+        "modification_status": "modified",
+        "modification_evidence": [
+          "PROVENANCE.json",
+          "fixes/bio-proteomics-spectral-libraries.md"
+        ],
+        "modified_by": "mrsonord2240"
+      },
+      "upstream_audit": {
+        "score": 95,
+        "audited_on": "2026-09-23",
+        "audit_path": "audits/skills/bio-proteomics-spectral-libraries",
+        "fix_log": "fixes/bio-proteomics-spectral-libraries.md",
+        "evidence": {
+          "report_path": "audits/skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@09467a9/report.json",
+          "report_sha256": "9c52c3841ef801b279118e522047d52aafa34ce390e6e4891e7e55b893544eb1",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@09467a9/report.json",
+          "record_path": "audits/skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@09467a9/record.json",
+          "record_sha256": "e898d658d0c0012b574c9a3be121cdf1bf1bcdb239d108d986c6bbf6353396f5",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@09467a9/record.json",
+          "fix_log_sha256": "ae6f98e7962c1bd03cb95f2d65972eb847997c04b76f6b678fc2c1e7027acced",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-proteomics-spectral-libraries.md",
+          "audited_source": {
+            "repository": "mrsonord2240/bioSkills",
+            "commit": "09467a99deaa8ac30799074803a8b87af6d60858",
+            "path": "proteomics/spectral-libraries",
+            "author": "GPTomics",
+            "author_url": "https://github.com/GPTomics",
+            "license": "MIT",
+            "modified_by": "Samuel Nord",
+            "fork_of": {
+              "repository": "GPTomics/bioSkills",
+              "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+            },
+            "url": "https://github.com/mrsonord2240/bioSkills/tree/09467a99deaa8ac30799074803a8b87af6d60858/proteomics/spectral-libraries"
+          },
+          "auditor_independent": false,
+          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+        }
+      },
+      "aipoch_review": {
+        "status": "pending_independent_review",
+        "reviewed_by": null,
+        "reviewed_on": null,
+        "score": null,
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "unresolved_limitations": [
+          "Predicted retention time and CCS are model-scale values that require empirical calibration before search.",
+          "Remote Koina availability and model inventory are external, mutable dependencies."
+        ]
+      },
+      "runtime_dependencies": {
+        "languages": [
+          "Python 3",
+          "Java for EncyclopeDIA"
+        ],
+        "python_packages": [
+          "koinapy >=0.0.5 (checked 0.0.11)",
+          "ms2pip >=4.0 (checked 4.2.0)",
+          "deeplc >=4.1 (checked 4.5.0)",
+          "pandas >=2.2",
+          "numpy",
+          "scipy",
+          "pyteomics",
+          "psm_utils for DeepLC 4.1+"
+        ],
+        "r_packages": [],
+        "cli_tools": [
+          "EncyclopeDIA",
+          "EasyPQP or FragPipe for DDA-derived libraries",
+          "OpenMS 3.5.0 TargetedFileConverter and OpenSwathDecoyGenerator"
+        ],
+        "services_apis": [
+          "Koina inference service at koina.wilhelmlab.org:443 when using served predictors"
+        ],
+        "databases_reference_data": [
+          "peptide/precursor list or identified PSMs",
+          "iRT/CiRT calibrants or empirical GPF-DIA observations"
+        ],
+        "external_models": [
+          "Prosit",
+          "AlphaPeptDeep",
+          "MS2PIP",
+          "DeepLC",
+          "optional Koina-served UniSpec model"
+        ],
+        "containers": [],
+        "hardware": [],
+        "declaration_scope": "Named dependencies from bundled executables and documented routes; optional alternatives are not all required together. Versions are source-declared compatibility claims, not a newly tested environment lock."
+      },
+      "contract": {
+        "inputs": [
+          "identified or predicted peptides/precursors",
+          "fragmentation settings and RT/CCS calibration observations"
+        ],
+        "outputs": [
+          "DIA-NN, OpenSWATH, Spectronaut, BLIB, DLIB, ELIB, TraML, or PQP spectral-library artifacts",
+          "library QC/merge reports"
+        ],
+        "bundled_executables": [
+          "examples/build_library.py",
+          "scripts/build_openswath_tsv.py",
+          "scripts/spectronaut_to_diann.py"
+        ],
+        "cross_check_status": "static_cross_check_completed_runtime_coverage_partial",
+        "findings": []
+      },
+      "package_evidence": {
+        "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_path": "skills/bio-proteomics-spectral-libraries",
+        "manifest_sha256": "57f280bd8f3c2cf2c76c9de938883d1a1de7f4879bfe587c928fbc4d20e688b3",
+        "content_sha256": "2154d2acfcf1080ba05fadef15136c6db14cd6aa27cfb02970afeb2cb69a6839",
+        "file_count": 8,
+        "total_bytes": 35527,
+        "license_expression": "MIT",
+        "license_files": [
+          {
+            "path": "LICENSE",
+            "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+          },
+          {
+            "path": "skills/bio-proteomics-spectral-libraries/SKILL.md",
+            "sha256": "42677f204b4a227371d76ba9078b89c6197638f3ea5bf7df245c09d9f990a36b"
+          }
+        ]
+      },
+      "provider_review": {
+        "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+        "reviewed_on": "2026-09-24",
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "static_review_status": "completed_with_declared_limitations",
+        "runtime_status": "selected_smoke_checks_passed",
+        "runtime_checks": [
+          {
+            "id": "bio-proteomics-spectral-libraries",
+            "script": "examples/build_library.py",
+            "command": "python",
+            "args": [
+              "-B",
+              "examples/build_library.py"
+            ],
+            "status": "passed",
+            "exit_code": 0,
+            "error": null,
+            "checks": [
+              {
+                "expected": "R^2 =",
+                "passed": true
+              },
+              {
+                "expected": "both retained: True",
+                "passed": true
+              }
+            ],
+            "source_sha256": "f244ac8d75b9e3c82f273aa6cd9a6169b78d0088833dbba3ae2dcd93e9bdb262",
+            "stdout": "iRT calibration: RT = 0.179 * iRT + 5.035, R^2 = 1.000\r\nMerged library stats: {'precursors': 3, 'proteins': 2, 'transitions_per_precursor': 6.0}\r\nCharge-2 and charge-3 of LGGNEQVTR both retained: True\r\n",
+            "stderr": "",
+            "environment": "Windows",
+            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bio-proteomics-quantification",
+      "intake_record": "bio-proteomics-quantification@1.0.0",
+      "provenance": {
+        "upstream_path": "proteomics/quantification",
+        "original_author": "GPTomics",
+        "modification_status": "modified",
+        "modification_evidence": [
+          "PROVENANCE.json",
+          "fixes/bio-proteomics-quantification.md"
+        ],
+        "modified_by": "mrsonord2240"
+      },
+      "upstream_audit": {
+        "score": 94,
+        "audited_on": "2026-09-23",
+        "audit_path": "audits/skills/bio-proteomics-quantification",
+        "fix_log": "fixes/bio-proteomics-quantification.md",
+        "evidence": {
+          "report_path": "audits/skills/bio-proteomics-quantification/mrsonord2240-bioSkills@fb1efc1/report.json",
+          "report_sha256": "91583e31d78e99ea738240a465457895cee0781b8af1074d434e8d63f4296c23",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-proteomics-quantification/mrsonord2240-bioSkills@fb1efc1/report.json",
+          "record_path": "audits/skills/bio-proteomics-quantification/mrsonord2240-bioSkills@fb1efc1/record.json",
+          "record_sha256": "7d5122efb40e452fb022929024f2ca4a4cb803c0b2d9c824ae7fdd439d959e8e",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-proteomics-quantification/mrsonord2240-bioSkills@fb1efc1/record.json",
+          "fix_log_sha256": "ce67505e00a6250d112b436fdaccde22ec718b2f43ffd74f17bdb43e485dbd4a",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-proteomics-quantification.md",
+          "audited_source": {
+            "repository": "mrsonord2240/bioSkills",
+            "commit": "fb1efc10a979717f1fc66a48a6a8b12e95aa6401",
+            "path": "proteomics/quantification",
+            "author": "GPTomics",
+            "author_url": "https://github.com/GPTomics",
+            "license": "MIT",
+            "modified_by": "Samuel Nord",
+            "fork_of": {
+              "repository": "GPTomics/bioSkills",
+              "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+            },
+            "url": "https://github.com/mrsonord2240/bioSkills/tree/fb1efc10a979717f1fc66a48a6a8b12e95aa6401/proteomics/quantification"
+          },
+          "auditor_independent": false,
+          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+        }
+      },
+      "aipoch_review": {
+        "status": "pending_independent_review",
+        "reviewed_by": null,
+        "reviewed_on": null,
+        "score": null,
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "unresolved_limitations": [
+          "Statistical testing, general missing-value imputation, and clinical decision use are outside scope.",
+          "LFQ, TMT/iTRAQ, SILAC, and affinity-enrichment routes have different irreducible measurement assumptions."
+        ]
+      },
+      "runtime_dependencies": {
+        "languages": [
+          "Python 3",
+          "R"
+        ],
+        "python_packages": [
+          "numpy 2.5.3",
+          "pandas 3.0.5"
+        ],
+        "r_packages": [
+          "Bioconductor MSstats 4.14.2",
+          "Bioconductor MSnbase 2.32.0",
+          "CRAN iq 2.0.1"
+        ],
+        "cli_tools": [],
+        "services_apis": [],
+        "databases_reference_data": [
+          "peptide/feature/reporter-ion intensity tables with sample annotations"
+        ],
+        "external_models": [
+          "MSstats Tukey median-polish and optional AFT missingness model",
+          "MaxLFQ peptide-ratio least-squares model"
+        ],
+        "containers": [],
+        "hardware": [],
+        "declaration_scope": "Named dependencies from bundled executables and documented routes; optional alternatives are not all required together. Versions are source-declared compatibility claims, not a newly tested environment lock."
+      },
+      "contract": {
+        "inputs": [
+          "LFQ peptide features, TMT/iTRAQ reporter ions, SILAC ratios, or affinity-enrichment counts",
+          "sample design and protein-group assignments"
+        ],
+        "outputs": [
+          "normalized protein-by-sample abundance matrix",
+          "summarization and assay-specific QC"
+        ],
+        "bundled_executables": [
+          "examples/lfq_normalization.py",
+          "scripts/apms_score.py",
+          "scripts/maxlfq_iq.R",
+          "scripts/msstats_summarize.R",
+          "scripts/silac_checks.py"
+        ],
+        "cross_check_status": "static_cross_check_completed_runtime_coverage_partial",
+        "findings": []
+      },
+      "package_evidence": {
+        "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_path": "skills/bio-proteomics-quantification",
+        "manifest_sha256": "f36ccc48337ccc75e759fbfe37126790aea2f00a12db0f955b780bc849b01563",
+        "content_sha256": "33c2be1e3e076d868bf75f4961313e788876789bbbbe57939c985b1b3ad52a01",
+        "file_count": 10,
+        "total_bytes": 56076,
+        "license_expression": "MIT",
+        "license_files": [
+          {
+            "path": "LICENSE",
+            "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+          },
+          {
+            "path": "skills/bio-proteomics-quantification/SKILL.md",
+            "sha256": "f8c7eb41aba33d30ffe397678689158df8fb0a1e77c60a3eeb916acca3b8a3af"
+          }
+        ]
+      },
+      "provider_review": {
+        "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+        "reviewed_on": "2026-09-24",
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "static_review_status": "completed_with_declared_limitations",
+        "runtime_status": "selected_smoke_checks_passed",
+        "runtime_checks": [
+          {
+            "id": "bio-proteomics-quantification",
+            "script": "examples/lfq_normalization.py",
+            "command": "python",
+            "args": [
+              "-B",
+              "examples/lfq_normalization.py"
+            ],
+            "status": "passed",
+            "exit_code": 0,
+            "error": null,
+            "checks": [
+              {
+                "expected": "interactors 5/5, sticky binders called 0/10",
+                "passed": true
+              }
+            ],
+            "source_sha256": "c199bfd751beb683cb1f77e34b39fb54ccb5f4a88e1643b113e2af71ad4bab8b",
+            "stdout": "Missing values: 17.2%\r\nSample medians before centering: [19.71 20.69 19.56 20.15 19.11 20.45]\r\nSample medians after centering:  [19.93 19.93 19.93 19.93 19.93 19.93]\r\nProteins after >=50% valid filter: 200\r\nIRS: 1 proteins lack a reference in >=1 plex; set to NaN: ['P000']\r\nNon-reference plex offset (median log2 B-A): SL only +0.951, after IRS -0.019\r\nSILAC pilot: incorporation 0.93 (planted 0.93), Arg->Pro per proline 0.08 (planted 0.08)\r\nAP-MS: called 5; interactors 5/5, sticky binders called 0/10\r\nAP-MS: control runs with no data, excluded: ['ctrl3']\r\nmin_bait_reps: prey00 called strict=False, min_bait_reps=2 -> True\r\n",
+            "stderr": "",
+            "environment": "Windows",
+            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+          },
+          {
+            "id": "bio-proteomics-quantification",
+            "script": "scripts/maxlfq_iq.R",
+            "command": "C:/R/bin/x64/Rscript.exe",
+            "args": [
+              "--vanilla",
+              "scripts/maxlfq_iq.R",
+              "smoke-peptides.csv",
+              "smoke-maxlfq.csv"
+            ],
+            "status": "passed",
+            "exit_code": 0,
+            "error": null,
+            "checks": [
+              {
+                "expected": "proteins: 4 | samples: 3 | disconnected: 0",
+                "passed": true
+              }
+            ],
+            "source_sha256": "449ca953abeca739819dddb12142b2509055b17f5043d1fbdefad42242db2b54",
+            "stdout": "proteins: 4 | samples: 3 | disconnected: 0 \r\n",
+            "stderr": "Concatenating secondary ids...\r\n\r\nRemoving low intensities...\r\n\r\nMedian normalization ...\r\n\r\n# proteins = 4, # samples = 3\r\nCompleted.\r\nCompleted.\r\n",
+            "environment": "Windows",
+            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bio-single-cell-batch-integration",
+      "intake_record": "bio-single-cell-batch-integration@1.0.0",
+      "provenance": {
+        "upstream_path": "single-cell/batch-integration",
+        "original_author": "GPTomics",
+        "modification_status": "modified",
+        "modification_evidence": [
+          "PROVENANCE.json",
+          "fixes/bio-single-cell-batch-integration.md"
+        ],
+        "modified_by": "mrsonord2240"
+      },
+      "upstream_audit": {
+        "score": 97,
+        "audited_on": "2026-09-24",
+        "audit_path": "audits/skills/bio-single-cell-batch-integration",
+        "fix_log": "fixes/bio-single-cell-batch-integration.md",
+        "evidence": {
+          "report_path": "audits/skills/bio-single-cell-batch-integration/mrsonord2240-bioSkills@8edc49c/report.json",
+          "report_sha256": "85bfa6b30a2b235809c0a6a1bd0e111494dbe36b5ec85cf2a361ef3f528f8d8a",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-single-cell-batch-integration/mrsonord2240-bioSkills@8edc49c/report.json",
+          "record_path": "audits/skills/bio-single-cell-batch-integration/mrsonord2240-bioSkills@8edc49c/record.json",
+          "record_sha256": "dda79c26396b94f2549c63799f3b612e13d17ef3741a57dc5b2618c10db35c6b",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-single-cell-batch-integration/mrsonord2240-bioSkills@8edc49c/record.json",
+          "fix_log_sha256": "8605f788ab390ae5d8b3078fa4cbf24daca85a48652b0ecf81937bc28f915cfd",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-single-cell-batch-integration.md",
+          "audited_source": {
+            "repository": "mrsonord2240/bioSkills",
+            "commit": "8edc49ca40e7eab8a24c1d9555a176ae894e16ac",
+            "path": "single-cell/batch-integration",
+            "author": "GPTomics",
+            "author_url": "https://github.com/GPTomics",
+            "license": "MIT",
+            "modified_by": "Samuel Nord",
+            "fork_of": {
+              "repository": "GPTomics/bioSkills",
+              "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+            },
+            "url": "https://github.com/mrsonord2240/bioSkills/tree/8edc49ca40e7eab8a24c1d9555a176ae894e16ac/single-cell/batch-integration"
+          },
+          "auditor_independent": null,
+          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+        }
+      },
+      "aipoch_review": {
+        "status": "pending_independent_review",
+        "reviewed_by": null,
+        "reviewed_on": null,
+        "score": null,
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "unresolved_limitations": [
+          "Batch correction cannot identify biology when batch and biological condition are confounded.",
+          "Corrected expression or latent coordinates must not be used as measurements for differential expression."
+        ]
+      },
+      "runtime_dependencies": {
+        "languages": [
+          "Python 3",
+          "R"
+        ],
+        "python_packages": [
+          "scanpy >=1.10",
+          "scanpy.external",
+          "harmonypy >=0.0.10",
+          "scvi-tools >=1.1",
+          "bbknn",
+          "scanorama",
+          "optional scib-metrics for evaluation",
+          "numpy",
+          "matplotlib",
+          "scikit-learn",
+          "scikit-misc for seurat_v3 HVG",
+          "igraph and leidenalg for graph clustering",
+          "umap-learn"
+        ],
+        "r_packages": [
+          "Seurat >=5.0",
+          "harmony",
+          "Bioconductor batchelor for fastMNN",
+          "optional scIB-compatible evaluation tooling",
+          "ggplot2",
+          "optional SeuratWrappers and reticulate for alternative integration routes"
+        ],
+        "cli_tools": [],
+        "services_apis": [],
+        "databases_reference_data": [
+          "AnnData or Seurat object with batch labels and raw/count layers required by the chosen method"
+        ],
+        "external_models": [
+          "scVI/scANVI variational model when selected"
+        ],
+        "containers": [],
+        "hardware": [
+          "GPU optional for scVI/scANVI acceleration"
+        ],
+        "declaration_scope": "Named dependencies from bundled executables and documented routes; optional alternatives are not all required together. Versions are source-declared compatibility claims, not a newly tested environment lock."
+      },
+      "contract": {
+        "inputs": [
+          "multiple scRNA-seq batches/samples",
+          "batch covariate and optional cell labels",
+          "scripts/scvi_scanvi_integration.py requires raw counts in X; it overwrites layers['counts'] from X"
+        ],
+        "outputs": [
+          "integrated embedding or corrected neighbor graph",
+          "batch-removal and biological-conservation metrics"
+        ],
+        "bundled_executables": [
+          "examples/harmony_integration.py",
+          "examples/harmony_integration.R",
+          "scripts/harmony_integration.py",
+          "scripts/scvi_scanvi_integration.py",
+          "scripts/seurat_v5_integration.R"
+        ],
+        "cross_check_status": "static_cross_check_completed_runtime_coverage_partial",
+        "findings": []
+      },
+      "package_evidence": {
+        "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_path": "skills/bio-single-cell-batch-integration",
+        "manifest_sha256": "11c774679908c3978795c9d357f3a7b7e6f05e39823f6ce93c389e73f8e6f96f",
+        "content_sha256": "2ef930037fc33a804e6ea60a28dd8d0e92443722e2d97cffc11622e8584c3e1d",
+        "file_count": 10,
+        "total_bytes": 30128,
+        "license_expression": "MIT",
+        "license_files": [
+          {
+            "path": "LICENSE",
+            "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+          },
+          {
+            "path": "skills/bio-single-cell-batch-integration/SKILL.md",
+            "sha256": "0656bb679c7f486b9357880480f5de6156446475251fd7ec77e914d25d585e78"
+          }
+        ]
+      },
+      "provider_review": {
+        "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+        "reviewed_on": "2026-09-24",
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "static_review_status": "completed_with_declared_limitations",
+        "runtime_status": "not_executed_in_this_pass",
+        "runtime_checks": []
+      }
+    },
+    {
+      "id": "bio-single-cell-clustering",
+      "intake_record": "bio-single-cell-clustering@1.0.0",
+      "provenance": {
+        "upstream_path": "single-cell/clustering",
+        "original_author": "GPTomics",
+        "modification_status": "modified",
+        "modification_evidence": [
+          "PROVENANCE.json",
+          "fixes/bio-single-cell-clustering.md"
+        ],
+        "modified_by": "mrsonord2240"
+      },
+      "upstream_audit": {
+        "score": 95,
+        "audited_on": "2026-09-24",
+        "audit_path": "audits/skills/bio-single-cell-clustering",
+        "fix_log": "fixes/bio-single-cell-clustering.md",
+        "evidence": {
+          "report_path": "audits/skills/bio-single-cell-clustering/mrsonord2240-bioSkills@a409b09/report.json",
+          "report_sha256": "59320abbc39b696c7e8ddc9a911dc7af7462c7d0e646480d6e4d941c89fad767",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-single-cell-clustering/mrsonord2240-bioSkills@a409b09/report.json",
+          "record_path": "audits/skills/bio-single-cell-clustering/mrsonord2240-bioSkills@a409b09/record.json",
+          "record_sha256": "d90dfc9ddb411fd7fea710453c10618fbcf097a114f46dc9a39c5450f55f77db",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-single-cell-clustering/mrsonord2240-bioSkills@a409b09/record.json",
+          "fix_log_sha256": "8281fc797065d8dd0ea8405948726f61c97ea5a89cc5a507658404dc3531635d",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-single-cell-clustering.md",
+          "audited_source": {
+            "repository": "mrsonord2240/bioSkills",
+            "commit": "a409b098b3602b13d7c40610f1c6bc09057258ac",
+            "path": "single-cell/clustering",
+            "author": "GPTomics",
+            "author_url": "https://github.com/GPTomics",
+            "license": "MIT",
+            "modified_by": "Samuel Nord",
+            "fork_of": {
+              "repository": "GPTomics/bioSkills",
+              "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+            },
+            "url": "https://github.com/mrsonord2240/bioSkills/tree/a409b098b3602b13d7c40610f1c6bc09057258ac/single-cell/clustering"
+          },
+          "auditor_independent": null,
+          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+        }
+      },
+      "aipoch_review": {
+        "status": "pending_independent_review",
+        "reviewed_by": null,
+        "reviewed_on": null,
+        "score": null,
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "unresolved_limitations": [
+          "Cluster count and membership are sensitive to preprocessing, PCs, neighbors, seed, algorithm, and resolution.",
+          "Post-clustering marker p-values are suitable for ranking/labeling, not confirmatory inference about cluster existence."
+        ]
+      },
+      "runtime_dependencies": {
+        "languages": [
+          "Python 3",
+          "R"
+        ],
+        "python_packages": [
+          "scanpy >=1.10",
+          "anndata >=0.10",
+          "Leiden/igraph and UMAP dependencies installed through the Scanpy route",
+          "numpy",
+          "pandas",
+          "scikit-learn",
+          "matplotlib",
+          "igraph",
+          "leidenalg",
+          "umap-learn"
+        ],
+        "r_packages": [
+          "Seurat >=5.0",
+          "optional clustree for resolution visualization",
+          "optional scSHC for cluster significance"
+        ],
+        "cli_tools": [],
+        "services_apis": [],
+        "databases_reference_data": [
+          "normalized single-cell expression matrix or precomputed PCA representation"
+        ],
+        "external_models": [
+          "k-nearest-neighbor graph and Leiden/Louvain community model"
+        ],
+        "containers": [],
+        "hardware": [],
+        "declaration_scope": "Named dependencies from bundled executables and documented routes; optional alternatives are not all required together. Versions are source-declared compatibility claims, not a newly tested environment lock."
+      },
+      "contract": {
+        "inputs": [
+          "normalized AnnData or Seurat object",
+          "PC, neighbor, algorithm, seed, and resolution choices"
+        ],
+        "outputs": [
+          "neighbor graph",
+          "cluster labels",
+          "UMAP/t-SNE coordinates and stability diagnostics"
+        ],
+        "bundled_executables": [
+          "examples/cluster_scanpy.py",
+          "examples/cluster_seurat.R",
+          "examples/validate_partition.py"
+        ],
+        "cross_check_status": "static_cross_check_completed_runtime_coverage_partial",
+        "findings": []
+      },
+      "package_evidence": {
+        "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_path": "skills/bio-single-cell-clustering",
+        "manifest_sha256": "e407fb1d36e939d4794d7f33b8bc0fa4004f72e192e8c0bf1acf038660d52a32",
+        "content_sha256": "3d57ac5742da2bb9fd41a265f913c1d1fe9e026917e7fa139c0862ef3581ce24",
+        "file_count": 5,
+        "total_bytes": 27140,
+        "license_expression": "MIT",
+        "license_files": [
+          {
+            "path": "LICENSE",
+            "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+          },
+          {
+            "path": "skills/bio-single-cell-clustering/SKILL.md",
+            "sha256": "a6bf5d529c736847dc0722b66c23c7b6894bd1be36e95025316382260162c3dc"
+          }
+        ]
+      },
+      "provider_review": {
+        "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+        "reviewed_on": "2026-09-24",
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "static_review_status": "completed_with_declared_limitations",
+        "runtime_status": "selected_smoke_checks_passed",
+        "runtime_checks": [
+          {
+            "id": "bio-single-cell-clustering",
+            "script": "examples/cluster_scanpy.py",
+            "command": "python",
+            "args": [
+              "-B",
+              "-c",
+              "\nimport runpy\nimport numpy as np\nimport scanpy as sc\nfrom scipy import sparse\nrng = np.random.default_rng(41)\nadata = sc.AnnData(sparse.csr_matrix(rng.poisson(1.0, (180, 120)).astype(float)))\nsc.pp.normalize_total(adata, target_sum=1e4)\nsc.pp.log1p(adata)\nadata.write_h5ad('preprocessed.h5ad')\nrunpy.run_path('examples/cluster_scanpy.py', run_name='__main__')\nresult = sc.read_h5ad('clustered.h5ad')\nassert result.n_obs == 180 and result.n_vars == 120\nassert 'leiden' in result.obs and result.obsm['X_umap'].shape == (180, 2)\nassert np.isfinite(result.obsm['X_umap']).all()\nprint('SYNTHETIC_CLUSTER_ASSERTIONS_OK')\n"
+            ],
+            "status": "passed",
+            "exit_code": 0,
+            "error": null,
+            "checks": [
+              {
+                "expected": "SYNTHETIC_CLUSTER_ASSERTIONS_OK",
+                "passed": true
+              }
+            ],
+            "source_sha256": "ee037c05ec99ff1a46a2cc0a5b6779bb9c443f013106f1a97883c40e025af15e",
+            "stdout": "Loaded 180 cells\r\nFound 1 clusters\r\nleiden\r\n0    180\r\nName: count, dtype: int64\r\nSaved clustered data\r\nSYNTHETIC_CLUSTER_ASSERTIONS_OK\r\n",
+            "stderr": "examples/cluster_scanpy.py:10: FutureWarning: Argument `save` is deprecated and will be removed in a future version. Use `sc.pl.plot(show=False).figure.savefig()` instead.\r\n  sc.pl.pca_variance_ratio(adata, n_pcs=50, save='_variance.png')\r\nWARNING: saving figure to file figures\\pca_variance_ratio_variance.png\r\nC:\\Users\\User\\AppData\\Roaming\\Python\\Python314\\site-packages\\scanpy\\plotting\\_utils.py:393: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown\r\n  plt.show()\r\nexamples/cluster_scanpy.py:19: FutureWarning: Argument `save` is deprecated and will be removed in a future version. Use `sc.pl.plot(show=False).figure.savefig()` instead.\r\n  sc.pl.umap(adata, color='leiden', save='_clusters.png')\r\nWARNING: saving figure to file figures\\umap_clusters.png\r\nC:\\Users\\User\\AppData\\Roaming\\Python\\Python314\\site-packages\\scanpy\\plotting\\_utils.py:393: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown\r\n  plt.show()\r\n",
+            "environment": "Windows",
+            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bio-single-cell-preprocessing",
+      "intake_record": "bio-single-cell-preprocessing@1.0.0",
+      "provenance": {
+        "upstream_path": "single-cell/preprocessing",
+        "original_author": "GPTomics",
+        "modification_status": "modified",
+        "modification_evidence": [
+          "PROVENANCE.json",
+          "fixes/bio-single-cell-preprocessing.md"
+        ],
+        "modified_by": "mrsonord2240"
+      },
+      "upstream_audit": {
+        "score": 93,
+        "audited_on": "2026-09-24",
+        "audit_path": "audits/skills/bio-single-cell-preprocessing",
+        "fix_log": "fixes/bio-single-cell-preprocessing.md",
+        "evidence": {
+          "report_path": "audits/skills/bio-single-cell-preprocessing/mrsonord2240-bioSkills@9918c63/report.json",
+          "report_sha256": "72700c36c3e8d3b7c117af018575fd189b2d68e27c4aeb03f4260f4ca4a267bc",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-single-cell-preprocessing/mrsonord2240-bioSkills@9918c63/report.json",
+          "record_path": "audits/skills/bio-single-cell-preprocessing/mrsonord2240-bioSkills@9918c63/record.json",
+          "record_sha256": "1830ed9101e3a30352bd493f3c0b83c536e6b7591c6962db88057814e7d20f13",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-single-cell-preprocessing/mrsonord2240-bioSkills@9918c63/record.json",
+          "fix_log_sha256": "fda29f49ba28b7c5cfd6db9e9e167c16594958de58d6e9c7d3e5bd5908f84c97",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-single-cell-preprocessing.md",
+          "audited_source": {
+            "repository": "mrsonord2240/bioSkills",
+            "commit": "9918c631d94f81dd418cf71d5c40be59f4850677",
+            "path": "single-cell/preprocessing",
+            "author": "GPTomics",
+            "author_url": "https://github.com/GPTomics",
+            "license": "MIT",
+            "modified_by": "Samuel Nord",
+            "fork_of": {
+              "repository": "GPTomics/bioSkills",
+              "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+            },
+            "url": "https://github.com/mrsonord2240/bioSkills/tree/9918c631d94f81dd418cf71d5c40be59f4850677/single-cell/preprocessing"
+          },
+          "auditor_independent": false,
+          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+        }
+      },
+      "aipoch_review": {
+        "status": "pending_independent_review",
+        "reviewed_by": null,
+        "reviewed_on": null,
+        "score": null,
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "unresolved_limitations": [
+          "QC thresholds are tissue-, chemistry-, and sample-specific; fixed mitochondrial cutoffs can delete valid populations.",
+          "Ambient-removal methods are alternatives and must not be stacked; aggressive correction can remove real expression."
+        ]
+      },
+      "runtime_dependencies": {
+        "languages": [
+          "Python 3",
+          "R"
+        ],
+        "python_packages": [
+          "scanpy >=1.10",
+          "matplotlib",
+          "scikit-misc for seurat_v3 HVG",
+          "optional cellbender",
+          "numpy",
+          "scipy"
+        ],
+        "r_packages": [
+          "Seurat >=5.0",
+          "SoupX",
+          "Bioconductor scran >=1.30",
+          "Bioconductor celda for DecontX",
+          "optional miQC for mixture-model QC"
+        ],
+        "cli_tools": [
+          "CellBender CLI when the GPU-backed ambient-removal route is selected"
+        ],
+        "services_apis": [],
+        "databases_reference_data": [
+          "raw and/or filtered UMI count matrices",
+          "raw h5 droplets for CellBender",
+          "gene annotations sufficient to identify mitochondrial genes"
+        ],
+        "external_models": [
+          "CellBender deep generative background model when selected",
+          "miQC mixture model when selected"
+        ],
+        "containers": [],
+        "hardware": [
+          "CUDA-capable GPU recommended for CellBender"
+        ],
+        "declaration_scope": "Named dependencies from bundled executables and documented routes; optional alternatives are not all required together. Versions are source-declared compatibility claims, not a newly tested environment lock."
+      },
+      "contract": {
+        "inputs": [
+          "raw scRNA-seq counts plus sample/tissue context",
+          "optional raw droplets for ambient-RNA estimation"
+        ],
+        "outputs": [
+          "quality-filtered and normalized AnnData/Seurat object",
+          "highly variable genes and QC/ambient diagnostics"
+        ],
+        "bundled_executables": [
+          "examples/preprocess_scanpy.py",
+          "examples/preprocess_seurat.R"
+        ],
+        "cross_check_status": "static_cross_check_completed_runtime_coverage_partial",
+        "findings": []
+      },
+      "package_evidence": {
+        "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_path": "skills/bio-single-cell-preprocessing",
+        "manifest_sha256": "45e2d256c43c1ca586186600ab7fd4e382e9ede64b5b868e8425b763237ebef8",
+        "content_sha256": "b7943b6a32ea2e65f1200ae6816c3af9eaf42b347f7a33960a83186065f643bb",
+        "file_count": 4,
+        "total_bytes": 31634,
+        "license_expression": "MIT",
+        "license_files": [
+          {
+            "path": "LICENSE",
+            "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+          },
+          {
+            "path": "skills/bio-single-cell-preprocessing/SKILL.md",
+            "sha256": "d6a6c2f7bac0fedcde8631beb4dab6888bb817fdd09b0ea186c275c959f27371"
+          }
+        ]
+      },
+      "provider_review": {
+        "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+        "reviewed_on": "2026-09-24",
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "static_review_status": "completed_with_declared_limitations",
+        "runtime_status": "selected_smoke_checks_passed",
+        "runtime_checks": [
+          {
+            "id": "bio-single-cell-preprocessing",
+            "script": "examples/preprocess_scanpy.py",
+            "command": "python",
+            "args": [
+              "-B",
+              "-c",
+              "\nimport gzip, pathlib, runpy\nimport numpy as np\nfrom scipy import io, sparse\nimport scanpy as sc\nrng = np.random.default_rng(29)\ncounts = rng.poisson(rng.lognormal(0, 0.15, (180, 1)) * rng.gamma(0.5, 1.2, (1, 3000)))\nfolder = pathlib.Path('filtered_feature_bc_matrix')\nfolder.mkdir()\nwith gzip.open(folder / 'matrix.mtx.gz', 'wb') as f: io.mmwrite(f, sparse.coo_matrix(counts.T))\nwith gzip.open(folder / 'barcodes.tsv.gz', 'wt') as f: f.write(''.join(f'cell{i}\\n' for i in range(180)))\nwith gzip.open(folder / 'features.tsv.gz', 'wt') as f:\n    f.write(''.join(f'gene{i}\\t' + ('MT-' if i < 30 else '') + f'G{i}\\tGene Expression\\n' for i in range(3000)))\nrunpy.run_path('examples/preprocess_scanpy.py', run_name='__main__')\nresult = sc.read_h5ad('preprocessed.h5ad')\nassert result.n_obs >= 144 and result.n_vars > 50\nassert 'counts' in result.layers and 'X_pca' in result.obsm\nassert not np.allclose(result.X.data, result.layers['counts'].data)\nprint('SYNTHETIC_PREPROCESS_ASSERTIONS_OK')\n"
+            ],
+            "status": "passed",
+            "exit_code": 0,
+            "error": null,
+            "checks": [
+              {
+                "expected": "SYNTHETIC_PREPROCESS_ASSERTIONS_OK",
+                "passed": true
+              }
+            ],
+            "source_sha256": "62380b4bb9093d86437ee61f26c26fce1f7f2b27b346f4ba7f499a43cd3ff72e",
+            "stdout": "Raw: 180 cells, 3000 genes\r\nlog1p_total_counts: median=7.521, MAD=0.103\r\nlog1p_n_genes_by_counts: median=6.891, MAD=0.062\r\npct_counts_in_top_20_genes: median=8.051, MAD=0.335\r\npct_counts_mt: median=0.906, MAD=0.136\r\nFiltered: 172 cells, 2587 genes\r\nHVGs: 2000\r\nSaved preprocessed data\r\nSYNTHETIC_PREPROCESS_ASSERTIONS_OK\r\n",
+            "stderr": "",
+            "environment": "Windows",
+            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bio-single-cell-scatac-analysis",
+      "intake_record": "bio-single-cell-scatac-analysis@1.0.0",
+      "provenance": {
+        "upstream_path": "single-cell/scatac-analysis",
+        "original_author": "GPTomics",
+        "modification_status": "modified",
+        "modification_evidence": [
+          "PROVENANCE.json",
+          "fixes/bio-single-cell-scatac-analysis.md"
+        ],
+        "modified_by": "mrsonord2240"
+      },
+      "upstream_audit": {
+        "score": 96,
+        "audited_on": "2026-09-23",
+        "audit_path": "audits/skills/bio-single-cell-scatac-analysis",
+        "fix_log": "fixes/bio-single-cell-scatac-analysis.md",
+        "evidence": {
+          "report_path": "audits/skills/bio-single-cell-scatac-analysis/mrsonord2240-bioSkills@e14c7b5/report.json",
+          "report_sha256": "4eea079183bfaf542fc50c95cf5fa5cc00c944dc6b2fbb3747ec8fd2920e4b0b",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-single-cell-scatac-analysis/mrsonord2240-bioSkills@e14c7b5/report.json",
+          "record_path": "audits/skills/bio-single-cell-scatac-analysis/mrsonord2240-bioSkills@e14c7b5/record.json",
+          "record_sha256": "c9119ef4ac92e88e0f136394c117527ee4e51ad8b6f01910fc8b6f0ab0184a8e",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-single-cell-scatac-analysis/mrsonord2240-bioSkills@e14c7b5/record.json",
+          "fix_log_sha256": "49d908898d09c08ae4ca8210c5b28895e118d632112172e75bdb4dba86946aed",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-single-cell-scatac-analysis.md",
+          "audited_source": {
+            "repository": "mrsonord2240/bioSkills",
+            "commit": "e14c7b581acaa271a9bf643febcb5ff0dd40d966",
+            "path": "single-cell/scatac-analysis",
+            "author": "GPTomics",
+            "author_url": "https://github.com/GPTomics",
+            "license": "MIT",
+            "modified_by": "Samuel Nord",
+            "fork_of": {
+              "repository": "GPTomics/bioSkills",
+              "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+            },
+            "url": "https://github.com/mrsonord2240/bioSkills/tree/e14c7b581acaa271a9bf643febcb5ff0dd40d966/single-cell/scatac-analysis"
+          },
+          "auditor_independent": false,
+          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+        }
+      },
+      "aipoch_review": {
+        "status": "pending_independent_review",
+        "reviewed_by": null,
+        "reviewed_on": null,
+        "score": null,
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "unresolved_limitations": [
+          "Signac APIs are version-sensitive; ATACqc requires the external fragtk binary while deprecated fallback calls may be removed.",
+          "Signac is RAM-bound at large cell counts, and motif scores depend on genome-matched sequence/background resources."
+        ]
+      },
+      "runtime_dependencies": {
+        "languages": [
+          "R >=4.4 for the checked Signac route",
+          "optional Python 3"
+        ],
+        "python_packages": [
+          "optional snapatac2 and scanpy for the >1M-cell alternative",
+          "numpy"
+        ],
+        "r_packages": [
+          "Signac >=1.13 (checked 1.17.1)",
+          "Seurat >=5.0",
+          "ArchR >=1.0",
+          "Bioconductor EnsDb.Hsapiens.v86",
+          "Bioconductor BSgenome.Hsapiens.UCSC.hg38",
+          "Bioconductor chromVAR",
+          "motifmatchr",
+          "JASPAR2020",
+          "TFBSTools",
+          "scDblFinder",
+          "biovizBase",
+          "devtools for ArchR installation",
+          "Bioconductor SummarizedExperiment",
+          "Bioconductor BiocParallel"
+        ],
+        "cli_tools": [
+          "optional fragtk required by Signac ATACqc",
+          "MACS2/MACS3 for peak calling via Signac CallPeaks"
+        ],
+        "services_apis": [],
+        "databases_reference_data": [
+          "indexed scATAC fragments",
+          "genome-matched EnsDb/BSgenome annotation",
+          "JASPAR motif database"
+        ],
+        "external_models": [
+          "chromVAR GC-matched background model",
+          "optional SnapATAC2 spectral or deep generative models"
+        ],
+        "containers": [],
+        "hardware": [
+          "large-memory system for Signac/ArchR; backed SnapATAC2 route recommended at very large scale"
+        ],
+        "declaration_scope": "Named dependencies from bundled executables and documented routes; optional alternatives are not all required together. Versions are source-declared compatibility claims, not a newly tested environment lock."
+      },
+      "contract": {
+        "inputs": [
+          "fragment file and cell barcodes",
+          "genome annotation/reference and optional peaks/motifs",
+          "Signac example: filtered_peak_bc_matrix.h5, indexed fragments.tsv.gz, and singlecell.csv with peak_region_fragments, passed_filters, blacklist_region_fragments"
+        ],
+        "outputs": [
+          "scATAC QC metrics",
+          "peak-by-cell representation",
+          "TF-IDF/LSI embedding, clusters, motif deviations, and doublet diagnostics"
+        ],
+        "bundled_executables": [
+          "examples/scatac_workflow.py",
+          "examples/signac_workflow.R",
+          "scripts/run_chromvar.R"
+        ],
+        "cross_check_status": "static_cross_check_completed_runtime_coverage_partial",
+        "findings": []
+      },
+      "package_evidence": {
+        "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_path": "skills/bio-single-cell-scatac-analysis",
+        "manifest_sha256": "6b8b9729ec8dd4a4a5203bc1f09ecd3cdee6a14eda053021ee1bfce3e8edc95c",
+        "content_sha256": "cb51658881483f0039102526a36c9022bf02603485fe4daea83b1df972975872",
+        "file_count": 5,
+        "total_bytes": 32381,
+        "license_expression": "MIT",
+        "license_files": [
+          {
+            "path": "LICENSE",
+            "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+          },
+          {
+            "path": "skills/bio-single-cell-scatac-analysis/SKILL.md",
+            "sha256": "e5ea223d7b84507bc7ed5cf4acb0027afead5694079434b70518ecea6c0d7b3d"
+          }
+        ]
+      },
+      "provider_review": {
+        "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+        "reviewed_on": "2026-09-24",
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "static_review_status": "completed_with_declared_limitations",
+        "runtime_status": "not_executed_in_this_pass",
+        "runtime_checks": []
+      }
+    },
+    {
+      "id": "bio-single-cell-cell-annotation",
+      "intake_record": "bio-single-cell-cell-annotation@1.0.0",
+      "provenance": {
+        "upstream_path": "single-cell/cell-annotation",
+        "original_author": "GPTomics",
+        "modification_status": "modified",
+        "modification_evidence": [
+          "PROVENANCE.json",
+          "fixes/bio-single-cell-cell-annotation.md"
+        ],
+        "modified_by": "mrsonord2240"
+      },
+      "upstream_audit": {
+        "score": 94,
+        "audited_on": "2026-09-24",
+        "audit_path": "audits/skills/bio-single-cell-cell-annotation",
+        "fix_log": "fixes/bio-single-cell-cell-annotation.md",
+        "evidence": {
+          "report_path": "audits/skills/bio-single-cell-cell-annotation/mrsonord2240-bioSkills@b7fc90e/report.json",
+          "report_sha256": "44f052ded6bc4d59da4283be1a218074ff194b5e23c22eec3c58d7c0b8a93e19",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-single-cell-cell-annotation/mrsonord2240-bioSkills@b7fc90e/report.json",
+          "record_path": "audits/skills/bio-single-cell-cell-annotation/mrsonord2240-bioSkills@b7fc90e/record.json",
+          "record_sha256": "f856a78617a4ccc2840d64ddd3bef4ff0718374a2bb1576567c15048e59eb88b",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-single-cell-cell-annotation/mrsonord2240-bioSkills@b7fc90e/record.json",
+          "fix_log_sha256": "6dfa331cf65a43f591f876038ce9db2780f3d9271aa9b20453cc21d9e802e3bc",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-single-cell-cell-annotation.md",
+          "audited_source": {
+            "repository": "mrsonord2240/bioSkills",
+            "commit": "b7fc90e69bdf4839b958a13b37581945ba694413",
+            "path": "single-cell/cell-annotation",
+            "author": "GPTomics",
+            "author_url": "https://github.com/GPTomics",
+            "license": "MIT",
+            "modified_by": "Samuel Nord",
+            "fork_of": {
+              "repository": "GPTomics/bioSkills",
+              "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+            },
+            "url": "https://github.com/mrsonord2240/bioSkills/tree/b7fc90e69bdf4839b958a13b37581945ba694413/single-cell/cell-annotation"
+          },
+          "auditor_independent": null,
+          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+        }
+      },
+      "aipoch_review": {
+        "status": "pending_independent_review",
+        "reviewed_by": null,
+        "reviewed_on": null,
+        "score": null,
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "unresolved_limitations": [
+          "Reference-based labels inherit reference taxonomy and domain shift; unexpected cells are not automatically novel types.",
+          "Confidence thresholds are model- and dataset-specific and require rejection calibration.",
+          "celltypist-example-contract: The example does not validate normalization or UMAP availability and uses automatic over-clustering without the explicit seeded labels documented in SKILL.md."
+        ]
+      },
+      "runtime_dependencies": {
+        "languages": [
+          "Python 3",
+          "R"
+        ],
+        "python_packages": [
+          "scanpy >=1.10",
+          "celltypist >=1.6",
+          "optional scvi-tools for scANVI/scArches",
+          "matplotlib",
+          "pandas",
+          "scikit-learn",
+          "igraph and leidenalg for over-clustering"
+        ],
+        "r_packages": [
+          "Seurat >=5.0",
+          "Bioconductor SingleR",
+          "optional Azimuth and scmap",
+          "Bioconductor celldex",
+          "Bioconductor SingleCellExperiment",
+          "pheatmap"
+        ],
+        "cli_tools": [],
+        "services_apis": [
+          "network access for CellTypist/Azimuth reference or model download when not pre-cached",
+          "celldex reference retrieval requires network or a populated cache"
+        ],
+        "databases_reference_data": [
+          "annotated reference atlas or pretrained model",
+          "query expression object with compatible gene identifiers",
+          "celldex HumanPrimaryCellAtlasData and MonacoImmuneData for SingleR examples"
+        ],
+        "external_models": [
+          "CellTypist pretrained logistic-regression model",
+          "optional scANVI/scArches model",
+          "Azimuth reference model when selected"
+        ],
+        "containers": [],
+        "hardware": [
+          "GPU optional for scANVI/scArches acceleration"
+        ],
+        "declaration_scope": "Named dependencies from bundled executables and documented routes; optional alternatives are not all required together. Versions are source-declared compatibility claims, not a newly tested environment lock."
+      },
+      "contract": {
+        "inputs": [
+          "query single-cell expression object",
+          "compatible annotated reference or pretrained model",
+          "CellTypist example requires CP10K-log1p data with gene symbols and precomputed UMAP in adata_processed.h5ad"
+        ],
+        "outputs": [
+          "cell-level predicted labels",
+          "confidence/rejection values and cluster-level consensus diagnostics"
+        ],
+        "bundled_executables": [
+          "examples/celltypist_annotation.py",
+          "examples/singler_annotation.R"
+        ],
+        "cross_check_status": "completed_with_open_source_findings",
+        "findings": [
+          {
+            "id": "celltypist-example-contract",
+            "status": "open",
+            "severity": "medium",
+            "paths": [
+              "examples/celltypist_annotation.py:6",
+              "examples/celltypist_annotation.py:11",
+              "SKILL.md:77"
+            ],
+            "finding": "The example does not validate normalization or UMAP availability and uses automatic over-clustering without the explicit seeded labels documented in SKILL.md.",
+            "required_action": "Align the example with the documented normalization, embedding and seeded over-clustering contract, then test a local cached model without network side effects."
+          }
+        ]
+      },
+      "package_evidence": {
+        "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_path": "skills/bio-single-cell-cell-annotation",
+        "manifest_sha256": "a158b92f20ab08b685d13f5577e5b95c02a777c2d18c16e89a3ba87ea7fb8b04",
+        "content_sha256": "d58f2ab73655d752aac4705afc055fb019f62196a5ddbb47303de7847637898d",
+        "file_count": 4,
+        "total_bytes": 21185,
+        "license_expression": "MIT",
+        "license_files": [
+          {
+            "path": "LICENSE",
+            "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+          },
+          {
+            "path": "skills/bio-single-cell-cell-annotation/SKILL.md",
+            "sha256": "c8b06413b128e026df1d2e0b4fe587ab26b511a0e153171c782b93db2342e698"
+          }
+        ]
+      },
+      "provider_review": {
+        "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+        "reviewed_on": "2026-09-24",
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "static_review_status": "findings_open",
+        "runtime_status": "not_executed_in_this_pass",
+        "runtime_checks": []
+      }
+    },
+    {
+      "id": "bio-variant-annotation",
+      "intake_record": "bio-variant-annotation@1.0.0",
+      "provenance": {
+        "upstream_path": "variant-calling/variant-annotation",
+        "original_author": "GPTomics",
+        "modification_status": "modified",
+        "modification_evidence": [
+          "PROVENANCE.json",
+          "fixes/bio-variant-annotation.md"
+        ],
+        "modified_by": "mrsonord2240"
+      },
+      "upstream_audit": {
+        "score": 91,
+        "audited_on": "2026-09-24",
+        "audit_path": "audits/skills/bio-variant-annotation",
+        "fix_log": "fixes/bio-variant-annotation.md",
+        "evidence": {
+          "report_path": "audits/skills/bio-variant-annotation/mrsonord2240-bioSkills@6122d46/report.json",
+          "report_sha256": "33020faf84eaa65f202c1ee557e760a420d8eb6da846620017334c27e9f7c4f4",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-variant-annotation/mrsonord2240-bioSkills@6122d46/report.json",
+          "record_path": "audits/skills/bio-variant-annotation/mrsonord2240-bioSkills@6122d46/record.json",
+          "record_sha256": "3f8a44349377179cf3e1e5e8402318d89de29a7103cde31577ff089fdf833722",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-variant-annotation/mrsonord2240-bioSkills@6122d46/record.json",
+          "fix_log_sha256": "2a582e15f0139260ffad2383267e43f1b604d8c2e27c762b8ae2882986726336",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-variant-annotation.md",
+          "audited_source": {
+            "repository": "mrsonord2240/bioSkills",
+            "commit": "6122d469f440f6030b278a155d8e4e78c8788dbf",
+            "path": "variant-calling/variant-annotation",
+            "author": "GPTomics",
+            "author_url": "https://github.com/GPTomics",
+            "license": "MIT",
+            "modified_by": "Samuel Nord",
+            "fork_of": {
+              "repository": "GPTomics/bioSkills",
+              "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+            },
+            "url": "https://github.com/mrsonord2240/bioSkills/tree/6122d469f440f6030b278a155d8e4e78c8788dbf/variant-calling/variant-annotation"
+          },
+          "auditor_independent": false,
+          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+        }
+      },
+      "aipoch_review": {
+        "status": "pending_independent_review",
+        "reviewed_by": null,
+        "reviewed_on": null,
+        "score": null,
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "unresolved_limitations": [
+          "Annotation depends on genome build, transcript set, engine/version, parameters, and database release; those must be pinned together.",
+          "The Skill does not perform final ACMG classification or replace validated clinical interpretation."
+        ]
+      },
+      "runtime_dependencies": {
+        "languages": [
+          "Python 3 for optional parsing",
+          "Java for SnpEff/SnpSift",
+          "Perl for ANNOVAR",
+          "Bash for examples/annotate_vcf.sh"
+        ],
+        "python_packages": [
+          "cyvcf2 for custom CSQ/ANN parsing"
+        ],
+        "r_packages": [],
+        "cli_tools": [
+          "bcftools >=1.19",
+          "Ensembl VEP >=110",
+          "SnpEff/SnpSift >=5.2",
+          "ANNOVAR 2020Jun07+",
+          "bgzip/tabix for indexed resources",
+          "awk, grep, sed, comm, sort, cut, and standard Unix core utilities; optional wget for resource downloads"
+        ],
+        "services_apis": [
+          "optional network access to obtain VEP caches and annotation databases"
+        ],
+        "databases_reference_data": [
+          "build-matched reference FASTA",
+          "Ensembl/RefSeq/MANE transcript resources",
+          "gnomAD v2/v3/v4",
+          "ClinVar",
+          "dbSNP",
+          "engine-specific caches/databases"
+        ],
+        "external_models": [
+          "optional calibrated predictors such as REVEL, AlphaMissense, CADD, SpliceAI, or Pangolin, each with a pinned release"
+        ],
+        "containers": [],
+        "hardware": [],
+        "declaration_scope": "Named dependencies from bundled executables and documented routes; optional alternatives are not all required together. Versions are source-declared compatibility claims, not a newly tested environment lock."
+      },
+      "contract": {
+        "inputs": [
+          "normalized VCF/BCF",
+          "build-matched reference, transcript set, caches, and annotation databases"
+        ],
+        "outputs": [
+          "annotated VCF/BCF or flattened table with consequences, frequencies, and predictor fields"
+        ],
+        "bundled_executables": [
+          "examples/annotate_vcf.sh"
+        ],
+        "cross_check_status": "static_cross_check_completed_runtime_coverage_partial",
+        "findings": []
+      },
+      "package_evidence": {
+        "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_path": "skills/bio-variant-annotation",
+        "manifest_sha256": "0ed3529feedce5e2f9dc8cdd36003122ddeb6eb7e8c064572221e3a8c8667609",
+        "content_sha256": "c503d95f1e9177d977a49ea174f0b5af998eb6e64e4e65ad55c9658a74537d6c",
+        "file_count": 3,
+        "total_bytes": 46935,
+        "license_expression": "MIT",
+        "license_files": [
+          {
+            "path": "LICENSE",
+            "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+          },
+          {
+            "path": "skills/bio-variant-annotation/SKILL.md",
+            "sha256": "02f034e3ad4e074fae0e421c823f83adb59ee78e86f8afff4f5264550fb207a8"
+          }
+        ]
+      },
+      "provider_review": {
+        "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+        "reviewed_on": "2026-09-24",
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "static_review_status": "completed_with_declared_limitations",
+        "runtime_status": "not_executed_in_this_pass",
+        "runtime_checks": []
+      }
+    },
+    {
+      "id": "bio-variant-normalization",
+      "intake_record": "bio-variant-normalization@1.0.0",
+      "provenance": {
+        "upstream_path": "variant-calling/variant-normalization",
+        "original_author": "GPTomics",
+        "modification_status": "modified",
+        "modification_evidence": [
+          "PROVENANCE.json",
+          "fixes/bio-variant-normalization.md"
+        ],
+        "modified_by": "mrsonord2240"
+      },
+      "upstream_audit": {
+        "score": 95,
+        "audited_on": "2026-09-24",
+        "audit_path": "audits/skills/bio-variant-normalization",
+        "fix_log": "fixes/bio-variant-normalization.md",
+        "evidence": {
+          "report_path": "audits/skills/bio-variant-normalization/mrsonord2240-bioSkills@3565810/report.json",
+          "report_sha256": "33bec6ea8014a117fa8992748fbb560d750b23d6998d7f2a5f78bc378db440e7",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-variant-normalization/mrsonord2240-bioSkills@3565810/report.json",
+          "record_path": "audits/skills/bio-variant-normalization/mrsonord2240-bioSkills@3565810/record.json",
+          "record_sha256": "fb16a2858db903a2b3faf3ea4653d71a65d8b4b627a419380388d83247e9ee57",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-variant-normalization/mrsonord2240-bioSkills@3565810/record.json",
+          "fix_log_sha256": "a95c19f2ba6386c6c2106e89024da751c7778eee2906f0568542ce7b2adde49e",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-variant-normalization.md",
+          "audited_source": {
+            "repository": "mrsonord2240/bioSkills",
+            "commit": "356581080738dee60b613812b35fd4b99d217527",
+            "path": "variant-calling/variant-normalization",
+            "author": "GPTomics",
+            "author_url": "https://github.com/GPTomics",
+            "license": "MIT",
+            "modified_by": "Samuel Nord",
+            "fork_of": {
+              "repository": "GPTomics/bioSkills",
+              "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+            },
+            "url": "https://github.com/mrsonord2240/bioSkills/tree/356581080738dee60b613812b35fd4b99d217527/variant-calling/variant-normalization"
+          },
+          "auditor_independent": false,
+          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+        }
+      },
+      "aipoch_review": {
+        "status": "pending_independent_review",
+        "reviewed_by": null,
+        "reviewed_on": null,
+        "score": null,
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "unresolved_limitations": [
+          "Normalization must use the exact downstream reference build; otherwise database and cohort matching silently fail.",
+          "Atomized records are useful for matching but can misrepresent haplotype-level functional consequences and HGVS 3-prime conventions."
+        ]
+      },
+      "runtime_dependencies": {
+        "languages": [
+          "Bash for the bundled workflow",
+          "optional Python 3"
+        ],
+        "python_packages": [
+          "optional cyvcf2 >=0.30 for programmatic inspection"
+        ],
+        "r_packages": [],
+        "cli_tools": [
+          "bcftools >=1.19 (atomize requires >=1.12)",
+          "bgzip/tabix",
+          "optional vt for older bcftools compatibility",
+          "samtools faidx for reference indexing",
+          "grep, wc, tr, and standard Unix core utilities"
+        ],
+        "services_apis": [],
+        "databases_reference_data": [
+          "input VCF/BCF",
+          "exact build-matched reference FASTA and index"
+        ],
+        "external_models": [],
+        "containers": [],
+        "hardware": [],
+        "declaration_scope": "Named dependencies from bundled executables and documented routes; optional alternatives are not all required together. Versions are source-declared compatibility claims, not a newly tested environment lock."
+      },
+      "contract": {
+        "inputs": [
+          "VCF/BCF and exact downstream reference FASTA"
+        ],
+        "outputs": [
+          "left-aligned, parsimonious, split and/or atomized VCF/BCF",
+          "optional original-record provenance tags"
+        ],
+        "bundled_executables": [
+          "examples/normalize_vcf.sh"
+        ],
+        "cross_check_status": "static_cross_check_completed_runtime_coverage_partial",
+        "findings": []
+      },
+      "package_evidence": {
+        "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_path": "skills/bio-variant-normalization",
+        "manifest_sha256": "9b0912c4700f8121a209a53db53d7378a52eb394e24e85f3faa1855fc8f5236f",
+        "content_sha256": "15c6b67425781566d05b11d4d595de0245a7047f44a26bbe6d72be9bf5a76f88",
+        "file_count": 3,
+        "total_bytes": 40339,
+        "license_expression": "MIT",
+        "license_files": [
+          {
+            "path": "LICENSE",
+            "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+          },
+          {
+            "path": "skills/bio-variant-normalization/SKILL.md",
+            "sha256": "f433baf669645644e1ec6bc5480ba2cb9889bc44e1dff012afb8efc5bb7088dd"
+          }
+        ]
+      },
+      "provider_review": {
+        "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+        "reviewed_on": "2026-09-24",
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "static_review_status": "completed_with_declared_limitations",
+        "runtime_status": "selected_smoke_checks_passed",
+        "runtime_checks": [
+          {
+            "id": "bio-variant-normalization",
+            "script": "examples/normalize_vcf.sh",
+            "args": [
+              "bash",
+              "examples/normalize_vcf.sh",
+              "reference.fa",
+              "input.vcf",
+              "normalized.vcf.gz"
+            ],
+            "status": "passed",
+            "exit_code": 0,
+            "error": null,
+            "source_sha256": "cc5b6b1122e8330d8f8293c88d889f100f2d397c21e39873a8d4b1c7089d28f8",
+            "stdout": "\n=== Normalization Complete ===\nInput:  input.vcf\nOutput: normalized.vcf.gz\n\nRecords before:                    2\nRecords after split+left-align:    3\nRecords after full (with atomize): 4\nExtra records from atomization:    1\n\nThe difference counts the MNP and complex records that bcftools-only norm leaves\nintact but vt-style decomposition splits into atoms. Standardize one tool +\nflags across every cohort compared, or these become false private variants.\n",
+            "stderr": "Lines   total/split/joined/realigned/mismatch_removed/dup_removed/skipped:\t2/1/0/0/0/0/0\nLines   total/split/joined/realigned/mismatch_removed/dup_removed/skipped:\t2/1/0/0/0/0/0\nLines   total/split/joined/realigned/mismatch_removed/dup_removed/skipped:\t3/0/0/0/0/0/0\nLines   total/split/joined/realigned/mismatch_removed/dup_removed/skipped:\t4/0/0/0/0/0/0\n",
+            "environment": "WSL science",
+            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bio-vcf-basics",
+      "intake_record": "bio-vcf-basics@1.0.0",
+      "provenance": {
+        "upstream_path": "variant-calling/vcf-basics",
+        "original_author": "GPTomics",
+        "modification_status": "modified",
+        "modification_evidence": [
+          "PROVENANCE.json",
+          "fixes/bio-vcf-basics.md"
+        ],
+        "modified_by": "mrsonord2240"
+      },
+      "upstream_audit": {
+        "score": 95,
+        "audited_on": "2026-09-24",
+        "audit_path": "audits/skills/bio-vcf-basics",
+        "fix_log": "fixes/bio-vcf-basics.md",
+        "evidence": {
+          "report_path": "audits/skills/bio-vcf-basics/mrsonord2240-bioSkills@7c66584/report.json",
+          "report_sha256": "7c841b33ecf9eba3c865696aad8bc003e20e18a971b94442290a2ed58a9222fa",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-vcf-basics/mrsonord2240-bioSkills@7c66584/report.json",
+          "record_path": "audits/skills/bio-vcf-basics/mrsonord2240-bioSkills@7c66584/record.json",
+          "record_sha256": "6f7706bcd9749849678dea0abbe5cc448ac79dcbc4b3fe7e39675b97218e7f97",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-vcf-basics/mrsonord2240-bioSkills@7c66584/record.json",
+          "fix_log_sha256": "4b866d45e6d8980db34c566b5311fd7d5062aa4f7fdc4616bb6974322b61230d",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-vcf-basics.md",
+          "audited_source": {
+            "repository": "mrsonord2240/bioSkills",
+            "commit": "7c665843f733a0833f21fe95a7c7199376159059",
+            "path": "variant-calling/vcf-basics",
+            "author": "GPTomics",
+            "author_url": "https://github.com/GPTomics",
+            "license": "MIT",
+            "modified_by": "Samuel Nord",
+            "fork_of": {
+              "repository": "GPTomics/bioSkills",
+              "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+            },
+            "url": "https://github.com/mrsonord2240/bioSkills/tree/7c665843f733a0833f21fe95a7c7199376159059/variant-calling/vcf-basics"
+          },
+          "auditor_independent": false,
+          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+        }
+      },
+      "aipoch_review": {
+        "status": "pending_independent_review",
+        "reviewed_by": null,
+        "reviewed_on": null,
+        "score": null,
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "unresolved_limitations": [
+          "VCF field meaning depends on header Number/Type declarations, ploidy, and caller conventions.",
+          "Missing genotype, homozygous reference, symbolic alleles, and gVCF reference blocks must not be conflated."
+        ]
+      },
+      "runtime_dependencies": {
+        "languages": [
+          "Python 3"
+        ],
+        "python_packages": [
+          "cyvcf2 >=0.30",
+          "numpy >=1.26"
+        ],
+        "r_packages": [],
+        "cli_tools": [
+          "bcftools >=1.19",
+          "bgzip/tabix for compressed indexed input"
+        ],
+        "services_apis": [],
+        "databases_reference_data": [
+          "VCF/BCF/gVCF and its header; reference FASTA when allele/reference validation is needed"
+        ],
+        "external_models": [],
+        "containers": [],
+        "hardware": [],
+        "declaration_scope": "Named dependencies from bundled executables and documented routes; optional alternatives are not all required together. Versions are source-declared compatibility claims, not a newly tested environment lock."
+      },
+      "contract": {
+        "inputs": [
+          "VCF, BCF, or gVCF"
+        ],
+        "outputs": [
+          "viewed/subset variant files",
+          "flat query tables and correctly interpreted site/genotype fields"
+        ],
+        "bundled_executables": [
+          "examples/view_vcf.py"
+        ],
+        "cross_check_status": "static_cross_check_completed_runtime_coverage_partial",
+        "findings": []
+      },
+      "package_evidence": {
+        "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_path": "skills/bio-vcf-basics",
+        "manifest_sha256": "9cfc46821dad23296b93849819936d0a5643f522ecfebacea12463f00e17904a",
+        "content_sha256": "9c74b149dd1df5f709a15c0695d9c0d599cdd35beed0c65e0f1502d99d5f6f65",
+        "file_count": 3,
+        "total_bytes": 27472,
+        "license_expression": "MIT",
+        "license_files": [
+          {
+            "path": "LICENSE",
+            "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+          },
+          {
+            "path": "skills/bio-vcf-basics/SKILL.md",
+            "sha256": "33c16090e10507b61869e603f460c49a01a31a6971293d652757095a6bc42c1a"
+          }
+        ]
+      },
+      "provider_review": {
+        "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+        "reviewed_on": "2026-09-24",
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "static_review_status": "completed_with_declared_limitations",
+        "runtime_status": "not_executed_in_this_pass",
+        "runtime_checks": []
+      }
+    },
+    {
+      "id": "bio-vcf-statistics",
+      "intake_record": "bio-vcf-statistics@1.0.0",
+      "provenance": {
+        "upstream_path": "variant-calling/vcf-statistics",
+        "original_author": "GPTomics",
+        "modification_status": "modified",
+        "modification_evidence": [
+          "PROVENANCE.json",
+          "fixes/bio-vcf-statistics.md"
+        ],
+        "modified_by": "mrsonord2240"
+      },
+      "upstream_audit": {
+        "score": 94,
+        "audited_on": "2026-09-24",
+        "audit_path": "audits/skills/bio-vcf-statistics",
+        "fix_log": "fixes/bio-vcf-statistics.md",
+        "evidence": {
+          "report_path": "audits/skills/bio-vcf-statistics/mrsonord2240-bioSkills@c4d5511/report.json",
+          "report_sha256": "68b03f13b3aebb309f44d3a08a62ff054bb78ba57eaf6db9ef38129919ef2a56",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-vcf-statistics/mrsonord2240-bioSkills@c4d5511/report.json",
+          "record_path": "audits/skills/bio-vcf-statistics/mrsonord2240-bioSkills@c4d5511/record.json",
+          "record_sha256": "bbfc12fb7dc0b5d90e7e1c068935f76f42785a243f070a0b9b85da60d831a9a3",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-vcf-statistics/mrsonord2240-bioSkills@c4d5511/record.json",
+          "fix_log_sha256": "6d4809e4f8bdede4da2be5a5f048e8c3103d3ae45f35175233294616ef33f599",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-vcf-statistics.md",
+          "audited_source": {
+            "repository": "mrsonord2240/bioSkills",
+            "commit": "c4d5511fe2830349a9d65609495018ed862ead58",
+            "path": "variant-calling/vcf-statistics",
+            "author": "GPTomics",
+            "author_url": "https://github.com/GPTomics",
+            "license": "MIT",
+            "modified_by": "Samuel Nord",
+            "fork_of": {
+              "repository": "GPTomics/bioSkills",
+              "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+            },
+            "url": "https://github.com/mrsonord2240/bioSkills/tree/c4d5511fe2830349a9d65609495018ed862ead58/variant-calling/vcf-statistics"
+          },
+          "auditor_independent": false,
+          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+        }
+      },
+      "aipoch_review": {
+        "status": "pending_independent_review",
+        "reviewed_by": null,
+        "reviewed_on": null,
+        "score": null,
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "unresolved_limitations": [
+          "Expected Ti/Tv, heterozygosity, HWE, and missingness depend on assay, ancestry, filters, genomic context, and disease design.",
+          "VCF-level contamination signals are screening indicators; dedicated BAM/CRAM methods are needed for measurement.",
+          "vcf-example-zero-quality: The truthiness check skips valid QUAL=0 values, biasing mean QUAL.",
+          "vcf-example-multiallelic: The example counts only ALT[0] for Ti/Tv and cannot represent all alternate alleles at a multiallelic SNP."
+        ]
+      },
+      "runtime_dependencies": {
+        "languages": [
+          "Python 3",
+          "Bash utilities for command examples"
+        ],
+        "python_packages": [
+          "cyvcf2 >=0.30",
+          "numpy >=1.26",
+          "matplotlib for plot-vcfstats"
+        ],
+        "r_packages": [],
+        "cli_tools": [
+          "bcftools >=1.19",
+          "vcftools >=0.1.16",
+          "somalier >=0.2.19",
+          "peddy >=0.4.8",
+          "optional KING-compatible relatedness route and VerifyBamID2/CHARR follow-up",
+          "pdflatex or tectonic for plot-vcfstats PDF output",
+          "awk, grep, cut, sort, uniq, wc and standard Unix core utilities"
+        ],
+        "services_apis": [],
+        "databases_reference_data": [
+          "VCF/BCF",
+          "optional PED/sample metadata",
+          "known-sites and stratification BEDs",
+          "BAM/CRAM plus population resource for dedicated contamination follow-up"
+        ],
+        "external_models": [
+          "peddy ancestry/relatedness model",
+          "somalier population sketches when selected"
+        ],
+        "containers": [],
+        "hardware": [],
+        "declaration_scope": "Named dependencies from bundled executables and documented routes; optional alternatives are not all required together. Versions are source-declared compatibility claims, not a newly tested environment lock."
+      },
+      "contract": {
+        "inputs": [
+          "cohort or sample VCF/BCF",
+          "optional pedigree, known-site, and region-stratification resources"
+        ],
+        "outputs": [
+          "variant/sample QC statistics",
+          "plots and relatedness/identity diagnostics"
+        ],
+        "bundled_executables": [
+          "examples/vcf_stats.py"
+        ],
+        "cross_check_status": "completed_with_open_source_findings",
+        "findings": [
+          {
+            "id": "vcf-example-zero-quality",
+            "status": "open",
+            "severity": "medium",
+            "paths": [
+              "examples/vcf_stats.py:40"
+            ],
+            "finding": "The truthiness check skips valid QUAL=0 values, biasing mean QUAL.",
+            "required_action": "Use an explicit missing-value check and test QUAL=0 together with nonzero and missing quality."
+          },
+          {
+            "id": "vcf-example-multiallelic",
+            "status": "open",
+            "severity": "medium",
+            "paths": [
+              "examples/vcf_stats.py:26"
+            ],
+            "finding": "The example counts only ALT[0] for Ti/Tv and cannot represent all alternate alleles at a multiallelic SNP.",
+            "required_action": "Declare and enforce a biallelic input boundary or compute an explicitly defined per-allele statistic."
+          }
+        ]
+      },
+      "package_evidence": {
+        "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_path": "skills/bio-vcf-statistics",
+        "manifest_sha256": "493a5481aed185c57da5676753708a8122c8ec25b86a3f69c2f6c2be575ecdc3",
+        "content_sha256": "86ba88c26643dc1cc22d74138c09127e2dfa4276c8f6508e1d1de0879e94f684",
+        "file_count": 3,
+        "total_bytes": 36546,
+        "license_expression": "MIT",
+        "license_files": [
+          {
+            "path": "LICENSE",
+            "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+          },
+          {
+            "path": "skills/bio-vcf-statistics/SKILL.md",
+            "sha256": "30007a60bae29631dc0298ac7ce508a82464d7d3f09c365e13f05f13308757a2"
+          }
+        ]
+      },
+      "provider_review": {
+        "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+        "reviewed_on": "2026-09-24",
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "static_review_status": "findings_open",
+        "runtime_status": "not_executed_in_this_pass",
+        "runtime_checks": []
+      }
+    },
+    {
+      "id": "bio-variant-calling-filtering-best-practices",
+      "intake_record": "bio-variant-calling-filtering-best-practices@1.0.0",
+      "provenance": {
+        "upstream_path": "variant-calling/filtering-best-practices",
+        "original_author": "GPTomics",
+        "modification_status": "modified",
+        "modification_evidence": [
+          "PROVENANCE.json",
+          "fixes/bio-variant-calling-filtering-best-practices.md"
+        ],
+        "modified_by": "mrsonord2240"
+      },
+      "upstream_audit": {
+        "score": 91,
+        "audited_on": "2026-09-24",
+        "audit_path": "audits/skills/bio-variant-calling-filtering-best-practices",
+        "fix_log": "fixes/bio-variant-calling-filtering-best-practices.md",
+        "evidence": {
+          "report_path": "audits/skills/bio-variant-calling-filtering-best-practices/mrsonord2240-bioSkills@c7f131e/report.json",
+          "report_sha256": "bce5b5fc5c210d12849510aac2a6f9b112ef3277f6f4a9c0739123e7161c8dae",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-variant-calling-filtering-best-practices/mrsonord2240-bioSkills@c7f131e/report.json",
+          "record_path": "audits/skills/bio-variant-calling-filtering-best-practices/mrsonord2240-bioSkills@c7f131e/record.json",
+          "record_sha256": "d2253c43e1831af529d37f2d86bd74ae898ea5e9251dd5c4cd962c9b27184769",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-variant-calling-filtering-best-practices/mrsonord2240-bioSkills@c7f131e/record.json",
+          "fix_log_sha256": "35b247a0be9e666a062028cfefaa2d4595e39a81d6c906f0502259f99f06bd41",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-variant-calling-filtering-best-practices.md",
+          "audited_source": {
+            "repository": "mrsonord2240/bioSkills",
+            "commit": "c7f131e61134fb550457f761e76bd07dc0a840a8",
+            "path": "variant-calling/filtering-best-practices",
+            "author": "GPTomics",
+            "author_url": "https://github.com/GPTomics",
+            "license": "MIT",
+            "modified_by": "Samuel Nord",
+            "fork_of": {
+              "repository": "GPTomics/bioSkills",
+              "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+            },
+            "url": "https://github.com/mrsonord2240/bioSkills/tree/c7f131e61134fb550457f761e76bd07dc0a840a8/variant-calling/filtering-best-practices"
+          },
+          "auditor_independent": false,
+          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+        }
+      },
+      "aipoch_review": {
+        "status": "pending_independent_review",
+        "reviewed_by": null,
+        "reviewed_on": null,
+        "score": null,
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "unresolved_limitations": [
+          "Method choice is cohort-, platform-, caller-, and organism-specific; VQSR is unreliable on undersized callsets and caller-native calibrated outputs should not receive generic GATK hard filters.",
+          "VETS is beta, CNNScoreVariants is deprecated, and NVScoreVariants availability/model requirements must be checked against the installed GATK build.",
+          "filter-script-snv-indel-only: The bundled shell workflow retains SNP and indel records; it explicitly warns that MNP/mixed records are dropped."
+        ]
+      },
+      "runtime_dependencies": {
+        "languages": [
+          "Python 3",
+          "Java for GATK",
+          "Bash for the bundled workflow"
+        ],
+        "python_packages": [
+          "cyvcf2 >=0.30",
+          "PyTorch environment used by GATK NVScoreVariants when selected"
+        ],
+        "r_packages": [],
+        "cli_tools": [
+          "GATK >=4.6",
+          "bcftools >=1.19",
+          "bgzip/tabix",
+          "awk, grep, sed, and standard Unix core utilities for Bash recipes"
+        ],
+        "services_apis": [],
+        "databases_reference_data": [
+          "raw germline or somatic VCF/BCF",
+          "build-matched reference FASTA",
+          "HapMap/Omni/1000G/dbSNP truth/training resources for VQSR",
+          "GIAB truth and stratification BEDs for validation",
+          "contamination/segmentation tables for Mutect2 filtering"
+        ],
+        "external_models": [
+          "VQSR Gaussian-mixture model",
+          "VETS isolation-forest model",
+          "NVScoreVariants PyTorch CNN",
+          "caller-native calibrated quality model when applicable"
+        ],
+        "containers": [],
+        "hardware": [
+          "GPU-friendly environment recommended for the NVScoreVariants 2D model"
+        ],
+        "declaration_scope": "Named dependencies from bundled executables and documented routes; optional alternatives are not all required together. Versions are source-declared compatibility claims, not a newly tested environment lock."
+      },
+      "contract": {
+        "inputs": [
+          "germline or somatic VCF/BCF",
+          "reference and method-specific truth/model/contamination resources"
+        ],
+        "outputs": [
+          "soft- or hard-filtered site/genotype VCF/BCF",
+          "before/after QC and tranche/filter summaries"
+        ],
+        "bundled_executables": [
+          "examples/filter_variants.sh"
+        ],
+        "cross_check_status": "static_cross_check_completed_runtime_coverage_partial",
+        "findings": [
+          {
+            "id": "filter-script-snv-indel-only",
+            "status": "documented_limitation",
+            "severity": "scope",
+            "paths": [
+              "examples/filter_variants.sh:10"
+            ],
+            "finding": "The bundled shell workflow retains SNP and indel records; it explicitly warns that MNP/mixed records are dropped.",
+            "required_action": "Use only within its documented SNV/indel scope; preserve other classes in a separate workflow."
+          }
+        ]
+      },
+      "package_evidence": {
+        "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+        "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+        "source_path": "skills/bio-variant-calling-filtering-best-practices",
+        "manifest_sha256": "87ed8545d7f49f8ad7e5d7a8a7e85a855a944e1c9e40845657c50d3c5fe95c1f",
+        "content_sha256": "334cd8c408c93b1667cad06eca3422c3604653fbb3e6cf589ad197d5507a630b",
+        "file_count": 3,
+        "total_bytes": 34141,
+        "license_expression": "MIT",
+        "license_files": [
+          {
+            "path": "LICENSE",
+            "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+          },
+          {
+            "path": "skills/bio-variant-calling-filtering-best-practices/SKILL.md",
+            "sha256": "8574e51caf2020a60d65622cb9fb181c634500f5ab3338ab5dd029866ceec2d3"
+          }
+        ]
+      },
+      "provider_review": {
+        "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+        "reviewed_on": "2026-09-24",
+        "review_scope": [
+          "package_bytes",
+          "license_and_attribution",
+          "runtime_dependencies",
+          "semantic_contract"
+        ],
+        "static_review_status": "completed_with_declared_limitations",
+        "runtime_status": "selected_smoke_checks_passed",
+        "runtime_checks": [
+          {
+            "id": "bio-variant-calling-filtering-best-practices",
+            "script": "examples/filter_variants.sh",
+            "args": [
+              "bash",
+              "examples/filter_variants.sh",
+              "input.vcf",
+              "filtered"
+            ],
+            "status": "passed",
+            "exit_code": 0,
+            "error": null,
+            "source_sha256": "3a74a3e0e2d650e3bb13c34f6da0d6eeeaf917d3a0864515fb66c486e53118aa",
+            "stdout": "=== Splitting SNPs and Indels (their error processes and thresholds differ) ===\n=== Filtering SNPs ===\n=== Filtering Indels ===\n=== Merging filtered variants ===\n=== Statistics (before / after) ===\nSN\t0\tnumber of samples:\t0\nSN\t0\tnumber of records:\t3\nSN\t0\tnumber of no-ALTs:\t0\nSN\t0\tnumber of SNPs:\t2\nSN\t0\tnumber of MNPs:\t0\nSN\t0\tnumber of indels:\t1\nSN\t0\tnumber of others:\t0\nSN\t0\tnumber of multiallelic sites:\t0\nSN\t0\tnumber of multiallelic SNP sites:\t0\nTSTV\t0\t1\t1\t1.00\t1\t1\t1.00\n\nSN\t0\tnumber of samples:\t0\nSN\t0\tnumber of records:\t2\nSN\t0\tnumber of no-ALTs:\t0\nSN\t0\tnumber of SNPs:\t1\nSN\t0\tnumber of MNPs:\t0\nSN\t0\tnumber of indels:\t1\nSN\t0\tnumber of others:\t0\nSN\t0\tnumber of multiallelic sites:\t0\nSN\t0\tnumber of multiallelic SNP sites:\t0\nTSTV\t0\t1\t0\t0.00\t1\t0\t0.00\n\nTi/Tv ratio: 0.00 (expected ~2.0-2.1 for WGS, ~3.0-3.3 for exomes)\nOutput: filtered_all_filtered.vcf.gz\n",
+            "stderr": "Checking the headers and starting positions of 2 files\nWriting to /tmp/bcftools.txfxJt\nMerging 1 temporary files\nDone\nCleaning\n",
+            "environment": "WSL science",
+            "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82"
+          }
+        ]
+      }
+    }
+  ],
+  "provider_review": {
+    "reviewed_by": "Codex (provider-side review; separate spec and standards reviewer agents)",
+    "reviewed_on": "2026-09-24",
+    "review_scope": [
+      "Exact package and license hashes recomputed using Marketplace intake",
+      "All 68 bundled executable paths and local bytes compared with pinned Git source",
+      "Python, Bash and R syntax checks",
+      "Per-Skill declared dependencies and input/output/limitation cross-check",
+      "Selected offline synthetic execution, with per-Skill coverage and failures recorded"
+    ],
+    "unresolved_limitations": [
+      "This is a scoped provider preflight, not Marketplace maintainer approval or a full independent scientific audit.",
+      "Seven Skills have no new functional execution in this pass; passing smoke checks cover only the named workflows.",
+      "Scientific redistribution scope and final AIPOCH score/approval remain for Marketplace review."
+    ],
+    "source_commit": "524cbb7ce83008e2e037bed0bb1cd04fc61dcb82",
+    "upstream_audit_commit": "0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5",
+    "marketplace_tool_commit": "e751844be4ade3e4d997ea4dbc63a0b81cf6ff75",
+    "syntax_checks": {
+      "python_files": 52,
+      "bash_files": 6,
+      "r_files": 10,
+      "status": "passed"
+    },
+    "functional_checks": {
+      "total": 16,
+      "passed": 15,
+      "failed": 1,
+      "skills_exercised": 13
+    },
+    "marketplace_checks": {
+      "intake_records": 20,
+      "intake_matches_saved": true,
+      "validate": "passed",
+      "test_suite": {
+        "passed": 98,
+        "failed": 0
+      },
+      "publish_dry_run": "passed_fixture_rehearsal_only",
+      "pilot_publication": "not_attempted_requires_maintainer_review"
+    },
+    "functional_environments": [
+      {
+        "platform": "Windows",
+        "python_versions": "3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]\r\n{'biopython': '1.88', 'numpy': '2.5.2', 'pandas': '2.3.3', 'scipy': '1.16.3'}",
+        "rscript_version": "Rscript (R) version 4.6.1 (2026-06-24)"
+      },
+      {
+        "platform": "Windows",
+        "python_versions": "3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]\r\n{'biopython': '1.88', 'numpy': '2.5.2', 'pandas': '2.3.3', 'scipy': '1.16.3'}",
+        "rscript_version": "Rscript (R) version 4.6.1 (2026-06-24)"
+      },
+      {
+        "platform": "WSL science",
+        "python_versions": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+        "pysam_version": "0.24.1",
+        "samtools_version": "samtools 1.22.1",
+        "bcftools_version": "bcftools 1.22"
+      }
+    ]
+  }
+}
