@@ -4,7 +4,7 @@
   "submitted_source": {
     "repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
     "commit": "2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db",
-    "package_metrics": "intake-review-input.json"
+    "package_metrics": "skills[*].package_evidence"
   },
   "original_source": {
     "repository": "https://github.com/GPTomics/bioSkills",
@@ -3504,7 +3504,7 @@
     },
     "marketplace_checks": {
       "intake_records": 20,
-      "intake_matches_saved": true,
+      "refreshed_intake_matches_embedded_package_evidence": true,
       "validate": "passed",
       "test_suite": {
         "passed": 98,

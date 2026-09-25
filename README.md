@@ -28,7 +28,7 @@ justified.
 | Skills in this repository | **157** |
 | substantively modified by us, each with a fix log | 138 |
 | unmodified apart from declared `license: MIT` and `author: GPTomics` lines | 19 |
-| **fix pass still needed** (first audit only, whatever the score) | **19** |
+| **fix pass still needed** (first audit only, whatever the score) | **0** |
 | **re-audit still needed** (changed after their latest audit) | **3** |
 | audit coverage | **100%** |
 
