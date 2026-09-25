@@ -22,11 +22,14 @@ def calculate_stats(vcf_path):
 
         if variant.is_snp:
             stats['snps'] += 1
-            ref, alt = variant.REF, variant.ALT[0]
-            if (ref, alt) in ti_pairs:
-                stats['transitions'] += 1
-            else:
-                stats['transversions'] += 1
+            ref = variant.REF
+            # Ti/Tv is an allele-level statistic. A multiallelic SNP record
+            # contributes one substitution for every alternate allele.
+            for alt in variant.ALT:
+                if (ref, alt) in ti_pairs:
+                    stats['transitions'] += 1
+                else:
+                    stats['transversions'] += 1
         elif variant.is_indel:
             stats['indels'] += 1
         else:
@@ -37,7 +40,8 @@ def calculate_stats(vcf_path):
         else:
             stats['filtered'] += 1
 
-        if variant.QUAL:
+        # QUAL=0 is observed quality, not a missing value.
+        if variant.QUAL is not None:
             stats['qual_sum'] += variant.QUAL
             stats['qual_count'] += 1
 

@@ -1,0 +1,6 @@
+Protein IDs	Reverse	Potential contaminant	Only identified by site	LFQ intensity S1	LFQ intensity S2
+P1				1024	2048
+P2				0	4096
+REV__P3	+			100	200
+CON__P4		+		100	200
+P5			+	100	200

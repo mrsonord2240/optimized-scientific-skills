@@ -294,6 +294,7 @@ def assess_missingness(matrix, sample_cols):
 | NaN gene labels break a merge | `Gene names` is a semicolon list, sometimes blank | `.where(notna(), '').str.split(';').str[0]` |
 | Ratios track loading not biology | Read `Intensity` (raw) instead of `LFQ intensity` | Use `LFQ intensity` for between-sample comparison |
 | `get_peaks()` unpacking error | Expecting a 2D array | It returns a tuple `(mz, intensity)` of two numpy arrays |
+| Correct QFeatures summary followed by Windows exit `3221225477` / `0xC0000005` | A native Windows dependency can crash during process teardown; one reproduced case was `cli.dll` in `cli__kill_thread`, after the analysis had finished | Treat the nonzero exit as failure. Reinstall/update `cli` in a clean R library, or run the same script in WSL/Linux; confirm a zero exit code rather than relying on printed output |
 
 ## References
 
