@@ -32,21 +32,24 @@ content. Per-Skill upstream paths and modification evidence are recorded in
 
 The external audit repository is pinned to
 `https://github.com/mrsonord2240/optimizing-agent-science-skills` commit
-`0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5`. Its scores are retained only as
-upstream audit evidence. They are not AIPOCH review scores. Each Skill now links
-the exact matching report and record, with their SHA-256 hashes and audited
-source identity. Those reports refer to commits in `mrsonord2240/bioSkills`;
-byte equivalence with the submitted packages has not been established. Sixteen
-reports explicitly say `auditor_independent: false`; four do not specify it.
+`34db8d35cbd5521bfce459e7ed2245e353f46a89`. Its scores are retained only as
+external audit evidence. They are not AIPOCH review scores. Each Skill links the
+exact matching report and record, with their SHA-256 hashes and audited source
+identity. The reports for `bio-proteomics-data-import`,
+`bio-single-cell-cell-annotation`, and `bio-vcf-statistics` are independent
+re-audits of the exact submitted repository, commit, and package path. Of the 20
+latest reports, those three record `auditor_independent: true`; thirteen older
+reports record `false`; four do not specify it.
 
 ## Review gate
 
-Every `aipoch_review` record is intentionally pending, with `reviewed_by`,
-`reviewed_on`, and `score` set to `null`. Those values must be filled only by a
-Marketplace maintainer after reviewing the exact pinned bytes, license scope,
-attribution, dependencies, and semantic contract. The official reviewed batch
-JSON should be generated from `intake-review-input.json`; this provider evidence
-file is not a substitute for that Marketplace review record.
+Every `aipoch_review` record is intentionally
+`pending_marketplace_maintainer_review`, with `reviewed_by`, `reviewed_on`, and
+`score` set to `null`. Those values must be filled only by a Marketplace
+maintainer after reviewing the exact pinned bytes, license scope, attribution,
+dependencies, and semantic contract. The official reviewed batch JSON should be
+generated from `intake-review-input.json`; this provider evidence file is not a
+substitute for that Marketplace review record.
 
 Separate `provider_review` records identify Codex as the provider-side reviewer,
 date the review, and state its completed scope and execution coverage. These
@@ -69,11 +72,11 @@ separate spec and standards agents to check the prepared evidence.
    reference resources, downloads and models. This is not a tested environment
    lock or evidence of clean installation of every optional route.
 8. Input/output/limitation/script cross-check: static checks completed for all
-   20; selected synthetic execution covers 15. The two source findings are
-   corrected and re-tested, but all three changed Skills require independent
-   re-audit before their Marketplace-ready state can be restored. One checked
-   Windows R route retains a documented platform-specific failure alongside a
-   passing WSL route. Full functional verification remains incomplete.
+   20; selected provider-preflight execution covers 15. The three changed Skills
+   were independently re-audited against the exact submitted bytes and remain
+   Production Ready and deployable. One checked Windows R route retains a
+   documented platform-specific failure alongside a passing WSL route. Full
+   functional verification of every optional route remains incomplete.
 
 ## Local syntax checks
 
@@ -116,17 +119,31 @@ The three prior findings were handled as follows:
   cyvcf2 0.31.4 fixture produced three transitions, one transversion and mean
   QUAL 10.0 from values 0, 20 and missing.
 
+The exact-source independent re-audits produced these release results:
+
+- `bio-proteomics-data-import`: **95/100, Production Ready, deployable**; 7/7
+  inputs executed and 34/35 assertions passed. One P2 remains: align QFeatures'
+  all-missing-row filtering with the Python route.
+- `bio-single-cell-cell-annotation`: **91/100, Production Ready, deployable**;
+  5/7 inputs completed with clean exits and 33/35 assertions passed. One P1
+  remains for an exit-0 Linux SingleR/Azimuth smoke because the Windows routes
+  produced valid outputs and then exited 2816 during teardown. Two P2s cover the
+  inline CellTypist model contract and runnable scANVI/scmap examples.
+- `bio-vcf-statistics`: **91/100, Production Ready, deployable**; 7/7 inputs
+  executed and 26/28 assertions passed. Two P2s cover PASS-versus-dot labeling
+  and Ti/Tv component reporting when the denominator is zero.
+
 The variant-filtering shell example's SNV/indel-only boundary is also recorded:
 it warns that MNP/mixed records are dropped. Its scoped synthetic test passed.
 
 The corrected Skill files are committed and all 20 release manifests, official
-intake records and provider evidence are refreshed against the new source pin.
-Five Skills still have no new functional execution in this pass; that remaining
-coverage gap is explicit and does not imply those Skills are broken. Repository
-provenance now marks `bio-proteomics-data-import`,
-`bio-single-cell-cell-annotation`, and `bio-vcf-statistics` as
-`reaudit: needed` and `marketplace_ready: false`; the pilot is not ready for
-Marketplace submission until an independent re-audit clears those states.
+intake records and provider evidence are refreshed against the pinned source.
+Five Skills still have no new functional execution in the provider preflight;
+that coverage gap is explicit and does not imply those Skills are broken.
+Repository provenance now marks all three changed Skills as
+`reaudit: not needed` and `marketplace_ready: true`. All 20 packages are ready
+on the provider side for Marketplace maintainer review. They have not been
+approved, enrolled, or published by AIPOCH.
 
 ## Reproduce provider checks
 

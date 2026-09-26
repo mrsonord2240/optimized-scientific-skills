@@ -14,8 +14,8 @@
   },
   "external_audit": {
     "repository": "https://github.com/mrsonord2240/optimizing-agent-science-skills",
-    "commit": "0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5",
-    "classification": "upstream audit evidence; not AIPOCH review evidence"
+    "commit": "34db8d35cbd5521bfce459e7ed2245e353f46a89",
+    "classification": "provider-commissioned external audit evidence; three exact-source re-audits are independent; not AIPOCH Marketplace review evidence"
   },
   "review_scope_definitions": {
     "package_bytes": "Match the release config, intake hashes, file count, total bytes, and license-evidence hashes to the exact submitted commit.",
@@ -26,9 +26,9 @@
   "pilot_wide_notes": [
     "No pilot Skill declares Stata as a runtime.",
     "No pilot Skill requires a container image; containers are therefore explicitly empty in every record.",
-    "Upstream audit scores below come from PROVENANCE.json and the pinned external audit repository. AIPOCH scores remain null until independent review.",
-    "The two provider source findings are corrected and re-tested, and the Windows QFeatures limitation has a passing WSL route. Because three Skill packages changed after their recorded upstream audits, PROVENANCE marks them re-audit needed and marketplace_ready false; AIPOCH review remains pending.",
-    "Pinned upstream reports refer to mrsonord2240/bioSkills commits. Their byte equivalence to the submitted optimized-scientific-skills packages is unverified. Sixteen reports explicitly record auditor_independent=false; four leave independence unspecified."
+    "External audit scores below come from PROVENANCE.json and the pinned external audit repository. AIPOCH scores remain null until Marketplace maintainer review.",
+    "The three packages changed during pilot preparation were independently re-audited against the exact submitted repository, commit, and path; all three remain Production Ready and deployable.",
+    "Of the 20 latest external reports, three exact-source re-audits record auditor_independent=true, thirteen older reports record false, and four leave independence unspecified."
   ],
   "skills": [
     {
@@ -52,12 +52,12 @@
         "evidence": {
           "report_path": "audits/skills/bio-alignment-filtering/mrsonord2240-bioSkills@6c71f04/report.json",
           "report_sha256": "ab8d4c2ce5ebdc9e260e5fe521e5524bb67e812197eca259682073c767d1239e",
-          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-alignment-filtering/mrsonord2240-bioSkills@6c71f04/report.json",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-alignment-filtering/mrsonord2240-bioSkills@6c71f04/report.json",
           "record_path": "audits/skills/bio-alignment-filtering/mrsonord2240-bioSkills@6c71f04/record.json",
           "record_sha256": "95d2a96c813ab8d79ee751211f92900d02a34b065404c242d947c01c345b00d7",
-          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-alignment-filtering/mrsonord2240-bioSkills@6c71f04/record.json",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-alignment-filtering/mrsonord2240-bioSkills@6c71f04/record.json",
           "fix_log_sha256": "f8cad3b76fa4e34a9a2e84cbdb8dc9031c5fd6d8cc80b4deb9e348a1447c6718",
-          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-alignment-filtering.md",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/fixes/bio-alignment-filtering.md",
           "audited_source": {
             "repository": "mrsonord2240/bioSkills",
             "commit": "6c71f04151377fe0d412ece85d9dc52cdccdf747",
@@ -73,11 +73,11 @@
             "url": "https://github.com/mrsonord2240/bioSkills/tree/6c71f04151377fe0d412ece85d9dc52cdccdf747/alignment-files/alignment-filtering"
           },
           "auditor_independent": false,
-          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+          "submitted_byte_equivalence": "unverified_different_repository_or_commit_or_path"
         }
       },
       "aipoch_review": {
-        "status": "pending_independent_review",
+        "status": "pending_marketplace_maintainer_review",
         "reviewed_by": null,
         "reviewed_on": null,
         "score": null,
@@ -230,12 +230,12 @@
         "evidence": {
           "report_path": "audits/skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@f3a7a62/report.json",
           "report_sha256": "b39c7c86bd83831a96fbad74cd6ad74693f466b4e10777b07b97c6e1bffb11ab",
-          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@f3a7a62/report.json",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@f3a7a62/report.json",
           "record_path": "audits/skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@f3a7a62/record.json",
           "record_sha256": "7c5a514425c25bb4a3c7df867f5a5575d0db1c262ac461d3efca7cd25bfd3df2",
-          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@f3a7a62/record.json",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@f3a7a62/record.json",
           "fix_log_sha256": "ea8b5c6eb7f156d1ed78b8ab07a0881288673fc4689f9b777984dd31283c179f",
-          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-alignment-msa-statistics.md",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/fixes/bio-alignment-msa-statistics.md",
           "audited_source": {
             "repository": "mrsonord2240/bioSkills",
             "commit": "f3a7a62091e42f6e98653b5b626de94c6f7bfff7",
@@ -251,11 +251,11 @@
             "url": "https://github.com/mrsonord2240/bioSkills/tree/f3a7a62091e42f6e98653b5b626de94c6f7bfff7/alignment/msa-statistics"
           },
           "auditor_independent": false,
-          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+          "submitted_byte_equivalence": "unverified_different_repository_or_commit_or_path"
         }
       },
       "aipoch_review": {
-        "status": "pending_independent_review",
+        "status": "pending_marketplace_maintainer_review",
         "reviewed_by": null,
         "reviewed_on": null,
         "score": null,
@@ -399,12 +399,12 @@
         "evidence": {
           "report_path": "audits/skills/bio-alignment-pairwise/mrsonord2240-bioSkills@d45a647/report.json",
           "report_sha256": "4982d03befb1df019e91262922269ba1455ef6341e90d8d9d4c055059ddd0664",
-          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-alignment-pairwise/mrsonord2240-bioSkills@d45a647/report.json",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-alignment-pairwise/mrsonord2240-bioSkills@d45a647/report.json",
           "record_path": "audits/skills/bio-alignment-pairwise/mrsonord2240-bioSkills@d45a647/record.json",
           "record_sha256": "559c4294cf259085ca3bd172275bd8402caadfc3f2f4dba9d9c8037c0423c00f",
-          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-alignment-pairwise/mrsonord2240-bioSkills@d45a647/record.json",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-alignment-pairwise/mrsonord2240-bioSkills@d45a647/record.json",
           "fix_log_sha256": "00eb5d3a8658788d05593f5a0bac98c85349dcd5f89c97febc37142123df7025",
-          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-alignment-pairwise.md",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/fixes/bio-alignment-pairwise.md",
           "audited_source": {
             "repository": "mrsonord2240/bioSkills",
             "commit": "d45a6478bc0f0450f101b6c394415998d7151899",
@@ -420,11 +420,11 @@
             "url": "https://github.com/mrsonord2240/bioSkills/tree/d45a6478bc0f0450f101b6c394415998d7151899/alignment/pairwise-alignment"
           },
           "auditor_independent": false,
-          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+          "submitted_byte_equivalence": "unverified_different_repository_or_commit_or_path"
         }
       },
       "aipoch_review": {
-        "status": "pending_independent_review",
+        "status": "pending_marketplace_maintainer_review",
         "reviewed_by": null,
         "reviewed_on": null,
         "score": null,
@@ -563,12 +563,12 @@
         "evidence": {
           "report_path": "audits/skills/bio-alignment-trimming/mrsonord2240-bioSkills@c5bda09/report.json",
           "report_sha256": "ee20533b6a2dc436c9290e6a7a985504f5a547d898f42cee3bbb3af19a553013",
-          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-alignment-trimming/mrsonord2240-bioSkills@c5bda09/report.json",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-alignment-trimming/mrsonord2240-bioSkills@c5bda09/report.json",
           "record_path": "audits/skills/bio-alignment-trimming/mrsonord2240-bioSkills@c5bda09/record.json",
           "record_sha256": "16a960ff9405fe8f47d1cceb60f70943d0b42727356aa80b749d17738d87959e",
-          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-alignment-trimming/mrsonord2240-bioSkills@c5bda09/record.json",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-alignment-trimming/mrsonord2240-bioSkills@c5bda09/record.json",
           "fix_log_sha256": "6fb4c1350d55f284a08a4012d433691132785a1bc545255318c521dc7ebac34e",
-          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-alignment-trimming.md",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/fixes/bio-alignment-trimming.md",
           "audited_source": {
             "repository": "mrsonord2240/bioSkills",
             "commit": "c5bda09627a2d9f0bfc2222bfcef06249772f0a2",
@@ -584,11 +584,11 @@
             "url": "https://github.com/mrsonord2240/bioSkills/tree/c5bda09627a2d9f0bfc2222bfcef06249772f0a2/alignment/alignment-trimming"
           },
           "auditor_independent": null,
-          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+          "submitted_byte_equivalence": "unverified_different_repository_or_commit_or_path"
         }
       },
       "aipoch_review": {
-        "status": "pending_independent_review",
+        "status": "pending_marketplace_maintainer_review",
         "reviewed_by": null,
         "reviewed_on": null,
         "score": null,
@@ -704,12 +704,12 @@
         "evidence": {
           "report_path": "audits/skills/bio-alignment-validation/mrsonord2240-bioSkills@173fd90/report.json",
           "report_sha256": "dd0262491e34d29511ddbb4cca784891313bf52cb17ccf4824a5faa65bf95d0a",
-          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-alignment-validation/mrsonord2240-bioSkills@173fd90/report.json",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-alignment-validation/mrsonord2240-bioSkills@173fd90/report.json",
           "record_path": "audits/skills/bio-alignment-validation/mrsonord2240-bioSkills@173fd90/record.json",
           "record_sha256": "a91d39b11b59385187fd6b8bab9655e85f6b81b00278a658a4b414bf951663c6",
-          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-alignment-validation/mrsonord2240-bioSkills@173fd90/record.json",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-alignment-validation/mrsonord2240-bioSkills@173fd90/record.json",
           "fix_log_sha256": "142b7f7e7aec06d9d7b38f8cda1c36d37f8d7ba1bc7c772a126b6b3ab85a47ec",
-          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-alignment-validation.md",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/fixes/bio-alignment-validation.md",
           "audited_source": {
             "repository": "mrsonord2240/bioSkills",
             "commit": "173fd9097151633f9d7658826e094440f902e495",
@@ -725,11 +725,11 @@
             "url": "https://github.com/mrsonord2240/bioSkills/tree/173fd9097151633f9d7658826e094440f902e495/alignment-files/alignment-validation"
           },
           "auditor_independent": false,
-          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+          "submitted_byte_equivalence": "unverified_different_repository_or_commit_or_path"
         }
       },
       "aipoch_review": {
-        "status": "pending_independent_review",
+        "status": "pending_marketplace_maintainer_review",
         "reviewed_by": null,
         "reviewed_on": null,
         "score": null,
@@ -858,22 +858,22 @@
       },
       "upstream_audit": {
         "score": 95,
-        "audited_on": "2026-09-24",
+        "audited_on": "2026-09-25",
         "audit_path": "audits/skills/bio-proteomics-data-import",
         "fix_log": "fixes/bio-proteomics-data-import.md",
         "evidence": {
-          "report_path": "audits/skills/bio-proteomics-data-import/mrsonord2240-bioSkills@622dadd/report.json",
-          "report_sha256": "f19d2e213d60dc4117fc3e082f121013f0de98994e2d9ca4cd92229c208aa4e2",
-          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-proteomics-data-import/mrsonord2240-bioSkills@622dadd/report.json",
-          "record_path": "audits/skills/bio-proteomics-data-import/mrsonord2240-bioSkills@622dadd/record.json",
-          "record_sha256": "ff9c769adb18146f76b1471517833d39fd266c5b7127817d0ce71f7e5a570824",
-          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-proteomics-data-import/mrsonord2240-bioSkills@622dadd/record.json",
-          "fix_log_sha256": "6feb2bd386928dd321ae2fcddcfd737fca373243ca3cdbda55c03b8b22879e39",
-          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-proteomics-data-import.md",
+          "report_path": "audits/skills/bio-proteomics-data-import/mrsonord2240-optimized-scientific-skills@2dee47f/report.json",
+          "report_sha256": "57dbc38fb5c4ee4572094d1453a8fdfbff68d0955d23ae68d17885cc73da1647",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-proteomics-data-import/mrsonord2240-optimized-scientific-skills@2dee47f/report.json",
+          "record_path": "audits/skills/bio-proteomics-data-import/mrsonord2240-optimized-scientific-skills@2dee47f/record.json",
+          "record_sha256": "7edb1cd27a080edabd509b0ff0bcea3166d7ea22364b9c3af8ca6f639e12cd49",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-proteomics-data-import/mrsonord2240-optimized-scientific-skills@2dee47f/record.json",
+          "fix_log_sha256": "305c8f316115b1202c1101fbf878dcaa47a99a58d994bccd1f2d5224fdef6fbf",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/fixes/bio-proteomics-data-import.md",
           "audited_source": {
-            "repository": "mrsonord2240/bioSkills",
-            "commit": "622daddbf14af58b9a83bdae2d586133ba35b2a6",
-            "path": "proteomics/data-import",
+            "repository": "mrsonord2240/optimized-scientific-skills",
+            "commit": "2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db",
+            "path": "skills/bio-proteomics-data-import",
             "author": "GPTomics",
             "author_url": "https://github.com/GPTomics",
             "license": "MIT",
@@ -882,14 +882,14 @@
               "repository": "GPTomics/bioSkills",
               "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
             },
-            "url": "https://github.com/mrsonord2240/bioSkills/tree/622daddbf14af58b9a83bdae2d586133ba35b2a6/proteomics/data-import"
+            "url": "https://github.com/mrsonord2240/optimized-scientific-skills/tree/2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db/skills/bio-proteomics-data-import"
           },
-          "auditor_independent": false,
-          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+          "auditor_independent": true,
+          "submitted_byte_equivalence": "verified_exact_repository_commit_and_path"
         }
       },
       "aipoch_review": {
-        "status": "pending_independent_review",
+        "status": "pending_marketplace_maintainer_review",
         "reviewed_by": null,
         "reviewed_on": null,
         "score": null,
@@ -902,8 +902,8 @@
         "unresolved_limitations": [
           "Vendor RAW conversion, statistical testing, batch correction, and imputation are outside this Skill.",
           "Quantification column semantics and decoy/contaminant conventions remain search-engine specific.",
-          "Windows R 4.6.1 can exit with 0xC0000005 in cli.dll teardown after correct output in the checked environment; WSL R 4.5.2 with QFeatures 1.20.0 completed cleanly.",
-          "The submitted SKILL.md changed after its recorded upstream audit; independent re-audit is required before Marketplace-ready status can be restored."
+          "Windows R 4.6.1 can exit with 0xC0000005 in cli.dll teardown after correct output in the checked environment; the exact bundled route completed with exit 0 in WSL R.",
+          "Open P2 from the independent re-audit: the QFeatures route retains 55 all-missing protein groups that the Python route removes."
         ]
       },
       "runtime_dependencies": {
@@ -993,7 +993,7 @@
           "runtime_dependencies",
           "semantic_contract"
         ],
-        "static_review_status": "source_findings_resolved_independent_reaudit_required",
+        "static_review_status": "source_findings_resolved_independent_reaudit_passed",
         "runtime_status": "selected_smoke_checks_passed_with_windows_runtime_limitation",
         "runtime_checks": [
           {
@@ -1095,12 +1095,12 @@
         "evidence": {
           "report_path": "audits/skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@0f447a7/report.json",
           "report_sha256": "69024897bab6567834136de4bffd788413422d58e90a7a29007412355a7a3a3e",
-          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@0f447a7/report.json",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@0f447a7/report.json",
           "record_path": "audits/skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@0f447a7/record.json",
           "record_sha256": "afd8707fda14443f85c87d18d953d6830379aa4c5d43add55b09f9d3c68ac5c7",
-          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@0f447a7/record.json",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@0f447a7/record.json",
           "fix_log_sha256": "e7c5f1540c65162915ad711f6d1d4386f3083083dc4a912372f27504bfa7d983",
-          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-proteomics-peptide-identification.md",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/fixes/bio-proteomics-peptide-identification.md",
           "audited_source": {
             "repository": "mrsonord2240/bioSkills",
             "commit": "0f447a7a628052aac81acecb85c3d52d442a974a",
@@ -1116,11 +1116,11 @@
             "url": "https://github.com/mrsonord2240/bioSkills/tree/0f447a7a628052aac81acecb85c3d52d442a974a/proteomics/peptide-identification"
           },
           "auditor_independent": false,
-          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+          "submitted_byte_equivalence": "unverified_different_repository_or_commit_or_path"
         }
       },
       "aipoch_review": {
-        "status": "pending_independent_review",
+        "status": "pending_marketplace_maintainer_review",
         "reviewed_by": null,
         "reviewed_on": null,
         "score": null,
@@ -1267,12 +1267,12 @@
         "evidence": {
           "report_path": "audits/skills/bio-proteomics-protein-inference/mrsonord2240-bioSkills@2e41419/report.json",
           "report_sha256": "a930f82858436d3576983ce79dd99423eb3edcf25802ff0a788f0e691cd2bcb2",
-          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-proteomics-protein-inference/mrsonord2240-bioSkills@2e41419/report.json",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-proteomics-protein-inference/mrsonord2240-bioSkills@2e41419/report.json",
           "record_path": "audits/skills/bio-proteomics-protein-inference/mrsonord2240-bioSkills@2e41419/record.json",
           "record_sha256": "95fc31e953d604900c28d111ff0634c9a79d207c0ce253a08561e06450bba17e",
-          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-proteomics-protein-inference/mrsonord2240-bioSkills@2e41419/record.json",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-proteomics-protein-inference/mrsonord2240-bioSkills@2e41419/record.json",
           "fix_log_sha256": "754d54d501097bb887d930f8c1cf04fcdccc4767175d0abd06c8372305519e35",
-          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-proteomics-protein-inference.md",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/fixes/bio-proteomics-protein-inference.md",
           "audited_source": {
             "repository": "mrsonord2240/bioSkills",
             "commit": "2e41419be0f5d52378d18ce545c162a611006a93",
@@ -1288,11 +1288,11 @@
             "url": "https://github.com/mrsonord2240/bioSkills/tree/2e41419be0f5d52378d18ce545c162a611006a93/proteomics/protein-inference"
           },
           "auditor_independent": false,
-          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+          "submitted_byte_equivalence": "unverified_different_repository_or_commit_or_path"
         }
       },
       "aipoch_review": {
-        "status": "pending_independent_review",
+        "status": "pending_marketplace_maintainer_review",
         "reviewed_by": null,
         "reviewed_on": null,
         "score": null,
@@ -1437,12 +1437,12 @@
         "evidence": {
           "report_path": "audits/skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@09467a9/report.json",
           "report_sha256": "9c52c3841ef801b279118e522047d52aafa34ce390e6e4891e7e55b893544eb1",
-          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@09467a9/report.json",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@09467a9/report.json",
           "record_path": "audits/skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@09467a9/record.json",
           "record_sha256": "e898d658d0c0012b574c9a3be121cdf1bf1bcdb239d108d986c6bbf6353396f5",
-          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@09467a9/record.json",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@09467a9/record.json",
           "fix_log_sha256": "ae6f98e7962c1bd03cb95f2d65972eb847997c04b76f6b678fc2c1e7027acced",
-          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-proteomics-spectral-libraries.md",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/fixes/bio-proteomics-spectral-libraries.md",
           "audited_source": {
             "repository": "mrsonord2240/bioSkills",
             "commit": "09467a99deaa8ac30799074803a8b87af6d60858",
@@ -1458,11 +1458,11 @@
             "url": "https://github.com/mrsonord2240/bioSkills/tree/09467a99deaa8ac30799074803a8b87af6d60858/proteomics/spectral-libraries"
           },
           "auditor_independent": false,
-          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+          "submitted_byte_equivalence": "unverified_different_repository_or_commit_or_path"
         }
       },
       "aipoch_review": {
-        "status": "pending_independent_review",
+        "status": "pending_marketplace_maintainer_review",
         "reviewed_by": null,
         "reviewed_on": null,
         "score": null,
@@ -1616,12 +1616,12 @@
         "evidence": {
           "report_path": "audits/skills/bio-proteomics-quantification/mrsonord2240-bioSkills@fb1efc1/report.json",
           "report_sha256": "91583e31d78e99ea738240a465457895cee0781b8af1074d434e8d63f4296c23",
-          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-proteomics-quantification/mrsonord2240-bioSkills@fb1efc1/report.json",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-proteomics-quantification/mrsonord2240-bioSkills@fb1efc1/report.json",
           "record_path": "audits/skills/bio-proteomics-quantification/mrsonord2240-bioSkills@fb1efc1/record.json",
           "record_sha256": "7d5122efb40e452fb022929024f2ca4a4cb803c0b2d9c824ae7fdd439d959e8e",
-          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-proteomics-quantification/mrsonord2240-bioSkills@fb1efc1/record.json",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-proteomics-quantification/mrsonord2240-bioSkills@fb1efc1/record.json",
           "fix_log_sha256": "ce67505e00a6250d112b436fdaccde22ec718b2f43ffd74f17bdb43e485dbd4a",
-          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-proteomics-quantification.md",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/fixes/bio-proteomics-quantification.md",
           "audited_source": {
             "repository": "mrsonord2240/bioSkills",
             "commit": "fb1efc10a979717f1fc66a48a6a8b12e95aa6401",
@@ -1637,11 +1637,11 @@
             "url": "https://github.com/mrsonord2240/bioSkills/tree/fb1efc10a979717f1fc66a48a6a8b12e95aa6401/proteomics/quantification"
           },
           "auditor_independent": false,
-          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+          "submitted_byte_equivalence": "unverified_different_repository_or_commit_or_path"
         }
       },
       "aipoch_review": {
-        "status": "pending_independent_review",
+        "status": "pending_marketplace_maintainer_review",
         "reviewed_by": null,
         "reviewed_on": null,
         "score": null,
@@ -1806,12 +1806,12 @@
         "evidence": {
           "report_path": "audits/skills/bio-single-cell-batch-integration/mrsonord2240-bioSkills@8edc49c/report.json",
           "report_sha256": "85bfa6b30a2b235809c0a6a1bd0e111494dbe36b5ec85cf2a361ef3f528f8d8a",
-          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-single-cell-batch-integration/mrsonord2240-bioSkills@8edc49c/report.json",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-single-cell-batch-integration/mrsonord2240-bioSkills@8edc49c/report.json",
           "record_path": "audits/skills/bio-single-cell-batch-integration/mrsonord2240-bioSkills@8edc49c/record.json",
           "record_sha256": "dda79c26396b94f2549c63799f3b612e13d17ef3741a57dc5b2618c10db35c6b",
-          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-single-cell-batch-integration/mrsonord2240-bioSkills@8edc49c/record.json",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-single-cell-batch-integration/mrsonord2240-bioSkills@8edc49c/record.json",
           "fix_log_sha256": "8605f788ab390ae5d8b3078fa4cbf24daca85a48652b0ecf81937bc28f915cfd",
-          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-single-cell-batch-integration.md",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/fixes/bio-single-cell-batch-integration.md",
           "audited_source": {
             "repository": "mrsonord2240/bioSkills",
             "commit": "8edc49ca40e7eab8a24c1d9555a176ae894e16ac",
@@ -1827,11 +1827,11 @@
             "url": "https://github.com/mrsonord2240/bioSkills/tree/8edc49ca40e7eab8a24c1d9555a176ae894e16ac/single-cell/batch-integration"
           },
           "auditor_independent": null,
-          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+          "submitted_byte_equivalence": "unverified_different_repository_or_commit_or_path"
         }
       },
       "aipoch_review": {
-        "status": "pending_independent_review",
+        "status": "pending_marketplace_maintainer_review",
         "reviewed_by": null,
         "reviewed_on": null,
         "score": null,
@@ -1963,12 +1963,12 @@
         "evidence": {
           "report_path": "audits/skills/bio-single-cell-clustering/mrsonord2240-bioSkills@a409b09/report.json",
           "report_sha256": "59320abbc39b696c7e8ddc9a911dc7af7462c7d0e646480d6e4d941c89fad767",
-          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-single-cell-clustering/mrsonord2240-bioSkills@a409b09/report.json",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-single-cell-clustering/mrsonord2240-bioSkills@a409b09/report.json",
           "record_path": "audits/skills/bio-single-cell-clustering/mrsonord2240-bioSkills@a409b09/record.json",
           "record_sha256": "d90dfc9ddb411fd7fea710453c10618fbcf097a114f46dc9a39c5450f55f77db",
-          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-single-cell-clustering/mrsonord2240-bioSkills@a409b09/record.json",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-single-cell-clustering/mrsonord2240-bioSkills@a409b09/record.json",
           "fix_log_sha256": "8281fc797065d8dd0ea8405948726f61c97ea5a89cc5a507658404dc3531635d",
-          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-single-cell-clustering.md",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/fixes/bio-single-cell-clustering.md",
           "audited_source": {
             "repository": "mrsonord2240/bioSkills",
             "commit": "a409b098b3602b13d7c40610f1c6bc09057258ac",
@@ -1984,11 +1984,11 @@
             "url": "https://github.com/mrsonord2240/bioSkills/tree/a409b098b3602b13d7c40610f1c6bc09057258ac/single-cell/clustering"
           },
           "auditor_independent": null,
-          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+          "submitted_byte_equivalence": "unverified_different_repository_or_commit_or_path"
         }
       },
       "aipoch_review": {
-        "status": "pending_independent_review",
+        "status": "pending_marketplace_maintainer_review",
         "reviewed_by": null,
         "reviewed_on": null,
         "score": null,
@@ -2135,12 +2135,12 @@
         "evidence": {
           "report_path": "audits/skills/bio-single-cell-preprocessing/mrsonord2240-bioSkills@9918c63/report.json",
           "report_sha256": "72700c36c3e8d3b7c117af018575fd189b2d68e27c4aeb03f4260f4ca4a267bc",
-          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-single-cell-preprocessing/mrsonord2240-bioSkills@9918c63/report.json",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-single-cell-preprocessing/mrsonord2240-bioSkills@9918c63/report.json",
           "record_path": "audits/skills/bio-single-cell-preprocessing/mrsonord2240-bioSkills@9918c63/record.json",
           "record_sha256": "1830ed9101e3a30352bd493f3c0b83c536e6b7591c6962db88057814e7d20f13",
-          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-single-cell-preprocessing/mrsonord2240-bioSkills@9918c63/record.json",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-single-cell-preprocessing/mrsonord2240-bioSkills@9918c63/record.json",
           "fix_log_sha256": "fda29f49ba28b7c5cfd6db9e9e167c16594958de58d6e9c7d3e5bd5908f84c97",
-          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-single-cell-preprocessing.md",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/fixes/bio-single-cell-preprocessing.md",
           "audited_source": {
             "repository": "mrsonord2240/bioSkills",
             "commit": "9918c631d94f81dd418cf71d5c40be59f4850677",
@@ -2156,11 +2156,11 @@
             "url": "https://github.com/mrsonord2240/bioSkills/tree/9918c631d94f81dd418cf71d5c40be59f4850677/single-cell/preprocessing"
           },
           "auditor_independent": false,
-          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+          "submitted_byte_equivalence": "unverified_different_repository_or_commit_or_path"
         }
       },
       "aipoch_review": {
-        "status": "pending_independent_review",
+        "status": "pending_marketplace_maintainer_review",
         "reviewed_by": null,
         "reviewed_on": null,
         "score": null,
@@ -2310,12 +2310,12 @@
         "evidence": {
           "report_path": "audits/skills/bio-single-cell-scatac-analysis/mrsonord2240-bioSkills@e14c7b5/report.json",
           "report_sha256": "4eea079183bfaf542fc50c95cf5fa5cc00c944dc6b2fbb3747ec8fd2920e4b0b",
-          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-single-cell-scatac-analysis/mrsonord2240-bioSkills@e14c7b5/report.json",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-single-cell-scatac-analysis/mrsonord2240-bioSkills@e14c7b5/report.json",
           "record_path": "audits/skills/bio-single-cell-scatac-analysis/mrsonord2240-bioSkills@e14c7b5/record.json",
           "record_sha256": "c9119ef4ac92e88e0f136394c117527ee4e51ad8b6f01910fc8b6f0ab0184a8e",
-          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-single-cell-scatac-analysis/mrsonord2240-bioSkills@e14c7b5/record.json",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-single-cell-scatac-analysis/mrsonord2240-bioSkills@e14c7b5/record.json",
           "fix_log_sha256": "49d908898d09c08ae4ca8210c5b28895e118d632112172e75bdb4dba86946aed",
-          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-single-cell-scatac-analysis.md",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/fixes/bio-single-cell-scatac-analysis.md",
           "audited_source": {
             "repository": "mrsonord2240/bioSkills",
             "commit": "e14c7b581acaa271a9bf643febcb5ff0dd40d966",
@@ -2331,11 +2331,11 @@
             "url": "https://github.com/mrsonord2240/bioSkills/tree/e14c7b581acaa271a9bf643febcb5ff0dd40d966/single-cell/scatac-analysis"
           },
           "auditor_independent": false,
-          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+          "submitted_byte_equivalence": "unverified_different_repository_or_commit_or_path"
         }
       },
       "aipoch_review": {
-        "status": "pending_independent_review",
+        "status": "pending_marketplace_maintainer_review",
         "reviewed_by": null,
         "reviewed_on": null,
         "score": null,
@@ -2462,23 +2462,23 @@
         "modified_by": "mrsonord2240"
       },
       "upstream_audit": {
-        "score": 94,
-        "audited_on": "2026-09-24",
+        "score": 91,
+        "audited_on": "2026-09-25",
         "audit_path": "audits/skills/bio-single-cell-cell-annotation",
         "fix_log": "fixes/bio-single-cell-cell-annotation.md",
         "evidence": {
-          "report_path": "audits/skills/bio-single-cell-cell-annotation/mrsonord2240-bioSkills@b7fc90e/report.json",
-          "report_sha256": "44f052ded6bc4d59da4283be1a218074ff194b5e23c22eec3c58d7c0b8a93e19",
-          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-single-cell-cell-annotation/mrsonord2240-bioSkills@b7fc90e/report.json",
-          "record_path": "audits/skills/bio-single-cell-cell-annotation/mrsonord2240-bioSkills@b7fc90e/record.json",
-          "record_sha256": "f856a78617a4ccc2840d64ddd3bef4ff0718374a2bb1576567c15048e59eb88b",
-          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-single-cell-cell-annotation/mrsonord2240-bioSkills@b7fc90e/record.json",
-          "fix_log_sha256": "6dfa331cf65a43f591f876038ce9db2780f3d9271aa9b20453cc21d9e802e3bc",
-          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-single-cell-cell-annotation.md",
+          "report_path": "audits/skills/bio-single-cell-cell-annotation/mrsonord2240-optimized-scientific-skills@2dee47f/report.json",
+          "report_sha256": "b7d864600ad7bdbe4258eb8e3a4d143a0c664610e6c1078a59842c3526b5b6e8",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-single-cell-cell-annotation/mrsonord2240-optimized-scientific-skills@2dee47f/report.json",
+          "record_path": "audits/skills/bio-single-cell-cell-annotation/mrsonord2240-optimized-scientific-skills@2dee47f/record.json",
+          "record_sha256": "93c2af81bca3993c0eac63dd0719ced3f8b8c828fd66b9ebec72a31aa6825760",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-single-cell-cell-annotation/mrsonord2240-optimized-scientific-skills@2dee47f/record.json",
+          "fix_log_sha256": "8f132b81fdefe9b8e1b08722653377000ab562a8e7e0fa6442b6082c6f5d5a44",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/fixes/bio-single-cell-cell-annotation.md",
           "audited_source": {
-            "repository": "mrsonord2240/bioSkills",
-            "commit": "b7fc90e69bdf4839b958a13b37581945ba694413",
-            "path": "single-cell/cell-annotation",
+            "repository": "mrsonord2240/optimized-scientific-skills",
+            "commit": "2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db",
+            "path": "skills/bio-single-cell-cell-annotation",
             "author": "GPTomics",
             "author_url": "https://github.com/GPTomics",
             "license": "MIT",
@@ -2487,14 +2487,14 @@
               "repository": "GPTomics/bioSkills",
               "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
             },
-            "url": "https://github.com/mrsonord2240/bioSkills/tree/b7fc90e69bdf4839b958a13b37581945ba694413/single-cell/cell-annotation"
+            "url": "https://github.com/mrsonord2240/optimized-scientific-skills/tree/2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db/skills/bio-single-cell-cell-annotation"
           },
-          "auditor_independent": null,
-          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+          "auditor_independent": true,
+          "submitted_byte_equivalence": "verified_exact_repository_commit_and_path"
         }
       },
       "aipoch_review": {
-        "status": "pending_independent_review",
+        "status": "pending_marketplace_maintainer_review",
         "reviewed_by": null,
         "reviewed_on": null,
         "score": null,
@@ -2507,7 +2507,8 @@
         "unresolved_limitations": [
           "Reference-based labels inherit reference taxonomy and domain shift; unexpected cells are not automatically novel types.",
           "Confidence thresholds are model- and dataset-specific and require rejection calibration.",
-          "The submitted CellTypist example changed after its recorded upstream audit; independent re-audit is required before Marketplace-ready status can be restored."
+          "Open P1 from the independent re-audit: establish an exit-0 Linux smoke for SingleR and Azimuth; both Windows routes produced scientifically valid outputs and then exited 2816 during teardown.",
+          "Open P2s: align the inline CellTypist block with the executable offline-model contract, and add runnable scANVI and scmap examples."
         ]
       },
       "runtime_dependencies": {
@@ -2612,7 +2613,7 @@
           "runtime_dependencies",
           "semantic_contract"
         ],
-        "static_review_status": "source_findings_resolved_independent_reaudit_required",
+        "static_review_status": "source_findings_resolved_independent_reaudit_passed",
         "runtime_status": "selected_smoke_checks_passed",
         "runtime_checks": [
           {
@@ -2680,12 +2681,12 @@
         "evidence": {
           "report_path": "audits/skills/bio-variant-annotation/mrsonord2240-bioSkills@6122d46/report.json",
           "report_sha256": "33020faf84eaa65f202c1ee557e760a420d8eb6da846620017334c27e9f7c4f4",
-          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-variant-annotation/mrsonord2240-bioSkills@6122d46/report.json",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-variant-annotation/mrsonord2240-bioSkills@6122d46/report.json",
           "record_path": "audits/skills/bio-variant-annotation/mrsonord2240-bioSkills@6122d46/record.json",
           "record_sha256": "3f8a44349377179cf3e1e5e8402318d89de29a7103cde31577ff089fdf833722",
-          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-variant-annotation/mrsonord2240-bioSkills@6122d46/record.json",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-variant-annotation/mrsonord2240-bioSkills@6122d46/record.json",
           "fix_log_sha256": "2a582e15f0139260ffad2383267e43f1b604d8c2e27c762b8ae2882986726336",
-          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-variant-annotation.md",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/fixes/bio-variant-annotation.md",
           "audited_source": {
             "repository": "mrsonord2240/bioSkills",
             "commit": "6122d469f440f6030b278a155d8e4e78c8788dbf",
@@ -2701,11 +2702,11 @@
             "url": "https://github.com/mrsonord2240/bioSkills/tree/6122d469f440f6030b278a155d8e4e78c8788dbf/variant-calling/variant-annotation"
           },
           "auditor_independent": false,
-          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+          "submitted_byte_equivalence": "unverified_different_repository_or_commit_or_path"
         }
       },
       "aipoch_review": {
-        "status": "pending_independent_review",
+        "status": "pending_marketplace_maintainer_review",
         "reviewed_by": null,
         "reviewed_on": null,
         "score": null,
@@ -2826,12 +2827,12 @@
         "evidence": {
           "report_path": "audits/skills/bio-variant-normalization/mrsonord2240-bioSkills@3565810/report.json",
           "report_sha256": "33bec6ea8014a117fa8992748fbb560d750b23d6998d7f2a5f78bc378db440e7",
-          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-variant-normalization/mrsonord2240-bioSkills@3565810/report.json",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-variant-normalization/mrsonord2240-bioSkills@3565810/report.json",
           "record_path": "audits/skills/bio-variant-normalization/mrsonord2240-bioSkills@3565810/record.json",
           "record_sha256": "fb16a2858db903a2b3faf3ea4653d71a65d8b4b627a419380388d83247e9ee57",
-          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-variant-normalization/mrsonord2240-bioSkills@3565810/record.json",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-variant-normalization/mrsonord2240-bioSkills@3565810/record.json",
           "fix_log_sha256": "a95c19f2ba6386c6c2106e89024da751c7778eee2906f0568542ce7b2adde49e",
-          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-variant-normalization.md",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/fixes/bio-variant-normalization.md",
           "audited_source": {
             "repository": "mrsonord2240/bioSkills",
             "commit": "356581080738dee60b613812b35fd4b99d217527",
@@ -2847,11 +2848,11 @@
             "url": "https://github.com/mrsonord2240/bioSkills/tree/356581080738dee60b613812b35fd4b99d217527/variant-calling/variant-normalization"
           },
           "auditor_independent": false,
-          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+          "submitted_byte_equivalence": "unverified_different_repository_or_commit_or_path"
         }
       },
       "aipoch_review": {
-        "status": "pending_independent_review",
+        "status": "pending_marketplace_maintainer_review",
         "reviewed_by": null,
         "reviewed_on": null,
         "score": null,
@@ -2981,12 +2982,12 @@
         "evidence": {
           "report_path": "audits/skills/bio-vcf-basics/mrsonord2240-bioSkills@7c66584/report.json",
           "report_sha256": "7c841b33ecf9eba3c865696aad8bc003e20e18a971b94442290a2ed58a9222fa",
-          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-vcf-basics/mrsonord2240-bioSkills@7c66584/report.json",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-vcf-basics/mrsonord2240-bioSkills@7c66584/report.json",
           "record_path": "audits/skills/bio-vcf-basics/mrsonord2240-bioSkills@7c66584/record.json",
           "record_sha256": "6f7706bcd9749849678dea0abbe5cc448ac79dcbc4b3fe7e39675b97218e7f97",
-          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-vcf-basics/mrsonord2240-bioSkills@7c66584/record.json",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-vcf-basics/mrsonord2240-bioSkills@7c66584/record.json",
           "fix_log_sha256": "4b866d45e6d8980db34c566b5311fd7d5062aa4f7fdc4616bb6974322b61230d",
-          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-vcf-basics.md",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/fixes/bio-vcf-basics.md",
           "audited_source": {
             "repository": "mrsonord2240/bioSkills",
             "commit": "7c665843f733a0833f21fe95a7c7199376159059",
@@ -3002,11 +3003,11 @@
             "url": "https://github.com/mrsonord2240/bioSkills/tree/7c665843f733a0833f21fe95a7c7199376159059/variant-calling/vcf-basics"
           },
           "auditor_independent": false,
-          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+          "submitted_byte_equivalence": "unverified_different_repository_or_commit_or_path"
         }
       },
       "aipoch_review": {
-        "status": "pending_independent_review",
+        "status": "pending_marketplace_maintainer_review",
         "reviewed_by": null,
         "reviewed_on": null,
         "score": null,
@@ -3105,23 +3106,23 @@
         "modified_by": "mrsonord2240"
       },
       "upstream_audit": {
-        "score": 94,
-        "audited_on": "2026-09-24",
+        "score": 91,
+        "audited_on": "2026-09-25",
         "audit_path": "audits/skills/bio-vcf-statistics",
         "fix_log": "fixes/bio-vcf-statistics.md",
         "evidence": {
-          "report_path": "audits/skills/bio-vcf-statistics/mrsonord2240-bioSkills@c4d5511/report.json",
-          "report_sha256": "68b03f13b3aebb309f44d3a08a62ff054bb78ba57eaf6db9ef38129919ef2a56",
-          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-vcf-statistics/mrsonord2240-bioSkills@c4d5511/report.json",
-          "record_path": "audits/skills/bio-vcf-statistics/mrsonord2240-bioSkills@c4d5511/record.json",
-          "record_sha256": "bbfc12fb7dc0b5d90e7e1c068935f76f42785a243f070a0b9b85da60d831a9a3",
-          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-vcf-statistics/mrsonord2240-bioSkills@c4d5511/record.json",
-          "fix_log_sha256": "6d4809e4f8bdede4da2be5a5f048e8c3103d3ae45f35175233294616ef33f599",
-          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-vcf-statistics.md",
+          "report_path": "audits/skills/bio-vcf-statistics/mrsonord2240-optimized-scientific-skills@2dee47f/report.json",
+          "report_sha256": "ec72e3dbb7547f2b2acbc04ea0353e5b3ca1f2a2a154667a33a824d40cfa81ad",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-vcf-statistics/mrsonord2240-optimized-scientific-skills@2dee47f/report.json",
+          "record_path": "audits/skills/bio-vcf-statistics/mrsonord2240-optimized-scientific-skills@2dee47f/record.json",
+          "record_sha256": "cff6e309f600822f1e24cfab175ac4d4954780482ffe31f7a7ae531bb6e620ab",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-vcf-statistics/mrsonord2240-optimized-scientific-skills@2dee47f/record.json",
+          "fix_log_sha256": "dca499b3e7b73c1f9047f708323cebb219f226a9989e110578aa10b21986325b",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/fixes/bio-vcf-statistics.md",
           "audited_source": {
-            "repository": "mrsonord2240/bioSkills",
-            "commit": "c4d5511fe2830349a9d65609495018ed862ead58",
-            "path": "variant-calling/vcf-statistics",
+            "repository": "mrsonord2240/optimized-scientific-skills",
+            "commit": "2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db",
+            "path": "skills/bio-vcf-statistics",
             "author": "GPTomics",
             "author_url": "https://github.com/GPTomics",
             "license": "MIT",
@@ -3130,14 +3131,14 @@
               "repository": "GPTomics/bioSkills",
               "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
             },
-            "url": "https://github.com/mrsonord2240/bioSkills/tree/c4d5511fe2830349a9d65609495018ed862ead58/variant-calling/vcf-statistics"
+            "url": "https://github.com/mrsonord2240/optimized-scientific-skills/tree/2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db/skills/bio-vcf-statistics"
           },
-          "auditor_independent": false,
-          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+          "auditor_independent": true,
+          "submitted_byte_equivalence": "verified_exact_repository_commit_and_path"
         }
       },
       "aipoch_review": {
-        "status": "pending_independent_review",
+        "status": "pending_marketplace_maintainer_review",
         "reviewed_by": null,
         "reviewed_on": null,
         "score": null,
@@ -3150,7 +3151,7 @@
         "unresolved_limitations": [
           "Expected Ti/Tv, heterozygosity, HWE, and missingness depend on assay, ancestry, filters, genomic context, and disease design.",
           "VCF-level contamination signals are screening indicators; dedicated BAM/CRAM methods are needed for measurement.",
-          "The submitted VCF statistics example changed after its recorded upstream audit; independent re-audit is required before Marketplace-ready status can be restored."
+          "Open P2s from the independent re-audit: distinguish strict PASS from unfiltered dot records, and report Ti/Tv component counts when the transversion denominator is zero."
         ]
       },
       "runtime_dependencies": {
@@ -3253,7 +3254,7 @@
           "runtime_dependencies",
           "semantic_contract"
         ],
-        "static_review_status": "source_findings_resolved_independent_reaudit_required",
+        "static_review_status": "source_findings_resolved_independent_reaudit_passed",
         "runtime_status": "selected_smoke_checks_passed",
         "runtime_checks": [
           {
@@ -3312,12 +3313,12 @@
         "evidence": {
           "report_path": "audits/skills/bio-variant-calling-filtering-best-practices/mrsonord2240-bioSkills@c7f131e/report.json",
           "report_sha256": "bce5b5fc5c210d12849510aac2a6f9b112ef3277f6f4a9c0739123e7161c8dae",
-          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-variant-calling-filtering-best-practices/mrsonord2240-bioSkills@c7f131e/report.json",
+          "report_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-variant-calling-filtering-best-practices/mrsonord2240-bioSkills@c7f131e/report.json",
           "record_path": "audits/skills/bio-variant-calling-filtering-best-practices/mrsonord2240-bioSkills@c7f131e/record.json",
           "record_sha256": "d2253c43e1831af529d37f2d86bd74ae898ea5e9251dd5c4cd962c9b27184769",
-          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/audits/skills/bio-variant-calling-filtering-best-practices/mrsonord2240-bioSkills@c7f131e/record.json",
+          "record_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/audits/skills/bio-variant-calling-filtering-best-practices/mrsonord2240-bioSkills@c7f131e/record.json",
           "fix_log_sha256": "35b247a0be9e666a062028cfefaa2d4595e39a81d6c906f0502259f99f06bd41",
-          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5/fixes/bio-variant-calling-filtering-best-practices.md",
+          "fix_log_url": "https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/34db8d35cbd5521bfce459e7ed2245e353f46a89/fixes/bio-variant-calling-filtering-best-practices.md",
           "audited_source": {
             "repository": "mrsonord2240/bioSkills",
             "commit": "c7f131e61134fb550457f761e76bd07dc0a840a8",
@@ -3333,11 +3334,11 @@
             "url": "https://github.com/mrsonord2240/bioSkills/tree/c7f131e61134fb550457f761e76bd07dc0a840a8/variant-calling/filtering-best-practices"
           },
           "auditor_independent": false,
-          "submitted_byte_equivalence": "unverified_different_repository_and_commit"
+          "submitted_byte_equivalence": "unverified_different_repository_or_commit_or_path"
         }
       },
       "aipoch_review": {
-        "status": "pending_independent_review",
+        "status": "pending_marketplace_maintainer_review",
         "reviewed_by": null,
         "reviewed_on": null,
         "score": null,
@@ -3481,14 +3482,15 @@
       "Selected offline synthetic execution, with per-Skill coverage and failures recorded"
     ],
     "unresolved_limitations": [
-      "This is a scoped provider preflight, not Marketplace maintainer approval or a full independent scientific audit.",
-      "Five Skills have no new functional execution in this pass; passing smoke checks cover only the named workflows.",
-      "The checked Windows R 4.6.1 QFeatures route has a documented cli.dll teardown failure; the WSL route passes with a clean exit.",
-      "bio-proteomics-data-import, bio-single-cell-cell-annotation, and bio-vcf-statistics changed after their recorded upstream audits and require independent re-audit before Marketplace-ready status is restored.",
+      "This is a scoped provider preflight plus three provider-commissioned independent re-audits, not Marketplace maintainer approval.",
+      "Five Skills have no new functional execution in the provider preflight; passing smoke checks cover only the named workflows.",
+      "The checked Windows R 4.6.1 QFeatures route has a documented cli.dll teardown failure; the exact bundled WSL route passes with a clean exit.",
+      "The cell-annotation re-audit retains one P1 follow-up for an exit-0 Linux SingleR/Azimuth smoke; its Windows routes produced valid artifacts before teardown exit 2816.",
+      "The three re-audits retain five non-blocking P2 recommendations in total.",
       "Scientific redistribution scope and final AIPOCH score/approval remain for Marketplace review."
     ],
     "source_commit": "2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db",
-    "upstream_audit_commit": "0d1d6c1f2e8c3ec89316b58269a4a8c795690cf5",
+    "upstream_audit_commit": "34db8d35cbd5521bfce459e7ed2245e353f46a89",
     "marketplace_tool_commit": "e751844be4ade3e4d997ea4dbc63a0b81cf6ff75",
     "syntax_checks": {
       "python_files": 52,

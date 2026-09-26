@@ -21,7 +21,10 @@ const git = (repo, ...args) => execFileSync('git', ['-C', repo, ...args], { maxB
 const blob = (repo, commit, file) => git(repo, 'show', `${commit}:${file}`);
 const audit = evidence.external_audit;
 const source = evidence.submitted_source;
-const provenanceBytes = blob(root, source.commit, 'PROVENANCE.json');
+// PROVENANCE is provider review metadata and may advance after the immutable
+// package commit (for example, when an exact-source re-audit lands). Package
+// bytes below remain verified against source.commit.
+const provenanceBytes = readFileSync(path.join(root, 'PROVENANCE.json'));
 const provenance = JSON.parse(provenanceBytes);
 assert.equal(evidence.original_source.repository, provenance.sources['gptomics-bioskills'].upstream_repository);
 assert.equal(evidence.original_source.commit, provenance.sources['gptomics-bioskills'].upstream_commit);
@@ -60,7 +63,10 @@ for (const skill of evidence.skills) {
   assert.equal(upstream.score, skill.upstream_audit.score);
   assert.equal(upstream.audited_on, skill.upstream_audit.audited_on);
   assert.equal(upstream.fix_log, skill.upstream_audit.fix_log);
-  assert.equal(skill.aipoch_review.status, 'pending_independent_review');
+  assert.equal(upstream.fix_pass, 'done', `Fix pass remains open: ${skill.id}`);
+  assert.equal(upstream.reaudit, 'not needed', `Re-audit remains open: ${skill.id}`);
+  assert.equal(upstream.marketplace_ready, true, `Provider readiness is false: ${skill.id}`);
+  assert.equal(skill.aipoch_review.status, 'pending_marketplace_maintainer_review');
   for (const field of ['reviewed_by', 'reviewed_on', 'score'])
     assert.equal(skill.aipoch_review[field], null, 'Provider preflight must not fabricate approval');
   for (const scope of skill.aipoch_review.review_scope)
@@ -92,6 +98,14 @@ for (const skill of evidence.skills) {
   const record = JSON.parse(recordBytes);
   assert.equal(record.source.author, 'GPTomics');
   assert.match(record.source.commit, /^[0-9a-f]{40}$/);
+  const submittedRepository = source.repository
+    .replace(/^https:\/\/github\.com\//, '')
+    .replace(/\.git$/, '');
+  const submittedByteEquivalence = record.source.repository === submittedRepository
+    && record.source.commit === source.commit
+    && record.source.path === config.source.path
+    ? 'verified_exact_repository_commit_and_path'
+    : 'unverified_different_repository_or_commit_or_path';
   const auditEvidence = {
     report_path: match.file, report_sha256: hash(match.bytes),
     report_url: `${audit.repository}/blob/${audit.commit}/${match.file}`,
@@ -101,7 +115,7 @@ for (const skill of evidence.skills) {
     fix_log_url: `${audit.repository}/blob/${audit.commit}/${upstream.fix_log}`,
     audited_source: record.source,
     auditor_independent: match.report.meta?.auditor_independent ?? null,
-    submitted_byte_equivalence: 'unverified_different_repository_and_commit',
+    submitted_byte_equivalence: submittedByteEquivalence,
   };
   if (skill.upstream_audit.evidence)
     assert.deepEqual(skill.upstream_audit.evidence, auditEvidence);
