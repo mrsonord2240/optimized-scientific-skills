@@ -3518,22 +3518,23 @@
     {
       "id": "bio-variant-normalization",
       "upstream_path": "variant-calling/variant-normalization",
-      "score": 95,
+      "score": 98,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-24",
+      "audited_on": "2026-09-27",
       "fix_log": "fixes/bio-variant-normalization.md",
       "fix_pass": "done",
       "category": "Data Analysis",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
         "normalize_vcf.sh",
-        "usage-guide.md"
+        "usage-guide.md",
+        "check_normalization.py"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-vcf-basics",
