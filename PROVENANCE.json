@@ -3486,14 +3486,14 @@
       "fix_log": "fixes/bio-variant-annotation.md",
       "fix_pass": "done",
       "category": "Data Analysis",
-      "reaudit": "not needed",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
         "annotate_vcf.sh",
         "usage-guide.md"
       ],
-      "marketplace_ready": true
+      "marketplace_ready": false
     },
     {
       "id": "bio-variant-calling-filtering-best-practices",
@@ -3526,14 +3526,14 @@
       "fix_log": "fixes/bio-variant-normalization.md",
       "fix_pass": "done",
       "category": "Data Analysis",
-      "reaudit": "not needed",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
         "normalize_vcf.sh",
         "usage-guide.md"
       ],
-      "marketplace_ready": true
+      "marketplace_ready": false
     },
     {
       "id": "bio-vcf-basics",
@@ -3585,14 +3585,14 @@
       "fix_log": "fixes/bio-vcf-statistics.md",
       "fix_pass": "done",
       "category": "Data Analysis",
-      "reaudit": "not needed",
+      "reaudit": "needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
         "usage-guide.md",
         "vcf_stats.py"
       ],
-      "marketplace_ready": true
+      "marketplace_ready": false
     },
     {
       "id": "bio-virtual-screening",
