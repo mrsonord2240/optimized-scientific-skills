@@ -2,8 +2,11 @@
 
 This directory contains the provider-side material for the first 20-Skill
 Marketplace pilot. The source packages are pinned to commit
-`2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db` of
-`https://github.com/mrsonord2240/optimized-scientific-skills`.
+`ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4` of
+`https://github.com/mrsonord2240/optimized-scientific-skills`. (`bio-variant-normalization`,
+`bio-vcf-statistics`, and `bio-variant-annotation` had their `usage-guide.md` trimmed of
+content duplicated from `SKILL.md` after the prior pin and were independently re-audited;
+see their entries in `pilot-review-evidence.json` and `PROVENANCE.json`.)
 
 The files have deliberately separate responsibilities:
 
@@ -32,7 +35,7 @@ content. Per-Skill upstream paths and modification evidence are recorded in
 
 The external audit repository is pinned to
 `https://github.com/mrsonord2240/optimizing-agent-science-skills` commit
-`34db8d35cbd5521bfce459e7ed2245e353f46a89`. Its scores are retained only as
+`64eb44f399bc769501d11134057c7f6a3858b33f`. Its scores are retained only as
 external audit evidence. They are not AIPOCH review scores. Each Skill links the
 exact matching report and record, with their SHA-256 hashes and audited source
 identity. The reports for `bio-proteomics-data-import`,
