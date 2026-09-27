@@ -3581,18 +3581,18 @@
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-25",
+      "audited_on": "2026-09-27",
       "fix_log": "fixes/bio-vcf-statistics.md",
       "fix_pass": "done",
       "category": "Data Analysis",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
         "usage-guide.md",
         "vcf_stats.py"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-virtual-screening",
