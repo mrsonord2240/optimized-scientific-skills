@@ -3478,22 +3478,22 @@
     {
       "id": "bio-variant-annotation",
       "upstream_path": "variant-calling/variant-annotation",
-      "score": 91,
+      "score": 95,
       "grade": "Production Ready",
       "deployable": true,
       "open_p0": 0,
-      "audited_on": "2026-09-24",
+      "audited_on": "2026-09-27",
       "fix_log": "fixes/bio-variant-annotation.md",
       "fix_pass": "done",
       "category": "Data Analysis",
-      "reaudit": "needed",
+      "reaudit": "not needed",
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
         "annotate_vcf.sh",
         "usage-guide.md"
       ],
-      "marketplace_ready": false
+      "marketplace_ready": true
     },
     {
       "id": "bio-variant-calling-filtering-best-practices",
