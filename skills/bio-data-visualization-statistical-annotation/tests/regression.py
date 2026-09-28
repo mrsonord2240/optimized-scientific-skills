@@ -32,6 +32,14 @@ with tempfile.TemporaryDirectory(prefix="statanno-regression-") as tmp:
     )
     expected = multipletests(results["p"], method="holm")[1]
     assert max(abs(results["p_adj"] - expected)) < 1e-12
+    assert {"test", "adjust_method", "family_size", "effect_type", "effect_size"}.issubset(
+        results.columns
+    )
+    assert set(results["effect_type"]) == {"rank_biserial_r"}
+    assert results["effect_size"].notna().all()
+    assert (results["effect_size"].abs() <= 1).all()
+    persisted = pd.read_csv(scratch / "pairwise.results.csv")
+    assert {"effect_type", "effect_size"}.issubset(persisted.columns)
 
     paired = paired_mod.annotate_paired(
         str(data_dir / "paired.csv"), str(scratch / "paired.png"), "holm"

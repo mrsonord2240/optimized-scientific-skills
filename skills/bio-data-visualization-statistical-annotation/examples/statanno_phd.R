@@ -14,7 +14,6 @@ source(file.path(skill_dir, "scripts", "annotate_nested.R"))
 suppressPackageStartupMessages({
   library(ggplot2)
   library(ggsignif)
-  library(rstatix)
 })
 
 args <- commandArgs(trailingOnly = TRUE)
@@ -28,11 +27,10 @@ dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 pairwise_result <- annotate_pairwise(
   three_group_csv, file.path(output_dir, "pairwise-adjusted.png"), "wilcox", "holm"
 )
-effect_sizes <- pairwise_result$data |> wilcox_effsize(value ~ group, ci = TRUE)
 pairwise_result$plot <- pairwise_result$plot +
   labs(caption = sprintf(
     "Wilcoxon pairwise, Holm-adjusted; rank-biserial r range %.2f-%.2f.",
-    min(effect_sizes$effsize), max(effect_sizes$effsize)
+    min(pairwise_result$tests$effect_size), max(pairwise_result$tests$effect_size)
   ))
 ggsave(file.path(output_dir, "pairwise-adjusted.png"), pairwise_result$plot,
        width = 6.5, height = 5.5, dpi = 160)

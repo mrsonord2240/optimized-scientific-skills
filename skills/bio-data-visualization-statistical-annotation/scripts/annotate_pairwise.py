@@ -27,21 +27,29 @@ def annotate_pairwise(input_csv: str, output_plot: str, adjust_method: str = "ho
     if len(groups) < 2:
         raise ValueError("at least two groups are required")
     pairs = list(itertools.combinations(groups, 2))
-    raw = [
+    test_results = [
         mannwhitneyu(
             df.loc[df["group"].astype(str) == left, "value"],
             df.loc[df["group"].astype(str) == right, "value"],
             alternative="two-sided",
             method="auto",
-        ).pvalue
+        )
         for left, right in pairs
     ]
+    raw = [result.pvalue for result in test_results]
+    effect_sizes = []
+    for (left, right), result in zip(pairs, test_results, strict=True):
+        n_left = int((df["group"].astype(str) == left).sum())
+        n_right = int((df["group"].astype(str) == right).sum())
+        effect_sizes.append(2 * float(result.statistic) / (n_left * n_right) - 1)
     method_map = {"BH": "fdr_bh", "bh": "fdr_bh", "fdr": "fdr_bh"}
     method = method_map.get(adjust_method, adjust_method)
     adjusted = multipletests(raw, method=method)[1]
     results = pd.DataFrame(
         {"group1": [p[0] for p in pairs], "group2": [p[1] for p in pairs],
-         "p": raw, "p_adj": adjusted, "adjust_method": adjust_method}
+         "test": "Mann-Whitney U", "p": raw, "p_adj": adjusted,
+         "adjust_method": adjust_method, "family_size": len(pairs),
+         "effect_type": "rank_biserial_r", "effect_size": effect_sizes}
     )
 
     fig, ax = plt.subplots(figsize=(6.5, 5.5))

@@ -60,7 +60,9 @@ Use the runnable workflow (Wilcoxon is the default mode):
 Rscript scripts/annotate_pairwise.R data.csv annotated.png wilcox holm
 ```
 
-The script requires `group,value`, computes `pairwise_wilcox_test(..., p.adjust.method='holm')`, independently checks its adjusted values with `p.adjust`, adds bracket positions, and writes both the figure and a `*.results.csv` table. Use mode `dunn` after Kruskal-Wallis. Use mode `tukey` with adjustment label `tukey` after ANOVA; it runs `rstatix::tukey_hsd()` and uses Tukey's simultaneous adjustment, not Holm, before `stat_pvalue_manual()`.
+The script requires `group,value`, computes `pairwise_wilcox_test(..., p.adjust.method='holm')`, independently checks its adjusted values with `p.adjust`, adds bracket positions, and writes both the figure and a `*.results.csv` table. The table includes the test, raw and adjusted p-values, adjustment, family size, `effect_type`, and signed `effect_size`; rank-based modes use rank-biserial r and Tukey mode uses Hedges' g, with positive values meaning the first named group tends higher. Use mode `dunn` after Kruskal-Wallis. Use mode `tukey` with adjustment label `tukey` after ANOVA; it runs `rstatix::tukey_hsd()` and uses Tukey's simultaneous adjustment, not Holm, before `stat_pvalue_manual()`.
+
+Bracket spacing is derived from the family size and the y scale is expanded above the omnibus label. For a specific layout, pass a positive spacing fraction as the fifth argument, for example `... wilcox holm 0.16`. When a full family is still too dense, keep the complete results table but use comparison facets or a compact-letter display for the family-wide result instead of forcing every bracket into one panel; state that the alternate view does not show exact per-pair p-values or effects.
 
 Do not use this pattern for adjusted pairwise labels:
 
@@ -86,7 +88,7 @@ With `map_signif_level=TRUE`, ggsignif 0.6.4 uses `***`, `**`, `*`, and `NS.` ra
 python scripts/annotate_pairwise.py data.csv annotated.png holm
 ```
 
-The script computes Mann-Whitney p-values with SciPy, adjusts the whole family with `statsmodels.stats.multitest.multipletests`, and supplies those adjusted values through `Annotator.set_pvalues()` before `annotate()`.
+The script computes Mann-Whitney p-values and signed rank-biserial r values with SciPy, adjusts the whole family with `statsmodels.stats.multitest.multipletests`, supplies those adjusted values through `Annotator.set_pvalues()` before `annotate()`, and persists `effect_type` plus `effect_size` with the p-value fields.
 
 In statannotations 0.7.2, `comparisons_correction='holm'` and `'BH'` are type-1 corrections: they can append a significance-loss suffix, but the displayed number or stars remain based on raw p-values. Do not present those labels as adjusted. Supplying adjusted p-values explicitly works; the built-in `bonferroni` route also rewrites p-values.
 
@@ -117,12 +119,12 @@ Rscript scripts/annotate_nested.R nested.csv nested.png holm
 
 For ggpubr 1.0.0 and statannotations 0.7.2, the default star bins are inclusive at the boundary: `****` for p <= 1e-4, `***` for p <= 0.001, `**` for p <= 0.01, `*` for p <= 0.05, and `ns` otherwise. ggsignif's default mapping differs as noted above. Treat stars as a display convention, not a substitute for exact adjusted p-values.
 
-ggpubr `label='p.format'` prints formatted values and may print `p < 2e-16` for extremely small p-values. Preserve a results table with the test, effect size, raw p, adjusted p, adjustment method, and comparison family.
+ggpubr `label='p.format'` prints formatted values and may print `p < 2e-16` for extremely small p-values. Preserve a results table with the test, effect type and signed effect size, raw p, adjusted p, adjustment method, and comparison-family size. The default R and Python pairwise scripts implement this contract; paired and model-based workflows may require design-specific magnitudes rather than reusing an independent-groups effect.
 
 Report magnitude alongside significance:
 
 - Cohen's d for a normal-location comparison.
-- Rank-biserial r from `rstatix::wilcox_effsize()`; this is not Cliff's delta.
+- Rank-biserial r, computed from Mann-Whitney U as `2U/(n1*n2) - 1` in the shipped pairwise scripts; this is not Cliff's delta.
 - Cliff's delta only when it was actually computed as Cliff's delta.
 - A median difference and confidence interval when that is easier to interpret.
 
