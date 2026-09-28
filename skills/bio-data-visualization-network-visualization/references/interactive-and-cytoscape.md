@@ -29,10 +29,14 @@ python examples/cytoscape_automation.py --graphml network.graphml --output-dir o
 
 The example creates the mapped `degree`, `gene_type`, `score`, and capped `display_label` columns before
 upload. It labels the same adaptive degree-ranked subset used by the static workflow, applies the
-force-directed layout, and calls `fit_content()` before export. With py4cytoscape 1.13,
+force-directed layout and final style, scales the layout 2.4-fold along the landscape export's x axis,
+spaces the capped hubs evenly around the force layout's perimeter with their labels anchored outward,
+then calls `fit_content()`. The style uses an
+explicit 18-point label font and an 18-56 node-size range, so the capped labels remain readable instead
+of being covered by oversized hubs. With py4cytoscape 1.13,
 `set_node_shape_mapping` is discrete and does not accept `mapping_type`. Exports use resolved absolute
-paths and `overwrite_file=True`; failures print a traceback and return a nonzero exit. Suppress labels
-or reduce the cap when the rendered export still crowds at a large node count.
+paths and `overwrite_file=True`; failures print a traceback and return a nonzero exit. For a portrait
+canvas, replace the x-axis spacing with y-axis spacing before the final fit.
 
 The shipped style is for an undirected PPI and deliberately has no target arrows. For a regulatory
 network, explicitly set `EDGE_TARGET_ARROW_SHAPE` and map the sign attribute to edge colors, or use the

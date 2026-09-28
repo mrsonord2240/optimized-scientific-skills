@@ -12,6 +12,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import networkx as nx
+import pandas as pd
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -90,17 +91,55 @@ def test_signed_edges_and_cytoscape_labels() -> None:
     assert sum(bool(label) for label in labels.values()) == 15
 
     calls = []
+    cytoscape_positions = pd.DataFrame(
+        {
+            "x": [float(index) for index in range(100)],
+            "y": [float((index * 7) % 23) for index in range(100)],
+        },
+        index=[f"G{index:03d}" for index in range(100)],
+    )
     with (
         patch.object(cytoscape.p4c, "create_network_from_networkx", return_value=7),
         patch.object(cytoscape.p4c, "layout_network", side_effect=lambda *_: calls.append("layout")),
+        patch.object(cytoscape, "apply_ppi_style", side_effect=lambda: calls.append("style")),
+        patch.object(
+            cytoscape.p4c,
+            "scale_layout",
+            side_effect=lambda axis, factor: calls.append(("scale", axis, factor)),
+        ),
+        patch.object(cytoscape.p4c, "get_node_position", return_value=cytoscape_positions),
+        patch.object(
+            cytoscape.p4c,
+            "set_node_position_bypass",
+            side_effect=lambda names, xs, ys: calls.append(("nodes", names, xs, ys)),
+        ),
+        patch.object(
+            cytoscape.p4c,
+            "set_node_label_position_bypass",
+            side_effect=lambda names, positions: calls.append(("labels", names, positions)),
+        ),
         patch.object(cytoscape.p4c, "fit_content", side_effect=lambda *_args, **_kwargs: calls.append("fit")),
     ):
         cytoscape.send_network_to_cytoscape(ppi)
-    assert calls == ["layout", "fit"]
+    assert calls[:3] == ["layout", "style", ("scale", "X Axis", 2.4)]
+    assert calls[-1] == "fit"
+    node_call = calls[3]
+    assert node_call[0] == "nodes"
+    assert len(node_call[1]) == len(node_call[2]) == len(node_call[3]) == 15
+    assert len(set(zip(node_call[2], node_call[3], strict=True))) == 15
+    label_call = calls[4]
+    assert label_call[0] == "labels"
+    assert len(label_call[1]) == len(label_call[2]) == 15
+    assert set(label_call[2]) == {
+        "N,S,c,0.00,-8.00",
+        "S,N,c,0.00,8.00",
+        "E,W,l,8.00,0.00",
+        "W,E,r,-8.00,0.00",
+    }
 
     with (
-        patch.object(cytoscape.p4c, "create_visual_style"),
-        patch.object(cytoscape.p4c, "set_node_size_mapping"),
+        patch.object(cytoscape.p4c, "create_visual_style") as create_style,
+        patch.object(cytoscape.p4c, "set_node_size_mapping") as size_mapping,
         patch.object(cytoscape.p4c, "set_node_color_mapping"),
         patch.object(cytoscape.p4c, "set_edge_line_width_mapping"),
         patch.object(cytoscape.p4c, "set_node_shape_mapping"),
@@ -108,6 +147,9 @@ def test_signed_edges_and_cytoscape_labels() -> None:
         patch.object(cytoscape.p4c, "set_visual_style"),
     ):
         cytoscape.apply_ppi_style()
+    defaults = create_style.call_args.kwargs["defaults"]
+    assert defaults["NODE_LABEL_FONT_SIZE"] == 18
+    assert size_mapping.call_args.args[2] == [18, 32, 56]
     label_mapping.assert_called_once_with("display_label", style_name="PPIStyle")
 
 
