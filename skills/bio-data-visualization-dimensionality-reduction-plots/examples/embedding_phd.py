@@ -57,6 +57,59 @@ def neighbor_retention(high_dim: np.ndarray, embedding: np.ndarray, k: int = 15)
     )
 
 
+def categorical_colors(n_categories: int) -> np.ndarray:
+    """Return one distinct tab20 RGBA value per category, up to twenty."""
+    if not 1 <= n_categories <= 20:
+        raise ValueError(
+            "categorical color encoding supports 1-20 categories; "
+            "facet the plot or supply a documented alternative encoding above 20"
+        )
+    return np.asarray(plt.colormaps["tab20"](np.arange(n_categories)))
+
+
+def annotate_loading_labels(
+    ax: plt.Axes, endpoints: np.ndarray, labels: list[str]
+) -> list[plt.Annotation]:
+    """Place loading labels with deterministic, rendered-box collision checks."""
+    if len(endpoints) != len(labels):
+        raise ValueError("loading endpoints and labels must have equal length")
+
+    # Search close to each arrow tip first, alternating below and above. Wider
+    # columns provide a deterministic escape hatch for unusually long labels.
+    offsets = [
+        (x_offset, y_offset)
+        for x_offset in (6, 30, 54)
+        for y_offset in (0, -12, 12, -24, 24, -36, 36, -48, 48)
+    ]
+    accepted_boxes = []
+    annotations = []
+    for endpoint, label in zip(endpoints, labels):
+        for offset in offsets:
+            annotation = ax.annotate(
+                label,
+                xy=tuple(endpoint),
+                xytext=offset,
+                textcoords="offset points",
+                fontsize=6,
+                bbox={
+                    "facecolor": "white",
+                    "alpha": 0.7,
+                    "edgecolor": "none",
+                    "pad": 0.2,
+                },
+            )
+            ax.figure.canvas.draw()
+            box = annotation.get_window_extent(ax.figure.canvas.get_renderer())
+            if not any(box.overlaps(accepted) for accepted in accepted_boxes):
+                annotations.append(annotation)
+                accepted_boxes.append(box)
+                break
+            annotation.remove()
+        else:
+            raise RuntimeError("could not place PCA loading labels without overlap")
+    return annotations
+
+
 def save_figure(fig: plt.Figure, path: Path) -> None:
     fig.savefig(path, bbox_inches="tight", dpi=300)
     plt.close(fig)
@@ -83,7 +136,7 @@ def main() -> None:
     variance = adata.uns["pca"]["variance_ratio"]
     conditions = adata.obs["condition"].astype("category")
     categories = list(conditions.cat.categories)
-    condition_colors = plt.colormaps["tab10"](np.arange(len(categories)))
+    condition_colors = categorical_colors(len(categories))
 
     # PCA with truthful categorical legend and the five strongest PC1/PC2 loadings.
     fig, ax = plt.subplots(figsize=(5, 4))
@@ -97,15 +150,14 @@ def main() -> None:
     strongest = np.argsort(np.linalg.norm(loadings, axis=1))[-5:]
     arrow_scale = 0.12 * min(np.ptp(scores[:, 0]), np.ptp(scores[:, 1]))
     loading_scale = arrow_scale / max(np.linalg.norm(loadings[strongest], axis=1))
-    label_offsets = [(6, -18), (6, -9), (6, 0), (6, 9), (6, 18)]
-    for gene_index, offset in zip(strongest, label_offsets):
+    endpoints = []
+    loading_labels = []
+    for gene_index in strongest:
         dx, dy = loadings[gene_index] * loading_scale
         ax.arrow(0, 0, dx, dy, color="black", width=0.002 * arrow_scale)
-        ax.annotate(
-            str(adata.var_names[gene_index]), xy=(dx, dy), xytext=offset,
-            textcoords="offset points", fontsize=6,
-            bbox={"facecolor": "white", "alpha": 0.7, "edgecolor": "none", "pad": 0.2},
-        )
+        endpoints.append((dx, dy))
+        loading_labels.append(str(adata.var_names[gene_index]))
+    annotate_loading_labels(ax, np.asarray(endpoints), loading_labels)
     ax.set_xlabel(f"PC1 ({variance[0] * 100:.1f}%)")
     ax.set_ylabel(f"PC2 ({variance[1] * 100:.1f}%)")
     ax.set_title("PCA")
@@ -142,7 +194,7 @@ def main() -> None:
     ).fit(scores[:, :50])
     fig, ax = plt.subplots(figsize=(4, 4))
     leiden = adata.obs["leiden"].astype("category")
-    leiden_colors = plt.colormaps["tab10"](np.arange(len(leiden.cat.categories)))
+    leiden_colors = categorical_colors(len(leiden.cat.categories))
     for index, category in enumerate(leiden.cat.categories):
         selected = np.asarray(leiden == category)
         ax.scatter(

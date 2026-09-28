@@ -61,7 +61,7 @@ A second foundational paper is Kobak & Berens 2019 *Nat Commun* 10:5416 on t-SNE
 
 - [Method recipes](references/method-recipes.md): read when implementing PCA/loadings, t-SNE, UMAP, Scanpy saving, or PHATE. The decision-tree rows above map directly to those recipes.
 - [Neighborhood validation](references/neighborhood-validation.md): read before claiming that an embedding preserved neighborhoods, batch mixing, or global structure.
-- [`examples/embedding_phd.py`](examples/embedding_phd.py): runnable Scanpy comparison with raw-count HVG selection, categorical legends, PCA loading arrows, four saved figures, fixed seeds, and a neighborhood-retention measurement.
+- [`examples/embedding_phd.py`](examples/embedding_phd.py): runnable Scanpy comparison with raw-count HVG selection, categorical legends, PCA loading arrows, five saved figures, fixed seeds, and a neighborhood-retention measurement.
 
 ## Method Rules
 

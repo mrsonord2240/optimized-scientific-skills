@@ -14,7 +14,7 @@ PCAtools::screeplot(p, components = seq_len(min(10, ncol(SummarizedExperiment::a
 PCAtools::plotloadings(p, components = 1, rangeRetain = 0.05)
 ```
 
-With scikit-learn, use a fixed solver or seed. Convert string groups to categories and draw one scatter per group so the legend is truthful. `components_` contains feature loadings; the shipped example scales and draws its largest arrows.
+With scikit-learn, use a fixed solver or seed. Convert string groups to categories and draw one scatter per group so the legend is truthful. The shipped example gives each of up to 20 categories a distinct `tab20` color; above 20, facet the plot or choose and document another encoding instead of recycling colors. `components_` contains feature loadings; the example scales and draws its largest arrows, then deterministically checks rendered label boxes to avoid collisions.
 
 ```python
 pca = PCA(n_components=10, svd_solver="full")

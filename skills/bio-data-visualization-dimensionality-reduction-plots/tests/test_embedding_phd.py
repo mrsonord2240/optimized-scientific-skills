@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import importlib.util
+from itertools import combinations
 from pathlib import Path
 import unittest
 
 import anndata as ad
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -34,6 +36,30 @@ class EmbeddingExampleTests(unittest.TestCase):
         rng = np.random.default_rng(42)
         values = rng.normal(size=(30, 2))
         self.assertEqual(MODULE.neighbor_retention(values, values.copy(), k=5), 1.0)
+
+    def test_twelve_categories_receive_unique_rgba_values(self) -> None:
+        colors = MODULE.categorical_colors(12)
+        self.assertEqual(colors.shape, (12, 4))
+        self.assertEqual(len({tuple(color) for color in colors}), 12)
+        with self.assertRaisesRegex(ValueError, "facet"):
+            MODULE.categorical_colors(21)
+
+    def test_loading_labels_do_not_overlap(self) -> None:
+        fig, ax = plt.subplots(figsize=(5, 4))
+        endpoints = np.zeros((5, 2))
+        labels = [f"LONG_GENE_LABEL_{index}" for index in range(5)]
+        annotations = MODULE.annotate_loading_labels(ax, endpoints, labels)
+        fig.canvas.draw()
+        renderer = fig.canvas.get_renderer()
+        boxes = [annotation.get_window_extent(renderer) for annotation in annotations]
+        self.assertTrue(
+            all(not left.overlaps(right) for left, right in combinations(boxes, 2))
+        )
+        self.assertEqual(
+            [annotation.get_position() for annotation in annotations],
+            [(6, 0), (6, -12), (6, 12), (6, -24), (6, 24)],
+        )
+        plt.close(fig)
 
     def test_validate_input_accepts_raw_counts(self) -> None:
         rng = np.random.default_rng(42)
