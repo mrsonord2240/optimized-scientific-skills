@@ -7,6 +7,7 @@ Usage: ``python examples/cytoscape_automation.py --graphml network.graphml --out
 from __future__ import annotations
 
 import argparse
+import math
 import traceback
 from pathlib import Path
 
@@ -40,6 +41,16 @@ def build_demo_graph() -> nx.Graph:
 def prepare_style_attributes(graph: nx.Graph) -> nx.Graph:
     """Populate every column referenced by the Cytoscape visual mappings."""
     nx.set_node_attributes(graph, dict(graph.degree()), "degree")
+    degrees = dict(graph.degree())
+    label_count = min(len(graph), 30, max(15, math.ceil(0.02 * len(graph))))
+    labelled = set(
+        sorted(graph, key=lambda node: (-degrees[node], str(node)))[:label_count]
+    )
+    nx.set_node_attributes(
+        graph,
+        {node: str(node) if node in labelled else "" for node in graph},
+        "display_label",
+    )
     for node in graph:
         graph.nodes[node].setdefault("gene_type", "other")
     for _, _, data in graph.edges(data=True):
@@ -53,6 +64,7 @@ def send_network_to_cytoscape(graph: nx.Graph, title: str = "PPI Network") -> in
     """Send a NetworkX graph to Cytoscape and apply a force-directed layout."""
     suid = p4c.create_network_from_networkx(graph, title=title)
     p4c.layout_network("force-directed")
+    p4c.fit_content()
     print(f"Network created in Cytoscape (SUID: {suid})")
     return suid
 
@@ -87,6 +99,7 @@ def apply_ppi_style() -> str:
         "gene_type", ["kinase", "other"], ["DIAMOND", "ELLIPSE"],
         style_name=style_name,
     )
+    p4c.set_node_label_mapping("display_label", style_name=style_name)
     p4c.set_visual_style(style_name)
     print(f"Applied style: {style_name}")
     return style_name

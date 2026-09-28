@@ -80,7 +80,8 @@ python examples/network_plots.py --graphml network.graphml --output-dir out/stat
 ```
 
 This example uses one discrete color mapping for both nodes and legend swatches, ranks hubs for
-labels, treats missing edge weights as 1, and rescales widths to 0.5-4 points.
+labels in every view, treats missing edge weights as 1, and rescales widths to 0.5-4 points. Repeat
+`--label GENE` to retain prespecified genes of interest in addition to the adaptive ranked set.
 
 ## Comparing Conditions
 
@@ -147,7 +148,8 @@ single mid-range width when all values are identical.
 style, whose target arrow shape is `NONE`.
 
 **Fix:** Use `Network(directed=True)` for PyVis. For static GRNs, use the signed Graphviz recipe. If
-using Cytoscape, explicitly map the target arrow shape and sign colors.
+using Cytoscape, explicitly map the target arrow shape and sign colors. Validate the sign domain
+before drawing so an unknown value cannot silently disappear.
 
 ### Cytoscape silently keeps default styling
 

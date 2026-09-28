@@ -7,7 +7,9 @@ Usage: ``python examples/interactive_network.py --graphml network.graphml --outp
 from __future__ import annotations
 
 import argparse
+import html
 import json
+import re
 from pathlib import Path
 
 import networkx as nx
@@ -20,6 +22,25 @@ PALETTE = [
     "#E64B35", "#4DBBD5", "#00A087", "#3C5488",
     "#F39B7F", "#8491B4", "#91D1C2", "#DC0000",
 ]
+
+
+def save_with_single_heading(net: Network, output: Path, title: str) -> Path:
+    """Save PyVis HTML and replace template-duplicated headings with one escaped title."""
+    output.parent.mkdir(parents=True, exist_ok=True)
+    net.save_graph(str(output))
+    document = output.read_text(encoding="utf-8")
+    document = re.sub(
+        r"\s*<center>\s*<h1>.*?</h1>\s*</center>\s*",
+        "\n",
+        document,
+        flags=re.DOTALL,
+    )
+    heading = f"<center><h1>{html.escape(title)}</h1></center>"
+    if "<body>" not in document:
+        raise RuntimeError("PyVis template did not emit a body element")
+    document = document.replace("<body>", f"<body>\n{heading}", 1)
+    output.write_text(document, encoding="utf-8", newline="\n")
+    return output
 
 
 def build_demo_graph() -> nx.Graph:
@@ -40,14 +61,12 @@ def create_interactive_network(
     """Write a basic network without allowing PyVis to mutate the caller's graph."""
     net = Network(
         height="700px", width="100%", bgcolor="white", font_color="black",
-        heading=title, directed=graph.is_directed(), cdn_resources="in_line",
+        heading="", directed=graph.is_directed(), cdn_resources="in_line",
     )
     net.from_nx(graph.copy())
     net.toggle_physics(True)
     net.show_buttons(filter_=["physics"])
-    output.parent.mkdir(parents=True, exist_ok=True)
-    net.save_graph(str(output))
-    return output
+    return save_with_single_heading(net, output, title)
 
 
 def create_styled_network(
@@ -62,7 +81,7 @@ def create_styled_network(
     degrees = dict(graph.degree())
     net = Network(
         height="700px", width="100%", bgcolor="white", font_color="black",
-        heading=title, directed=graph.is_directed(), cdn_resources="in_line",
+        heading="", directed=graph.is_directed(), cdn_resources="in_line",
     )
     for node in graph.nodes():
         community = membership.get(node, 0)
@@ -85,9 +104,7 @@ def create_styled_network(
         },
         "interaction": {"hover": True, "navigationButtons": True, "keyboard": True},
     }))
-    output.parent.mkdir(parents=True, exist_ok=True)
-    net.save_graph(str(output))
-    return output
+    return save_with_single_heading(net, output, title)
 
 
 def main() -> None:

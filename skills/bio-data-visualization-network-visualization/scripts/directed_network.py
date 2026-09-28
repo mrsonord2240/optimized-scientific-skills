@@ -18,10 +18,24 @@ from matplotlib.lines import Line2D
 SIGN_COLORS = {"+": "#D55E00", "-": "#0072B2"}
 
 
+def validate_sign_values(graph: nx.DiGraph, sign_attribute: str) -> None:
+    """Reject explicit sign values that the renderer would otherwise omit."""
+    values = {
+        str(data.get(sign_attribute, "+")) for _, _, data in graph.edges(data=True)
+    }
+    unknown = sorted(values - set(SIGN_COLORS))
+    if unknown:
+        raise ValueError(
+            f"Unknown {sign_attribute!r} value(s): {unknown}; "
+            "normalize activation/repression to '+'/'-' before rendering"
+        )
+
+
 def render_directed(graph: nx.DiGraph, output: Path, sign_attribute: str) -> Path:
     """Render direction with arrowheads and regulation sign with edge color."""
     if not graph.is_directed():
         raise ValueError("Expected a directed graph")
+    validate_sign_values(graph, sign_attribute)
     positions = nx.nx_pydot.graphviz_layout(graph, prog="dot")
     fig, ax = plt.subplots(figsize=(11, 8))
     nx.draw_networkx_nodes(

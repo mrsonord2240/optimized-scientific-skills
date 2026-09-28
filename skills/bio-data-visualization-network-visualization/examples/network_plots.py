@@ -7,7 +7,9 @@ Usage: ``python examples/network_plots.py --graphml network.graphml --output-dir
 from __future__ import annotations
 
 import argparse
+import math
 from pathlib import Path
+from typing import Iterable
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -57,11 +59,26 @@ def community_style(
     return communities, membership, colors
 
 
-def render_networks(graph: nx.Graph, output_dir: Path) -> list[Path]:
+def adaptive_labels(
+    graph: nx.Graph, genes_of_interest: Iterable[str] = ()
+) -> dict[str, str]:
+    """Return capped degree-ranked labels plus requested nodes present in the graph."""
+    degrees = dict(graph.degree())
+    label_count = min(len(graph), 30, max(15, math.ceil(0.02 * len(graph))))
+    ranked = sorted(graph, key=lambda node: (-degrees[node], str(node)))[:label_count]
+    requested = [node for node in genes_of_interest if node in graph]
+    selected = dict.fromkeys([*ranked, *requested])
+    return {node: str(node) for node in selected}
+
+
+def render_networks(
+    graph: nx.Graph, output_dir: Path, genes_of_interest: Iterable[str] = ()
+) -> list[Path]:
     """Render four static network views and return their paths."""
     output_dir.mkdir(parents=True, exist_ok=True)
     pos = nx.spring_layout(graph, seed=42, k=1.5)
     degrees = dict(graph.degree())
+    labels = adaptive_labels(graph, genes_of_interest)
     node_sizes = [100 + degrees[node] * 150 for node in graph.nodes()]
     edge_widths = visible_edge_widths(graph)
     outputs: list[Path] = []
@@ -80,7 +97,7 @@ def render_networks(graph: nx.Graph, output_dir: Path) -> list[Path]:
         linewidths=0.5,
         ax=ax,
     )
-    nx.draw_networkx_labels(graph, pos, font_size=7, ax=ax)
+    nx.draw_networkx_labels(graph, pos, labels=labels, font_size=7, ax=ax)
     fig.colorbar(nodes, ax=ax, label="Degree", shrink=0.8)
     ax.set_title(
         f"PPI Network ({graph.number_of_nodes()} nodes, {graph.number_of_edges()} edges)"
@@ -103,7 +120,7 @@ def render_networks(graph: nx.Graph, output_dir: Path) -> list[Path]:
         linewidths=0.5,
         ax=ax,
     )
-    nx.draw_networkx_labels(graph, pos, font_size=7, ax=ax)
+    nx.draw_networkx_labels(graph, pos, labels=labels, font_size=7, ax=ax)
     for index, community in enumerate(communities):
         ax.scatter(
             [], [], c=[palette(index)], s=80,
@@ -126,7 +143,7 @@ def render_networks(graph: nx.Graph, output_dir: Path) -> list[Path]:
         edgecolors="black", linewidths=0.5, ax=ax,
     )
     nx.draw_networkx_labels(
-        graph, pos, labels={node: node for node in hub_genes},
+        graph, pos, labels=labels,
         font_size=10, font_weight="bold", ax=ax,
     )
     ax.set_title("Hub Genes Highlighted (top 5 by degree)")
@@ -149,7 +166,7 @@ def render_networks(graph: nx.Graph, output_dir: Path) -> list[Path]:
         graph, pos, node_size=node_sizes, node_color="#4DBBD5",
         edgecolors="black", linewidths=0.5, ax=ax,
     )
-    nx.draw_networkx_labels(graph, pos, font_size=7, ax=ax)
+    nx.draw_networkx_labels(graph, pos, labels=labels, font_size=7, ax=ax)
     ax.scatter([], [], c="#E64B35", s=60, label="Score >= 900")
     ax.scatter([], [], c="#F39B7F", s=60, label="Score >= 700")
     ax.scatter([], [], c="#cccccc", s=60, label="Score < 700")
@@ -178,9 +195,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--graphml", type=Path)
     parser.add_argument("--output-dir", type=Path, default=Path("out/static"))
+    parser.add_argument(
+        "--label", action="append", default=[], metavar="NODE",
+        help="also label this node (repeat for multiple genes of interest)",
+    )
     args = parser.parse_args()
     graph = nx.read_graphml(args.graphml) if args.graphml else build_demo_graph()
-    render_networks(graph, args.output_dir.resolve())
+    render_networks(graph, args.output_dir.resolve(), args.label)
 
 
 if __name__ == "__main__":

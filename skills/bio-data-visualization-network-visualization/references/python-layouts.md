@@ -27,11 +27,13 @@ in networkx 3.4+; no `fa2_modified` package or Gephi round trip is required for 
 The complete static example owns the visible-width helper and the shared node/legend color mapping:
 
 ```bash
-python examples/network_plots.py --graphml network.graphml --output-dir out/static
+python examples/network_plots.py --graphml network.graphml --output-dir out/static --label TP53
 ```
 
 Replace its deterministic demo graph with a real loader while keeping the rendering functions. The
-example ranks the top five demo hubs; for a real graph use the adaptive top-k threshold in `SKILL.md`.
+example computes the adaptive top-k set once and uses it in every view; repeat `--label` for
+prespecified genes of interest. The hub panel emphasizes its top five nodes without changing which
+labels are eligible.
 
 ## Signed Directed Regulatory Network
 
@@ -43,7 +45,9 @@ python scripts/directed_network.py grn.graphml --output out/grn.png --sign-attri
 ```
 
 This requires both `pydot` and the Graphviz `dot` executable. Do not silently coerce an undirected
-network: the script rejects it. If the sign column uses other values, normalize them before rendering.
+network: the script rejects it. It also raises a `ValueError` naming unknown sign values rather than
+writing a plausible node-only figure. Normalize values such as `activation` and `repression` to `+`
+and `-` before rendering.
 
 ## Shared Layout for Two Conditions
 
