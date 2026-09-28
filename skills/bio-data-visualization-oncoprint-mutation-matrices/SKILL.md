@@ -120,11 +120,19 @@ Prepare tab-separated mutation, clinical, and TMB files with columns
 `sample`, `category`, `value`, plus a cohort file with `sample`. The script sets
 the full cohort before adding datasets, sorts samples by TMB (or mutation burden
 without TMB), reverses the y-axis category order so the most frequent gene is on
-top, and derives the TMB range from the data with a zero lower bound.
+top, derives the TMB range from the data with a zero lower bound, and adds a
+unified alteration/clinical legend. Cohort and track IDs are normalized to
+stripped strings; empty or NA IDs fail. TMB values must be finite and
+non-negative.
 
 ```bash
 python scripts/comut_plot.py --mutations mutations.tsv --cohort cohort.tsv --clinical clinical.tsv --tmb tmb.tsv --output comut.pdf
 ```
+
+Sample IDs are shown for cohorts of at most 50 samples and hidden automatically
+above that threshold. Change the cutoff with `--sample-label-threshold N`; use
+`0` to hide all labels or a larger value to force labels for a known-readable
+layout.
 
 Unknown cohort IDs and alteration classes fail loudly. Use pandas 2.x; do not
 work around the pandas 3 error by dropping the continuous track silently.
@@ -173,6 +181,8 @@ counts and avoid classifying direction from a corrected odds ratio alone.
 | comut top gene appears at bottom | Natural category order supplied | Reverse `category_order`; the script does this |
 | comut continuous track errors | pandas 3 with comut 0.0.3 | Use pandas 2.x |
 | TMB colors saturate | Hard-coded range | Use `(0, observed maximum)` |
+| comut sample IDs overlap | Dense cohort exceeds 50 samples | Let the script hide them, or set `--sample-label-threshold` explicitly |
+| comut accepts invalid burden values | TMB was not range-checked | Require finite, non-negative TMB; the script rejects invalid values |
 
 ## References
 

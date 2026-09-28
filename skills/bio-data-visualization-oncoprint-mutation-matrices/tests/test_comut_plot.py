@@ -24,6 +24,28 @@ CLASS_MAP = {
 }
 
 
+def expect_value_error(label: str, call) -> None:
+    try:
+        call()
+    except ValueError:
+        return
+    raise AssertionError(f"{label} was accepted")
+
+
+def rendered_texts(text_artists, figure) -> list[str]:
+    """Return visible, non-empty text whose rendered bounding box has area."""
+    figure.canvas.draw()
+    renderer = figure.canvas.get_renderer()
+    return [
+        artist.get_text()
+        for artist in text_artists
+        if artist.get_visible()
+        and artist.get_text()
+        and artist.get_window_extent(renderer).width > 0
+        and artist.get_window_extent(renderer).height > 0
+    ]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("maf", type=Path)
@@ -82,10 +104,53 @@ def main() -> None:
     assert len(plot.samples) == len(cohort)
     assert ticks[-1] == top_genes[0]
     assert tmb_max == float(tmb_values.max())
+    legend = plot.axes["Mutations"].get_legend()
+    assert legend is not None
+    legend_text = rendered_texts(legend.get_texts(), plot.figure)
+    observed_classes = set(mutations["value"])
+    observed_clinical = set(clinical_long["value"].dropna().astype(str))
+    assert {"Mutations", "Clinical"}.issubset(legend_text)
+    assert observed_classes.issubset(legend_text)
+    assert observed_clinical.issubset(legend_text)
+    small_sample_labels = rendered_texts(
+        plot.axes["Mutations"].get_xticklabels(), plot.figure
+    )
+    assert small_sample_labels == expected_samples
     direct_output = args.output_dir / "comut-direct.png"
     plot.figure.savefig(direct_output, dpi=100, bbox_inches="tight")
     assert direct_output.stat().st_size > 1_000
-    print("PASS: full cohort, burden order, top gene placement, and data-derived TMB range")
+
+    dense_cohort = cohort + [f"EMPTY_{index:03d}" for index in range(31)]
+    dense_plot, _, _ = module.build_comut(mutations, dense_cohort, top=6)
+    assert not rendered_texts(
+        dense_plot.axes["Mutations"].get_xticklabels(), dense_plot.figure
+    )
+    dense_legend = dense_plot.axes["Mutations"].get_legend()
+    assert dense_legend is not None
+    assert observed_classes.issubset(rendered_texts(dense_legend.get_texts(), dense_plot.figure))
+    dense_output = args.output_dir / "comut-dense.png"
+    dense_plot.figure.savefig(dense_output, dpi=100, bbox_inches="tight")
+    assert dense_output.stat().st_size > 1_000
+
+    for bad_id in ["", "   ", None, pd.NA, float("nan")]:
+        expect_value_error(
+            f"cohort ID {bad_id!r}",
+            lambda bad_id=bad_id: module.build_comut(mutations, cohort + [bad_id]),
+        )
+
+    for bad_tmb in ["", pd.NA, float("inf"), float("-inf"), -1]:
+        bad = tmb.copy()
+        bad["value"] = bad["value"].astype(object)
+        bad.loc[0, "value"] = bad_tmb
+        expect_value_error(
+            f"TMB value {bad_tmb!r}",
+            lambda bad=bad: module.build_comut(mutations, cohort, tmb=bad, top=6),
+        )
+
+    print(
+        "PASS: cohort/order/TMB range, rendered legends, dense label policy, "
+        "and invalid ID/TMB rejection"
+    )
 
 
 if __name__ == "__main__":
