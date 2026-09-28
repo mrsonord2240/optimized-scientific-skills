@@ -1,0 +1,275 @@
+- generic [active] [ref=e1]:
+  - link "Skip to dashboard" [ref=e2] [cursor=pointer]:
+    - /url: "#main"
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - paragraph [ref=e5]: Open Science · Refinement Control
+      - generic [ref=e6]:
+        - heading "Scientific Skill Refinement" [level=1] [ref=e7]
+        - generic "Snapshot identity" [ref=e8]:
+          - text: Corpus snapshot
+          - strong [ref=e9]: 2026-09-27
+          - text: GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a
+      - navigation "Audit records" [ref=e10]:
+        - link "Markdown status" [ref=e11] [cursor=pointer]:
+          - /url: STATUS.md
+        - link "Audit index" [ref=e12] [cursor=pointer]:
+          - /url: INDEX.md
+        - link "Improvement backlog" [ref=e13] [cursor=pointer]:
+          - /url: BACKLOG.md
+        - link "Corpus snapshot" [ref=e14] [cursor=pointer]:
+          - /url: CORPUS.json
+  - main [ref=e15]:
+    - region [ref=e16]:
+      - generic [ref=e17]:
+        - heading "Portfolio overview" [level=2] [ref=e18]
+        - paragraph [ref=e19]: Audit coverage measures published latest audits across the in-scope corpus. Ready means the canonical provider records exact deployable bytes that have cleared the scientific readiness gate. Marketplace intake remains the final step before work is called done.
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - img "30.3 percent audit coverage" [ref=e22]
+          - generic [ref=e25]:
+            - strong [ref=e26]: 30.3%
+            - generic [ref=e27]: 170 of 561 in-scope Skills audited
+        - generic [ref=e28]:
+          - term [ref=e29]: Ready on shelf
+          - definition [ref=e30]: "162"
+          - generic [ref=e31]: 28.9% of the in-scope corpus
+        - generic [ref=e32]:
+          - term [ref=e33]: Untouched
+          - definition [ref=e34]: "391"
+          - generic [ref=e35]: No published audit yet
+        - generic [ref=e36]:
+          - term [ref=e37]: Needs resolution
+          - definition [ref=e38]: "8"
+          - generic [ref=e39]: Audited, but not provider-ready
+      - img "162 ready, 8 audited but not ready, 391 untouched, 1 out of scope" [ref=e40]
+      - generic "Status legend" [ref=e45]:
+        - generic [ref=e46]: Ready 162
+        - generic [ref=e48]: Audited, not ready 8
+        - generic [ref=e50]: Untouched 391
+        - generic [ref=e52]: Out of scope 1
+    - region [ref=e54]:
+      - generic [ref=e55]:
+        - heading "Coverage by category" [level=2] [ref=e56]
+        - paragraph [ref=e57]: Category comes from the latest audit when available, then from the canonical corpus snapshot. Unclassified Skills remain unclassified rather than being guessed from their directory names.
+      - generic [ref=e58]:
+        - article "Evidence Insight status" [ref=e59]:
+          - generic [ref=e60]:
+            - heading "Evidence Insight" [level=3] [ref=e61]
+            - generic [ref=e62]: 1 known
+          - img "1 ready, 0 audited but not ready, 0 untouched, 0 out of scope" [ref=e63]:
+            - 'generic "Ready: 1" [ref=e64]'
+            - 'generic "Audited, not ready: 0"'
+            - 'generic "Untouched: 0"'
+            - 'generic "Out of scope: 0"'
+          - generic [ref=e65]:
+            - generic [ref=e66]:
+              - term [ref=e67]: Audited
+              - definition [ref=e68]: "1"
+            - generic [ref=e69]:
+              - term [ref=e70]: Ready
+              - definition [ref=e71]: "1"
+            - generic [ref=e72]:
+              - term [ref=e73]: Untouched
+              - definition [ref=e74]: "0"
+        - article "Protocol Design status" [ref=e75]:
+          - generic [ref=e76]:
+            - heading "Protocol Design" [level=3] [ref=e77]
+            - generic [ref=e78]: 5 known
+          - img "5 ready, 0 audited but not ready, 0 untouched, 0 out of scope" [ref=e79]:
+            - 'generic "Ready: 5" [ref=e80]'
+            - 'generic "Audited, not ready: 0"'
+            - 'generic "Untouched: 0"'
+            - 'generic "Out of scope: 0"'
+          - generic [ref=e81]:
+            - generic [ref=e82]:
+              - term [ref=e83]: Audited
+              - definition [ref=e84]: "5"
+            - generic [ref=e85]:
+              - term [ref=e86]: Ready
+              - definition [ref=e87]: "5"
+            - generic [ref=e88]:
+              - term [ref=e89]: Untouched
+              - definition [ref=e90]: "0"
+        - article "Data Analysis status" [ref=e91]:
+          - generic [ref=e92]:
+            - heading "Data Analysis" [level=3] [ref=e93]
+            - generic [ref=e94]: 164 known
+          - img "156 ready, 8 audited but not ready, 0 untouched, 0 out of scope" [ref=e95]:
+            - 'generic "Ready: 156" [ref=e96]'
+            - 'generic "Audited, not ready: 8" [ref=e97]'
+            - 'generic "Untouched: 0"'
+            - 'generic "Out of scope: 0"'
+          - generic [ref=e98]:
+            - generic [ref=e99]:
+              - term [ref=e100]: Audited
+              - definition [ref=e101]: "164"
+            - generic [ref=e102]:
+              - term [ref=e103]: Ready
+              - definition [ref=e104]: "156"
+            - generic [ref=e105]:
+              - term [ref=e106]: Untouched
+              - definition [ref=e107]: "0"
+        - article "Unclassified status" [ref=e108]:
+          - generic [ref=e109]:
+            - heading "Unclassified" [level=3] [ref=e110]
+            - generic [ref=e111]: 392 known
+          - img "0 ready, 0 audited but not ready, 391 untouched, 1 out of scope" [ref=e112]:
+            - 'generic "Ready: 0"'
+            - 'generic "Audited, not ready: 0"'
+            - 'generic "Untouched: 391" [ref=e113]'
+            - 'generic "Out of scope: 1" [ref=e114]'
+          - generic [ref=e115]:
+            - generic [ref=e116]:
+              - term [ref=e117]: Audited
+              - definition [ref=e118]: "0"
+            - generic [ref=e119]:
+              - term [ref=e120]: Ready
+              - definition [ref=e121]: "0"
+            - generic [ref=e122]:
+              - term [ref=e123]: Untouched
+              - definition [ref=e124]: "391"
+    - region [ref=e125]:
+      - generic [ref=e126]:
+        - heading "Audited, not ready" [level=2] [ref=e127]
+        - paragraph [ref=e128]: "This is the immediate resolution queue. A high score alone does not make a Skill ready: provider state, fix completion, re-audit status, and open findings still govern promotion."
+      - generic [ref=e129]:
+        - paragraph [ref=e130]: Showing 8 Skills
+        - generic [ref=e131]:
+          - generic [ref=e132]: Filter the queue
+          - searchbox "Filter the queue" [ref=e133]
+      - table [ref=e135]:
+        - rowgroup [ref=e136]:
+          - row [ref=e137]:
+            - columnheader "Skill" [ref=e138]
+            - columnheader "Score" [ref=e139]
+            - columnheader "Grade" [ref=e140]
+            - columnheader "Provider state" [ref=e141]
+            - columnheader "Open findings" [ref=e142]
+        - rowgroup [ref=e143]:
+          - row [ref=e144]:
+            - cell "bio-data-visualization-ggplot2-fundamentals Data Analysis" [ref=e145]:
+              - link "bio-data-visualization-ggplot2-fundamentals" [ref=e146] [cursor=pointer]:
+                - /url: skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md
+              - generic [ref=e147]: Data Analysis
+            - cell [ref=e148]:
+              - strong [ref=e149]: "75"
+            - cell "Beta Only" [ref=e150]
+            - cell "Excluded" [ref=e152]
+            - cell "0 P0, 4 P1, 2 P2 findings" [ref=e154]:
+              - generic [ref=e155]: P0 0
+              - generic [ref=e156]: P1 4
+              - generic [ref=e157]: P2 2
+          - row [ref=e158]:
+            - cell "bio-data-visualization-matplotlib-fundamentals Data Analysis" [ref=e159]:
+              - link "bio-data-visualization-matplotlib-fundamentals" [ref=e160] [cursor=pointer]:
+                - /url: skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md
+              - generic [ref=e161]: Data Analysis
+            - cell [ref=e162]:
+              - strong [ref=e163]: "75"
+            - cell "Beta Only" [ref=e164]
+            - cell "Excluded" [ref=e166]
+            - cell "0 P0, 6 P1, 6 P2 findings" [ref=e168]:
+              - generic [ref=e169]: P0 0
+              - generic [ref=e170]: P1 6
+              - generic [ref=e171]: P2 6
+          - row [ref=e172]:
+            - cell "bio-data-visualization-volcano-and-ma-plots Data Analysis" [ref=e173]:
+              - link "bio-data-visualization-volcano-and-ma-plots" [ref=e174] [cursor=pointer]:
+                - /url: skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md
+              - generic [ref=e175]: Data Analysis
+            - cell [ref=e176]:
+              - strong [ref=e177]: "76"
+            - cell "Beta Only" [ref=e178]
+            - cell "Excluded" [ref=e180]
+            - cell "0 P0, 3 P1, 6 P2 findings" [ref=e182]:
+              - generic [ref=e183]: P0 0
+              - generic [ref=e184]: P1 3
+              - generic [ref=e185]: P2 6
+          - row [ref=e186]:
+            - cell "bio-data-visualization-heatmaps-clustering Data Analysis" [ref=e187]:
+              - link "bio-data-visualization-heatmaps-clustering" [ref=e188] [cursor=pointer]:
+                - /url: skills/bio-data-visualization-heatmaps-clustering/mrsonord2240-bioSkills@6454218/viewer.md
+              - generic [ref=e189]: Data Analysis
+            - cell [ref=e190]:
+              - strong [ref=e191]: "90"
+            - cell "Production Ready" [ref=e192]
+            - cell "Remaining" [ref=e194]
+            - cell "0 P0, 0 P1, 0 P2 findings" [ref=e196]:
+              - generic [ref=e197]: P0 0
+              - generic [ref=e198]: P1 0
+              - generic [ref=e199]: P2 0
+          - row [ref=e200]:
+            - cell "bio-data-visualization-lollipop-protein-maps Data Analysis" [ref=e201]:
+              - link "bio-data-visualization-lollipop-protein-maps" [ref=e202] [cursor=pointer]:
+                - /url: skills/bio-data-visualization-lollipop-protein-maps/mrsonord2240-bioSkills@4f5e4c0/viewer.md
+              - generic [ref=e203]: Data Analysis
+            - cell [ref=e204]:
+              - strong [ref=e205]: "93"
+            - cell "Production Ready" [ref=e206]
+            - cell "Remaining" [ref=e208]
+            - cell "0 P0, 0 P1, 0 P2 findings" [ref=e210]:
+              - generic [ref=e211]: P0 0
+              - generic [ref=e212]: P1 0
+              - generic [ref=e213]: P2 0
+          - row [ref=e214]:
+            - cell "bio-data-visualization-upset-plots Data Analysis" [ref=e215]:
+              - link "bio-data-visualization-upset-plots" [ref=e216] [cursor=pointer]:
+                - /url: skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@cbf6803/viewer.md
+              - generic [ref=e217]: Data Analysis
+            - cell [ref=e218]:
+              - strong [ref=e219]: "93"
+            - cell "Production Ready" [ref=e220]
+            - cell "Remaining" [ref=e222]
+            - cell "0 P0, 0 P1, 0 P2 findings" [ref=e224]:
+              - generic [ref=e225]: P0 0
+              - generic [ref=e226]: P1 0
+              - generic [ref=e227]: P2 0
+          - row [ref=e228]:
+            - cell "bio-data-visualization-distribution-plots Data Analysis" [ref=e229]:
+              - link "bio-data-visualization-distribution-plots" [ref=e230] [cursor=pointer]:
+                - /url: skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@25b3d21/viewer.md
+              - generic [ref=e231]: Data Analysis
+            - cell [ref=e232]:
+              - strong [ref=e233]: "93.1"
+            - cell "Production Ready" [ref=e234]
+            - cell "Remaining" [ref=e236]
+            - cell "0 P0, 0 P1, 0 P2 findings" [ref=e238]:
+              - generic [ref=e239]: P0 0
+              - generic [ref=e240]: P1 0
+              - generic [ref=e241]: P2 0
+          - row [ref=e242]:
+            - cell "bio-data-visualization-multipanel-figures Data Analysis" [ref=e243]:
+              - link "bio-data-visualization-multipanel-figures" [ref=e244] [cursor=pointer]:
+                - /url: skills/bio-data-visualization-multipanel-figures/mrsonord2240-bioSkills@3749f31/viewer.md
+              - generic [ref=e245]: Data Analysis
+            - cell [ref=e246]:
+              - strong [ref=e247]: "94.1"
+            - cell "Production Ready" [ref=e248]
+            - cell "Remaining" [ref=e250]
+            - cell "0 P0, 0 P1, 0 P2 findings" [ref=e252]:
+              - generic [ref=e253]: P0 0
+              - generic [ref=e254]: P1 0
+              - generic [ref=e255]: P2 0
+    - region [ref=e256]:
+      - generic [ref=e257]:
+        - heading "Readiness states" [level=2] [ref=e258]
+        - paragraph [ref=e259]: The relay keeps scientific certification, product landing, and Marketplace compatibility distinct so a successful audit cannot silently stand in for release readiness.
+      - generic [ref=e260]:
+        - article [ref=e261]:
+          - heading "Candidate-ready" [level=3] [ref=e262]
+          - paragraph [ref=e263]: Independent final audit passed the exact working bytes.
+        - article [ref=e264]:
+          - heading "Ready" [level=3] [ref=e265]
+          - paragraph [ref=e266]: Those exact audited bytes are committed on the optimized shelf with reconciled provider metadata.
+        - article [ref=e267]:
+          - heading "Done" [level=3] [ref=e268]
+          - paragraph [ref=e269]: The Marketplace intake validator accepted the exact optimized commit and path.
+  - contentinfo [ref=e270]:
+    - paragraph [ref=e271]:
+      - text: Generated by
+      - code [ref=e272]: npm run audits:index
+      - text: from
+      - code [ref=e273]: audits/CORPUS.json
+      - text: and the latest published audit records. Do not edit generated data by hand.
+    - paragraph [ref=e274]: Explanatory text is locally editable for design review only; refresh the page to restore generated content.

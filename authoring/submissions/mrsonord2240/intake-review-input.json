@@ -1,0 +1,402 @@
+{
+  "bio-alignment-filtering@1.0.0": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "source_path": "skills/bio-alignment-filtering",
+    "manifest_sha256": "78f13b5f3d946b78ff0e3d4e3e5435958e56ff01683a532f74c2d339f4d59a4b",
+    "content_sha256": "693d50c362ccef6081e6fb40db76df582e15585c45f84480f45cce65dbf7e126",
+    "file_count": 9,
+    "total_bytes": 31381,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "skills/bio-alignment-filtering/SKILL.md",
+        "sha256": "872aa3ffb8d154dbf3c01e6b2c6c46b230f9f231257aa3c79aed3512da08cc64"
+      }
+    ]
+  },
+  "bio-alignment-msa-statistics@1.0.0": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "source_path": "skills/bio-alignment-msa-statistics",
+    "manifest_sha256": "da17d47780a5bb760fc6a1b31b76b83901a332ebb8f8d2457c30e2c03d0cd6ab",
+    "content_sha256": "eeadefcb5110e3fbff1062f98b2b631d7ac6e1c340e134315387a7f2a3ad7c96",
+    "file_count": 22,
+    "total_bytes": 72697,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "skills/bio-alignment-msa-statistics/SKILL.md",
+        "sha256": "bd4b393018045449cfb35077f196a5bfdd4c3c9af2c483f070db24e3b58a794f"
+      }
+    ]
+  },
+  "bio-alignment-pairwise@1.0.0": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "source_path": "skills/bio-alignment-pairwise",
+    "manifest_sha256": "4fa805114274808ef49e90db72f176479a3c2f2e25e136852947b4187a1469be",
+    "content_sha256": "be1b84b29cf9aa4b53c1f9d6100f1477e5a81548ff96fd163aa7e82c81dc6806",
+    "file_count": 14,
+    "total_bytes": 41530,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "skills/bio-alignment-pairwise/SKILL.md",
+        "sha256": "d97ab041a0a716de9d4d0465f4c006a462f8af61444b3df58a9560fb375f6edf"
+      }
+    ]
+  },
+  "bio-alignment-trimming@1.0.0": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "source_path": "skills/bio-alignment-trimming",
+    "manifest_sha256": "a1edd7d828bdf853528d157d10eaa7377859622967553d1d858781f8260a3593",
+    "content_sha256": "f28a52fe6598d9589462ac3b50d3a36075bfe3571ec11e4900138d6207280ce9",
+    "file_count": 8,
+    "total_bytes": 45968,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "skills/bio-alignment-trimming/SKILL.md",
+        "sha256": "e8061c8416180d7b3722e591a831736bc73c7740b32bbf05ca3fe4496066be81"
+      }
+    ]
+  },
+  "bio-alignment-validation@1.0.0": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "source_path": "skills/bio-alignment-validation",
+    "manifest_sha256": "0c4ef0dbb466a7bdbe7613e0b387ab59c3745527faae814aa699ae2a782b6684",
+    "content_sha256": "b63904a1933db33652e4a1d51faa28fab5ab2f7c706137daa3c7167d9776496f",
+    "file_count": 5,
+    "total_bytes": 36687,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "skills/bio-alignment-validation/SKILL.md",
+        "sha256": "25158bd0323386b8ffcdf2231ab75f06eed7af87da04e5b97aebafb465a281a7"
+      }
+    ]
+  },
+  "bio-proteomics-data-import@1.0.0": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "source_path": "skills/bio-proteomics-data-import",
+    "manifest_sha256": "dfd39e837a1ded4e825f40b51d9c3b5acd97e41ee349952b03e41ca75fa26ae5",
+    "content_sha256": "3c2b2222ec8873587947faab28975d89b922c4c3007fca8a99fb036bcb000a4f",
+    "file_count": 6,
+    "total_bytes": 41187,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "skills/bio-proteomics-data-import/SKILL.md",
+        "sha256": "5404f98b9abc9b4f0b6ae33d4139ad2f49f4c7a89233e9e3a1ca4f3ae025e991"
+      }
+    ]
+  },
+  "bio-proteomics-peptide-identification@1.0.0": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "source_path": "skills/bio-proteomics-peptide-identification",
+    "manifest_sha256": "16f279898480d229a0b4aa80c7cb09b8733538e3e5c048fde1b77de64d537ff5",
+    "content_sha256": "699b7c0bde8b44d443328ca2c77ea750d1e229387b04bdafdc2b5e4566c7229c",
+    "file_count": 12,
+    "total_bytes": 56443,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "skills/bio-proteomics-peptide-identification/SKILL.md",
+        "sha256": "74a6c8389cc45a112e35c7b04db8127c94e2c2394baaf76430819a72d01230c7"
+      }
+    ]
+  },
+  "bio-proteomics-protein-inference@1.0.0": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "source_path": "skills/bio-proteomics-protein-inference",
+    "manifest_sha256": "23f364f27201197bbfffeedc8139a234b8465230429036081fcca582763cbb34",
+    "content_sha256": "33045ccb909cfdde6a81fcd8686a888c185484121ae78647833198f44111493a",
+    "file_count": 10,
+    "total_bytes": 49231,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "skills/bio-proteomics-protein-inference/SKILL.md",
+        "sha256": "dbd7133032944a3648f4627e44daa866481590e7a4436b750d0fe0f1d7d4a663"
+      }
+    ]
+  },
+  "bio-proteomics-quantification@1.0.0": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "source_path": "skills/bio-proteomics-quantification",
+    "manifest_sha256": "b3d9ece0972e14f8f68b0dc8572fdfe7629300498a9272834c8e1b1d0a05386a",
+    "content_sha256": "33c2be1e3e076d868bf75f4961313e788876789bbbbe57939c985b1b3ad52a01",
+    "file_count": 10,
+    "total_bytes": 56076,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "skills/bio-proteomics-quantification/SKILL.md",
+        "sha256": "f8c7eb41aba33d30ffe397678689158df8fb0a1e77c60a3eeb916acca3b8a3af"
+      }
+    ]
+  },
+  "bio-proteomics-spectral-libraries@1.0.0": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "source_path": "skills/bio-proteomics-spectral-libraries",
+    "manifest_sha256": "66882de9e36ea9e28ab608d69cbe427fab4c64e5a36a9ce80ecf2319394b751f",
+    "content_sha256": "2154d2acfcf1080ba05fadef15136c6db14cd6aa27cfb02970afeb2cb69a6839",
+    "file_count": 8,
+    "total_bytes": 35527,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "skills/bio-proteomics-spectral-libraries/SKILL.md",
+        "sha256": "42677f204b4a227371d76ba9078b89c6197638f3ea5bf7df245c09d9f990a36b"
+      }
+    ]
+  },
+  "bio-single-cell-batch-integration@1.0.0": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "source_path": "skills/bio-single-cell-batch-integration",
+    "manifest_sha256": "5ac2f18fbb0bb3ba355ef64f28e0b1061b773ffd72a008ea052f2e9e424a9a6a",
+    "content_sha256": "2ef930037fc33a804e6ea60a28dd8d0e92443722e2d97cffc11622e8584c3e1d",
+    "file_count": 10,
+    "total_bytes": 30128,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "skills/bio-single-cell-batch-integration/SKILL.md",
+        "sha256": "0656bb679c7f486b9357880480f5de6156446475251fd7ec77e914d25d585e78"
+      }
+    ]
+  },
+  "bio-single-cell-cell-annotation@1.0.0": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "source_path": "skills/bio-single-cell-cell-annotation",
+    "manifest_sha256": "040e71992c4d7cedf33b9e1ae40e7a1821d600443f5571b0e058c0593632a8d7",
+    "content_sha256": "48db1f156c2d2d0c9314c5e765e76aec401e24dc2a2e2f3d9456c823cf8f9960",
+    "file_count": 4,
+    "total_bytes": 22823,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "skills/bio-single-cell-cell-annotation/SKILL.md",
+        "sha256": "c8b06413b128e026df1d2e0b4fe587ab26b511a0e153171c782b93db2342e698"
+      }
+    ]
+  },
+  "bio-single-cell-clustering@1.0.0": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "source_path": "skills/bio-single-cell-clustering",
+    "manifest_sha256": "49fc638f29983dfc0ddef3fb59e6d3d3ced9ad3790fae84c2c764ee41b8adb26",
+    "content_sha256": "3d57ac5742da2bb9fd41a265f913c1d1fe9e026917e7fa139c0862ef3581ce24",
+    "file_count": 5,
+    "total_bytes": 27140,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "skills/bio-single-cell-clustering/SKILL.md",
+        "sha256": "a6bf5d529c736847dc0722b66c23c7b6894bd1be36e95025316382260162c3dc"
+      }
+    ]
+  },
+  "bio-single-cell-preprocessing@1.0.0": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "source_path": "skills/bio-single-cell-preprocessing",
+    "manifest_sha256": "62cff2f0489e09954b9f83eb5696dcd02fcb5bb499ed357ebce790c2930a0a2b",
+    "content_sha256": "b7943b6a32ea2e65f1200ae6816c3af9eaf42b347f7a33960a83186065f643bb",
+    "file_count": 4,
+    "total_bytes": 31634,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "skills/bio-single-cell-preprocessing/SKILL.md",
+        "sha256": "d6a6c2f7bac0fedcde8631beb4dab6888bb817fdd09b0ea186c275c959f27371"
+      }
+    ]
+  },
+  "bio-single-cell-scatac-analysis@1.0.0": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "source_path": "skills/bio-single-cell-scatac-analysis",
+    "manifest_sha256": "53ba8d112dd2b2b34a18440f9847a72a1e98dfa100bdbee696e5698111241e3c",
+    "content_sha256": "cb51658881483f0039102526a36c9022bf02603485fe4daea83b1df972975872",
+    "file_count": 5,
+    "total_bytes": 32381,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "skills/bio-single-cell-scatac-analysis/SKILL.md",
+        "sha256": "e5ea223d7b84507bc7ed5cf4acb0027afead5694079434b70518ecea6c0d7b3d"
+      }
+    ]
+  },
+  "bio-variant-annotation@1.0.0": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "source_path": "skills/bio-variant-annotation",
+    "manifest_sha256": "574f4913390d4a55bc80468d1318b781bf9a4b8481a41dd10aa8c3a30252c9fc",
+    "content_sha256": "ba91c9e74702e3b5128af1e9a753620d47ac2b167617257574b1923337400b95",
+    "file_count": 3,
+    "total_bytes": 46741,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "skills/bio-variant-annotation/SKILL.md",
+        "sha256": "02f034e3ad4e074fae0e421c823f83adb59ee78e86f8afff4f5264550fb207a8"
+      }
+    ]
+  },
+  "bio-variant-calling-filtering-best-practices@1.0.0": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "source_path": "skills/bio-variant-calling-filtering-best-practices",
+    "manifest_sha256": "89cca709eace99e2859e97fc800d04582040d42d4adf9df4b75ea47a0ecf8aef",
+    "content_sha256": "334cd8c408c93b1667cad06eca3422c3604653fbb3e6cf589ad197d5507a630b",
+    "file_count": 3,
+    "total_bytes": 34141,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "skills/bio-variant-calling-filtering-best-practices/SKILL.md",
+        "sha256": "8574e51caf2020a60d65622cb9fb181c634500f5ab3338ab5dd029866ceec2d3"
+      }
+    ]
+  },
+  "bio-variant-normalization@1.0.0": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "source_path": "skills/bio-variant-normalization",
+    "manifest_sha256": "80e3506db2a1910089ea68554b17208e748e7580c553e86ab75b978924980e9f",
+    "content_sha256": "19ac2f5b53fe3f9cb27403cfbe5ed2549aa068e484f5a55a43ace0f6cdee2fa1",
+    "file_count": 4,
+    "total_bytes": 32883,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "skills/bio-variant-normalization/SKILL.md",
+        "sha256": "7d92f2c35ffef282bf3a3c43a285960dcde557939ed426df2ef8ebe72f1bda13"
+      }
+    ]
+  },
+  "bio-vcf-basics@1.0.0": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "source_path": "skills/bio-vcf-basics",
+    "manifest_sha256": "934f5c1d9223358cb36e4d1376c6792ec664e154773ebb88ab9a280bc45d86c5",
+    "content_sha256": "9c74b149dd1df5f709a15c0695d9c0d599cdd35beed0c65e0f1502d99d5f6f65",
+    "file_count": 3,
+    "total_bytes": 27472,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "skills/bio-vcf-basics/SKILL.md",
+        "sha256": "33c16090e10507b61869e603f460c49a01a31a6971293d652757095a6bc42c1a"
+      }
+    ]
+  },
+  "bio-vcf-statistics@1.0.0": {
+    "source_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "source_commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "source_path": "skills/bio-vcf-statistics",
+    "manifest_sha256": "b8a7d080cf7eae686b3e2cacd757b2870fda78b16da47157978a235ad2b0360b",
+    "content_sha256": "6a2a65d7c17d7f97ec86f12621f8c71f17f9f26281fad97043cb34477fdf468d",
+    "file_count": 3,
+    "total_bytes": 27828,
+    "license_expression": "MIT",
+    "license_files": [
+      {
+        "path": "LICENSE",
+        "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+      },
+      {
+        "path": "skills/bio-vcf-statistics/SKILL.md",
+        "sha256": "30007a60bae29631dc0298ac7ce508a82464d7d3f09c365e13f05f13308757a2"
+      }
+    ]
+  }
+}
