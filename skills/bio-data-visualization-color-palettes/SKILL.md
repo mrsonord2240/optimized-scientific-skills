@@ -198,6 +198,37 @@ plt.imshow(data, cmap='RdBu_r', vmin=-vmax, vmax=vmax)
 
 Do not use `vmin=data.min(), vmax=data.max()` for signed data: asymmetric bounds move zero away from the palette centre.
 
+## Nonzero References and Missing Values
+
+The meaningful centre of a diverging scale is the scientific reference, not necessarily zero. State that reference explicitly, choose bounds on both sides of it, and keep missing or non-finite cells out of the quantitative scale. Give missing values a separate neutral color and label it as missing rather than implying a numeric value.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.colors import TwoSlopeNorm
+
+reference = 0.5
+masked = np.ma.masked_invalid(data)
+norm = TwoSlopeNorm(vmin=0.0, vcenter=reference, vmax=1.0)
+cmap = plt.get_cmap('RdBu_r').copy()
+cmap.set_bad('#BBBBBB')
+plt.imshow(masked, cmap=cmap, norm=norm)
+```
+
+`TwoSlopeNorm` maps the declared reference to the palette centre. Validate that `vmin < reference < vmax`; if that is not true, a diverging scale is not defined for the supplied bounds. Report how many values were masked, and show missingness in the legend or caption.
+
+## Palette Audit Response Contract
+
+When recommending or auditing a palette, report this compact checklist:
+
+- palette name and type: sequential, diverging, cyclic, or categorical
+- normalization, bounds, and reference: include clipping or percentile rules
+- missing values: masked count and their separate neutral encoding
+- CVD minimum distances: deutan, protan, and tritan for categorical mappings
+- luminance verdict: monotonic, non-monotonic, or not applicable
+- redundant encoding: shape, labels, facets, or none with a reason
+- visual inspection: artifact opened, simulation inspected, and any limitation
+
 ## Custom Palette Construction
 
 ```r
