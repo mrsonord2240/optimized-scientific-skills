@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated": "2026-09-17",
+  "generated": "2026-09-27",
   "note": "Provenance is per Skill. The tree is flat by Skill id; upstream_path records where each Skill came from in its source repository.",
   "sources": {
     "gptomics-bioskills": {
@@ -8,8 +8,9 @@
       "upstream_commit": "d91ed3d563019e649dc854c56ccd62551359488a",
       "upstream_licence": "MIT",
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
-      "staging_repository": "https://github.com/mrsonord2240/bioSkills-Improved",
-      "staging_commit": "7963580251c856f48511aa64c438dd798decb0ae"
+      "provider_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+      "provider_ref": "main",
+      "provider_skills_tree": "f6f667d061dc2ac8eab9ee261b97301c5eb873d2"
     }
   },
   "skills": [
@@ -1281,6 +1282,52 @@
       "marketplace_ready": true
     },
     {
+      "id": "bio-data-visualization-color-palettes",
+      "upstream_path": "data-visualization/color-palettes",
+      "score": 97,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-27",
+      "fix_log": "fixes/bio-data-visualization-color-palettes.md",
+      "fix_pass": "done",
+      "category": "Data Analysis",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "examples/palette_examples.R",
+        "examples/palettes_phd.R",
+        "tests/validate_palette_contracts.R",
+        "tests/validate_palette_contracts.py",
+        "usage-guide.md"
+      ],
+      "marketplace_ready": false
+    },
+    {
+      "id": "bio-data-visualization-dimensionality-reduction-plots",
+      "upstream_path": "data-visualization/dimensionality-reduction-plots",
+      "score": 95,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-27",
+      "fix_log": "fixes/bio-data-visualization-dimensionality-reduction-plots.md",
+      "fix_pass": "done",
+      "category": "Data Analysis",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "examples/embedding_phd.py",
+        "references/method-recipes.md",
+        "references/neighborhood-validation.md",
+        "tests/test_embedding_phd.py",
+        "usage-guide.md"
+      ],
+      "marketplace_ready": false
+    },
+    {
       "id": "bio-data-visualization-forest-funnel-plots",
       "upstream_path": "data-visualization/forest-funnel-plots",
       "score": 95,
@@ -1299,6 +1346,61 @@
         "usage-guide.md"
       ],
       "marketplace_ready": true
+    },
+    {
+      "id": "bio-data-visualization-network-visualization",
+      "upstream_path": "data-visualization/network-visualization",
+      "score": 97,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-27",
+      "fix_log": "fixes/bio-data-visualization-network-visualization.md",
+      "fix_pass": "done",
+      "category": "Data Analysis",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "examples/cytoscape_automation.py",
+        "examples/interactive_network.py",
+        "examples/network_plots.py",
+        "references/interactive-and-cytoscape.md",
+        "references/python-layouts.md",
+        "references/r-layouts.md",
+        "scripts/directed_network.py",
+        "scripts/edge_bundling.R",
+        "scripts/ggraph_layouts.R",
+        "scripts/layouts.py",
+        "tests/test_network_recipes.py",
+        "usage-guide.md"
+      ],
+      "marketplace_ready": false
+    },
+    {
+      "id": "bio-data-visualization-oncoprint-mutation-matrices",
+      "upstream_path": "data-visualization/oncoprint-mutation-matrices",
+      "score": 97,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-27",
+      "fix_log": "fixes/bio-data-visualization-oncoprint-mutation-matrices.md",
+      "fix_pass": "done",
+      "category": "Data Analysis",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "examples/oncoprint_phd.R",
+        "scripts/comut_plot.py",
+        "scripts/maf_to_oncoprint.R",
+        "tests/test_comut_plot.py",
+        "tests/test_maf_to_oncoprint.R",
+        "tests/test_maftools_oncoplot.R",
+        "usage-guide.md"
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-data-visualization-sequence-logos",
@@ -1326,6 +1428,36 @@
         "usage-guide.md"
       ],
       "marketplace_ready": true
+    },
+    {
+      "id": "bio-data-visualization-statistical-annotation",
+      "upstream_path": "data-visualization/statistical-annotation",
+      "score": 95,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-27",
+      "fix_log": "fixes/bio-data-visualization-statistical-annotation.md",
+      "fix_pass": "done",
+      "category": "Data Analysis",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "examples/data/nested.csv",
+        "examples/data/paired.csv",
+        "examples/data/three_group.csv",
+        "examples/statanno_phd.R",
+        "scripts/annotate_nested.R",
+        "scripts/annotate_paired.R",
+        "scripts/annotate_paired.py",
+        "scripts/annotate_pairwise.R",
+        "scripts/annotate_pairwise.py",
+        "tests/regression.R",
+        "tests/regression.py",
+        "usage-guide.md"
+      ],
+      "marketplace_ready": false
     },
     {
       "id": "bio-differential-expression-deseq2-basics",

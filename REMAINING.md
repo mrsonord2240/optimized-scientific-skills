@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**396 remaining** across 52 folders. 157 are already refined and live in `skills/`.
+**396 remaining** across 52 folders. 162 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 157 refined, 8 audited and excluded, 1 out of scope, 396 remaining.
+The source tree holds 562 Skills: 162 refined, 3 audited and excluded, 1 out of scope, 396 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -18,7 +18,7 @@ The source tree holds 562 Skills: 157 refined, 8 audited and excluded, 1 out of 
 | clip-seq | 12 | 0 |
 | spatial-transcriptomics | 12 | 0 |
 | copy-number | 11 | 0 |
-| data-visualization | 10 | 2 |
+| data-visualization | 10 | 7 |
 | methylation-analysis | 10 | 0 |
 | structural-biology | 10 | 0 |
 | genome-assembly | 9 | 0 |
@@ -74,8 +74,11 @@ are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.
 
 ## Promoted, re-audit still needed
 
-None. The three packages changed during pilot preparation were independently re-audited
-against the exact submitted source commit on 2026-09-25.
+Changed in the provider after its latest audit, so the score describes earlier bytes.
+`reaudit` in PROVENANCE.json carries the same flag.
+
+| skill | score at last audit | audited on |
+| --- | ---: | --- |
 
 ## Audited and excluded
 
@@ -84,13 +87,8 @@ fixed.
 
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
-| `bio-data-visualization-color-palettes` | 71.8 | Beta Only | 0 |
-| `bio-data-visualization-dimensionality-reduction-plots` | 75 | Beta Only | 0 |
 | `bio-data-visualization-ggplot2-fundamentals` | 75 | Beta Only | 0 |
 | `bio-data-visualization-matplotlib-fundamentals` | 75 | Beta Only | 0 |
-| `bio-data-visualization-network-visualization` | 74 | Beta Only | 0 |
-| `bio-data-visualization-oncoprint-mutation-matrices` | 73 | Beta Only | 0 |
-| `bio-data-visualization-statistical-annotation` | 71.2 | Beta Only | 0 |
 | `bio-data-visualization-volcano-and-ma-plots` | 76 | Beta Only | 0 |
 
 ## Out of scope

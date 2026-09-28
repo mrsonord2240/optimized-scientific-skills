@@ -25,8 +25,8 @@ justified.
 
 | | count |
 | --- | ---: |
-| Skills in this repository | **157** |
-| substantively modified by us, each with a fix log | 138 |
+| Skills in this repository | **162** |
+| substantively modified by us, each with a fix log | 143 |
 | unmodified apart from declared `license: MIT` and `author: GPTomics` lines | 19 |
 | **fix pass still needed** (first audit only, whatever the score) | **0** |
 | **re-audit still needed** (changed after their latest audit) | **0** |
@@ -60,8 +60,9 @@ each modified Skill — is published separately in
 [optimizing-agent-science-skills](https://github.com/mrsonord2240/optimizing-agent-science-skills)
 under `audits/skills/<skill-id>/`.
 
-## Staging
+## Work in progress
 
-Work in progress lives in
-[bioSkills-Improved](https://github.com/mrsonord2240/bioSkills-Improved), which holds the whole
-upstream corpus with fixes in flight. A Skill is promoted here only once its re-audit passes.
+Fixes are developed on topic branches and linked worktrees in this repository. The archived
+[GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) repository is read-only provenance, not a
+staging source. Skill bytes reach `main` only after an independent re-audit passes; the records
+repository then reconciles provenance and remaining-work metadata without rebuilding `skills/`.

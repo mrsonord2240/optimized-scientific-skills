@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated": "2026-09-17",
+  "generated": "2026-09-27",
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 157,
-    "audited_and_excluded": 8,
+    "refined": 162,
+    "audited_and_excluded": 3,
     "out_of_scope": 1,
     "remaining": 396
   },
@@ -1597,30 +1597,6 @@
   ],
   "excluded": [
     {
-      "id": "bio-data-visualization-color-palettes",
-      "upstream_path": "data-visualization/color-palettes",
-      "score": 71.8,
-      "grade": "Beta Only",
-      "deployable": false,
-      "open_p0": 0,
-      "audited_on": "2026-09-20",
-      "fix_log": null,
-      "fix_pass": "needed",
-      "reaudit": "not needed"
-    },
-    {
-      "id": "bio-data-visualization-dimensionality-reduction-plots",
-      "upstream_path": "data-visualization/dimensionality-reduction-plots",
-      "score": 75,
-      "grade": "Beta Only",
-      "deployable": false,
-      "open_p0": 0,
-      "audited_on": "2026-09-20",
-      "fix_log": null,
-      "fix_pass": "needed",
-      "reaudit": "not needed"
-    },
-    {
       "id": "bio-data-visualization-ggplot2-fundamentals",
       "upstream_path": "data-visualization/ggplot2-fundamentals",
       "score": 75,
@@ -1636,42 +1612,6 @@
       "id": "bio-data-visualization-matplotlib-fundamentals",
       "upstream_path": "data-visualization/matplotlib-fundamentals",
       "score": 75,
-      "grade": "Beta Only",
-      "deployable": false,
-      "open_p0": 0,
-      "audited_on": "2026-09-20",
-      "fix_log": null,
-      "fix_pass": "needed",
-      "reaudit": "not needed"
-    },
-    {
-      "id": "bio-data-visualization-network-visualization",
-      "upstream_path": "data-visualization/network-visualization",
-      "score": 74,
-      "grade": "Beta Only",
-      "deployable": false,
-      "open_p0": 0,
-      "audited_on": "2026-09-20",
-      "fix_log": null,
-      "fix_pass": "needed",
-      "reaudit": "not needed"
-    },
-    {
-      "id": "bio-data-visualization-oncoprint-mutation-matrices",
-      "upstream_path": "data-visualization/oncoprint-mutation-matrices",
-      "score": 73,
-      "grade": "Beta Only",
-      "deployable": false,
-      "open_p0": 0,
-      "audited_on": "2026-09-20",
-      "fix_log": null,
-      "fix_pass": "needed",
-      "reaudit": "not needed"
-    },
-    {
-      "id": "bio-data-visualization-statistical-annotation",
-      "upstream_path": "data-visualization/statistical-annotation",
-      "score": 71.2,
       "grade": "Beta Only",
       "deployable": false,
       "open_p0": 0,
