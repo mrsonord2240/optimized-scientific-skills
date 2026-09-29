@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "generated": "2026-09-28",
+  "generated": "2026-09-29",
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 172,
+    "refined": 173,
     "audited_and_excluded": 3,
     "out_of_scope": 1,
-    "remaining": 386
+    "remaining": 385
   },
   "remaining": [
     {
@@ -21,10 +21,6 @@
     {
       "id": "bio-atac-seq-co-accessibility",
       "upstream_path": "atac-seq/co-accessibility"
-    },
-    {
-      "id": "bio-atac-seq-consensus-peakset",
-      "upstream_path": "atac-seq/consensus-peakset"
     },
     {
       "id": "bio-atac-seq-deep-learning-atac",

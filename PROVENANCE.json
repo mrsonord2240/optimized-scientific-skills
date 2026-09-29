@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated": "2026-09-28",
+  "generated": "2026-09-29",
   "note": "Provenance is per Skill. The tree is flat by Skill id; upstream_path records where each Skill came from in its source repository.",
   "sources": {
     "gptomics-bioskills": {
@@ -10,7 +10,7 @@
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "provider_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
       "provider_ref": "main",
-      "provider_skills_tree": "0ff7624f5ad62ba005fd5c44f61f2ce5e67574d0"
+      "provider_skills_tree": "5ff1503af7465e7fa49865cdbfbb769b27d22021"
     }
   },
   "skills": [
@@ -395,6 +395,30 @@
         "tests/test_aggregate_peak_ase.py",
         "tests/test_rasqual_driver.py",
         "tests/test_skill_contract.py",
+        "usage-guide.md"
+      ],
+      "marketplace_ready": false
+    },
+    {
+      "id": "bio-atac-seq-consensus-peakset",
+      "upstream_path": "atac-seq/consensus-peakset",
+      "score": 91,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-09-29",
+      "fix_log": "fixes/bio-atac-seq-consensus-peakset.md",
+      "fix_pass": "done",
+      "category": "Data Analysis",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "LICENSE",
+        "SKILL.md",
+        "examples/iterative_overlap.sh",
+        "references/method-reference.md",
+        "references/usage-guide.md",
+        "scripts/iterative_overlap.sh",
         "usage-guide.md"
       ],
       "marketplace_ready": false

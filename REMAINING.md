@@ -4,20 +4,20 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**386 remaining** across 52 folders. 172 are already refined and live in `skills/`.
+**385 remaining** across 52 folders. 173 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 172 refined, 3 audited and excluded, 1 out of scope, 386 remaining.
+The source tree holds 562 Skills: 173 refined, 3 audited and excluded, 1 out of scope, 385 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
 | workflows | 37 | 4 |
 | comparative-genomics | 12 | 1 |
 | spatial-transcriptomics | 12 | 0 |
-| atac-seq | 11 | 1 |
 | chip-seq | 11 | 1 |
 | clinical-biostatistics | 11 | 1 |
 | clip-seq | 11 | 1 |
 | copy-number | 11 | 0 |
+| atac-seq | 10 | 2 |
 | data-visualization | 10 | 7 |
 | methylation-analysis | 10 | 0 |
 | structural-biology | 10 | 0 |
@@ -108,7 +108,6 @@ fixed.
 - `bio-atac-seq-atac-peak-calling` — `atac-seq/atac-peak-calling`
 - `bio-atac-seq-atac-qc` — `atac-seq/atac-qc`
 - `bio-atac-seq-co-accessibility` — `atac-seq/co-accessibility`
-- `bio-atac-seq-consensus-peakset` — `atac-seq/consensus-peakset`
 - `bio-atac-seq-deep-learning-atac` — `atac-seq/deep-learning-atac`
 - `bio-atac-seq-differential-accessibility` — `atac-seq/differential-accessibility`
 - `bio-atac-seq-enhancer-gene-linking` — `atac-seq/enhancer-gene-linking`
