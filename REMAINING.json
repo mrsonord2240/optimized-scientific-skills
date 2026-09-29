@@ -1,23 +1,15 @@
 {
   "schema_version": 1,
-  "generated": "2026-09-27",
+  "generated": "2026-09-28",
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 162,
+    "refined": 172,
     "audited_and_excluded": 3,
     "out_of_scope": 1,
-    "remaining": 396
+    "remaining": 386
   },
   "remaining": [
-    {
-      "id": "bio-analytical-validation",
-      "upstream_path": "liquid-biopsy/analytical-validation"
-    },
-    {
-      "id": "bio-atac-seq-allele-specific-accessibility",
-      "upstream_path": "atac-seq/allele-specific-accessibility"
-    },
     {
       "id": "bio-atac-seq-atac-peak-calling",
       "upstream_path": "atac-seq/atac-peak-calling"
@@ -61,18 +53,6 @@
     {
       "id": "bio-atac-seq-single-cell-atac",
       "upstream_path": "atac-seq/single-cell-atac"
-    },
-    {
-      "id": "bio-batch-processing",
-      "upstream_path": "sequence-io/batch-processing"
-    },
-    {
-      "id": "bio-cfdna-preprocessing",
-      "upstream_path": "liquid-biopsy/cfdna-preprocessing"
-    },
-    {
-      "id": "bio-chipseq-allele-specific-binding",
-      "upstream_path": "chip-seq/allele-specific-binding"
     },
     {
       "id": "bio-chipseq-chip-deep-learning",
@@ -119,10 +99,6 @@
       "upstream_path": "chip-seq/chipseq-visualization"
     },
     {
-      "id": "bio-clinical-biostatistics-adaptive-designs",
-      "upstream_path": "clinical-biostatistics/adaptive-designs"
-    },
-    {
       "id": "bio-clinical-biostatistics-bayesian-trials",
       "upstream_path": "clinical-biostatistics/bayesian-trials"
     },
@@ -167,10 +143,6 @@
       "upstream_path": "clinical-biostatistics/trial-reporting"
     },
     {
-      "id": "bio-clinical-databases-acmg-classification",
-      "upstream_path": "clinical-databases/acmg-classification"
-    },
-    {
       "id": "bio-clinical-databases-hla-typing",
       "upstream_path": "clinical-databases/hla-typing"
     },
@@ -197,10 +169,6 @@
     {
       "id": "bio-clinical-databases-variant-prioritization",
       "upstream_path": "clinical-databases/variant-prioritization"
-    },
-    {
-      "id": "bio-clip-seq-ago-clip-mirna-targets",
-      "upstream_path": "clip-seq/ago-clip-mirna-targets"
     },
     {
       "id": "bio-clip-seq-binding-site-annotation",
@@ -245,14 +213,6 @@
     {
       "id": "bio-clip-seq-stamp-antibody-free",
       "upstream_path": "clip-seq/stamp-antibody-free"
-    },
-    {
-      "id": "bio-codon-usage",
-      "upstream_path": "sequence-manipulation/codon-usage"
-    },
-    {
-      "id": "bio-comparative-genomics-ancestral-reconstruction",
-      "upstream_path": "comparative-genomics/ancestral-reconstruction"
     },
     {
       "id": "bio-comparative-genomics-comparative-annotation-projection",

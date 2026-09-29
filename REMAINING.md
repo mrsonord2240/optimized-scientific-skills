@@ -4,19 +4,19 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**396 remaining** across 52 folders. 162 are already refined and live in `skills/`.
+**386 remaining** across 52 folders. 172 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 162 refined, 3 audited and excluded, 1 out of scope, 396 remaining.
+The source tree holds 562 Skills: 172 refined, 3 audited and excluded, 1 out of scope, 386 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
 | workflows | 37 | 4 |
-| comparative-genomics | 13 | 0 |
-| atac-seq | 12 | 0 |
-| chip-seq | 12 | 0 |
-| clinical-biostatistics | 12 | 0 |
-| clip-seq | 12 | 0 |
+| comparative-genomics | 12 | 1 |
 | spatial-transcriptomics | 12 | 0 |
+| atac-seq | 11 | 1 |
+| chip-seq | 11 | 1 |
+| clinical-biostatistics | 11 | 1 |
+| clip-seq | 11 | 1 |
 | copy-number | 11 | 0 |
 | data-visualization | 10 | 7 |
 | methylation-analysis | 10 | 0 |
@@ -24,16 +24,14 @@ The source tree holds 562 Skills: 162 refined, 3 audited and excluded, 1 out of 
 | genome-assembly | 9 | 0 |
 | hi-c-analysis | 9 | 0 |
 | long-read-sequencing | 9 | 0 |
-| sequence-io | 9 | 0 |
-| clinical-databases | 8 | 4 |
 | flow-cytometry | 8 | 0 |
 | genome-intervals | 8 | 0 |
 | metagenomics | 8 | 0 |
+| sequence-io | 8 | 1 |
+| clinical-databases | 7 | 5 |
 | genome-annotation | 7 | 0 |
 | imaging-mass-cytometry | 7 | 0 |
-| liquid-biopsy | 7 | 0 |
 | read-qc | 7 | 0 |
-| sequence-manipulation | 7 | 0 |
 | systems-biology | 7 | 0 |
 | variant-calling | 7 | 6 |
 | ecological-genomics | 6 | 0 |
@@ -42,6 +40,7 @@ The source tree holds 562 Skills: 162 refined, 3 audited and excluded, 1 out of 
 | population-genetics | 6 | 1 |
 | reporting | 6 | 0 |
 | ribo-seq | 6 | 0 |
+| sequence-manipulation | 6 | 1 |
 | small-rna-seq | 6 | 0 |
 | tcr-bcr-analysis | 6 | 0 |
 | temporal-genomics | 6 | 0 |
@@ -51,6 +50,7 @@ The source tree holds 562 Skills: 162 refined, 3 audited and excluded, 1 out of 
 | epitranscriptomics | 5 | 0 |
 | expression-matrix | 5 | 0 |
 | genome-engineering | 5 | 0 |
+| liquid-biopsy | 5 | 2 |
 | multi-omics-integration | 5 | 0 |
 | restriction-analysis | 5 | 0 |
 | workflow-management | 5 | 0 |
@@ -105,7 +105,6 @@ fixed.
 
 ### atac-seq
 
-- `bio-atac-seq-allele-specific-accessibility` — `atac-seq/allele-specific-accessibility`
 - `bio-atac-seq-atac-peak-calling` — `atac-seq/atac-peak-calling`
 - `bio-atac-seq-atac-qc` — `atac-seq/atac-qc`
 - `bio-atac-seq-co-accessibility` — `atac-seq/co-accessibility`
@@ -128,7 +127,6 @@ fixed.
 
 ### chip-seq
 
-- `bio-chipseq-allele-specific-binding` — `chip-seq/allele-specific-binding`
 - `bio-chipseq-chip-deep-learning` — `chip-seq/chip-deep-learning`
 - `bio-chipseq-chromatin-state-segmentation` — `chip-seq/chromatin-state-segmentation`
 - `bio-chipseq-cut-and-run-tag` — `chip-seq/cut-and-run-tag`
@@ -143,7 +141,6 @@ fixed.
 
 ### clinical-biostatistics
 
-- `bio-clinical-biostatistics-adaptive-designs` — `clinical-biostatistics/adaptive-designs`
 - `bio-clinical-biostatistics-bayesian-trials` — `clinical-biostatistics/bayesian-trials`
 - `bio-clinical-biostatistics-categorical-tests` — `clinical-biostatistics/categorical-tests`
 - `bio-clinical-biostatistics-cdisc-data` — `clinical-biostatistics/cdisc-data-handling`
@@ -158,7 +155,6 @@ fixed.
 
 ### clinical-databases
 
-- `bio-clinical-databases-acmg-classification` — `clinical-databases/acmg-classification`
 - `bio-clinical-databases-hla-typing` — `clinical-databases/hla-typing`
 - `bio-clinical-databases-msi-detection` — `clinical-databases/msi-detection`
 - `bio-clinical-databases-pharmacogenomics` — `clinical-databases/pharmacogenomics`
@@ -169,7 +165,6 @@ fixed.
 
 ### clip-seq
 
-- `bio-clip-seq-ago-clip-mirna-targets` — `clip-seq/ago-clip-mirna-targets`
 - `bio-clip-seq-binding-site-annotation` — `clip-seq/binding-site-annotation`
 - `bio-clip-seq-clip-alignment` — `clip-seq/clip-alignment`
 - `bio-clip-seq-clip-deep-learning` — `clip-seq/clip-deep-learning`
@@ -184,7 +179,6 @@ fixed.
 
 ### comparative-genomics
 
-- `bio-comparative-genomics-ancestral-reconstruction` — `comparative-genomics/ancestral-reconstruction`
 - `bio-comparative-genomics-comparative-annotation-projection` — `comparative-genomics/comparative-annotation-projection`
 - `bio-comparative-genomics-gene-family-evolution` — `comparative-genomics/gene-family-evolution`
 - `bio-comparative-genomics-gene-tree-species-tree-reconciliation` — `comparative-genomics/gene-tree-species-tree-reconciliation`
@@ -367,8 +361,6 @@ fixed.
 
 ### liquid-biopsy
 
-- `bio-analytical-validation` — `liquid-biopsy/analytical-validation`
-- `bio-cfdna-preprocessing` — `liquid-biopsy/cfdna-preprocessing`
 - `bio-ctdna-mutation-detection` — `liquid-biopsy/ctdna-mutation-detection`
 - `bio-fragment-analysis` — `liquid-biopsy/fragment-analysis`
 - `bio-longitudinal-monitoring` — `liquid-biopsy/longitudinal-monitoring`
@@ -508,7 +500,6 @@ fixed.
 
 ### sequence-io
 
-- `bio-batch-processing` — `sequence-io/batch-processing`
 - `bio-compressed-files` — `sequence-io/compressed-files`
 - `bio-fastq-quality` — `sequence-io/fastq-quality`
 - `bio-filter-sequences` — `sequence-io/filter-sequences`
@@ -520,7 +511,6 @@ fixed.
 
 ### sequence-manipulation
 
-- `bio-codon-usage` — `sequence-manipulation/codon-usage`
 - `bio-motif-search` — `sequence-manipulation/motif-search`
 - `bio-reverse-complement` — `sequence-manipulation/reverse-complement`
 - `bio-seq-objects` — `sequence-manipulation/seq-objects`
