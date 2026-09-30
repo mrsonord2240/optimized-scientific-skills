@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**385 remaining** across 52 folders. 173 are already refined and live in `skills/`.
+**375 remaining** across 51 folders. 183 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 173 refined, 3 audited and excluded, 1 out of scope, 385 remaining.
+The source tree holds 562 Skills: 183 refined, 3 audited and excluded, 1 out of scope, 375 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -17,7 +17,6 @@ The source tree holds 562 Skills: 173 refined, 3 audited and excluded, 1 out of 
 | clinical-biostatistics | 11 | 1 |
 | clip-seq | 11 | 1 |
 | copy-number | 11 | 0 |
-| atac-seq | 10 | 2 |
 | data-visualization | 10 | 7 |
 | methylation-analysis | 10 | 0 |
 | structural-biology | 10 | 0 |
@@ -102,19 +101,6 @@ fixed.
 ### alternative-splicing
 
 - `bio-splicing-quantification` — `alternative-splicing/splicing-quantification`
-
-### atac-seq
-
-- `bio-atac-seq-atac-peak-calling` — `atac-seq/atac-peak-calling`
-- `bio-atac-seq-atac-qc` — `atac-seq/atac-qc`
-- `bio-atac-seq-co-accessibility` — `atac-seq/co-accessibility`
-- `bio-atac-seq-deep-learning-atac` — `atac-seq/deep-learning-atac`
-- `bio-atac-seq-differential-accessibility` — `atac-seq/differential-accessibility`
-- `bio-atac-seq-enhancer-gene-linking` — `atac-seq/enhancer-gene-linking`
-- `bio-atac-seq-footprinting` — `atac-seq/footprinting`
-- `bio-atac-seq-motif-deviation` — `atac-seq/motif-deviation`
-- `bio-atac-seq-nucleosome-positioning` — `atac-seq/nucleosome-positioning`
-- `bio-atac-seq-single-cell-atac` — `atac-seq/single-cell-atac`
 
 ### chemoinformatics
 

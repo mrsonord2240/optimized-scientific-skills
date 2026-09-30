@@ -1,55 +1,15 @@
 {
   "schema_version": 1,
-  "generated": "2026-09-29",
+  "generated": "2026-09-30",
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 173,
+    "refined": 183,
     "audited_and_excluded": 3,
     "out_of_scope": 1,
-    "remaining": 385
+    "remaining": 375
   },
   "remaining": [
-    {
-      "id": "bio-atac-seq-atac-peak-calling",
-      "upstream_path": "atac-seq/atac-peak-calling"
-    },
-    {
-      "id": "bio-atac-seq-atac-qc",
-      "upstream_path": "atac-seq/atac-qc"
-    },
-    {
-      "id": "bio-atac-seq-co-accessibility",
-      "upstream_path": "atac-seq/co-accessibility"
-    },
-    {
-      "id": "bio-atac-seq-deep-learning-atac",
-      "upstream_path": "atac-seq/deep-learning-atac"
-    },
-    {
-      "id": "bio-atac-seq-differential-accessibility",
-      "upstream_path": "atac-seq/differential-accessibility"
-    },
-    {
-      "id": "bio-atac-seq-enhancer-gene-linking",
-      "upstream_path": "atac-seq/enhancer-gene-linking"
-    },
-    {
-      "id": "bio-atac-seq-footprinting",
-      "upstream_path": "atac-seq/footprinting"
-    },
-    {
-      "id": "bio-atac-seq-motif-deviation",
-      "upstream_path": "atac-seq/motif-deviation"
-    },
-    {
-      "id": "bio-atac-seq-nucleosome-positioning",
-      "upstream_path": "atac-seq/nucleosome-positioning"
-    },
-    {
-      "id": "bio-atac-seq-single-cell-atac",
-      "upstream_path": "atac-seq/single-cell-atac"
-    },
     {
       "id": "bio-chipseq-chip-deep-learning",
       "upstream_path": "chip-seq/chip-deep-learning"
