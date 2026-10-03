@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "generated": "2026-09-30",
+  "generated": "2026-10-03",
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 183,
+    "refined": 187,
     "audited_and_excluded": 3,
     "out_of_scope": 1,
-    "remaining": 375
+    "remaining": 371
   },
   "remaining": [
     {
@@ -359,10 +359,6 @@
       "upstream_path": "ecological-genomics/species-delimitation"
     },
     {
-      "id": "bio-ensembl-rest",
-      "upstream_path": "database-access/ensembl-rest"
-    },
-    {
       "id": "bio-epidemiological-genomics-amr-surveillance",
       "upstream_path": "epidemiological-genomics/amr-surveillance"
     },
@@ -711,10 +707,6 @@
       "upstream_path": "immunoinformatics/tcr-epitope-binding"
     },
     {
-      "id": "bio-interaction-databases",
-      "upstream_path": "database-access/interaction-databases"
-    },
-    {
       "id": "bio-long-read-sequencing-basecalling",
       "upstream_path": "long-read-sequencing/basecalling"
     },
@@ -873,10 +865,6 @@
     {
       "id": "bio-multi-omics-similarity-network",
       "upstream_path": "multi-omics-integration/similarity-network"
-    },
-    {
-      "id": "bio-ortholog-inference",
-      "upstream_path": "database-access/ortholog-inference"
     },
     {
       "id": "bio-paired-end-fastq",
@@ -1313,10 +1301,6 @@
     {
       "id": "bio-tumor-fraction-estimation",
       "upstream_path": "liquid-biopsy/tumor-fraction-estimation"
-    },
-    {
-      "id": "bio-uniprot-access",
-      "upstream_path": "database-access/uniprot-access"
     },
     {
       "id": "bio-variant-calling",

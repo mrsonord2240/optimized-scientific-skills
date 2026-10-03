@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**375 remaining** across 51 folders. 183 are already refined and live in `skills/`.
+**371 remaining** across 50 folders. 187 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 183 refined, 3 audited and excluded, 1 out of scope, 375 remaining.
+The source tree holds 562 Skills: 187 refined, 3 audited and excluded, 1 out of scope, 371 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -53,7 +53,6 @@ The source tree holds 562 Skills: 183 refined, 3 audited and excluded, 1 out of 
 | multi-omics-integration | 5 | 0 |
 | restriction-analysis | 5 | 0 |
 | workflow-management | 5 | 0 |
-| database-access | 4 | 11 |
 | machine-learning | 4 | 2 |
 | phasing-imputation | 4 | 0 |
 | primer-design | 4 | 0 |
@@ -203,13 +202,6 @@ fixed.
 - `bio-data-visualization-manhattan-qq-locuszoom` — `data-visualization/manhattan-qq-locuszoom`
 - `bio-data-visualization-multipanel-figures` — `data-visualization/multipanel-figures`
 - `bio-data-visualization-upset-plots` — `data-visualization/upset-plots`
-
-### database-access
-
-- `bio-ensembl-rest` — `database-access/ensembl-rest`
-- `bio-interaction-databases` — `database-access/interaction-databases`
-- `bio-ortholog-inference` — `database-access/ortholog-inference`
-- `bio-uniprot-access` — `database-access/uniprot-access`
 
 ### differential-expression
 
