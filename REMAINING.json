@@ -4,10 +4,10 @@
   "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a",
   "reconciliation": {
     "skills_in_source_tree": 562,
-    "refined": 187,
-    "audited_and_excluded": 3,
+    "refined": 195,
+    "audited_and_excluded": 0,
     "out_of_scope": 1,
-    "remaining": 371
+    "remaining": 366
   },
   "remaining": [
     {
@@ -747,22 +747,6 @@
       "upstream_path": "liquid-biopsy/longitudinal-monitoring"
     },
     {
-      "id": "bio-machine-learning-atlas-mapping",
-      "upstream_path": "machine-learning/atlas-mapping"
-    },
-    {
-      "id": "bio-machine-learning-biomarker-discovery",
-      "upstream_path": "machine-learning/biomarker-discovery"
-    },
-    {
-      "id": "bio-machine-learning-omics-classifiers",
-      "upstream_path": "machine-learning/omics-classifiers"
-    },
-    {
-      "id": "bio-machine-learning-survival-analysis",
-      "upstream_path": "machine-learning/survival-analysis"
-    },
-    {
       "id": "bio-metagenomics-abundance",
       "upstream_path": "metagenomics/abundance-estimation"
     },
@@ -1175,10 +1159,6 @@
       "upstream_path": "spatial-transcriptomics/spatial-visualization"
     },
     {
-      "id": "bio-splicing-quantification",
-      "upstream_path": "alternative-splicing/splicing-quantification"
-    },
-    {
       "id": "bio-structural-biology-alphafold-predictions",
       "upstream_path": "structural-biology/alphafold-predictions"
     },
@@ -1495,44 +1475,7 @@
       "upstream_path": "sequence-io/write-sequences"
     }
   ],
-  "excluded": [
-    {
-      "id": "bio-data-visualization-ggplot2-fundamentals",
-      "upstream_path": "data-visualization/ggplot2-fundamentals",
-      "score": 75,
-      "grade": "Beta Only",
-      "deployable": false,
-      "open_p0": 0,
-      "audited_on": "2026-09-20",
-      "fix_log": null,
-      "fix_pass": "needed",
-      "reaudit": "not needed"
-    },
-    {
-      "id": "bio-data-visualization-matplotlib-fundamentals",
-      "upstream_path": "data-visualization/matplotlib-fundamentals",
-      "score": 75,
-      "grade": "Beta Only",
-      "deployable": false,
-      "open_p0": 0,
-      "audited_on": "2026-09-20",
-      "fix_log": null,
-      "fix_pass": "needed",
-      "reaudit": "not needed"
-    },
-    {
-      "id": "bio-data-visualization-volcano-and-ma-plots",
-      "upstream_path": "data-visualization/volcano-and-ma-plots",
-      "score": 76,
-      "grade": "Beta Only",
-      "deployable": false,
-      "open_p0": 0,
-      "audited_on": "2026-09-20",
-      "fix_log": null,
-      "fix_pass": "needed",
-      "reaudit": "not needed"
-    }
-  ],
+  "excluded": [],
   "out_of_scope": [
     {
       "id": "clawhub-installer",

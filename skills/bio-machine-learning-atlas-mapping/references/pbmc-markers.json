@@ -1,0 +1,10 @@
+{
+ "T cells": ["CD247","BCL11B","GIMAP5","ZAP70","CCR7","CD7","CD8A","CD8B"],
+ "Monocytes": ["CD14","LYZ","S100A8","S100A9","FCN1","CST3","LST1"],
+ "B cells": ["MS4A1","CD79A","CD79B","CD74","BANK1","CD19"],
+ "ILC": ["NKG7","GNLY","KLRD1","GZMB","PRF1","CTSW"],
+ "DC": ["FCER1A","CD1C","CLEC10A","HLA-DPB1","HLA-DQA1","CST3"],
+ "Megakaryocytes/platelets": ["PPBP","PF4","GNG11","CAVIN2","TUBB1","SPARC"],
+ "Plasma cells": ["JCHAIN","MZB1","XBP1","SDC1"],
+ "pDC": ["LILRA4","IL3RA","IRF7","TCF4","CLEC4C"]
+}

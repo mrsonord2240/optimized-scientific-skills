@@ -4,9 +4,9 @@ Not yet refined. Scope is deliberately limited to the rest of
 [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) at commit
 `d91ed3d563019e649dc854c56ccd62551359488a`; other source corpora are out of scope for now.
 
-**371 remaining** across 50 folders. 187 are already refined and live in `skills/`.
+**366 remaining** across 48 folders. 195 are already refined and live in `skills/`.
 
-The source tree holds 562 Skills: 187 refined, 3 audited and excluded, 1 out of scope, 371 remaining.
+The source tree holds 562 Skills: 195 refined, 0 audited and excluded, 1 out of scope, 366 remaining.
 
 | folder | remaining | refined |
 | --- | ---: | ---: |
@@ -17,7 +17,7 @@ The source tree holds 562 Skills: 187 refined, 3 audited and excluded, 1 out of 
 | clinical-biostatistics | 11 | 1 |
 | clip-seq | 11 | 1 |
 | copy-number | 11 | 0 |
-| data-visualization | 10 | 7 |
+| data-visualization | 10 | 10 |
 | methylation-analysis | 10 | 0 |
 | structural-biology | 10 | 0 |
 | genome-assembly | 9 | 0 |
@@ -53,13 +53,11 @@ The source tree holds 562 Skills: 187 refined, 3 audited and excluded, 1 out of 
 | multi-omics-integration | 5 | 0 |
 | restriction-analysis | 5 | 0 |
 | workflow-management | 5 | 0 |
-| machine-learning | 4 | 2 |
 | phasing-imputation | 4 | 0 |
 | primer-design | 4 | 0 |
 | read-alignment | 4 | 0 |
 | rna-quantification | 4 | 0 |
 | rna-structure | 4 | 0 |
-| alternative-splicing | 1 | 8 |
 
 ## Promoted, fix pass still needed
 
@@ -85,9 +83,6 @@ fixed.
 
 | skill | score | grade | open P0 |
 | --- | ---: | --- | ---: |
-| `bio-data-visualization-ggplot2-fundamentals` | 75 | Beta Only | 0 |
-| `bio-data-visualization-matplotlib-fundamentals` | 75 | Beta Only | 0 |
-| `bio-data-visualization-volcano-and-ma-plots` | 76 | Beta Only | 0 |
 
 ## Out of scope
 
@@ -96,10 +91,6 @@ fixed.
 | `clawhub-installer` | upstream's own corpus installer, not a science Skill; declares os: darwin/linux only and exists to install the other Skills |
 
 ## The list
-
-### alternative-splicing
-
-- `bio-splicing-quantification` — `alternative-splicing/splicing-quantification`
 
 ### chemoinformatics
 
@@ -355,13 +346,6 @@ fixed.
 - `bio-long-read-sequencing-medaka-polishing` — `long-read-sequencing/medaka-polishing`
 - `bio-long-read-sequencing-nanopore-methylation` — `long-read-sequencing/nanopore-methylation`
 - `bio-long-read-sequencing-structural-variants` — `long-read-sequencing/structural-variants`
-
-### machine-learning
-
-- `bio-machine-learning-atlas-mapping` — `machine-learning/atlas-mapping`
-- `bio-machine-learning-biomarker-discovery` — `machine-learning/biomarker-discovery`
-- `bio-machine-learning-omics-classifiers` — `machine-learning/omics-classifiers`
-- `bio-machine-learning-survival-analysis` — `machine-learning/survival-analysis`
 
 ### metagenomics
 

@@ -10,7 +10,7 @@
       "upstream_status": "archived 2026-08-15; accepts no issues or pull requests",
       "provider_repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
       "provider_ref": "main",
-      "provider_skills_tree": "17e25937ba6050424e66b28b73c99fb84f76dd98"
+      "provider_skills_tree": "a951fe04f8713889870c43a384c2678e1a60c10b"
     }
   },
   "skills": [
@@ -1907,6 +1907,52 @@
       "marketplace_ready": true
     },
     {
+      "id": "bio-data-visualization-ggplot2-fundamentals",
+      "upstream_path": "data-visualization/ggplot2-fundamentals",
+      "score": 90,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-10-03",
+      "fix_log": "fixes/bio-data-visualization-ggplot2-fundamentals.md",
+      "fix_pass": "done",
+      "category": "Data Analysis",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "examples/publication_figures.R",
+        "references/failure-modes.md",
+        "references/geoms-scales-facets.md",
+        "scripts/publication_figures.R",
+        "usage-guide.md"
+      ],
+      "marketplace_ready": true
+    },
+    {
+      "id": "bio-data-visualization-matplotlib-fundamentals",
+      "upstream_path": "data-visualization/matplotlib-fundamentals",
+      "score": 90,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-10-03",
+      "fix_log": "fixes/bio-data-visualization-matplotlib-fundamentals.md",
+      "fix_pass": "done",
+      "category": "Data Analysis",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "examples/matplotlib_phd.py",
+        "references/chart-recipes.md",
+        "references/failure-modes.md",
+        "scripts/matplotlib_phd.py",
+        "usage-guide.md"
+      ],
+      "marketplace_ready": true
+    },
+    {
       "id": "bio-data-visualization-network-visualization",
       "upstream_path": "data-visualization/network-visualization",
       "score": 97,
@@ -2017,6 +2063,31 @@
         "usage-guide.md"
       ],
       "marketplace_ready": false
+    },
+    {
+      "id": "bio-data-visualization-volcano-and-ma-plots",
+      "upstream_path": "data-visualization/volcano-and-ma-plots",
+      "score": 89,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-10-03",
+      "fix_log": "fixes/bio-data-visualization-volcano-and-ma-plots.md",
+      "fix_pass": "done",
+      "category": "Data Analysis",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "examples/volcano_phd.R",
+        "references/failure-modes.md",
+        "references/reconciliation-thresholds-pushback.md",
+        "scripts/ma_plot.py",
+        "scripts/volcano_phd.R",
+        "scripts/volcano_plot.R",
+        "usage-guide.md"
+      ],
+      "marketplace_ready": true
     },
     {
       "id": "bio-differential-expression-deseq2-basics",
@@ -2419,6 +2490,57 @@
       "marketplace_ready": true
     },
     {
+      "id": "bio-machine-learning-atlas-mapping",
+      "upstream_path": "machine-learning/atlas-mapping",
+      "score": 87,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-10-03",
+      "fix_log": "fixes/bio-machine-learning-atlas-mapping.md",
+      "fix_pass": "done",
+      "category": "Data Analysis",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "examples/ood_gating_demo.py",
+        "examples/scarches_annotation.py",
+        "references/failure-modes.md",
+        "references/pbmc-markers.json",
+        "scripts/label_marker_check.py",
+        "scripts/ood_gating_demo.py",
+        "scripts/scarches_annotation.py",
+        "usage-guide.md"
+      ],
+      "marketplace_ready": true
+    },
+    {
+      "id": "bio-machine-learning-biomarker-discovery",
+      "upstream_path": "machine-learning/biomarker-discovery",
+      "score": 88,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-10-03",
+      "fix_log": "fixes/bio-machine-learning-biomarker-discovery.md",
+      "fix_pass": "done",
+      "category": "Data Analysis",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "examples/boruta_feature_selection.py",
+        "examples/lasso_biomarker.py",
+        "references/failure-modes.md",
+        "scripts/boruta_feature_selection.py",
+        "scripts/lasso_biomarker.py",
+        "scripts/stability_selection.py",
+        "usage-guide.md"
+      ],
+      "marketplace_ready": true
+    },
+    {
       "id": "bio-machine-learning-model-validation",
       "upstream_path": "machine-learning/model-validation",
       "score": 96,
@@ -2433,6 +2555,32 @@
       "relative_to_upstream": "modified",
       "changed_files": [
         "SKILL.md",
+        "usage-guide.md"
+      ],
+      "marketplace_ready": true
+    },
+    {
+      "id": "bio-machine-learning-omics-classifiers",
+      "upstream_path": "machine-learning/omics-classifiers",
+      "score": 88,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-10-03",
+      "fix_log": "fixes/bio-machine-learning-omics-classifiers.md",
+      "fix_pass": "done",
+      "category": "Data Analysis",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "examples/logistic_regression.py",
+        "examples/rf_xgboost_classifier.py",
+        "references/failure-modes.md",
+        "scripts/batch_checks.py",
+        "scripts/calibration_check.py",
+        "scripts/logistic_regression.py",
+        "scripts/rf_xgboost_classifier.py",
         "usage-guide.md"
       ],
       "marketplace_ready": true
@@ -2453,6 +2601,30 @@
       "changed_files": [
         "SKILL.md",
         "lime_explanation.py",
+        "usage-guide.md"
+      ],
+      "marketplace_ready": true
+    },
+    {
+      "id": "bio-machine-learning-survival-analysis",
+      "upstream_path": "machine-learning/survival-analysis",
+      "score": 87,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-10-03",
+      "fix_log": "fixes/bio-machine-learning-survival-analysis.md",
+      "fix_pass": "done",
+      "category": "Data Analysis",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "examples/competing_risks_cif.py",
+        "examples/cox_regression.py",
+        "references/failure-modes.md",
+        "scripts/competing_risks_cif.py",
+        "scripts/cox_regression.py",
         "usage-guide.md"
       ],
       "marketplace_ready": true
@@ -4185,6 +4357,29 @@
         "SKILL.md",
         "splicing_qc.py",
         "test_splicing_qc.py",
+        "usage-guide.md"
+      ],
+      "marketplace_ready": true
+    },
+    {
+      "id": "bio-splicing-quantification",
+      "upstream_path": "alternative-splicing/splicing-quantification",
+      "score": 85,
+      "grade": "Production Ready",
+      "deployable": true,
+      "open_p0": 0,
+      "audited_on": "2026-10-03",
+      "fix_log": "fixes/bio-splicing-quantification.md",
+      "fix_pass": "done",
+      "category": "Data Analysis",
+      "reaudit": "not needed",
+      "relative_to_upstream": "modified",
+      "changed_files": [
+        "SKILL.md",
+        "examples/quantify_splicing.py",
+        "references/failure-modes-and-errors.md",
+        "references/intron-retention-and-microexons.md",
+        "scripts/quantify_splicing.py",
         "usage-guide.md"
       ],
       "marketplace_ready": true
