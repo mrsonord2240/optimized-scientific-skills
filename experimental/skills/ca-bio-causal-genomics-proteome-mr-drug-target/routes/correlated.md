@@ -1,0 +1,2 @@
+# Correlated instruments
+The original correlated-IV example does not sign-align its LD matrix to the harmonized effect alleles. Do not run it unchanged. Prepare an ancestry-matched matrix, sign-align rows and columns to effect alleles, match SNP order, and assess near-singularity before adapting the [correlated-instrument methods](../references/correlated-instruments.md). Robust/penalized IVW and the Patel factor method are source-described alternatives requiring validated inputs and adaptation. The source does not provide a complete safe file-based entry point for them.

@@ -1,0 +1,26 @@
+## References
+
+- Trott & Olson, *J. Comput. Chem.* 31:455-461 (2010) -- AutoDock Vina. https://doi.org/10.1002/jcc.21334
+- Eberhardt et al., *J. Chem. Inf. Model.* 61:3891-3898 (2021) -- Vina 1.2 features. https://doi.org/10.1021/acs.jcim.1c00203
+- AutoDock Vina, official manual -- result-field and CLI semantics. https://vina.scripps.edu/manual/
+- AutoDock Vina, official zinc-metalloprotein tutorial -- AutoDock4Zn maps through the Vina executable. https://autodock-vina.readthedocs.io/en/latest/docking_zinc.html
+- Quiroga & Villarreal, *PLoS ONE* 11:e0155183 (2016) -- Vinardo scoring. https://doi.org/10.1371/journal.pone.0155183
+- McNutt et al., *J. Cheminformatics* 13:43 (2021) -- GNINA 1.0 CNN docking. https://doi.org/10.1186/s13321-021-00522-2
+- GNINA, official repository -- current CLI modes and named CNN ensembles. https://github.com/gnina/gnina
+- Buttenschoen et al., *Chem. Sci.* 15:3130-3139 (2024) -- PoseBusters benchmark. https://doi.org/10.1039/D3SC04185A
+- Lyu et al., *Nature* 566:224-229 (2019) -- ultralarge virtual-screening proof of concept. https://doi.org/10.1038/s41586-019-0917-9
+- Krivak & Hoksza, *J. Cheminformatics* 10:39 (2018) -- P2Rank. https://doi.org/10.1186/s13321-018-0285-8
+- Forli et al., *Nat. Protoc.* 11:905-919 (2016) -- AutoDock suite and AutoDockTools. https://doi.org/10.1038/nprot.2016.051
+- Le Guilloux, Schmidtke & Tuffery, *BMC Bioinformatics* 10:168 (2009) -- fpocket. https://doi.org/10.1186/1471-2105-10-168
+- Meeko, official documentation -- ligand/receptor PDBQT preparation and export interfaces. https://meeko.readthedocs.io/
+- Dolinsky et al., *Nucleic Acids Res.* 35:W522-W525 (2007) -- PDB2PQR. https://doi.org/10.1093/nar/gkm276
+- Olsson et al., *J. Chem. Theory Comput.* 7:525-537 (2011) -- PROPKA 3. https://doi.org/10.1021/ct100578z
+- PDBFixer, official repository -- missing-residue/atom repair interface. https://github.com/openmm/pdbfixer
+- Corso et al., *ICLR* (2024) -- DiffDock-L. https://proceedings.iclr.cc/paper_files/paper/2024/file/db334db287337b2a365120b524300ef3-Paper-Conference.pdf
+- Stärk et al., *ICML* (2022) -- EquiBind. https://proceedings.mlr.press/v162/stark22b.html
+- Qiao et al., *Nat. Mach. Intell.* 6:195-208 (2024) -- NeuralPLexer. https://doi.org/10.1038/s42256-024-00792-z
+- Passaro et al., bioRxiv (2025) -- Boltz-2. https://doi.org/10.1101/2025.06.14.659707
+- Abramson et al., *Nature* 630:493-500 (2024) -- AlphaFold 3. https://doi.org/10.1038/s41586-024-07487-w
+- ZINC22, official resource. https://zinc22.docking.org/
+- Enamine REAL, official resource. https://enamine.net/compound-collections/real-compounds
+- ChEMBL, official versioned database. https://www.ebi.ac.uk/chembl/

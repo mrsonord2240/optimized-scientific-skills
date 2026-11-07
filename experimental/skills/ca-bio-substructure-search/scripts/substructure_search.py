@@ -1,0 +1,122 @@
+#!/usr/bin/env python3
+'''
+Substructure searching with SMARTS patterns.
+'''
+# Reference: rdkit 2024.09+ | Verify API if version differs
+
+from rdkit import Chem
+from rdkit.Chem.Draw import rdMolDraw2D
+
+
+COMMON_SMARTS = {
+    'hydroxyl': '[OX2H]',
+    'primary_amine': '[NX3;H2;$(N-[#6]);!$(N-[C,S,P]=[O,S,N])]',
+    'secondary_amine': '[NX3;H1;$(N(-[#6])-[#6]);!$(N-[C,S,P]=[O,S,N])]',
+    'carboxylic_acid': '[CX3](=O)[OX2H1]',
+    'amide': '[CX3](=O)[NX3]',
+    'ester': '[CX3](=[OX1])[OX2][#6]',
+    'benzene': 'c1ccccc1',
+    'aromatic': '[a]',
+    'halogen': '[F,Cl,Br,I]',
+    'nitro': '[N+]([O-])=O',
+    'sulfonamide': '[S](=O)(=O)[NX3]',
+    'ketone': '[CX3;H0](=[OX1])([#6])[#6]',
+    'aldehyde': '[CX3H1](=O)',
+}
+
+
+def compile_smarts(smarts):
+    '''Compile a non-empty SMARTS query or raise a concise user-facing error.'''
+    if not isinstance(smarts, str) or not smarts.strip():
+        raise ValueError('SMARTS must be a non-empty string')
+    pattern = Chem.MolFromSmarts(smarts)
+    if pattern is None or pattern.GetNumAtoms() == 0:
+        raise ValueError(f'Invalid SMARTS: {smarts}')
+    return pattern
+
+
+def has_substructure(mol, smarts):
+    '''Check if molecule contains substructure.'''
+    return bool(mol and mol.HasSubstructMatch(compile_smarts(smarts)))
+
+
+def get_matches(mol, smarts):
+    '''Get all substructure matches as atom indices.'''
+    if mol is None:
+        return ()
+    return mol.GetSubstructMatches(compile_smarts(smarts))
+
+
+def filter_by_substructure(molecules, smarts, exclude=False):
+    '''Filter molecules by substructure presence/absence.'''
+    pattern = compile_smarts(smarts)
+
+    filtered = []
+    for mol in molecules:
+        if mol is None:
+            continue
+        has_match = mol.HasSubstructMatch(pattern)
+        if exclude:
+            if not has_match:
+                filtered.append(mol)
+        else:
+            if has_match:
+                filtered.append(mol)
+    return filtered
+
+
+def filter_multiple(molecules, include=None, exclude=None):
+    '''Filter by multiple inclusion and exclusion patterns.'''
+    result = list(molecules)
+
+    if include:
+        for smarts in include:
+            pattern = compile_smarts(smarts)
+            result = [m for m in result if m and m.HasSubstructMatch(pattern)]
+
+    if exclude:
+        for smarts in exclude:
+            pattern = compile_smarts(smarts)
+            result = [m for m in result if m and not m.HasSubstructMatch(pattern)]
+
+    return result
+
+
+def identify_functional_groups(mol, patterns=None):
+    '''Identify functional groups in molecule.'''
+    if patterns is None:
+        patterns = COMMON_SMARTS
+
+    found = {}
+    for name, smarts in patterns.items():
+        pattern = compile_smarts(smarts)
+        matches = mol.GetSubstructMatches(pattern)
+        if matches:
+            found[name] = len(matches)
+    return found
+
+
+def draw_with_highlight(mol, smarts, filename, size=(400, 300)):
+    '''Draw molecule with substructure highlighted.'''
+    pattern = compile_smarts(smarts)
+    match = mol.GetSubstructMatch(pattern)
+
+    drawer = rdMolDraw2D.MolDraw2DCairo(size[0], size[1])
+    if match:
+        drawer.DrawMolecule(mol, highlightAtoms=match)
+    else:
+        drawer.DrawMolecule(mol)
+    drawer.FinishDrawing()
+
+    with open(filename, 'wb') as f:
+        f.write(drawer.GetDrawingText())
+
+
+def find_scaffold_matches(molecules, scaffold_smarts):
+    '''Find molecules matching a scaffold pattern.'''
+    pattern = compile_smarts(scaffold_smarts)
+    matches = []
+    for i, mol in enumerate(molecules):
+        if mol and mol.HasSubstructMatch(pattern):
+            matches.append(i)
+    return matches

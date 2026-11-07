@@ -1,6 +1,6 @@
 # Experimental normalized Skills
 
-This collection contains **87 partially complete `ca-` (context-aware)
+This collection contains **101 partially complete `ca-` (context-aware)
 revisions** of the audited Skills. They use short entry points, task routes,
 scripts, and progressively deeper references. Publication does not certify
 their scientific behavior or confer Marketplace acceptance.
@@ -9,7 +9,7 @@ their scientific behavior or confer Marketplace acceptance.
 | --- | ---: |
 | Historical candidate-ready relay result | 1 |
 | Limited evaluation experiments, not audited | 3 |
-| Normalization only, not audited | 83 |
+| Normalization only, not audited | 97 |
 
 Sam authorized publishing the original 24 drafts and using Terra workers to
 normalize the other 171 Skills already on the optimized shelf. This is
@@ -63,8 +63,16 @@ skills directory and read its status notes before use.
 | [ca-bio-causal-genomics-mediation-analysis](skills/ca-bio-causal-genomics-mediation-analysis/STATUS.md) | Normalized only; not audited |
 | [ca-bio-causal-genomics-mendelian-randomization](skills/ca-bio-causal-genomics-mendelian-randomization/STATUS.md) | Normalized only; not audited |
 | [ca-bio-causal-genomics-pleiotropy-detection](skills/ca-bio-causal-genomics-pleiotropy-detection/STATUS.md) | Normalized only; not audited |
+| [ca-bio-causal-genomics-proteome-mr-drug-target](skills/ca-bio-causal-genomics-proteome-mr-drug-target/STATUS.md) | Normalized only; not audited |
+| [ca-bio-causal-genomics-transcriptome-wide-association](skills/ca-bio-causal-genomics-transcriptome-wide-association/STATUS.md) | Normalized only; not audited |
+| [ca-bio-clinical-databases-acmg-classification](skills/ca-bio-clinical-databases-acmg-classification/STATUS.md) | Normalized only; not audited |
+| [ca-bio-clinical-databases-clinvar-lookup](skills/ca-bio-clinical-databases-clinvar-lookup/STATUS.md) | Normalized only; not audited |
+| [ca-bio-clinical-databases-dbsnp-queries](skills/ca-bio-clinical-databases-dbsnp-queries/STATUS.md) | Normalized only; not audited |
 | [ca-bio-conformer-generation](skills/ca-bio-conformer-generation/STATUS.md) | Normalized only; not audited |
 | [ca-bio-covalent-design](skills/ca-bio-covalent-design/STATUS.md) | Normalized only; not audited |
+| [ca-bio-crispr-screens-bagel-essentiality](skills/ca-bio-crispr-screens-bagel-essentiality/STATUS.md) | Normalized only; not audited |
+| [ca-bio-crispr-screens-base-editing-analysis](skills/ca-bio-crispr-screens-base-editing-analysis/STATUS.md) | Normalized only; not audited |
+| [ca-bio-crispr-screens-batch-correction](skills/ca-bio-crispr-screens-batch-correction/STATUS.md) | Normalized only; not audited |
 | [ca-bio-differential-expression-deseq2-basics](skills/ca-bio-differential-expression-deseq2-basics/STATUS.md) | Evaluation experiment; not audited |
 | [ca-bio-differential-splicing](skills/ca-bio-differential-splicing/STATUS.md) | Normalized only; not audited |
 | [ca-bio-duplicate-handling](skills/ca-bio-duplicate-handling/STATUS.md) | Normalized only; not audited |
@@ -75,6 +83,7 @@ skills directory and read its status notes before use.
 | [ca-bio-geo-data](skills/ca-bio-geo-data/STATUS.md) | Normalized only; not audited |
 | [ca-bio-interaction-databases](skills/ca-bio-interaction-databases/STATUS.md) | Normalized only; not audited |
 | [ca-bio-isoform-switching](skills/ca-bio-isoform-switching/STATUS.md) | Normalized only; not audited |
+| [ca-bio-local-blast](skills/ca-bio-local-blast/STATUS.md) | Normalized only; not audited |
 | [ca-bio-long-read-splicing](skills/ca-bio-long-read-splicing/STATUS.md) | Normalized only; not audited |
 | [ca-bio-machine-learning-model-validation](skills/ca-bio-machine-learning-model-validation/STATUS.md) | Evaluation experiment; not audited |
 | [ca-bio-machine-learning-omics-classifiers](skills/ca-bio-machine-learning-omics-classifiers/STATUS.md) | Normalized only; not audited |
@@ -84,6 +93,8 @@ skills directory and read its status notes before use.
 | [ca-bio-molecular-descriptors](skills/ca-bio-molecular-descriptors/STATUS.md) | Normalized only; not audited |
 | [ca-bio-molecular-io](skills/ca-bio-molecular-io/STATUS.md) | Normalized only; not audited |
 | [ca-bio-molecular-standardization](skills/ca-bio-molecular-standardization/STATUS.md) | Normalized only; not audited |
+| [ca-bio-ncbi-datasets-cli](skills/ca-bio-ncbi-datasets-cli/STATUS.md) | Normalized only; not audited |
+| [ca-bio-ortholog-inference](skills/ca-bio-ortholog-inference/STATUS.md) | Normalized only; not audited |
 | [ca-bio-outlier-splicing-detection](skills/ca-bio-outlier-splicing-detection/STATUS.md) | Normalized only; not audited |
 | [ca-bio-pathway-go-enrichment](skills/ca-bio-pathway-go-enrichment/STATUS.md) | Normalized only; not audited |
 | [ca-bio-pharmacophore-modeling](skills/ca-bio-pharmacophore-modeling/STATUS.md) | Normalized only; not audited |
@@ -98,6 +109,7 @@ skills directory and read its status notes before use.
 | [ca-bio-sashimi-plots](skills/ca-bio-sashimi-plots/STATUS.md) | Normalized only; not audited |
 | [ca-bio-scaffold-analysis](skills/ca-bio-scaffold-analysis/STATUS.md) | Normalized only; not audited |
 | [ca-bio-shape-similarity](skills/ca-bio-shape-similarity/STATUS.md) | Normalized only; not audited |
+| [ca-bio-similarity-searching](skills/ca-bio-similarity-searching/STATUS.md) | Normalized only; not audited |
 | [ca-bio-single-cell-clustering](skills/ca-bio-single-cell-clustering/STATUS.md) | Normalized only; not audited |
 | [ca-bio-single-cell-data-io](skills/ca-bio-single-cell-data-io/STATUS.md) | Normalized only; not audited |
 | [ca-bio-single-cell-multimodal-integration](skills/ca-bio-single-cell-multimodal-integration/STATUS.md) | Normalized only; not audited |
@@ -106,10 +118,12 @@ skills directory and read its status notes before use.
 | [ca-bio-splice-variant-prediction](skills/ca-bio-splice-variant-prediction/STATUS.md) | Normalized only; not audited |
 | [ca-bio-splicing-qc](skills/ca-bio-splicing-qc/STATUS.md) | Normalized only; not audited |
 | [ca-bio-splicing-quantification](skills/ca-bio-splicing-quantification/STATUS.md) | Normalized only; not audited |
+| [ca-bio-substructure-search](skills/ca-bio-substructure-search/STATUS.md) | Normalized only; not audited |
 | [ca-bio-variant-annotation](skills/ca-bio-variant-annotation/STATUS.md) | Normalized only; not audited |
 | [ca-bio-variant-calling-filtering-best-practices](skills/ca-bio-variant-calling-filtering-best-practices/STATUS.md) | Normalized only; not audited |
 | [ca-bio-variant-normalization](skills/ca-bio-variant-normalization/STATUS.md) | Normalized only; not audited |
 | [ca-bio-vcf-statistics](skills/ca-bio-vcf-statistics/STATUS.md) | Normalized only; not audited |
+| [ca-bio-virtual-screening](skills/ca-bio-virtual-screening/STATUS.md) | Normalized only; not audited |
 | [ca-bio-workflows-crispr-screen-pipeline](skills/ca-bio-workflows-crispr-screen-pipeline/STATUS.md) | Historical candidate-ready; see limits |
 
 The [manifest](CANDIDATES.json) records source commits, file hashes, upstream

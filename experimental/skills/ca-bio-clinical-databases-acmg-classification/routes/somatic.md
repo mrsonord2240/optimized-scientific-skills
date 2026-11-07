@@ -1,0 +1,2 @@
+# Somatic evidence review
+The source includes a bounded cancer_amp_tier helper, but a reliable file-based tiering workflow requires an explicitly reviewed knowledgebase evidence record, tumor context, clinical significance, and access date. It is not a stand-alone clinical classifier. Do not convert a bare knowledgebase level into a tier; use the separate AMP/ASCO/CAP framework and review the [somatic reference](../references/acmg-framework.md) with a qualified specialist.
