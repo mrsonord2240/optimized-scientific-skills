@@ -1,6 +1,6 @@
 # Experimental normalized Skills
 
-This collection contains **81 partially complete `ca-` (context-aware)
+This collection contains **87 partially complete `ca-` (context-aware)
 revisions** of the audited Skills. They use short entry points, task routes,
 scripts, and progressively deeper references. Publication does not certify
 their scientific behavior or confer Marketplace acceptance.
@@ -9,7 +9,7 @@ their scientific behavior or confer Marketplace acceptance.
 | --- | ---: |
 | Historical candidate-ready relay result | 1 |
 | Limited evaluation experiments, not audited | 3 |
-| Normalization only, not audited | 77 |
+| Normalization only, not audited | 83 |
 
 Sam authorized publishing the original 24 drafts and using Terra workers to
 normalize the other 171 Skills already on the optimized shelf. This is
@@ -60,6 +60,9 @@ skills directory and read its status notes before use.
 | [ca-bio-causal-genomics-genetic-correlation](skills/ca-bio-causal-genomics-genetic-correlation/STATUS.md) | Normalized only; not audited |
 | [ca-bio-causal-genomics-genomic-sem](skills/ca-bio-causal-genomics-genomic-sem/STATUS.md) | Normalized only; not audited |
 | [ca-bio-causal-genomics-heritability-partitioning](skills/ca-bio-causal-genomics-heritability-partitioning/STATUS.md) | Normalized only; not audited |
+| [ca-bio-causal-genomics-mediation-analysis](skills/ca-bio-causal-genomics-mediation-analysis/STATUS.md) | Normalized only; not audited |
+| [ca-bio-causal-genomics-mendelian-randomization](skills/ca-bio-causal-genomics-mendelian-randomization/STATUS.md) | Normalized only; not audited |
+| [ca-bio-causal-genomics-pleiotropy-detection](skills/ca-bio-causal-genomics-pleiotropy-detection/STATUS.md) | Normalized only; not audited |
 | [ca-bio-conformer-generation](skills/ca-bio-conformer-generation/STATUS.md) | Normalized only; not audited |
 | [ca-bio-covalent-design](skills/ca-bio-covalent-design/STATUS.md) | Normalized only; not audited |
 | [ca-bio-differential-expression-deseq2-basics](skills/ca-bio-differential-expression-deseq2-basics/STATUS.md) | Evaluation experiment; not audited |
@@ -68,6 +71,9 @@ skills directory and read its status notes before use.
 | [ca-bio-ensembl-rest](skills/ca-bio-ensembl-rest/STATUS.md) | Normalized only; not audited |
 | [ca-bio-entrez-fetch](skills/ca-bio-entrez-fetch/STATUS.md) | Normalized only; not audited |
 | [ca-bio-entrez-link](skills/ca-bio-entrez-link/STATUS.md) | Normalized only; not audited |
+| [ca-bio-entrez-search](skills/ca-bio-entrez-search/STATUS.md) | Normalized only; not audited |
+| [ca-bio-geo-data](skills/ca-bio-geo-data/STATUS.md) | Normalized only; not audited |
+| [ca-bio-interaction-databases](skills/ca-bio-interaction-databases/STATUS.md) | Normalized only; not audited |
 | [ca-bio-isoform-switching](skills/ca-bio-isoform-switching/STATUS.md) | Normalized only; not audited |
 | [ca-bio-long-read-splicing](skills/ca-bio-long-read-splicing/STATUS.md) | Normalized only; not audited |
 | [ca-bio-machine-learning-model-validation](skills/ca-bio-machine-learning-model-validation/STATUS.md) | Evaluation experiment; not audited |

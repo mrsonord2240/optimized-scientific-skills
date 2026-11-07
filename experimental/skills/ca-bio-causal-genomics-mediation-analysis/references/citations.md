@@ -1,0 +1,16 @@
+# Literature
+- Baron RM, Kenny DA 1986 J Pers Soc Psychol 51:1173 (original product-of-coefficients)
+- Imai K, Keele L, Tingley D 2010 Psychol Methods 15:309 (counterfactual mediation, sequential ignorability)
+- VanderWeele TJ 2014 Epidemiology 25:749 (4-way decomposition)
+- VanderWeele TJ 2015 Explanation in Causal Inference (OUP) -- canonical textbook
+- Valeri L, VanderWeele TJ 2013 Psychol Methods 18:137 (binary outcomes; rare-disease 4-way)
+- Vansteelandt S, Daniel RM 2017 Epidemiology 28:258 (interventional / randomized indirect effects)
+- Shi B et al 2021 Epidemiology 32:e20 (CMAverse package; 6 estimators)
+- Zhang H et al 2016 Bioinformatics 32:3150 (HIMA original)
+- Perera C et al 2022 BMC Bioinformatics 23:296 (HIMA2 alpha-beta screening)
+- Song Y et al 2020 Biometrics 76:700 (BAMA Bayesian high-D mediation)
+- Burgess S et al 2015 IJE 44:484 (network / two-step MR)
+- Sanderson E et al 2019 IJE 48:713 (MVMR conditional F-statistic)
+- Carter AR & Sanderson E 2021 Eur J Epidemiol 36:465 (MVMR-mediation)
+- Farbmacher H et al 2022 Econometrics J 25:277 (medDML / double-ML mediation)
+- Smith LH, VanderWeele TJ 2019 Epidemiology 30:835 (mediational E-value)
