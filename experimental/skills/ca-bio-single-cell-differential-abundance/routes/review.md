@@ -1,0 +1,3 @@
+# Design and alternatives
+Proportions are compositional: a relative change is not automatically an absolute expansion or depletion. Use independent biological replicates and assess batch-condition confounding with the full design matrix; a batch occurring in one condition alone does not by itself prove the whole design is aliased. Milo, scCODA, sccomp and propeller estimate different quantities; see [methods](../references/methods.md). sccomp and propeller need study-specific inputs and package-version adaptation here. Compare abundance with donor-aware expression analysis and avoid reading an underpowered null as no change.
+Related shelf skills: bio-single-cell-clustering, bio-single-cell-cell-annotation and bio-single-cell-batch-integration.

@@ -1,6 +1,6 @@
 # Experimental normalized Skills
 
-This collection contains **135 partially complete `ca-` (context-aware)
+This collection contains **145 partially complete `ca-` (context-aware)
 revisions** of the audited Skills. They use short entry points, task routes,
 scripts, and progressively deeper references. Publication does not certify
 their scientific behavior or confer Marketplace acceptance.
@@ -9,7 +9,7 @@ their scientific behavior or confer Marketplace acceptance.
 | --- | ---: |
 | Historical candidate-ready relay result | 1 |
 | Limited evaluation experiments, not audited | 3 |
-| Normalization only, not audited | 131 |
+| Normalization only, not audited | 141 |
 
 Sam authorized publishing the original 24 drafts and using Terra workers to
 normalize the other 171 Skills already on the optimized shelf. This is
@@ -96,6 +96,7 @@ skills directory and read its status notes before use.
 | [ca-bio-data-visualization-oncoprint-mutation-matrices](skills/ca-bio-data-visualization-oncoprint-mutation-matrices/STATUS.md) | Normalized only; not audited |
 | [ca-bio-data-visualization-sequence-logos](skills/ca-bio-data-visualization-sequence-logos/STATUS.md) | Normalized only; not audited |
 | [ca-bio-data-visualization-statistical-annotation](skills/ca-bio-data-visualization-statistical-annotation/STATUS.md) | Normalized only; not audited |
+| [ca-bio-data-visualization-volcano-and-ma-plots](skills/ca-bio-data-visualization-volcano-and-ma-plots/STATUS.md) | Normalized only; not audited |
 | [ca-bio-differential-expression-deseq2-basics](skills/ca-bio-differential-expression-deseq2-basics/STATUS.md) | Evaluation experiment; not audited |
 | [ca-bio-differential-splicing](skills/ca-bio-differential-splicing/STATUS.md) | Normalized only; not audited |
 | [ca-bio-duplicate-handling](skills/ca-bio-duplicate-handling/STATUS.md) | Normalized only; not audited |
@@ -116,6 +117,9 @@ skills directory and read its status notes before use.
 | [ca-bio-machine-learning-model-validation](skills/ca-bio-machine-learning-model-validation/STATUS.md) | Evaluation experiment; not audited |
 | [ca-bio-machine-learning-omics-classifiers](skills/ca-bio-machine-learning-omics-classifiers/STATUS.md) | Normalized only; not audited |
 | [ca-bio-machine-learning-prediction-explanation](skills/ca-bio-machine-learning-prediction-explanation/STATUS.md) | Normalized only; not audited |
+| [ca-bio-metabolomics-isotope-tracing](skills/ca-bio-metabolomics-isotope-tracing/STATUS.md) | Normalized only; not audited |
+| [ca-bio-metabolomics-lipidomics](skills/ca-bio-metabolomics-lipidomics/STATUS.md) | Normalized only; not audited |
+| [ca-bio-metabolomics-metabolite-annotation](skills/ca-bio-metabolomics-metabolite-annotation/STATUS.md) | Normalized only; not audited |
 | [ca-bio-microbiome-amplicon-processing](skills/ca-bio-microbiome-amplicon-processing/STATUS.md) | Normalized only; not audited |
 | [ca-bio-microbiome-taxonomy-assignment](skills/ca-bio-microbiome-taxonomy-assignment/STATUS.md) | Normalized only; not audited |
 | [ca-bio-molecular-descriptors](skills/ca-bio-molecular-descriptors/STATUS.md) | Normalized only; not audited |
@@ -129,7 +133,10 @@ skills directory and read its status notes before use.
 | [ca-bio-pileup-generation](skills/ca-bio-pileup-generation/STATUS.md) | Normalized only; not audited |
 | [ca-bio-pose-validation](skills/ca-bio-pose-validation/STATUS.md) | Normalized only; not audited |
 | [ca-bio-protac-degraders](skills/ca-bio-protac-degraders/STATUS.md) | Normalized only; not audited |
+| [ca-bio-proteomics-data-import](skills/ca-bio-proteomics-data-import/STATUS.md) | Normalized only; not audited |
+| [ca-bio-proteomics-dia-analysis](skills/ca-bio-proteomics-dia-analysis/STATUS.md) | Normalized only; not audited |
 | [ca-bio-proteomics-differential-abundance](skills/ca-bio-proteomics-differential-abundance/STATUS.md) | Evaluation experiment; not audited |
+| [ca-bio-proteomics-peptide-identification](skills/ca-bio-proteomics-peptide-identification/STATUS.md) | Normalized only; not audited |
 | [ca-bio-proteomics-proteomics-qc](skills/ca-bio-proteomics-proteomics-qc/STATUS.md) | Normalized only; not audited |
 | [ca-bio-qsar-modeling](skills/ca-bio-qsar-modeling/STATUS.md) | Normalized only; not audited |
 | [ca-bio-reference-operations](skills/ca-bio-reference-operations/STATUS.md) | Normalized only; not audited |
@@ -143,7 +150,10 @@ skills directory and read its status notes before use.
 | [ca-bio-single-cell-cell-annotation](skills/ca-bio-single-cell-cell-annotation/STATUS.md) | Normalized only; not audited |
 | [ca-bio-single-cell-cell-communication](skills/ca-bio-single-cell-cell-communication/STATUS.md) | Normalized only; not audited |
 | [ca-bio-single-cell-clustering](skills/ca-bio-single-cell-clustering/STATUS.md) | Normalized only; not audited |
+| [ca-bio-single-cell-cnv-inference](skills/ca-bio-single-cell-cnv-inference/STATUS.md) | Normalized only; not audited |
 | [ca-bio-single-cell-data-io](skills/ca-bio-single-cell-data-io/STATUS.md) | Normalized only; not audited |
+| [ca-bio-single-cell-differential-abundance](skills/ca-bio-single-cell-differential-abundance/STATUS.md) | Normalized only; not audited |
+| [ca-bio-single-cell-doublet-detection](skills/ca-bio-single-cell-doublet-detection/STATUS.md) | Normalized only; not audited |
 | [ca-bio-single-cell-multimodal-integration](skills/ca-bio-single-cell-multimodal-integration/STATUS.md) | Normalized only; not audited |
 | [ca-bio-single-cell-preprocessing](skills/ca-bio-single-cell-preprocessing/STATUS.md) | Normalized only; not audited |
 | [ca-bio-single-cell-splicing](skills/ca-bio-single-cell-splicing/STATUS.md) | Normalized only; not audited |

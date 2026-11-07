@@ -1,0 +1,3 @@
+# Review and alternative methods
+Expression-based doublet detection misses many homotypic events and can overflag activated or high-RNA cells. Cross-check ambient RNA, QC, lineage patterns and experimental hashing/genotype evidence. Multiplexed samples can form cross-sample doublets within the same physical capture; the capture, not the donor label, defines possible combinations. [Methods](../references/methods.md) retain DoubletFinder pK/homotypic guidance, alternative tools and source citations; DoubletFinder and solo need a study-specific prepared object and API adaptation here.
+Related shelf skills: bio-single-cell-preprocessing, bio-single-cell-clustering and bio-single-cell-batch-integration.
