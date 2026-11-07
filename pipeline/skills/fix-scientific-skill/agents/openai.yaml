@@ -1,0 +1,6 @@
+interface:
+  display_name: "Fix Scientific Skill"
+  short_description: "Resolve one Skill's audit findings"
+  default_prompt: "Use $fix-scientific-skill to resolve this Skill's finding ledger, verify changed behavior, and leave a compact re-audit handoff."
+policy:
+  allow_implicit_invocation: true

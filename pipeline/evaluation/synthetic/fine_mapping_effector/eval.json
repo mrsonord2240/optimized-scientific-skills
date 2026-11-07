@@ -1,0 +1,29 @@
+{
+  "id": "synthetic_fine_mapping_effector_gene",
+  "replicates": "variantbench/fine_mapping_effector_gene_prioritization",
+  "synthetic": true,
+  "task": "You are given three tables for a chr22 disease-associated locus (data/trans_genes.tsv, data/credible_set_variants.tsv, data/cis_eqtl_SYNU1.tsv): (1) the genes trans-regulated by the locus with their effect estimates; (2) the variants in the 95% credible set for the locus signal, each annotated with its functional consequence, the gene it falls in, and (where coding) SIFT and PolyPhen predictions; (3) the cis association of the gene physically spanning the credible set with its own expression across the surrounding region.\n\nNominate the causal (effector) gene at this locus and the variant class most likely to mediate its effect.\n\nReport the number of protein-altering variants in the credible set, and your interpretation.\n\nReturn EXACTLY:\n\n<EVAL_ANSWER>\n{\"n_protein_altering_variants_in_credible_set\": <int>, \"answer\": \"<letter>\"}\n</EVAL_ANSWER>\n\nwhere <letter> is one of A, B, C, D, E, F:\nA. The effector is the gene spanning the credible set, acting through the intronic lead variant's regulation of that gene's own expression (a cis-expression mechanism).\nB. The effector is the gene spanning the credible set, acting through a protein-altering (missense) variant in the credible set, even though that variant is computationally predicted benign and the gene has no detectable cis-eQTL.\nC. The effector is whichever gene at the locus has the strongest cis-eQTL, following standard locus-to-gene expression prioritisation.\nD. No coding causal mechanism is supported, because protein-altering variants in the credible set are predicted benign, so the effector must act non-coding.\nE. The effector is the gene physically closest to the lead variant, by proximity.\nF. The effector is the most strongly trans-associated gene, since it carries the strongest association at the locus.",
+  "graders": [
+    {
+      "type": "numeric_tolerance",
+      "config": {
+        "tolerances": {
+          "n_protein_altering_variants_in_credible_set": {
+            "type": "absolute",
+            "value": 0
+          }
+        },
+        "ground_truth": {
+          "n_protein_altering_variants_in_credible_set": 1
+        }
+      }
+    },
+    {
+      "type": "multiple_choice",
+      "config": {
+        "correct_answer": "B"
+      }
+    }
+  ],
+  "data_dir": "data"
+}

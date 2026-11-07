@@ -1,0 +1,31 @@
+{
+  "id": "i3_ora_background",
+  "replicates": null,
+  "synthetic": true,
+  "task": "I ran a differential expression experiment in one tissue and now want to know which curated gene sets are over-represented among the differentially expressed genes.\n\nFiles:\n- data/de_genes.txt: the differentially expressed genes (one gene symbol per line, no header).\n- data/detected_genes.txt: the genes detected in this experiment (one symbol per line).\n- data/all_annotated_genes.txt: all annotated genes in the genome annotation used (one symbol per line).\n- data/pathways.gmt: the gene sets, in GMT format (set id, description, then member symbols; tab-separated). Some members are symbols that are not in the current annotation.\n\nTest each gene set for over-representation in the DE list with a one-sided hypergeometric test (equivalently, a one-sided Fisher's exact test), and control the false discovery rate with Benjamini-Hochberg across all gene sets tested. Only test gene sets that have between 10 and 500 members after restricting the set to the genes in your background; do not test the rest and do not count them in the multiple-testing correction. Report every gene set with BH-adjusted p < 0.05.\n\nReturn EXACTLY:\n\n<EVAL_ANSWER>\n{\"enriched_gene_sets\": []}\n</EVAL_ANSWER>\n\nwhere the list holds the ids of the significant gene sets (first column of the GMT).",
+  "graders": [
+    {
+      "type": "label_set_jaccard",
+      "config": {
+        "scoring": {
+          "pass_threshold": 1
+        },
+        "answer_field": "enriched_gene_sets",
+        "ground_truth_labels": [
+          "GS0012",
+          "GS0048"
+        ]
+      }
+    }
+  ],
+  "data_dir": "data",
+  "relevant_skills": [
+    "bio-pathway-go-enrichment",
+    "bio-pathway-gsea",
+    "bio-pathway-kegg-pathways",
+    "bio-pathway-reactome",
+    "bio-pathway-wikipathways",
+    "bio-pathway-enrichment-visualization"
+  ],
+  "design_source": "Over-representation analysis with a whole-genome background instead of the genes detectable in the assay gives spurious enrichment of tissue-expressed gene sets (Timmons et al. 2015 Genome Biol; Wijesooriya et al. 2022 PLoS Comput Biol)."
+}

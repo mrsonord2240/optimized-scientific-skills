@@ -1,0 +1,61 @@
+{
+  "id": "i7_isotope_correction",
+  "replicates": null,
+  "synthetic": true,
+  "task": "We ran a [U-13C6]-glucose tracing experiment in cultured cells and harvested at 1, 4, 8 and 24 h (samples Glc13C_1h ... Glc13C_24h). A parallel culture grown on unlabelled glucose and harvested at 24 h (Glc12C_24h) is also included. Four metabolites were measured by MS: peak areas for each mass isotopologue (M0, M1, ... = ion mass shifted by 0, 1, ... x 1.00335 Da; NA = not measured) are in data/isotopologue_areas.tsv. data/metabolites.tsv gives, for each metabolite, the formula of the ion that was actually measured (this includes any derivatisation atoms retained in the fragment), backbone_carbons (the number of carbons that come from the metabolite itself, i.e. the only positions that tracer carbon can occupy), the tracer and tracer_13C_purity (atom fraction of 13C at each labelled position of the tracer). Peak areas are on arbitrary, sample-specific scales.\n\nFor each of the following metabolite x time-point combinations, report the fractional 13C enrichment attributable to the tracer: the mean number of tracer-derived carbon atoms per molecule divided by backbone_carbons, i.e. sum_i i*MID_i / n, where MID_i (i = 0..n, summing to 1) is the fraction of the metabolite pool carrying i tracer-derived carbons. Report it as a fraction between 0 and 1 (not a percentage), to 3 decimals.\n\nlactate at 4 h; lactate at 24 h; alanine at 8 h; citrate at 8 h; glutamate at 4 h; glutamate at 24 h.\n\nReturn EXACTLY:\n\n<EVAL_ANSWER>\n{\"lactate_4h\": <number>, \"lactate_24h\": <number>, \"alanine_8h\": <number>, \"citrate_8h\": <number>, \"glutamate_4h\": <number>, \"glutamate_24h\": <number>}\n</EVAL_ANSWER>",
+  "graders": [
+    {
+      "type": "numeric_tolerance",
+      "config": {
+        "tolerances": {
+          "lactate_4h": {
+            "type": "absolute",
+            "lower": 0.01,
+            "upper": 0.01
+          },
+          "lactate_24h": {
+            "type": "absolute",
+            "lower": 0.01,
+            "upper": 0.01
+          },
+          "alanine_8h": {
+            "type": "absolute",
+            "lower": 0.01,
+            "upper": 0.01
+          },
+          "citrate_8h": {
+            "type": "absolute",
+            "lower": 0.01,
+            "upper": 0.01
+          },
+          "glutamate_4h": {
+            "type": "absolute",
+            "lower": 0.01,
+            "upper": 0.01
+          },
+          "glutamate_24h": {
+            "type": "absolute",
+            "lower": 0.01,
+            "upper": 0.01
+          }
+        },
+        "ground_truth": {
+          "lactate_4h": 0.1913,
+          "lactate_24h": 0.7633,
+          "alanine_8h": 0.119,
+          "citrate_8h": 0.135,
+          "glutamate_4h": 0.07,
+          "glutamate_24h": 0.196
+        }
+      }
+    }
+  ],
+  "data_dir": "data",
+  "relevant_skills": [
+    "bio-metabolomics-isotope-tracing",
+    "bio-metabolomics-targeted-analysis",
+    "bio-workflows-metabolomics-pipeline",
+    "bio-metabolomics-normalization-qc"
+  ],
+  "design_source": "Raw MIDs include natural-abundance isotopes of every element in the measured ion (incl. derivative atoms) and tracer impurity; enrichment needs full correction (Buescher et al. 2015 Curr Opin Biotechnol; Midani et al. 2017)."
+}

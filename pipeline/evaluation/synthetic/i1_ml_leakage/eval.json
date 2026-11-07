@@ -1,0 +1,43 @@
+{
+  "id": "i1_ml_leakage",
+  "replicates": null,
+  "synthetic": true,
+  "task": "A collaborator has sent two small omics datasets, each with a binary phenotype (label: 1 = case, 0 = control). Values are normalised, log-scale measurements.\n\n- data/dataset_a.csv: 60 samples (one row each). Columns: sample_id, label, then 5,000 numeric features (feat_0001 ... feat_5000).\n- data/dataset_b.csv: 120 samples from 40 patients, 3 samples per patient. Columns: sample_id, patient_id, label (the label belongs to the patient), then 2,000 numeric features (feat_0001 ... feat_2000).\n\nFor each dataset we intend to build the same classifier: keep the 50 features with the smallest p-values from a two-sample t-test between the two classes, z-score them, and fit an L2-regularised logistic regression (scikit-learn LogisticRegression, default C = 1) on those 50 features.\n\nWe need a trustworthy estimate of how well this pipeline will perform in practice. For each dataset, report the expected ROC AUC of the whole pipeline (feature selection included) on samples (dataset A) or patients (dataset B) that were not used for any fitting or selection step. Report each AUC to 2 decimal places.\n\nReturn EXACTLY:\n\n<EVAL_ANSWER>\n{\"auc_dataset_a\": 0.0, \"auc_dataset_b\": 0.0}\n</EVAL_ANSWER>",
+  "graders": [
+    {
+      "type": "numeric_tolerance",
+      "config": {
+        "tolerances": {
+          "auc_dataset_a": {
+            "type": "absolute",
+            "lower": 0.2,
+            "upper": 0.2
+          }
+        },
+        "ground_truth": {
+          "auc_dataset_a": 0.5
+        }
+      }
+    },
+    {
+      "type": "numeric_tolerance",
+      "config": {
+        "tolerances": {
+          "auc_dataset_b": {
+            "type": "absolute",
+            "lower": 0.15,
+            "upper": 0.13
+          }
+        },
+        "ground_truth": {
+          "auc_dataset_b": 0.76
+        }
+      }
+    }
+  ],
+  "data_dir": "data",
+  "relevant_skills": [
+    "bio-machine-learning-model-validation"
+  ],
+  "design_source": "Feature selection outside CV (Ambroise & McLachlan 2002, PNAS 99:6562) and replicate samples from one patient split across folds (subject-wise vs record-wise CV)."
+}

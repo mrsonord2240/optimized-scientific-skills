@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.env
+.env.*
+evaluation/latch-eval-tools/
+evaluation/runner/runs*/
+evaluation/runner/arms/*/
+evaluation/synthetic/*/data/

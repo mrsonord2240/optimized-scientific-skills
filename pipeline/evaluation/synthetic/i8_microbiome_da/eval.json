@@ -1,0 +1,37 @@
+{
+  "id": "i8_microbiome_da",
+  "replicates": null,
+  "synthetic": true,
+  "task": "You are given a 16S rRNA amplicon sequencing survey of the gut microbiome in 20 cases and 20 controls, processed into an ASV table: data/counts.tsv (raw read counts; rows are taxa, columns are samples), data/metadata.tsv (sample, group = case/control, sex) and data/taxonomy.tsv (taxonomic assignment of each taxon). Sequencing depth varies between samples.\n\nWhich taxa differ in abundance between cases and controls? Adjust for sex if you think it is appropriate, control the false discovery rate at 5% with the Benjamini-Hochberg procedure, and report the taxa that pass. Use the taxon ids exactly as they appear in the first column of data/counts.tsv (e.g. ASV001).\n\nReturn EXACTLY:\n\n<EVAL_ANSWER>\n{\"differential_taxa\": [\"<taxon_id>\", ...]}\n</EVAL_ANSWER>",
+  "graders": [
+    {
+      "type": "marker_gene_precision_recall",
+      "config": {
+        "answer_field": "differential_taxa",
+        "ground_truth_labels": [
+          "ASV004",
+          "ASV051",
+          "ASV052",
+          "ASV068",
+          "ASV095",
+          "ASV141",
+          "ASV150",
+          "ASV170"
+        ],
+        "scoring": {
+          "pass_thresholds": {
+            "precision_at_k": 0.4,
+            "recall_at_k": 0.75
+          }
+        }
+      }
+    }
+  ],
+  "data_dir": "data",
+  "relevant_skills": [
+    "bio-microbiome-differential-abundance",
+    "bio-microbiome-amplicon-processing",
+    "bio-microbiome-diversity-analysis"
+  ],
+  "design_source": "Compositionality: a bloom of a few taxa makes all others fall in relative abundance, so relative-abundance tests give false positives (Gloor et al. 2017 Front Microbiol; Nearing et al. 2022 Nat Commun)."
+}

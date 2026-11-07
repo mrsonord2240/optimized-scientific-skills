@@ -1,0 +1,13 @@
+{
+  "seed": 1,
+  "theta_true": {
+    "DBT": -0.08,
+    "PPM1K": 0.09,
+    "BCAT2": 0.01
+  },
+  "signal_genes": [
+    "DBT",
+    "PPM1K",
+    "BCAT2"
+  ]
+}

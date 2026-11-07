@@ -1,0 +1,32 @@
+BioSkills pipeline preservation, 2026-11-07
+Copyright 2026 Samuel Nord
+
+The six process Skills, repository-owned process tooling and documentation,
+and original evaluation harness/task work are covered by the MIT terms in
+LICENSE. The process suite is preserved from mrsonord2240/optimizing-agent-science-skills
+at e9dcbbb67b1e3f02922e5d84b6778d757dce08d1. Its original NOTICE is retained in
+licenses/records-NOTICE.txt; that notice describes the historical source repository.
+
+The normalization example derives from GPTomics/bioSkills. Original Skill
+authorship remains with GPTomics. Its MIT notice is retained in
+licenses/bioskills-MIT.txt. Our adaptations do not imply upstream endorsement.
+
+The audit method derives from AIPOCH's MIT-licensed skill-auditor, as credited
+in licenses/records-NOTICE.txt. The records Git history preserves that method.
+
+The synthetic fine_mapping_effector and cis_mr_bcaa tasks adapt the structure
+and task design of LatchBio variantbench, revision
+a1cd271bc3671c6ecef05176d33d29e5c490438c. Their data are fabricated and the
+tasks have been modified. Retain the Apache 2.0 terms in
+licenses/variantbench-Apache-2.0.txt for that adapted material. These results
+are not benchmarks.bio scores and are not endorsed by LatchBio.
+
+The historical grading adapter expects latchbio/latch-eval-tools at
+75cd1e8fc471e5622ec020a9e3bbf604ce88b454. Its checked-in LICENSE says
+"All rights reserved." That project's code is not redistributed in this
+package. The adapter and pinned dependency reference are preserved.
+
+Source text is retained with line endings normalized to LF. MANIFEST.json
+records both original source hashes and packaged file hashes. Evaluation
+results preserve original JSON values and record each original file hash.
+Exact original files and trajectories are held in the local evidence archive.

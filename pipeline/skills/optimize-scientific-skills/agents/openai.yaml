@@ -1,0 +1,6 @@
+interface:
+  display_name: "Optimize Scientific Skills"
+  short_description: "Run the batched five-worker science Skill relay"
+  default_prompt: "Use $optimize-scientific-skills to coordinate this scientific Skill refinement run through normalization, tooling, audit, fix, re-audit, and local intake validation."
+policy:
+  allow_implicit_invocation: true

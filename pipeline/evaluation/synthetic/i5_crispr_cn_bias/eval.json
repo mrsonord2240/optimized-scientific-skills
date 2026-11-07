@@ -1,0 +1,72 @@
+{
+  "id": "i5_crispr_cn_bias",
+  "replicates": null,
+  "synthetic": true,
+  "task": "We ran a pooled CRISPR-Cas9 knockout screen in a single cancer cell line (library of 4 sgRNAs per gene plus non-targeting control guides, labelled NTC). Cells were sampled at the plasmid stage and again at a late timepoint in two independent replicates. Files:\n- data/counts.tsv: raw sgRNA read counts (rows = guides; columns: plasmid, late_rep1, late_rep2)\n- data/library.tsv: guide_id -> gene (and spacer sequence)\n- data/gene_coordinates.tsv: gene, chromosome, start, end (genome coordinates, one row per targeted gene)\n- data/copy_number_segments.tsv: chromosome, start, end, copy_number (segment-level total copy number of this cell line)\n\nPlease identify the genes that are genuine essential dependencies of this cell line. Convention: a gene counts as an essential dependency if knocking it out substantially reduces the line's fitness (a gene-level log2 fold change of guide abundance, late versus plasmid, of about -1 or stronger, i.e. at least ~2-fold depletion, statistically supported at 5% FDR) for reasons intrinsic to loss of that gene, rather than as an artefact of the experiment. Do not report genes with only modest or marginal depletion.\n\nReturn the gene symbols exactly as they appear in data/library.tsv, in this format:\n\n<EVAL_ANSWER>\n{\"essential_genes\": [\"<gene>\", \"<gene>\", ...]}\n</EVAL_ANSWER>",
+  "graders": [
+    {
+      "type": "marker_gene_precision_recall",
+      "config": {
+        "canonical_markers": [
+          "SYN0175",
+          "SYN0602",
+          "SYN0628",
+          "SYN0633",
+          "SYN0717",
+          "SYN0804",
+          "SYN0931",
+          "SYN0958",
+          "SYN1250",
+          "SYN1520",
+          "SYN1602",
+          "SYN1703",
+          "SYN1738",
+          "SYN1796",
+          "SYN2131",
+          "SYN2535",
+          "SYN2613",
+          "SYN2909",
+          "SYN2951",
+          "SYN3118",
+          "SYN4067",
+          "SYN4340",
+          "SYN4453",
+          "SYN4813",
+          "SYN4920",
+          "SYN5481",
+          "SYN5672",
+          "SYN5838",
+          "SYN6005",
+          "SYN6120",
+          "SYN6453",
+          "SYN6928",
+          "SYN7032",
+          "SYN7115",
+          "SYN7200",
+          "SYN8103",
+          "SYN8541",
+          "SYN9312",
+          "SYN9787",
+          "SYN9975"
+        ],
+        "answer_field": "essential_genes",
+        "scoring": {
+          "pass_thresholds": {
+            "precision_at_k": 0.75,
+            "recall_at_k": 0.75
+          }
+        }
+      }
+    }
+  ],
+  "data_dir": "data",
+  "relevant_skills": [
+    "bio-crispr-screens-copy-number-correction",
+    "bio-crispr-screens-mageck-analysis",
+    "bio-crispr-screens-hit-calling",
+    "bio-crispr-screens-bagel-essentiality",
+    "bio-crispr-screens-screen-qc",
+    "bio-workflows-crispr-screen-pipeline"
+  ],
+  "design_source": "Copy-number-dependent Cas9 cutting toxicity makes non-essential genes in amplicons look like dependencies in CRISPR KO screens (Aguirre et al. 2016 Cancer Discov; Meyers et al. 2017 Nat Genet)."
+}

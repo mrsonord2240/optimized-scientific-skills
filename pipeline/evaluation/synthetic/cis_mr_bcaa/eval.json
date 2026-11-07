@@ -1,0 +1,56 @@
+{
+  "id": "synthetic_cis_mr_bcaa",
+  "replicates": "variantbench/cis_mr_bcaa",
+  "synthetic": true,
+  "task": "Your lab is investigating whether lowering plasma BCAA levels via inhibition of BCKDK kinase could reduce T2D risk.\n\nIn order to do so, you have obtained GWAS summary statistics on T2D risk, as well as circulating BCAA levels, all in European ancestry populations (data/bcaa_gwas.tsv.gz, data/t2d_gwas.tsv.gz, gene coordinates in data/genes.tsv, and a PLINK LD reference panel data/ld_ref.*).\n\nAs the degree of genetic correlation between circulating metabolites and heterogeneity between variants suggests a high degree of horizontal pleiotropy and difficulty in interpretation, you wish to avoid these issues while modeling the predicted change in T2D risk per 1 SD increase in levels of circulating BCAA levels at 3 best selected loci.\n\nWhat is the highest change you observe and the lowest across the loci that you investigate (report estimates as log odds ratios per 1 SD increase in BCAA)? Does genetic evidence support the idea that BCKDK inhibition would be beneficial for reducing T2D risk (answer \"YES\" or \"NO\") in a list?\n\nReturn EXACTLY:\n\n<EVAL_ANSWER>\n{\"loci_gene_names\": [], \"highest_estimate\": \"\", \"lowest_estimate\": \"\", \"bckdk_inhibition_yn\": []}\n</EVAL_ANSWER>",
+  "graders": [
+    {
+      "type": "label_set_jaccard",
+      "config": {
+        "scoring": {
+          "pass_threshold": 1
+        },
+        "answer_field": "loci_gene_names",
+        "ground_truth_labels": [
+          "BCAT2",
+          "DBT",
+          "PPM1K"
+        ]
+      }
+    },
+    {
+      "type": "numeric_tolerance",
+      "config": {
+        "tolerances": {
+          "lowest_estimate": {
+            "type": "absolute",
+            "lower": 0.15,
+            "upper": 0.15
+          },
+          "highest_estimate": {
+            "type": "absolute",
+            "lower": 0.15,
+            "upper": 0.15
+          }
+        },
+        "ground_truth": {
+          "lowest_estimate": -0.063,
+          "highest_estimate": 0.031
+        }
+      }
+    },
+    {
+      "type": "label_set_jaccard",
+      "config": {
+        "scoring": {
+          "pass_threshold": 1
+        },
+        "answer_field": "bckdk_inhibition_yn",
+        "ground_truth_labels": [
+          "NO"
+        ]
+      }
+    }
+  ],
+  "data_dir": "data"
+}

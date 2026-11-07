@@ -1,0 +1,58 @@
+{
+  "truth_taxa": [
+    "ASV004",
+    "ASV051",
+    "ASV052",
+    "ASV068",
+    "ASV095",
+    "ASV141",
+    "ASV150",
+    "ASV170"
+  ],
+  "up": {
+    "ASV051": 10.0,
+    "ASV095": 8.0,
+    "ASV170": 7.0,
+    "ASV068": 6.0,
+    "ASV052": 5.0
+  },
+  "down": {
+    "ASV004": 0.25,
+    "ASV150": 0.3,
+    "ASV141": 0.35
+  },
+  "sex_nuisance_taxa_not_in_truth": [
+    "ASV020",
+    "ASV025",
+    "ASV037",
+    "ASV043",
+    "ASV071",
+    "ASV080",
+    "ASV098",
+    "ASV111",
+    "ASV117",
+    "ASV165"
+  ],
+  "all_zero_taxa": [
+    "ASV014",
+    "ASV056",
+    "ASV083",
+    "ASV110",
+    "ASV127",
+    "ASV155"
+  ],
+  "near_zero_taxa": [
+    "ASV002",
+    "ASV007",
+    "ASV031",
+    "ASV039",
+    "ASV073",
+    "ASV100",
+    "ASV136",
+    "ASV151",
+    "ASV181"
+  ],
+  "note": "All other taxa have identical ABSOLUTE abundance in cases and controls; their relative abundance falls in cases by the factor below.",
+  "median_relative_abundance_ratio_case_over_control_of_unchanged_taxa": 0.5423092961682942,
+  "total_absolute_load_ratio_case_over_control": 2.03201660848926
+}

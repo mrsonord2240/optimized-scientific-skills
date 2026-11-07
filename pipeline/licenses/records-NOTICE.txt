@@ -1,0 +1,23 @@
+Optimizing Agent Science Skills
+Copyright 2026 Samuel Nord
+
+Tooling, briefs, audit records and fix logs in this repository are licensed under the MIT License
+(see LICENSE).
+
+Skill content belongs to its original authors and keeps that author's licence. The fixed Skills live in
+mrsonord2240/bioSkills-Improved and on the shelf mrsonord2240/optimized-scientific-skills, whose
+PROVENANCE.json records each Skill's source repository and exact commit and whose LICENSE is the
+upstream project's own, unmodified.
+
+Modified Skill files are changed only where an audit demonstrated a defect. Every change is listed in
+fixes/<skill-id>.md with how it was verified, and in the audit record's fixes.md.
+
+Current upstream sources:
+
+  GPTomics/bioSkills (MIT) — https://github.com/GPTomics/bioSkills
+
+The audit method is skill-auditor from aipoch/medical-research-skills (MIT),
+https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor
+
+Audits and fixes are performed by Claude (Anthropic) agents, commissioned by Samuel Nord. They are
+not reviewed or endorsed by the Skills' authors.

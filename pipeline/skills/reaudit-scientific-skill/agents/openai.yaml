@@ -1,0 +1,6 @@
+interface:
+  display_name: "Re-audit Scientific Skill"
+  short_description: "Run independent focused or delta Skill certification"
+  default_prompt: "Use $reaudit-scientific-skill to independently execute and certify this exact fixed Skill, then leave a candidate-ready or failure handoff."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,40 @@
+{
+  "id": "i9_vcf_normalization",
+  "replicates": null,
+  "synthetic": true,
+  "task": "Two variant callers were run on the same sample against the same reference, and I have their outputs: data/caller_A.vcf and data/caller_B.vcf (plain-text VCFs, one sample each), with the reference they were called against in data/reference.fa (indexed, data/reference.fa.fai). Every record in both files is a call we want to keep; nothing needs filtering.\n\nI want to know how well the two callers agree. Please count:\n\n- n_both: variants called by both callers\n- n_only_A: variants called only by caller A\n- n_only_B: variants called only by caller B\n\nCounting conventions:\n- Two calls are the same variant if they describe the same change to the reference sequence at the same place, regardless of how each caller happened to write it in the VCF.\n- A record with several ALT alleles counts as one variant per ALT allele.\n- Genotype, genotype quality, depth and QUAL are ignored; only whether the variant was called matters.\n- Multi-base substitutions (MNVs) are counted as single variants; do not break them into separate SNVs.\n- Count distinct variants, so n_both + n_only_A is the number of distinct variants in caller A and n_both + n_only_B is the number in caller B.\n\nReturn EXACTLY:\n\n<EVAL_ANSWER>\n{\"n_both\": 0, \"n_only_A\": 0, \"n_only_B\": 0}\n</EVAL_ANSWER>\n",
+  "graders": [
+    {
+      "type": "numeric_tolerance",
+      "config": {
+        "tolerances": {
+          "n_both": {
+            "type": "absolute",
+            "value": 0
+          },
+          "n_only_A": {
+            "type": "absolute",
+            "value": 0
+          },
+          "n_only_B": {
+            "type": "absolute",
+            "value": 0
+          }
+        },
+        "ground_truth": {
+          "n_both": 204,
+          "n_only_A": 52,
+          "n_only_B": 41
+        }
+      }
+    }
+  ],
+  "data_dir": "data",
+  "relevant_skills": [
+    "bio-variant-normalization",
+    "bio-vcf-manipulation",
+    "bio-vcf-basics",
+    "bio-vcf-statistics"
+  ],
+  "design_source": "Callsets from different callers write the same variant differently (non-left-aligned/over-padded indels, multi-allelic records); comparison needs split + left-align + trim first (Tan et al. 2015 Bioinformatics 31:2202, vt normalize; bcftools norm)."
+}

@@ -1,0 +1,12 @@
+{
+  "seed": 20260919,
+  "n_both": 204,
+  "n_only_A": 52,
+  "n_only_B": 41,
+  "n_records_A": 239,
+  "n_records_B": 245,
+  "n_multiallelic_records_A": 16,
+  "n_variants_A": 256,
+  "n_variants_B": 245,
+  "shared_raw_chrom_pos": 127
+}

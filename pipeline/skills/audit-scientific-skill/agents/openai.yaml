@@ -1,0 +1,6 @@
+interface:
+  display_name: "Audit Scientific Skill"
+  short_description: "Run a bounded diagnostic Skill audit"
+  default_prompt: "Use $audit-scientific-skill to perform the assigned initial diagnostic audit, publish evidence and findings, and leave a fixer-ready handoff."
+policy:
+  allow_implicit_invocation: true

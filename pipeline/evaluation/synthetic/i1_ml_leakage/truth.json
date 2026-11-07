@@ -1,0 +1,18 @@
+{
+  "auc_dataset_a": 0.5,
+  "auc_dataset_b_fresh_patients": 0.7607,
+  "note": "A: labels independent of features (exact). B: Monte Carlo on 4000 fresh patients from the generating model.",
+  "signal_feature_numbers_B": [
+    441,
+    580,
+    866,
+    906,
+    1052,
+    1417,
+    1538,
+    1739
+  ],
+  "n_fingerprint_features_B": 1200,
+  "D_SIG": 1.1,
+  "TAU_FP": 1.2
+}

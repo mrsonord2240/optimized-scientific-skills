@@ -1,0 +1,6 @@
+interface:
+  display_name: "Prepare Scientific Skill Tooling"
+  short_description: "Prepare reproducible tools for one Skill"
+  default_prompt: "Use $prepare-scientific-skill-tooling to run the assigned full or delta tooling pass and leave a verified TOOLS.md handoff."
+policy:
+  allow_implicit_invocation: true

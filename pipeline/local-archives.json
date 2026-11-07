@@ -1,0 +1,33 @@
+{
+  "preserved_on": "2026-11-07",
+  "archives": [
+    {
+      "file": "audit-records.bundle",
+      "source": "F:\\optimizing-agent-science-skills",
+      "head": "e9dcbbb67b1e3f02922e5d84b6778d757dce08d1",
+      "bytes": 33361786,
+      "sha256": "376c94e86c01995f78cfb696e2110c9b3c720f67a1c18e49434b7d927cee4b98"
+    },
+    {
+      "file": "optimized-shelf-pre-closeout.bundle",
+      "source": "F:\\optimized-scientific-skills",
+      "head": "f162b3a9fd54e41c8f9e06bb969f86d079788518",
+      "bytes": 6301871,
+      "sha256": "a54ba9aa99aa63e1118f7bbf9a5b782e0ed7e4592920655c91dfdda544781890"
+    },
+    {
+      "file": "bioskills-compatibility.bundle",
+      "source": "F:\\OpenScience\\bioSkills-Improved",
+      "head": "9ef4d6d08244ed94b6584a0151458e09cecc727f",
+      "bytes": 21665152,
+      "sha256": "0c8834e2b49a47a94c9084f0fdeb12138c9f4b8023415d4c14a7ae339146e6b7"
+    },
+    {
+      "file": "evaluation-evidence.zip",
+      "files": 4512,
+      "bytes": 33243252,
+      "sha256": "68c2e6653429172c3a55e5a33ba5968fea806b3f7a5b9bef24a5eda5478ff452",
+      "verified": "ZIP CRC and every extracted file SHA-256"
+    }
+  ]
+}

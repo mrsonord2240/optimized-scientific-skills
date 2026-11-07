@@ -1,0 +1,6 @@
+interface:
+  display_name: "Normalize Scientific Skill"
+  short_description: "Remove redundancy and route Skill resources"
+  default_prompt: "Use $normalize-scientific-skill to normalize this exact scientific Skill, preserve its meaning and provenance, and leave a tooling-ready handoff."
+policy:
+  allow_implicit_invocation: true

@@ -3,10 +3,18 @@
 Agent Skills for computational science that have been **audited against executed evidence**. Where the
 audit demonstrated a defect, the Skill is fixed and then re-audited by an agent that did not write the fix.
 
-Nothing enters this repository without an audit that found it deployable with no open P0 finding. **Not
-every Skill here has finished the process yet.** Each one's status is in [PROVENANCE.json](PROVENANCE.json)
-(`fix_pass`, `reaudit`), and both lists are at the top of [REMAINING.md](REMAINING.md). A Skill that has not
-been audited lives only in its upstream repository.
+## Project status
+
+This work was closed out on **2026-11-07**. The 195 scientific Skills and their
+evidence remain available. The preserved [pipeline](pipeline/README.md) contains
+the six process Skills, the [evaluation method and results](pipeline/EVALUATION.md),
+and an [evidence and recovery index](pipeline/EVIDENCE.md). Further audits,
+experimental recuts, and Open Science Marketplace follow-up are no longer an active queue.
+
+The closeout preserves prior results; it is not a new scientific audit or
+Marketplace acceptance. Each Skill's recorded status is in
+[PROVENANCE.json](PROVENANCE.json). [REMAINING.md](REMAINING.md) retains the
+historical unprocessed/excluded inventory, not a commitment to resume it.
 
 ## Attribution
 
@@ -18,16 +26,19 @@ The upstream `LICENSE` is preserved verbatim as [LICENSE](LICENSE). Every Skill 
 original licence. Per-Skill provenance — the upstream repository, the exact commit, the upstream path,
 and whether the content was modified — is recorded in [PROVENANCE.json](PROVENANCE.json).
 
-**We did not write these Skills.** What we added is the audit evidence, and the fixes that evidence
-justified.
+The upstream authors retain credit for the scientific Skills. Our contribution
+is refinement, audit evidence, and process/evaluation tooling. The separately
+preserved pipeline has its own [license and attribution](pipeline/NOTICE).
 
 ## Status
 
+These counts describe the committed provenance snapshot, not fresh execution:
+
 | | count |
 | --- | ---: |
-| Skills in this repository | **162** |
-| substantively modified by us, each with a fix log | 143 |
-| unmodified apart from declared `license: MIT` and `author: GPTomics` lines | 19 |
+| Skills in this repository | **195** |
+| marked modified, each with a fix-log reference | 195 |
+| unmodified apart from declared `license: MIT` and `author: GPTomics` lines | 0 |
 | **fix pass still needed** (first audit only, whatever the score) | **0** |
 | **re-audit still needed** (changed after their latest audit) | **0** |
 | audit coverage | **100%** |
@@ -46,6 +57,7 @@ Audited Skills that failed (open P0 or not deployable) are **not here**: they ar
 skills/<skill-id>/        SKILL.md, usually usage-guide.md, and examples/ or scripts/
 PROVENANCE.json           per-Skill upstream repository, commit, path, modification status, audit result
 REMAINING.json            what has not been refined yet, and what was audited and excluded
+pipeline/                 preserved process Skills, evaluation, and evidence/recovery index
 LICENSE                   the upstream MIT licence, verbatim
 ```
 
@@ -60,9 +72,11 @@ each modified Skill — is published separately in
 [optimizing-agent-science-skills](https://github.com/mrsonord2240/optimizing-agent-science-skills)
 under `audits/skills/<skill-id>/`.
 
-## Work in progress
+## Preserved experiments
 
-Fixes are developed on topic branches and linked worktrees in this repository. The archived
-[GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) repository is read-only provenance, not a
-staging source. Skill bytes reach `main` only after an independent re-audit passes; the records
-repository then reconciles provenance and remaining-work metadata without rebuilding `skills/`.
+The records repository retains 24 `ca-` experimental recuts with their individual
+states. They are not installed into this repository's scientific Skill collection.
+The evaluation's draft arms also remain experimental. The
+[evidence index](pipeline/EVIDENCE.md) pins their source revision and records the
+local preservation archives. This closeout does not change scientific Skill bytes
+or their provenance.

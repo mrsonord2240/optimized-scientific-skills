@@ -1,0 +1,910 @@
+{
+  "schema_version": 1,
+  "preserved_on": "2026-11-07",
+  "sources": {
+    "records": {
+      "path": "F:\\optimizing-agent-science-skills",
+      "repository": "https://github.com/mrsonord2240/optimizing-agent-science-skills.git",
+      "commit": "e9dcbbb67b1e3f02922e5d84b6778d757dce08d1"
+    },
+    "shelf": {
+      "path": "F:\\optimized-scientific-skills",
+      "repository": "https://github.com/mrsonord2240/optimized-scientific-skills.git",
+      "commit_before_closeout": "f162b3a9fd54e41c8f9e06bb969f86d079788518"
+    },
+    "evals": {
+      "path": "F:\\Bio-Evals",
+      "git_repository": false
+    },
+    "latch_eval_tools": {
+      "repository": "https://github.com/latchbio/latch-eval-tools",
+      "commit": "75cd1e8fc471e5622ec020a9e3bbf604ce88b454",
+      "redistributed": false
+    },
+    "variantbench": {
+      "repository": "https://github.com/latchbio/variantbench",
+      "commit": "a1cd271bc3671c6ecef05176d33d29e5c490438c"
+    }
+  },
+  "normalization": "Text content retained; CRLF normalized to LF for the repository. Both source and destination hashes are recorded.",
+  "imports": [
+    {
+      "path": "pipeline/LICENSE",
+      "source_root": "records",
+      "source_path": "LICENSE",
+      "source_sha256": "1494f0e4a18982c0226b2eb4c6fb7940ccbb4756fc49aaa5a92a1bcd8e050e06",
+      "sha256": "1494f0e4a18982c0226b2eb4c6fb7940ccbb4756fc49aaa5a92a1bcd8e050e06",
+      "bytes": 1350
+    },
+    {
+      "path": "pipeline/evaluation/history/EVAL_PLAN.md",
+      "source_root": "evals",
+      "source_path": "EVAL_PLAN.md",
+      "source_sha256": "db7b1496213da28125c498e651811ad123c0b4a8d7f2974f91a9e1c539fcf6e6",
+      "sha256": "db7b1496213da28125c498e651811ad123c0b4a8d7f2974f91a9e1c539fcf6e6",
+      "bytes": 7171
+    },
+    {
+      "path": "pipeline/evaluation/history/TASK_CANDIDATES.md",
+      "source_root": "evals",
+      "source_path": "TASK_CANDIDATES.md",
+      "source_sha256": "6683d115cdb3894bf693a524e57c00307cccf793a6b50ba04807cca0e0d164af",
+      "sha256": "6683d115cdb3894bf693a524e57c00307cccf793a6b50ba04807cca0e0d164af",
+      "bytes": 9112
+    },
+    {
+      "path": "pipeline/evaluation/runner/Dockerfile",
+      "source_root": "evals",
+      "source_path": "runner/Dockerfile",
+      "source_sha256": "3652f83e2babadbbdeb0a9c2be97fcae75a6d0a356df08873c914be084cebe46",
+      "sha256": "a0b9439ae1f565d0fae44c324bb34ba738ad1f393e574ceb5cbb7220f26e567b",
+      "bytes": 1969
+    },
+    {
+      "path": "pipeline/evaluation/runner/arms/MANIFEST.json",
+      "source_root": "evals",
+      "source_path": "runner/arms/MANIFEST.json",
+      "source_sha256": "0980648f61b01e36b9684d13fd5c76cf2823fa95cb26eb4af232064aca102ffd",
+      "sha256": "0127f4b848ec3a3e05099f29960eee4fdef440033ac2ae5e9fd50f7045da6756",
+      "bytes": 84092
+    },
+    {
+      "path": "pipeline/evaluation/runner/build_arms.py",
+      "source_root": "evals",
+      "source_path": "runner/build_arms.py",
+      "source_sha256": "866ff36993c5da429a5dfec786cc4659ceb41190c1fbf671221467bb59c4c302",
+      "sha256": "d75416385aa5ac21f10e4d2a3efa0fe3c68e23d8c942bbc9fa87bf8ed703f79a",
+      "bytes": 3656
+    },
+    {
+      "path": "pipeline/evaluation/runner/diag.py",
+      "source_root": "evals",
+      "source_path": "runner/diag.py",
+      "source_sha256": "4abb4cf76baead26871940d4c4be0d30f305dc418d74acb369ac8b07bf0c034e",
+      "sha256": "3024b23897778953a5a6aeff959af799980b7c5d963523aa054b44d8d89d221f",
+      "bytes": 4531
+    },
+    {
+      "path": "pipeline/evaluation/runner/report.py",
+      "source_root": "evals",
+      "source_path": "runner/report.py",
+      "source_sha256": "703c9631ead4fddabb12ae521ab77a9b8d486efac308bda74ab9076d7c28dc1b",
+      "sha256": "703c9631ead4fddabb12ae521ab77a9b8d486efac308bda74ab9076d7c28dc1b",
+      "bytes": 2406
+    },
+    {
+      "path": "pipeline/evaluation/runner/run.py",
+      "source_root": "evals",
+      "source_path": "runner/run.py",
+      "source_sha256": "cb9eaec59f47bd582cbac1792ee163adcb087159b9618a7224793c71c687cf52",
+      "sha256": "cb9eaec59f47bd582cbac1792ee163adcb087159b9618a7224793c71c687cf52",
+      "bytes": 33309
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/README.md",
+      "source_root": "evals",
+      "source_path": "synthetic/README.md",
+      "source_sha256": "d1e9c0077a0e62ba283ee66a53da51d230ec1ea3bf43b2851f4e7b03e284db7e",
+      "sha256": "d1e9c0077a0e62ba283ee66a53da51d230ec1ea3bf43b2851f4e7b03e284db7e",
+      "bytes": 3300
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/TASK_SPEC.md",
+      "source_root": "evals",
+      "source_path": "synthetic/TASK_SPEC.md",
+      "source_sha256": "f209359450ff03d4f2e2abfdef4c6ca9fa54b106b39e8aa72c62b73c0d61e1ed",
+      "sha256": "f209359450ff03d4f2e2abfdef4c6ca9fa54b106b39e8aa72c62b73c0d61e1ed",
+      "bytes": 5353
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/cis_mr_bcaa/eval.json",
+      "source_root": "evals",
+      "source_path": "synthetic/cis_mr_bcaa/eval.json",
+      "source_sha256": "a9a9dcfbd3a8c0a848bfc0eb72f81bedc34dda05bcd01c5baa1b8322c5347af4",
+      "sha256": "9ddfb815a10e340765e62c531dac1900686d9ef1c4bc1fee4381b24cbb0ac01b",
+      "bytes": 2353
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/cis_mr_bcaa/generate.py",
+      "source_root": "evals",
+      "source_path": "synthetic/cis_mr_bcaa/generate.py",
+      "source_sha256": "409225e60d672523a6828dfc5ebe3fbb59e7f2e1231a6e4c8b6567653d8f3886",
+      "sha256": "732228be013c41765939036ee7cbf77d52f68c475ead427eac8e7768603c5b9a",
+      "bytes": 11043
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/cis_mr_bcaa/solvers.py",
+      "source_root": "evals",
+      "source_path": "synthetic/cis_mr_bcaa/solvers.py",
+      "source_sha256": "53942814c550270babc74be6b30d6888381403d1e5e400ced754710a7e184e8e",
+      "sha256": "473a25ff548d5269ff904daa03e715fce8fd318960555c0da2974f15b2532133",
+      "bytes": 9376
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/cis_mr_bcaa/truth.json",
+      "source_root": "evals",
+      "source_path": "synthetic/cis_mr_bcaa/truth.json",
+      "source_sha256": "2c4a49ec86ce2b08d7662e6eae1f23a75126c35718e472077aed20999e85c64b",
+      "sha256": "9a42f300dabf299dde0c41b220b595d49ed83404cd04507a4eb404d40f3f15e3",
+      "bytes": 154
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/common/grading.py",
+      "source_root": "evals",
+      "source_path": "synthetic/common/grading.py",
+      "source_sha256": "b57ef909877e7265a94c98f041fd6e415babf31bfcdbaf241618ba9b53f9ec5e",
+      "sha256": "b57ef909877e7265a94c98f041fd6e415babf31bfcdbaf241618ba9b53f9ec5e",
+      "bytes": 1765
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/fine_mapping_effector/eval.json",
+      "source_root": "evals",
+      "source_path": "synthetic/fine_mapping_effector/eval.json",
+      "source_sha256": "3dff1ca37a67a4d8c588219b8618867e99945abffd2ce537d35d5ef9f163894c",
+      "sha256": "f04bf43b63d0fc9a594c46537085317696f08c9e4bd947d71d429ae1efa05c88",
+      "bytes": 2444
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/fine_mapping_effector/generate.py",
+      "source_root": "evals",
+      "source_path": "synthetic/fine_mapping_effector/generate.py",
+      "source_sha256": "33fb055d8a28d8dd64290df45fd86dd6a32bc56560ef372718cf3350cb257f2e",
+      "sha256": "33fb055d8a28d8dd64290df45fd86dd6a32bc56560ef372718cf3350cb257f2e",
+      "bytes": 7431
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/fine_mapping_effector/solvers.py",
+      "source_root": "evals",
+      "source_path": "synthetic/fine_mapping_effector/solvers.py",
+      "source_sha256": "06da048f5e688a27e54723227dea72697813af154d11f257c3b49153469e079e",
+      "sha256": "06da048f5e688a27e54723227dea72697813af154d11f257c3b49153469e079e",
+      "bytes": 3519
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i1_ml_leakage/NOTES.md",
+      "source_root": "evals",
+      "source_path": "synthetic/i1_ml_leakage/NOTES.md",
+      "source_sha256": "81bb6a16426b8ec7995456c9688f0631a54ed8ba0e963b7b9dfb060e16306588",
+      "sha256": "81bb6a16426b8ec7995456c9688f0631a54ed8ba0e963b7b9dfb060e16306588",
+      "bytes": 4437
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i1_ml_leakage/eval.json",
+      "source_root": "evals",
+      "source_path": "synthetic/i1_ml_leakage/eval.json",
+      "source_sha256": "f166e1fe7a36aeca88bdda6db6442dd9a427cd2d7c81ce82ce135cd61df88491",
+      "sha256": "22a5a1ed51e1294cc1766d65acc65480a412e064d7ec91ff9eb0643141dfc572",
+      "bytes": 2194
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i1_ml_leakage/generate.py",
+      "source_root": "evals",
+      "source_path": "synthetic/i1_ml_leakage/generate.py",
+      "source_sha256": "c5bc3465e2e1e39f810be7286310c7eccb1353e5e02fbfc1829f08b8b82e3487",
+      "sha256": "c5bc3465e2e1e39f810be7286310c7eccb1353e5e02fbfc1829f08b8b82e3487",
+      "bytes": 8164
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i1_ml_leakage/solvers.py",
+      "source_root": "evals",
+      "source_path": "synthetic/i1_ml_leakage/solvers.py",
+      "source_sha256": "463c7f83924fe7a78efdb4c47ce01d49f7d383e57afdb558e26634a24bc20d47",
+      "sha256": "463c7f83924fe7a78efdb4c47ce01d49f7d383e57afdb558e26634a24bc20d47",
+      "bytes": 6427
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i1_ml_leakage/truth.json",
+      "source_root": "evals",
+      "source_path": "synthetic/i1_ml_leakage/truth.json",
+      "source_sha256": "a62fc5d998f3c0d8196c8d264c7f8155aa0874dd168decf379acdef9a47639fa",
+      "sha256": "d4feab33f4e312409567d1b15b973043709e3492d63695857478fc035b750dd9",
+      "bytes": 371
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i2_pseudobulk_de/NOTES.md",
+      "source_root": "evals",
+      "source_path": "synthetic/i2_pseudobulk_de/NOTES.md",
+      "source_sha256": "b4a40f0c51e810370c4d0456c09116b74dadb747700109b03210269508577876",
+      "sha256": "b4a40f0c51e810370c4d0456c09116b74dadb747700109b03210269508577876",
+      "bytes": 5719
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i2_pseudobulk_de/eval.json",
+      "source_root": "evals",
+      "source_path": "synthetic/i2_pseudobulk_de/eval.json",
+      "source_sha256": "ec41cc10c6d424a623e7c8bb6c38ad1eda7ba32dc2f7718092c477b8ca9cce3d",
+      "sha256": "db59dc491c2e78824917c9e63a5478733a4b171228d495b3b4ce098aa5c8e66e",
+      "bytes": 8764
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i2_pseudobulk_de/generate.py",
+      "source_root": "evals",
+      "source_path": "synthetic/i2_pseudobulk_de/generate.py",
+      "source_sha256": "e490e9a31f003754dc0eafbdfed9a89deb718cb20e6a2580f1b362f81e4f5148",
+      "sha256": "c5e5809c3feadc4f3c2dfb3958f2b15602a3f14d931345874f078dde2879e230",
+      "bytes": 9249
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i2_pseudobulk_de/solvers.py",
+      "source_root": "evals",
+      "source_path": "synthetic/i2_pseudobulk_de/solvers.py",
+      "source_sha256": "9729d821e67a0d4a358cab03ba6c62dc144fa291121ba6a31ddba5060408cd54",
+      "sha256": "ff197767d675a8e92f500b039dde76320f9579a795d1959566a72240f93d2bcf",
+      "bytes": 9318
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i2_pseudobulk_de/truth.json",
+      "source_root": "evals",
+      "source_path": "synthetic/i2_pseudobulk_de/truth.json",
+      "source_sha256": "d92acd8d3417521b3d1078e67fa4e7b6c68e3cbc2ad0b9d61ebb8e7d303214e5",
+      "sha256": "45fc72a59dc34534b8345370366482f261bea19801ed2ae8d2fdb23b116c7373",
+      "bytes": 27932
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i3_ora_background/NOTES.md",
+      "source_root": "evals",
+      "source_path": "synthetic/i3_ora_background/NOTES.md",
+      "source_sha256": "e7915228ef416dc0d471c7b70f07553d927a5563270d7cf36bdabeab6e389175",
+      "sha256": "e7915228ef416dc0d471c7b70f07553d927a5563270d7cf36bdabeab6e389175",
+      "bytes": 3491
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i3_ora_background/eval.json",
+      "source_root": "evals",
+      "source_path": "synthetic/i3_ora_background/eval.json",
+      "source_sha256": "928ec5510f917310d52cbb851d12530f941cb95b55f18552244438b7e106ce1d",
+      "sha256": "928ec5510f917310d52cbb851d12530f941cb95b55f18552244438b7e106ce1d",
+      "bytes": 2165
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i3_ora_background/generate.py",
+      "source_root": "evals",
+      "source_path": "synthetic/i3_ora_background/generate.py",
+      "source_sha256": "d50002ca74570599c1979a5e6202e2a2a7b3e595f64db2822ade98d74db6f18b",
+      "sha256": "04a55f21cdabf2ec93595e48b1ebb4a679ba38e60c9d3379dbc4a5d981ec4d35",
+      "bytes": 8224
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i3_ora_background/solvers.py",
+      "source_root": "evals",
+      "source_path": "synthetic/i3_ora_background/solvers.py",
+      "source_sha256": "f099e68d329d7734b6a254654aa0cf5ca85b9ab54dee632306b9712172e1ad04",
+      "sha256": "7339c03d0f0f876fd58e36990f0336f54783e3d09902eadaefef0190620ff34a",
+      "bytes": 6130
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i3_ora_background/truth.json",
+      "source_root": "evals",
+      "source_path": "synthetic/i3_ora_background/truth.json",
+      "source_sha256": "465006f750c079ffdc4925fc3b0d8538f1b62ed761ad595905ee175feea37a52",
+      "sha256": "465006f750c079ffdc4925fc3b0d8538f1b62ed761ad595905ee175feea37a52",
+      "bytes": 8008
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i5_crispr_cn_bias/NOTES.md",
+      "source_root": "evals",
+      "source_path": "synthetic/i5_crispr_cn_bias/NOTES.md",
+      "source_sha256": "623cad5cf94c15a530f582eacd73b2513b211e01479f08e8cc4602f49f0a2baf",
+      "sha256": "623cad5cf94c15a530f582eacd73b2513b211e01479f08e8cc4602f49f0a2baf",
+      "bytes": 4889
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i5_crispr_cn_bias/eval.json",
+      "source_root": "evals",
+      "source_path": "synthetic/i5_crispr_cn_bias/eval.json",
+      "source_sha256": "a8df79541e410c34ad0485b6d431c6f882629b66d3eef796bb02ca298f65b507",
+      "sha256": "b750ea5afeb04bca94f9d844f838bb36051758a48d6da0c6c3972bf388a2eaaa",
+      "bytes": 3114
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i5_crispr_cn_bias/generate.py",
+      "source_root": "evals",
+      "source_path": "synthetic/i5_crispr_cn_bias/generate.py",
+      "source_sha256": "ae54a8aee0374f71d4bb4094932ac42ffb99c4a6e9bd97154c6275082fcb4bed",
+      "sha256": "ae54a8aee0374f71d4bb4094932ac42ffb99c4a6e9bd97154c6275082fcb4bed",
+      "bytes": 10716
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i5_crispr_cn_bias/solvers.py",
+      "source_root": "evals",
+      "source_path": "synthetic/i5_crispr_cn_bias/solvers.py",
+      "source_sha256": "806b1ab8a04841bccebdd9f058f44cdf45a98487401bb2c4ef26dd35efae4a4f",
+      "sha256": "806b1ab8a04841bccebdd9f058f44cdf45a98487401bb2c4ef26dd35efae4a4f",
+      "bytes": 7375
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i5_crispr_cn_bias/truth.json",
+      "source_root": "evals",
+      "source_path": "synthetic/i5_crispr_cn_bias/truth.json",
+      "source_sha256": "a25cbb821596959884ee714d805ecabe1fd74078577101244127b7862ee4b083",
+      "sha256": "99c07ccffbe42cbe5e8b1d44f085a389c165429ed00d455af9c66a027f1486b8",
+      "bytes": 24254
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i6_proteomics_de/NOTES.md",
+      "source_root": "evals",
+      "source_path": "synthetic/i6_proteomics_de/NOTES.md",
+      "source_sha256": "6ba452d3a8f390aeec32f69a23fb7932b61087ea8bc0bc238edb48b8c65bf00c",
+      "sha256": "6ba452d3a8f390aeec32f69a23fb7932b61087ea8bc0bc238edb48b8c65bf00c",
+      "bytes": 5977
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i6_proteomics_de/eval.json",
+      "source_root": "evals",
+      "source_path": "synthetic/i6_proteomics_de/eval.json",
+      "source_sha256": "179e1ee65d50543c114823d1c216ba52043299fb2c1c1ad7f10a00afad8feee3",
+      "sha256": "a151d3e2d0dd3282aeb063b7950617c0a1ec4d1ac84519566ff101ffdf22b32e",
+      "bytes": 4412
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i6_proteomics_de/generate.py",
+      "source_root": "evals",
+      "source_path": "synthetic/i6_proteomics_de/generate.py",
+      "source_sha256": "fe833000433511cc48feca9f2455a5afc91033a6ab1fba5314b64e9a2d1046da",
+      "sha256": "b302a23ea368b0ef096e5e3a2c2fcde90bd37b62f343138fd4c949cf38bbedd5",
+      "bytes": 9956
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i6_proteomics_de/solvers.py",
+      "source_root": "evals",
+      "source_path": "synthetic/i6_proteomics_de/solvers.py",
+      "source_sha256": "26e245bc730171cfafb27a80af6caddbb4cb2d8e45cb82bd165071201258e428",
+      "sha256": "a88cf5f71d0149f2fe9cfdd1171941a1df328109450bc90b313f9354b149a832",
+      "bytes": 9886
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i6_proteomics_de/truth.json",
+      "source_root": "evals",
+      "source_path": "synthetic/i6_proteomics_de/truth.json",
+      "source_sha256": "e8007d7f947e4e8a3fa15cf4ea801b5c6955ae72ee27610a4d434c761c547bb2",
+      "sha256": "6ca5af14658345eaa7eea5e068aa3c552908d975184cd75a8bb7b127f9b34a23",
+      "bytes": 6742
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i7_isotope_correction/NOTES.md",
+      "source_root": "evals",
+      "source_path": "synthetic/i7_isotope_correction/NOTES.md",
+      "source_sha256": "2ee767bf2aca9f1f116eb3739d2358f4c48017d9b519a2df910db28de6def91c",
+      "sha256": "2ee767bf2aca9f1f116eb3739d2358f4c48017d9b519a2df910db28de6def91c",
+      "bytes": 4507
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i7_isotope_correction/eval.json",
+      "source_root": "evals",
+      "source_path": "synthetic/i7_isotope_correction/eval.json",
+      "source_sha256": "ebf57028b3080d4951632321ee6ea10fb6800a16a0368b7bb61c7f0aa0b0630e",
+      "sha256": "c289db49d9e9ef2383fc96ab71a62131ddadc74bbf423b07c686bb45a09f13df",
+      "bytes": 3283
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i7_isotope_correction/generate.py",
+      "source_root": "evals",
+      "source_path": "synthetic/i7_isotope_correction/generate.py",
+      "source_sha256": "6ef1128afd85b5511a9f5d2edaca83de73686a5ab19243e4a45793a93bed0249",
+      "sha256": "769f9d7a771191ac1712c395bbf13072faa6787931a2a7e690f1471bde746de9",
+      "bytes": 8577
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i7_isotope_correction/solvers.py",
+      "source_root": "evals",
+      "source_path": "synthetic/i7_isotope_correction/solvers.py",
+      "source_sha256": "8feeea330fcc7cfb99a023e5cb64abf3a026676166deb5d156b34b81ce5d2b70",
+      "sha256": "a44fa31650fcbdfe0d1a0f010f54c3660c52ee25c78f67cb9b71a6cfad2a6f46",
+      "bytes": 7859
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i7_isotope_correction/truth.json",
+      "source_root": "evals",
+      "source_path": "synthetic/i7_isotope_correction/truth.json",
+      "source_sha256": "7b4151f316f13a792775069bb61e4fd0f9978a3f1bee6c64c08441fece9fc366",
+      "sha256": "65676b21afd6fd14aec1c81580d2742609f2b89f6b11cd6377bcad0b35b717bd",
+      "bytes": 3024
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i8_microbiome_da/NOTES.md",
+      "source_root": "evals",
+      "source_path": "synthetic/i8_microbiome_da/NOTES.md",
+      "source_sha256": "dd2317fe0279d31a61ea1d3015457e614e119663e22541f3e0e132f416bf6b24",
+      "sha256": "dd2317fe0279d31a61ea1d3015457e614e119663e22541f3e0e132f416bf6b24",
+      "bytes": 6308
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i8_microbiome_da/eval.json",
+      "source_root": "evals",
+      "source_path": "synthetic/i8_microbiome_da/eval.json",
+      "source_sha256": "525bdfb5c2e82a3c3ecacad22784ffa19e45d22a60c199d83e34e027a9f6fcb5",
+      "sha256": "525bdfb5c2e82a3c3ecacad22784ffa19e45d22a60c199d83e34e027a9f6fcb5",
+      "bytes": 1752
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i8_microbiome_da/generate.py",
+      "source_root": "evals",
+      "source_path": "synthetic/i8_microbiome_da/generate.py",
+      "source_sha256": "5ce85dfc470a50507490c89f674b8fcad650d8e794b7a51c07cb08765b899e1c",
+      "sha256": "a791796cec9d3e2319651b3884c41e47358c8b84737f6f89fc1f283f2f1d0a5d",
+      "bytes": 13433
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i8_microbiome_da/solvers.py",
+      "source_root": "evals",
+      "source_path": "synthetic/i8_microbiome_da/solvers.py",
+      "source_sha256": "89956e579ce7cf33a3c27c03f8f1a89daccae9beeb1b0e99fc985fcb76ea107f",
+      "sha256": "abfac7cba572e4920705882db0bdc61e6bdf9d2dbf34e6fc481ed6c76b27886a",
+      "bytes": 9376
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i8_microbiome_da/truth.json",
+      "source_root": "evals",
+      "source_path": "synthetic/i8_microbiome_da/truth.json",
+      "source_sha256": "6961aaa7b56974207413cd5aac066186d7a0c806ca34d9fba36ed81a8e9bc428",
+      "sha256": "6961aaa7b56974207413cd5aac066186d7a0c806ca34d9fba36ed81a8e9bc428",
+      "bytes": 1070
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i9_vcf_normalization/NOTES.md",
+      "source_root": "evals",
+      "source_path": "synthetic/i9_vcf_normalization/NOTES.md",
+      "source_sha256": "99e47c8cfb463261370ddf04507129b67c84ff99c6805b02046ca4e34cc8ab5c",
+      "sha256": "99e47c8cfb463261370ddf04507129b67c84ff99c6805b02046ca4e34cc8ab5c",
+      "bytes": 5097
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i9_vcf_normalization/eval.json",
+      "source_root": "evals",
+      "source_path": "synthetic/i9_vcf_normalization/eval.json",
+      "source_sha256": "c47403b602fcb5839a08a84277f9e257fbd7be66724f0caada7312e966578895",
+      "sha256": "48829643af6bcd764a213d41b88415e4cc436dac1a1e23a52c19485a055fc13e",
+      "bytes": 2324
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i9_vcf_normalization/generate.py",
+      "source_root": "evals",
+      "source_path": "synthetic/i9_vcf_normalization/generate.py",
+      "source_sha256": "f76af4a4673e260a91fef635d48064ed92f2f861769ca29e64112c88a6ba2de9",
+      "sha256": "5ac0bdc7c173d645f6521873f3af500434408a23ea180d9f81fa537833dc3e19",
+      "bytes": 17739
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i9_vcf_normalization/solvers.py",
+      "source_root": "evals",
+      "source_path": "synthetic/i9_vcf_normalization/solvers.py",
+      "source_sha256": "a9a603a84a70be27267aec01303557a6c2ef1334d0a2d621a082e31aff44a2b1",
+      "sha256": "a9a603a84a70be27267aec01303557a6c2ef1334d0a2d621a082e31aff44a2b1",
+      "bytes": 8520
+    },
+    {
+      "path": "pipeline/evaluation/synthetic/i9_vcf_normalization/truth.json",
+      "source_root": "evals",
+      "source_path": "synthetic/i9_vcf_normalization/truth.json",
+      "source_sha256": "5c8bb1b369931244009e8b2027164915defcabd3a12731816cfe9d672a593d21",
+      "sha256": "07d270189b6f1afeec406d2f2458b0a67c6144e53221c67a8a77272d1f935b64",
+      "bytes": 230
+    },
+    {
+      "path": "pipeline/licenses/bioskills-MIT.txt",
+      "source_root": "shelf",
+      "source_path": "LICENSE",
+      "source_sha256": "4dafc73d8d0444d7e5e2dcc2ce44e06d59f372865e73cd579a7a6756c25f2256",
+      "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f",
+      "bytes": 1065
+    },
+    {
+      "path": "pipeline/licenses/records-NOTICE.txt",
+      "source_root": "records",
+      "source_path": "NOTICE",
+      "source_sha256": "6099e3aad516f3a1b6723bd1812ff42b4d4a9922b0554d850dcf45f3924bc250",
+      "sha256": "6099e3aad516f3a1b6723bd1812ff42b4d4a9922b0554d850dcf45f3924bc250",
+      "bytes": 1127
+    },
+    {
+      "path": "pipeline/licenses/variantbench-Apache-2.0.txt",
+      "source_root": "evals",
+      "source_path": "variantbench/LICENSE",
+      "source_sha256": "93f196a5f0e9b3cdb647ec87ee83fff2271cf6798e6bbe4f63aab62e2da9d6dd",
+      "sha256": "440f5cbd29c18377ba71b960247e584dfc3065054dc6a6774aa1fdb63f23c8ed",
+      "bytes": 9073
+    },
+    {
+      "path": "pipeline/skills/audit-scientific-skill/SKILL.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/audit-scientific-skill/SKILL.md",
+      "source_sha256": "dd68f07dcf6a47b1945e42e7276041b55e3621443a4bc46c62c3569d85cb03b5",
+      "sha256": "dd68f07dcf6a47b1945e42e7276041b55e3621443a4bc46c62c3569d85cb03b5",
+      "bytes": 9123
+    },
+    {
+      "path": "pipeline/skills/audit-scientific-skill/agents/openai.yaml",
+      "source_root": "records",
+      "source_path": ".claude/skills/audit-scientific-skill/agents/openai.yaml",
+      "source_sha256": "e38717cd5d4768407c0f67537e04a21764876b30dd5525f6df49bd62cbf6c767",
+      "sha256": "e38717cd5d4768407c0f67537e04a21764876b30dd5525f6df49bd62cbf6c767",
+      "bytes": 316
+    },
+    {
+      "path": "pipeline/skills/fix-scientific-skill/SKILL.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/fix-scientific-skill/SKILL.md",
+      "source_sha256": "cf4b7c3be84a1a8fb39449f5dfc0492ae57e2adb722c26d68a8463cf61f8c232",
+      "sha256": "cf4b7c3be84a1a8fb39449f5dfc0492ae57e2adb722c26d68a8463cf61f8c232",
+      "bytes": 6316
+    },
+    {
+      "path": "pipeline/skills/fix-scientific-skill/agents/openai.yaml",
+      "source_root": "records",
+      "source_path": ".claude/skills/fix-scientific-skill/agents/openai.yaml",
+      "source_sha256": "725d017719463d56cea0264a94bcfa473c4d0ca325b3d49bc883a1c7b2543343",
+      "sha256": "725d017719463d56cea0264a94bcfa473c4d0ca325b3d49bc883a1c7b2543343",
+      "bytes": 299
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/SKILL.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/SKILL.md",
+      "source_sha256": "98b2d93e4c37c1d274958de6caa0cfa759dbc04949d2eb6fba33ddb2396b7077",
+      "sha256": "98b2d93e4c37c1d274958de6caa0cfa759dbc04949d2eb6fba33ddb2396b7077",
+      "bytes": 9433
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/agents/openai.yaml",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/agents/openai.yaml",
+      "source_sha256": "d92c45d0149403e780003f6bf221457e636be12d26c22a7c279f02ce2f4dcd4e",
+      "sha256": "d92c45d0149403e780003f6bf221457e636be12d26c22a7c279f02ce2f4dcd4e",
+      "bytes": 331
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/SKILL.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/SKILL.md",
+      "source_sha256": "b092bc9ca4acbae874b76033d863b82e8337320d41af3e579bfdc549e240ac6d",
+      "sha256": "b092bc9ca4acbae874b76033d863b82e8337320d41af3e579bfdc549e240ac6d",
+      "bytes": 2000
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/background.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/background.md",
+      "source_sha256": "7acacf60f1f0845519146a4126470bc5067d08d744cdb483f27c2c16f403b121",
+      "sha256": "7acacf60f1f0845519146a4126470bc5067d08d744cdb483f27c2c16f403b121",
+      "bytes": 2639
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/betaprior-history.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/betaprior-history.md",
+      "source_sha256": "7f872eb040cbf4031de2f5c7500be29838014cbc799a2b32b96940fd7b84090b",
+      "sha256": "7f872eb040cbf4031de2f5c7500be29838014cbc799a2b32b96940fd7b84090b",
+      "bytes": 702
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/citations.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/citations.md",
+      "source_sha256": "619cbe58e34f314563dc591b4d2a7577d6f3c18e31561b1295a4d56d9e05f392",
+      "sha256": "619cbe58e34f314563dc591b4d2a7577d6f3c18e31561b1295a4d56d9e05f392",
+      "bytes": 1578
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/dispersion-trend.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/dispersion-trend.md",
+      "source_sha256": "42c7fdd640af168e8218b4eb514eb75b035c0e3fe07232d7f6695bceb8a41696",
+      "sha256": "42c7fdd640af168e8218b4eb514eb75b035c0e3fe07232d7f6695bceb8a41696",
+      "bytes": 904
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/interaction-designs.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/interaction-designs.md",
+      "source_sha256": "24ae685cd23120ea0d72a9b436f145e070f9ec2844fe768eced36f90ba7d8d96",
+      "sha256": "24ae685cd23120ea0d72a9b436f145e070f9ec2844fe768eced36f90ba7d8d96",
+      "bytes": 995
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/lfc-shrinkage.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/lfc-shrinkage.md",
+      "source_sha256": "ee900b43db441b7c23e348a3fe6720debc1a781cf29431ece60c132c528ba9b0",
+      "sha256": "ee900b43db441b7c23e348a3fe6720debc1a781cf29431ece60c132c528ba9b0",
+      "bytes": 2361
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/lrt.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/lrt.md",
+      "source_sha256": "07f7531d13917328c1f9edd896e09578793ca41cba4da97398172f55cc6c5a27",
+      "sha256": "07f7531d13917328c1f9edd896e09578793ca41cba4da97398172f55cc6c5a27",
+      "bytes": 1506
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/padj-na-remedies.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/padj-na-remedies.md",
+      "source_sha256": "b72514be3f0de1e80a77ab19bc9f5fcc4c64c5618b0294d42f78140c2d7aae2b",
+      "sha256": "b72514be3f0de1e80a77ab19bc9f5fcc4c64c5618b0294d42f78140c2d7aae2b",
+      "bytes": 1176
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/prokaryotic-rna-seq.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/prokaryotic-rna-seq.md",
+      "source_sha256": "ece7cc222d008451b2806712449501abd9c53bbef0440ff8296c8432a52c50d4",
+      "sha256": "ece7cc222d008451b2806712449501abd9c53bbef0440ff8296c8432a52c50d4",
+      "bytes": 620
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/pydeseq2.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/pydeseq2.md",
+      "source_sha256": "2bd11ae3f0f9716673fbce8dfe228bae9274d752d9b018afc87c6cf39db54ca4",
+      "sha256": "2bd11ae3f0f9716673fbce8dfe228bae9274d752d9b018afc87c6cf39db54ca4",
+      "bytes": 548
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/size-factors.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/size-factors.md",
+      "source_sha256": "ad349bb96452c4758f5a3cec43b2eca4a804182fc11145ae67409ca85acc568b",
+      "sha256": "ad349bb96452c4758f5a3cec43b2eca4a804182fc11145ae67409ca85acc568b",
+      "bytes": 1312
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/transforms.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/transforms.md",
+      "source_sha256": "bbeda4b2d6b6596dffc9f085d35f80c6596a9e40475dcc7c33b5fa436b519fcc",
+      "sha256": "bbeda4b2d6b6596dffc9f085d35f80c6596a9e40475dcc7c33b5fa436b519fcc",
+      "bytes": 1280
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/tximport.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/references/tximport.md",
+      "source_sha256": "f8caf9b89fd6a2561fb59791171e38365a2c1c9ba0af006a7698a65fce1b9f41",
+      "sha256": "f8caf9b89fd6a2561fb59791171e38365a2c1c9ba0af006a7698a65fce1b9f41",
+      "bytes": 516
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/errors.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/errors.md",
+      "source_sha256": "8fe231b1799e3d059251e4b26d6ba0254d161318e7968b10e6cb91b6655900fc",
+      "sha256": "8fe231b1799e3d059251e4b26d6ba0254d161318e7968b10e6cb91b6655900fc",
+      "bytes": 1093
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/interaction.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/interaction.md",
+      "source_sha256": "0d0f58ebe0a2d714f837f1d3d55923a4fa0b4c5ef4be4ea9791c7682b515d745",
+      "sha256": "0d0f58ebe0a2d714f837f1d3d55923a4fa0b4c5ef4be4ea9791c7682b515d745",
+      "bytes": 889
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/multi-level.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/multi-level.md",
+      "source_sha256": "63c9a0b893097b3d65c51457cbe84acbe0d739b3dd56679280c1eb9a30b52aa7",
+      "sha256": "63c9a0b893097b3d65c51457cbe84acbe0d739b3dd56679280c1eb9a30b52aa7",
+      "bytes": 765
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/padj-na.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/padj-na.md",
+      "source_sha256": "70a8968e8faff4b781986114aa530d423095252c8dda09aa9f1e1f595dddeab0",
+      "sha256": "70a8968e8faff4b781986114aa530d423095252c8dda09aa9f1e1f595dddeab0",
+      "bytes": 981
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/paired-or-batch.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/paired-or-batch.md",
+      "source_sha256": "956592329f15b1cb6fde3fa239ee38be1f861dbdddeec370136707b47a521b20",
+      "sha256": "956592329f15b1cb6fde3fa239ee38be1f861dbdddeec370136707b47a521b20",
+      "bytes": 805
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/pseudobulk.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/pseudobulk.md",
+      "source_sha256": "c4cadb43b0cdc7021dc1f85373319824f364f60bf2e4f282d890889e70b587cc",
+      "sha256": "c4cadb43b0cdc7021dc1f85373319824f364f60bf2e4f282d890889e70b587cc",
+      "bytes": 1398
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/python.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/python.md",
+      "source_sha256": "722f7c9e41f920deccddbb38ddf70e1a5069b48c4e4f808df1d48559cec24882",
+      "sha256": "722f7c9e41f920deccddbb38ddf70e1a5069b48c4e4f808df1d48559cec24882",
+      "bytes": 829
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/report.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/report.md",
+      "source_sha256": "0596c690d80df270b1a8eb5500c0cb0eacf8956efb7e063e55ea9e1d0c11b035",
+      "sha256": "0596c690d80df270b1a8eb5500c0cb0eacf8956efb7e063e55ea9e1d0c11b035",
+      "bytes": 398
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/shrinkage.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/shrinkage.md",
+      "source_sha256": "a219828a4eccce652a36fe7ec893791af5da7d89ef79e2fe54c8283e392778c8",
+      "sha256": "a219828a4eccce652a36fe7ec893791af5da7d89ef79e2fe54c8283e392778c8",
+      "bytes": 792
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/transforms.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/transforms.md",
+      "source_sha256": "c188f0d9458cbe2a72e2a950f57eca663fb4f98b26b41590565a321c2ee8d884",
+      "sha256": "c188f0d9458cbe2a72e2a950f57eca663fb4f98b26b41590565a321c2ee8d884",
+      "bytes": 704
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/two-group.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/two-group.md",
+      "source_sha256": "5d4ea7003eb2105e3cdc44727feb2455d4120adbb0aa4999a865b6d56dc16ae1",
+      "sha256": "5d4ea7003eb2105e3cdc44727feb2455d4120adbb0aa4999a865b6d56dc16ae1",
+      "bytes": 914
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/tximport.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/routes/tximport.md",
+      "source_sha256": "474f4974dc7d26e5a071aa199e4e188e858d1738cfdff2519c866a9d66401cfd",
+      "sha256": "474f4974dc7d26e5a071aa199e4e188e858d1738cfdff2519c866a9d66401cfd",
+      "bytes": 877
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/scripts/deseq2_de.R",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/scripts/deseq2_de.R",
+      "source_sha256": "985a4e64ca748cad347f82806687a3f845f1618b135417e831c18c6b5b171b12",
+      "sha256": "985a4e64ca748cad347f82806687a3f845f1618b135417e831c18c6b5b171b12",
+      "bytes": 6832
+    },
+    {
+      "path": "pipeline/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/scripts/pseudobulk_de.R",
+      "source_root": "records",
+      "source_path": ".claude/skills/normalize-scientific-skill/references/example/bio-differential-expression-deseq2-basics/scripts/pseudobulk_de.R",
+      "source_sha256": "ef2e42f951bbb74ddab3a40547f30adcd470831d9b2047a1c0e4b661a0306ffa",
+      "sha256": "ef2e42f951bbb74ddab3a40547f30adcd470831d9b2047a1c0e4b661a0306ffa",
+      "bytes": 7282
+    },
+    {
+      "path": "pipeline/skills/optimize-scientific-skills/SKILL.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/optimize-scientific-skills/SKILL.md",
+      "source_sha256": "81fa822e59dbc939221356387a49bd8a3d00d75da49726852a22c94865407dec",
+      "sha256": "81fa822e59dbc939221356387a49bd8a3d00d75da49726852a22c94865407dec",
+      "bytes": 16442
+    },
+    {
+      "path": "pipeline/skills/optimize-scientific-skills/agents/openai.yaml",
+      "source_root": "records",
+      "source_path": ".claude/skills/optimize-scientific-skills/agents/openai.yaml",
+      "source_sha256": "6283c17aaf5cfc30389ac9af6a8b362e23cea3d5c38a443c53b5a27de41df8ea",
+      "sha256": "6283c17aaf5cfc30389ac9af6a8b362e23cea3d5c38a443c53b5a27de41df8ea",
+      "bytes": 355
+    },
+    {
+      "path": "pipeline/skills/optimize-scientific-skills/references/environment-policy.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/optimize-scientific-skills/references/environment-policy.md",
+      "source_sha256": "7ceb4ca366cc7f9ef9933427388d1a7d4bc47704264e791b0510c9a8cdbc0638",
+      "sha256": "7ceb4ca366cc7f9ef9933427388d1a7d4bc47704264e791b0510c9a8cdbc0638",
+      "bytes": 2356
+    },
+    {
+      "path": "pipeline/skills/optimize-scientific-skills/references/evidence-standard.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/optimize-scientific-skills/references/evidence-standard.md",
+      "source_sha256": "5c52fa1115b199a155639658ef3723e7f10ff114d1015955dba4d81d8ad0e01d",
+      "sha256": "5c52fa1115b199a155639658ef3723e7f10ff114d1015955dba4d81d8ad0e01d",
+      "bytes": 1618
+    },
+    {
+      "path": "pipeline/skills/optimize-scientific-skills/references/marketplace-intake-gate.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/optimize-scientific-skills/references/marketplace-intake-gate.md",
+      "source_sha256": "ef078cfdcce535419878eb5a90de891a350fef25c0fe7a729c957a12a10545b9",
+      "sha256": "ef078cfdcce535419878eb5a90de891a350fef25c0fe7a729c957a12a10545b9",
+      "bytes": 2951
+    },
+    {
+      "path": "pipeline/skills/optimize-scientific-skills/references/phase-handoff.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/optimize-scientific-skills/references/phase-handoff.md",
+      "source_sha256": "7f22dbc5f8c8a6050d0c4d3c331da476b25dcca9799a08547c38a8e90653bf65",
+      "sha256": "7f22dbc5f8c8a6050d0c4d3c331da476b25dcca9799a08547c38a8e90653bf65",
+      "bytes": 2363
+    },
+    {
+      "path": "pipeline/skills/optimize-scientific-skills/references/readiness-and-records.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/optimize-scientific-skills/references/readiness-and-records.md",
+      "source_sha256": "6f20386a75e5b647be75086d42465e4b773be7f11e507a62023fde89840f6005",
+      "sha256": "6f20386a75e5b647be75086d42465e4b773be7f11e507a62023fde89840f6005",
+      "bytes": 5011
+    },
+    {
+      "path": "pipeline/skills/optimize-scientific-skills/references/relay-operations.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/optimize-scientific-skills/references/relay-operations.md",
+      "source_sha256": "e90d3655fe61cc59651eba693ddc1b3905664533b306214b2096883179f942c9",
+      "sha256": "e90d3655fe61cc59651eba693ddc1b3905664533b306214b2096883179f942c9",
+      "bytes": 7100
+    },
+    {
+      "path": "pipeline/skills/optimize-scientific-skills/references/repository-contract.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/optimize-scientific-skills/references/repository-contract.md",
+      "source_sha256": "7d008422001bc19583ea47616297ee58edf0cec9a8016afdaaeb0a3da0392729",
+      "sha256": "7d008422001bc19583ea47616297ee58edf0cec9a8016afdaaeb0a3da0392729",
+      "bytes": 3226
+    },
+    {
+      "path": "pipeline/skills/prepare-scientific-skill-tooling/SKILL.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/prepare-scientific-skill-tooling/SKILL.md",
+      "source_sha256": "2402da6fcd70fb82a23594cc18cb9d3971e8ebfb5e4ed45951e1032b06b553da",
+      "sha256": "2402da6fcd70fb82a23594cc18cb9d3971e8ebfb5e4ed45951e1032b06b553da",
+      "bytes": 7582
+    },
+    {
+      "path": "pipeline/skills/prepare-scientific-skill-tooling/agents/openai.yaml",
+      "source_root": "records",
+      "source_path": ".claude/skills/prepare-scientific-skill-tooling/agents/openai.yaml",
+      "source_sha256": "f786fb815e9c965ad66f8c38799b0fc4e1a6e0b638da68d974c620dad177b831",
+      "sha256": "f786fb815e9c965ad66f8c38799b0fc4e1a6e0b638da68d974c620dad177b831",
+      "bytes": 312
+    },
+    {
+      "path": "pipeline/skills/reaudit-scientific-skill/SKILL.md",
+      "source_root": "records",
+      "source_path": ".claude/skills/reaudit-scientific-skill/SKILL.md",
+      "source_sha256": "81fe89129bdf2f20de124afbfa4219abeac4b29a723a50a3b39ed4271aab0364",
+      "sha256": "81fe89129bdf2f20de124afbfa4219abeac4b29a723a50a3b39ed4271aab0364",
+      "bytes": 8521
+    },
+    {
+      "path": "pipeline/skills/reaudit-scientific-skill/agents/openai.yaml",
+      "source_root": "records",
+      "source_path": ".claude/skills/reaudit-scientific-skill/agents/openai.yaml",
+      "source_sha256": "bd0cec6f9bac481b649ec4fba9cd5013843a10974bdc6a85f9e23b813452463d",
+      "sha256": "bd0cec6f9bac481b649ec4fba9cd5013843a10974bdc6a85f9e23b813452463d",
+      "bytes": 333
+    }
+  ],
+  "results": {
+    "count": 263,
+    "path": "pipeline/evaluation/results.jsonl",
+    "sha256": "ca7070fd0cf005b2c74ee2939f07bcf8ee1e06a8dc591af5e1a3a9198b5425af",
+    "source_hashes": "Each JSONL record carries its original result.json hash and source path."
+  }
+}
