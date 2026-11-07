@@ -1,0 +1,3 @@
+# Review candidate and library analysis
+**Source-incomplete:** The source candidate-ranking demonstration generates synthetic sequences and synthetic controls; it is not a file-based workflow for real target sequences or a validated on-target/off-target predictor. A real workflow needs the requested gene list, assembly, chemistry, coordinates, appropriate scoring and controls, and separate validation. The source's GC heuristic is not Rule Set 2. Consult [source method notes](../references/methods.md), [catalog](../references/library-catalog-and-pam.md), and canonical bio-crispr-screens-screen-qc for existing count-based QC.
+Done when provenance, scoring assumptions, gaps and QC results are documented; do not treat the synthetic demo as an actual design.

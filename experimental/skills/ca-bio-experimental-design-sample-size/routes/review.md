@@ -1,0 +1,3 @@
+# Design interpretation
+Sample-size targets depend on effect, dispersion, family, model and costs; historical assay floors are not substitutes for study-specific calculations. Technical replicates do not add independent biological units. The source's fixed-n check, no-reachable-n handling, proteomics multiplicity, depth tradeoffs and assay context are in [methods](../references/methods.md). The source treats NaN simulated FDR as zero discoveries in its example; check underlying discovery counts and report non-finite results explicitly instead of assuming their cause.
+Related shelf skills: bio-experimental-design-power-analysis, bio-experimental-design-randomization-blocking and bio-experimental-design-batch-design.

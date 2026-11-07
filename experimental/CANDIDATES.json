@@ -6046,6 +6046,293 @@
       "published_identity": "820a309a36fe26fec5633140254f508894473306a84c6ae5bf4d86b2d50596ac"
     },
     {
+      "id": "ca-bio-crispr-screens-jacks-analysis",
+      "recut_of": "bio-crispr-screens-jacks-analysis",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-crispr-screens-jacks-analysis",
+      "upstream_path": "crispr-screens/jacks-analysis",
+      "status_notes": "skills/ca-bio-crispr-screens-jacks-analysis/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "f8224f5920b7ddae90d546f5fb3bc9eec1a85b6692e0c0425b7477b546c43fbb",
+      "normalization_summary": "Split joint fit, efficacy summary, and reference reuse; retained source helpers, conditional guidance and GPTomics MIT attribution.",
+      "known_gaps": [
+        "Bundled wrapper does not expose reffile; use source JACKS CLI.",
+        "Source internal prior/convergence overrides rely on non-public version-specific APIs and are not verified.",
+        "Result example uses fixed filenames and first cell line; CLI and dependencies not executed.",
+        "Root LICENSE preflight warning: publication manifest must cite repository license evidence."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "joint Bayesian gene and guide fit": "routes/joint.md",
+        "guide efficacy summary": "routes/efficacy.md",
+        "matched reference transfer": "routes/prior.md",
+        "posterior interpretation, convergence, model comparison": "references/model.md and method references",
+        "result plots and effect/std example": "scripts/analyze_results.py"
+      },
+      "reviewed_source_files": [
+        "SKILL.md",
+        "usage-guide.md",
+        "examples/run_jacks.py",
+        "references/efficacy-prior-and-diagnostics.md",
+        "references/failure-modes.md",
+        "references/tool-comparison.md",
+        "scripts/efficacy_summary.py",
+        "scripts/run_jacks_joint.py"
+      ],
+      "scripts_added_or_changed": [],
+      "documentation_sources": [
+        "GPTomics source and included citations; no API upgrades."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "4a986deda6374c0ac3495cde098845f2f9c6c307c78996147c0775e621562aaf",
+          "sha256": "4a986deda6374c0ac3495cde098845f2f9c6c307c78996147c0775e621562aaf"
+        },
+        "references/citations.md": {
+          "worker_sha256": "2b5daf5a7c6426d6db8e4556de6ee6f418a966689d003a7ee0a18a2139f9c621",
+          "sha256": "2b5daf5a7c6426d6db8e4556de6ee6f418a966689d003a7ee0a18a2139f9c621"
+        },
+        "references/efficacy-prior-and-diagnostics.md": {
+          "worker_sha256": "e7677ba5024c9d43434b07cafe1694e8b3721cdcc5efd8605714c7fef00b5ff0",
+          "sha256": "e7677ba5024c9d43434b07cafe1694e8b3721cdcc5efd8605714c7fef00b5ff0"
+        },
+        "references/failure-modes.md": {
+          "worker_sha256": "b6fad057823deb1282fcecd3b69ff340a7d8fa8f27d2768c2579eb865fb7801c",
+          "sha256": "b6fad057823deb1282fcecd3b69ff340a7d8fa8f27d2768c2579eb865fb7801c"
+        },
+        "references/model.md": {
+          "worker_sha256": "2231c8cc0a803716f01945c22605695147f42dc006c94b09c58c8c688d9fc3eb",
+          "sha256": "2231c8cc0a803716f01945c22605695147f42dc006c94b09c58c8c688d9fc3eb"
+        },
+        "references/tool-comparison.md": {
+          "worker_sha256": "f05bb0b9cee73eb7dd5f73d3c51e3fde2764a92e506bf6da744a0700b3d82159",
+          "sha256": "f05bb0b9cee73eb7dd5f73d3c51e3fde2764a92e506bf6da744a0700b3d82159"
+        },
+        "routes/efficacy.md": {
+          "worker_sha256": "e88ab9492f1c6581394573e992365bf569b958b036790d5ceea56a94cda3fa33",
+          "sha256": "e88ab9492f1c6581394573e992365bf569b958b036790d5ceea56a94cda3fa33"
+        },
+        "routes/joint.md": {
+          "worker_sha256": "0b09951c3fee0470d5eb3b67eedf4e0ee86e2454f65b0d158ea7ed0ab0e821b3",
+          "sha256": "0b09951c3fee0470d5eb3b67eedf4e0ee86e2454f65b0d158ea7ed0ab0e821b3"
+        },
+        "routes/prior.md": {
+          "worker_sha256": "dd51bd936456054ddb54e1b3260e334d0e568bbc15f5b81f42598d02de6cec81",
+          "sha256": "dd51bd936456054ddb54e1b3260e334d0e568bbc15f5b81f42598d02de6cec81"
+        },
+        "scripts/analyze_results.py": {
+          "worker_sha256": "1dd7375a37a58b77ccf1c19bece13557f9006d58b5f90e822846d40ecccfb77b",
+          "sha256": "1dd7375a37a58b77ccf1c19bece13557f9006d58b5f90e822846d40ecccfb77b"
+        },
+        "scripts/efficacy_summary.py": {
+          "worker_sha256": "ee0eab53d5dbe746d4bc7c50c984e1852e60b6167b857b2b460248cfae6cc4b1",
+          "sha256": "ee0eab53d5dbe746d4bc7c50c984e1852e60b6167b857b2b460248cfae6cc4b1"
+        },
+        "scripts/run_jacks_joint.py": {
+          "worker_sha256": "1a4b07dcc83f1929dce052cd71fb1c0e8909912dfcb37bba5cb2f5f1edba750a",
+          "sha256": "1a4b07dcc83f1929dce052cd71fb1c0e8909912dfcb37bba5cb2f5f1edba750a"
+        }
+      },
+      "published_identity": "850ac63ffb58943f2418cf3b0cf9ab092e1af56719704abf690360cc5c2a64ac"
+    },
+    {
+      "id": "ca-bio-crispr-screens-library-design",
+      "recut_of": "bio-crispr-screens-library-design",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-crispr-screens-library-design",
+      "upstream_path": "crispr-screens/library-design",
+      "status_notes": "skills/ca-bio-crispr-screens-library-design/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "922dfc923867895d083c748ec0e409883eb6de3104f564eef56c2fa91901c8cc",
+      "normalization_summary": "Routed existing TSS window and generic oligo formatting helpers; retained design and QC references and GPTomics MIT attribution. Synthetic demo is explicitly identified as incomplete.",
+      "known_gaps": [
+        "Source candidate example uses synthetic sequences and controls; no real input-file pipeline or off-target scorer is supplied.",
+        "GC heuristic is not Rule Set 2; source reports Azimuth compatibility problems.",
+        "Oligo helper does not validate sequence or change output based on vector option.",
+        "No new organism-specific procedures or scientific executions performed.",
+        "Root LICENSE preflight warning: publication manifest must cite repository license evidence."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "strand-aware source TSS windows": "routes/windows.md",
+        "existing spacer formatting": "routes/oligo.md",
+        "candidate scoring, control composition and QC": "routes/candidates.md and references/methods.md",
+        "modality, library and PAM reference": "references/library-catalog-and-pam.md",
+        "synthetic-only ranking demonstration": "reviewed and identified as source-incomplete in routes/candidates.md"
+      },
+      "reviewed_source_files": [
+        "SKILL.md",
+        "usage-guide.md",
+        "examples/design_library.py",
+        "references/crispri-crispra-tss.md",
+        "references/failure-modes.md",
+        "references/library-catalog-and-pam.md",
+        "references/oligo-design.md",
+        "scripts/build_oligo.py",
+        "scripts/tss_windows.py"
+      ],
+      "scripts_added_or_changed": [],
+      "documentation_sources": [
+        "GPTomics source and included citations; no API upgrades."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "37c65bd12a074c732ac75a7126fab898e5c1dc58454549cdaad007da86e0caad",
+          "sha256": "37c65bd12a074c732ac75a7126fab898e5c1dc58454549cdaad007da86e0caad"
+        },
+        "references/citations.md": {
+          "worker_sha256": "5282f9ce5d8aad5d5a123ea8cf9e0c3eb500f992b230bbee7e13f2d1d76a1e51",
+          "sha256": "5282f9ce5d8aad5d5a123ea8cf9e0c3eb500f992b230bbee7e13f2d1d76a1e51"
+        },
+        "references/crispri-crispra-tss.md": {
+          "worker_sha256": "9c3131cb3d6f187b552dc3d02f49ade73cee2bb1a6b78b1ada10aca7e74e3077",
+          "sha256": "9c3131cb3d6f187b552dc3d02f49ade73cee2bb1a6b78b1ada10aca7e74e3077"
+        },
+        "references/failure-modes.md": {
+          "worker_sha256": "36de7b570d174adacbad1a66aebf9759add4ae31c7b6c60c48d313f2fdd0a96b",
+          "sha256": "36de7b570d174adacbad1a66aebf9759add4ae31c7b6c60c48d313f2fdd0a96b"
+        },
+        "references/library-catalog-and-pam.md": {
+          "worker_sha256": "27a04c21724f168b6b6235514c80f8b108b9e1831bff97bdea1e1a32af3cd490",
+          "sha256": "27a04c21724f168b6b6235514c80f8b108b9e1831bff97bdea1e1a32af3cd490"
+        },
+        "references/methods.md": {
+          "worker_sha256": "3fe6f43a3dd33aacfd1d94ced54ec7e37e38cc727d4a13925ec654da18cf494f",
+          "sha256": "3fe6f43a3dd33aacfd1d94ced54ec7e37e38cc727d4a13925ec654da18cf494f"
+        },
+        "references/oligo-design.md": {
+          "worker_sha256": "1a6e5e33402fd74a5e5109800055c4419795eeab781fc776c487427a90cd8012",
+          "sha256": "1a6e5e33402fd74a5e5109800055c4419795eeab781fc776c487427a90cd8012"
+        },
+        "routes/candidates.md": {
+          "worker_sha256": "09b04d422f100ca2e8e7a8671c8d335e24424e5170a162e72dd838de81f7cecf",
+          "sha256": "09b04d422f100ca2e8e7a8671c8d335e24424e5170a162e72dd838de81f7cecf"
+        },
+        "routes/oligo.md": {
+          "worker_sha256": "520275ed39f9de03a15c63dfd9159cbe7067a7c3cf5abbe9269ea23f6780a3f3",
+          "sha256": "520275ed39f9de03a15c63dfd9159cbe7067a7c3cf5abbe9269ea23f6780a3f3"
+        },
+        "routes/windows.md": {
+          "worker_sha256": "3fce8d967b85fd43719893d9fda00045500972741bf947431d42f219b00ddfaf",
+          "sha256": "3fce8d967b85fd43719893d9fda00045500972741bf947431d42f219b00ddfaf"
+        },
+        "scripts/build_oligo.py": {
+          "worker_sha256": "fdb39e9a35135904b487ae8ec640a86215947db4d4d794dae7d98904850e7b72",
+          "sha256": "fdb39e9a35135904b487ae8ec640a86215947db4d4d794dae7d98904850e7b72"
+        },
+        "scripts/tss_windows.py": {
+          "worker_sha256": "1e2d1867f22517bb047a1b361d2a1808d9e08892a4df51326330266a3431754e",
+          "sha256": "1e2d1867f22517bb047a1b361d2a1808d9e08892a4df51326330266a3431754e"
+        }
+      },
+      "published_identity": "0cf057b17eae7e74567d22cf06e8642b2df032aef99e6ad786c49fce8942c6de"
+    },
+    {
+      "id": "ca-bio-crispr-screens-mageck-analysis",
+      "recut_of": "bio-crispr-screens-mageck-analysis",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-crispr-screens-mageck-analysis",
+      "upstream_path": "crispr-screens/mageck-analysis",
+      "status_notes": "skills/ca-bio-crispr-screens-mageck-analysis/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "aefeecabe8398d5b1d0ab7d162b8b7bf2c56668049ddb82bdd43a4235412a4f4",
+      "normalization_summary": "Split existing read count, RRA, MLE and visualization workflows; extracted source time-course and volcano functions with file interfaces and retained GPTomics MIT attribution.",
+      "known_gaps": [
+        "Time-course source function computes same-sign flags but does not require them; route warns.",
+        "Source example shell uses hardcoded FDR positions and is not copied; outputs need header-based interpretation.",
+        "MAGeCKFlute and VISPR are source snippets not bundled runnable wrappers; package compatibility remains unverified.",
+        "MLE permutation FDR is stochastic and design rank/confounding require review.",
+        "No scientific execution or installation.",
+        "Root LICENSE preflight warning: publication manifest must cite repository license evidence."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "FASTQ counting and normalization": "routes/count.md",
+        "two-condition RRA, paired and drug comparisons": "routes/rra.md",
+        "multi-condition and batch MLE, efficiency": "routes/mle.md and references/models.md",
+        "time-course consistency and volcano": "routes/results.md",
+        "MAGeCKFlute and VISPR": "references/visualization.md",
+        "tool comparisons, thresholds and failure modes": "references/models.md",
+        "workflow shell example": "reviewed; routes replace fixed example and its hardcoded FDR column indexes"
+      },
+      "reviewed_source_files": [
+        "SKILL.md",
+        "usage-guide.md",
+        "examples/mageck_workflow.sh"
+      ],
+      "scripts_added_or_changed": [
+        "scripts/time_course.py",
+        "scripts/volcano.py"
+      ],
+      "documentation_sources": [
+        "GPTomics source and included citations; no API upgrades."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "23993205ba5c18869a88a18fb05e481b75b59d4f463b042d5f5a16810a23051f",
+          "sha256": "23993205ba5c18869a88a18fb05e481b75b59d4f463b042d5f5a16810a23051f"
+        },
+        "references/citations.md": {
+          "worker_sha256": "6825acb8f82b68101f53a3bb5d473c7bd0d3d51d95c54b9568e18e880ff30068",
+          "sha256": "6825acb8f82b68101f53a3bb5d473c7bd0d3d51d95c54b9568e18e880ff30068"
+        },
+        "references/models.md": {
+          "worker_sha256": "a08258e344371eec039848277c80fb558da17bc958049ce6ae7e7a4f6bf96970",
+          "sha256": "a08258e344371eec039848277c80fb558da17bc958049ce6ae7e7a4f6bf96970"
+        },
+        "references/visualization.md": {
+          "worker_sha256": "75dabaf62bbe6bd09a9e80f49a59a0f14f8880e1c93f7ed4f06068715044385a",
+          "sha256": "75dabaf62bbe6bd09a9e80f49a59a0f14f8880e1c93f7ed4f06068715044385a"
+        },
+        "routes/count.md": {
+          "worker_sha256": "dd730f8e9aca74bc6d4242096f37d3b768cf52c78c6f45cb47562c60ffc22fa1",
+          "sha256": "dd730f8e9aca74bc6d4242096f37d3b768cf52c78c6f45cb47562c60ffc22fa1"
+        },
+        "routes/mle.md": {
+          "worker_sha256": "f3eefd0ba7608e245867f590ebc410e2b9873b8d888909cce89313cd4b7aa004",
+          "sha256": "f3eefd0ba7608e245867f590ebc410e2b9873b8d888909cce89313cd4b7aa004"
+        },
+        "routes/results.md": {
+          "worker_sha256": "730b5ebdfcc54046c1039b839e1b5826ac3977b59b3ab6a5fce026dbdb882ad9",
+          "sha256": "730b5ebdfcc54046c1039b839e1b5826ac3977b59b3ab6a5fce026dbdb882ad9"
+        },
+        "routes/rra.md": {
+          "worker_sha256": "3b488e3b454ca11522c707d3f81d16fd32f8797ba12b0297eb124573b1ebb377",
+          "sha256": "3b488e3b454ca11522c707d3f81d16fd32f8797ba12b0297eb124573b1ebb377"
+        },
+        "scripts/time_course.py": {
+          "worker_sha256": "4b0416fcabb12ff63046eeb34cef9fa0ca26ea6841438ece32e5662b8f9e5924",
+          "sha256": "4b0416fcabb12ff63046eeb34cef9fa0ca26ea6841438ece32e5662b8f9e5924"
+        },
+        "scripts/volcano.py": {
+          "worker_sha256": "34bc1f5407c7c7632bf8690a69a0d821c9cb393ce2c37e5d3a9ab77349a31a36",
+          "sha256": "34bc1f5407c7c7632bf8690a69a0d821c9cb393ce2c37e5d3a9ab77349a31a36"
+        }
+      },
+      "published_identity": "29d6d00ab3e60d29086e0b636abae677f73a0f6872c28b36483838448ebcfb85"
+    },
+    {
       "id": "ca-bio-data-visualization-color-palettes",
       "recut_of": "bio-data-visualization-color-palettes",
       "status": "normalized-only-not-audited",
@@ -6276,6 +6563,283 @@
         }
       },
       "published_identity": "6588270315dc071b92f03455ac56823d392b4d1e8a1536a627630188808210b0"
+    },
+    {
+      "id": "ca-bio-data-visualization-ggplot2-fundamentals",
+      "recut_of": "bio-data-visualization-ggplot2-fundamentals",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-data-visualization-ggplot2-fundamentals",
+      "upstream_path": "data-visualization/ggplot2-fundamentals",
+      "status_notes": "skills/ca-bio-data-visualization-ggplot2-fundamentals/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "18b6eececd92b0d0476611be46c31a693c683c9c570ea166ea6e9cf4e86dfef6",
+      "normalization_summary": "Intent routes, CSV wrapper and retained source helpers/references.",
+      "known_gaps": [
+        "No rendering or scientific workflows executed.",
+        "Customized facets, rich text and composite layouts require adaptation; CSV wrapper covers three helpers.",
+        "No source LICENSE file; repository license evidence required."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "box, PCA, volcano and publication exports": "routes/figures.md",
+        "grammar, geoms, scales, facets, themes and multi-panel": "routes/customize.md and references/geoms-scales-facets.md",
+        "failure and label cautions": "references/failure-modes.md and routes/figures.md"
+      },
+      "reviewed_source_files": [
+        "SKILL.md",
+        "usage-guide.md",
+        "references\\failure-modes.md",
+        "references\\geoms-scales-facets.md",
+        "scripts\\publication_figures.R"
+      ],
+      "scripts_added_or_changed": [
+        "scripts/plot_csv.R added",
+        "source publication_figures.R copied"
+      ],
+      "documentation_sources": [
+        "Source references only; no live docs consulted"
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "50281d52cdcd3e2dc9910c2f9b5402489a44977e557d7cfaaec20a774ed1f0f0",
+          "sha256": "50281d52cdcd3e2dc9910c2f9b5402489a44977e557d7cfaaec20a774ed1f0f0"
+        },
+        "references/citations.md": {
+          "worker_sha256": "12ec38cbd8ddbc5a939778dc00e210239e9bc7f08c7f7ec6209f58fea4ce156b",
+          "sha256": "12ec38cbd8ddbc5a939778dc00e210239e9bc7f08c7f7ec6209f58fea4ce156b"
+        },
+        "references/failure-modes.md": {
+          "worker_sha256": "669284acee6c5b3cabd03cf9b24346f0836a192bbcb7e42388518e8ff6c20b5d",
+          "sha256": "669284acee6c5b3cabd03cf9b24346f0836a192bbcb7e42388518e8ff6c20b5d"
+        },
+        "references/geoms-scales-facets.md": {
+          "worker_sha256": "7b0fb494de5fb18da7b738e2474ada2cb0580bad082e0b19e3f3f0b84a008ed0",
+          "sha256": "7b0fb494de5fb18da7b738e2474ada2cb0580bad082e0b19e3f3f0b84a008ed0"
+        },
+        "routes/customize.md": {
+          "worker_sha256": "41492bdfae8e25c2cdee9932c6fafb6b895eb536cfaa44028d2956182d538858",
+          "sha256": "41492bdfae8e25c2cdee9932c6fafb6b895eb536cfaa44028d2956182d538858"
+        },
+        "routes/figures.md": {
+          "worker_sha256": "f4723599acf59c6d48df344899b3958beff7a754220cfd3abfd5e8d03fe74c47",
+          "sha256": "f4723599acf59c6d48df344899b3958beff7a754220cfd3abfd5e8d03fe74c47"
+        },
+        "scripts/plot_csv.R": {
+          "worker_sha256": "2383b11ad497287936bad585032f0b9fea1a7f471549deed18a8bb338a70adbf",
+          "sha256": "2383b11ad497287936bad585032f0b9fea1a7f471549deed18a8bb338a70adbf"
+        },
+        "scripts/publication_figures.R": {
+          "worker_sha256": "0598f83060bbbfaa89bd82de2883f11505b170d8a87a9e33720152441e01c43e",
+          "sha256": "0598f83060bbbfaa89bd82de2883f11505b170d8a87a9e33720152441e01c43e"
+        }
+      },
+      "published_identity": "4f174159913e4e537817fcf2ad778988ef0875eb7c6723d0dc258c5679e9f821"
+    },
+    {
+      "id": "ca-bio-data-visualization-matplotlib-fundamentals",
+      "recut_of": "bio-data-visualization-matplotlib-fundamentals",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-data-visualization-matplotlib-fundamentals",
+      "upstream_path": "data-visualization/matplotlib-fundamentals",
+      "status_notes": "skills/ca-bio-data-visualization-matplotlib-fundamentals/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "c80ac14264a599bd8df9555aab7e9a0da67da969fd794a416da95b1d44c3ffd5",
+      "normalization_summary": "Task routes, generic CSV scatter and source demo and references.",
+      "known_gaps": [
+        "No rendering or scientific workflows executed.",
+        "Chart types other than scatter need input-specific adaptation; demonstration uses simulated data and private seaborn legend access.",
+        "No source LICENSE file; repository license evidence required."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "scatter and publication export": "routes/scatter.md",
+        "multi-panel, heatmaps and seaborn": "routes/customize.md",
+        "chart types and axes": "references/chart-recipes.md",
+        "failure modes and font/layout cautions": "references/failure-modes.md"
+      },
+      "reviewed_source_files": [
+        "SKILL.md",
+        "usage-guide.md",
+        "references\\chart-recipes.md",
+        "references\\failure-modes.md",
+        "scripts\\matplotlib_phd.py"
+      ],
+      "scripts_added_or_changed": [
+        "scripts/scatter_csv.py added",
+        "source demo copied"
+      ],
+      "documentation_sources": [
+        "Source citations only; no live docs consulted"
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "6bebbf1021319ef7717692ae50226e87da13a3b48813cfa49969b506b5962dba",
+          "sha256": "6bebbf1021319ef7717692ae50226e87da13a3b48813cfa49969b506b5962dba"
+        },
+        "references/chart-recipes.md": {
+          "worker_sha256": "40f030d3324e53496f947ddd8cfce81220d1fc2ead164d058680ea0b884b533e",
+          "sha256": "40f030d3324e53496f947ddd8cfce81220d1fc2ead164d058680ea0b884b533e"
+        },
+        "references/citations.md": {
+          "worker_sha256": "3d7b571698b007b0a8159a9a7071b958992a88dce56a64cd95efef23fbe0db74",
+          "sha256": "3d7b571698b007b0a8159a9a7071b958992a88dce56a64cd95efef23fbe0db74"
+        },
+        "references/failure-modes.md": {
+          "worker_sha256": "beea486948019190e27bcbf0056fd3abd18068b25d727211b8d1c4a64a0ad011",
+          "sha256": "beea486948019190e27bcbf0056fd3abd18068b25d727211b8d1c4a64a0ad011"
+        },
+        "routes/customize.md": {
+          "worker_sha256": "2258b9d7c595f6e415cb607b698bff9df2560e97c7d255aa8e03dc99f10f26f3",
+          "sha256": "2258b9d7c595f6e415cb607b698bff9df2560e97c7d255aa8e03dc99f10f26f3"
+        },
+        "routes/scatter.md": {
+          "worker_sha256": "f63135573d85da90b7f72d78cadc7c7b814c7361614afd6a9e744af04fcfcb96",
+          "sha256": "f63135573d85da90b7f72d78cadc7c7b814c7361614afd6a9e744af04fcfcb96"
+        },
+        "scripts/matplotlib_phd.py": {
+          "worker_sha256": "fcd7894115f6b88c5933d3809c297e103b425b056b1d3e2fdbbfd5cc799cfe53",
+          "sha256": "fcd7894115f6b88c5933d3809c297e103b425b056b1d3e2fdbbfd5cc799cfe53"
+        },
+        "scripts/scatter_csv.py": {
+          "worker_sha256": "61fc97a0a355cb0142ad45ddde0bd3d030ba309801b8ba6f1185fbbad4d264c7",
+          "sha256": "61fc97a0a355cb0142ad45ddde0bd3d030ba309801b8ba6f1185fbbad4d264c7"
+        }
+      },
+      "published_identity": "3b0f8c90ef300a9bfa5697ec093a18d761319fe37f3b8b2b35e62b5aa87fafc2"
+    },
+    {
+      "id": "ca-bio-data-visualization-network-visualization",
+      "recut_of": "bio-data-visualization-network-visualization",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-data-visualization-network-visualization",
+      "upstream_path": "data-visualization/network-visualization",
+      "status_notes": "skills/ca-bio-data-visualization-network-visualization/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "da1dfcf9fa95b672aabc1573eb187e1cb754478dca619eb0ce5a0bcf684c5a86",
+      "normalization_summary": "Intent router, retained file-based scripts and detailed source references; clarified GraphML loader.",
+      "known_gaps": [
+        "No rendering, Cytoscape interaction or scientific workflows executed.",
+        "Interactive CLI final community summary may fail on directed input; directed renderer defaults missing signs to plus. Both limitations flagged.",
+        "Shared-layout and user-supplied hierarchy require adaptation; adjacency plot not supplied.",
+        "Source tests reviewed but not copied or run.",
+        "No source LICENSE file; repository license evidence required."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "static PPI, layouts and signed directed": "routes/static.md and references/python-layouts.md",
+        "PyVis and Cytoscape": "routes/interactive.md and references/interactive-and-cytoscape.md",
+        "ggraph and hierarchy bundling": "routes/r-layouts.md and references/r-layouts.md",
+        "shared layout and adjacency alternatives": "references/interpretation.md"
+      },
+      "reviewed_source_files": [
+        "SKILL.md",
+        "usage-guide.md",
+        "examples\\cytoscape_automation.py",
+        "examples\\interactive_network.py",
+        "examples\\network_plots.py",
+        "references\\interactive-and-cytoscape.md",
+        "references\\python-layouts.md",
+        "references\\r-layouts.md",
+        "scripts\\directed_network.py",
+        "scripts\\edge_bundling.R",
+        "scripts\\ggraph_layouts.R",
+        "scripts\\layouts.py",
+        "tests\\test_network_recipes.py"
+      ],
+      "scripts_added_or_changed": [
+        "source examples and scripts copied"
+      ],
+      "documentation_sources": [
+        "Source citations only; no live docs consulted"
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "5096d34f5533b5085897054c2af191a1f6025b89f184d6c0a94e02c8a8e2bd03",
+          "sha256": "5096d34f5533b5085897054c2af191a1f6025b89f184d6c0a94e02c8a8e2bd03"
+        },
+        "examples/cytoscape_automation.py": {
+          "worker_sha256": "804622cb9b2b20645406bda2ec5b7d903a54c4c9af088cde9eaf3ed9bb16b38d",
+          "sha256": "804622cb9b2b20645406bda2ec5b7d903a54c4c9af088cde9eaf3ed9bb16b38d"
+        },
+        "examples/interactive_network.py": {
+          "worker_sha256": "90a7a3624d03265ecf3ffa5501da108608478b8c0a11cb954458565ffdb3821e",
+          "sha256": "90a7a3624d03265ecf3ffa5501da108608478b8c0a11cb954458565ffdb3821e"
+        },
+        "examples/network_plots.py": {
+          "worker_sha256": "36d1255926a427590255ddcd1a651d8a72294d193592e257c7e3720637025dbf",
+          "sha256": "36d1255926a427590255ddcd1a651d8a72294d193592e257c7e3720637025dbf"
+        },
+        "references/citations.md": {
+          "worker_sha256": "90410fa81debb4c3c2fe4e54d6a9d7d88d8975a5a4a19634541bd85c7ba05bc1",
+          "sha256": "90410fa81debb4c3c2fe4e54d6a9d7d88d8975a5a4a19634541bd85c7ba05bc1"
+        },
+        "references/interactive-and-cytoscape.md": {
+          "worker_sha256": "2b3f04d44c76872e3529406ebc742006215f8c637cc7a2f1fba57ae46150e71c",
+          "sha256": "2b3f04d44c76872e3529406ebc742006215f8c637cc7a2f1fba57ae46150e71c"
+        },
+        "references/interpretation.md": {
+          "worker_sha256": "805b0c41077540dad2d00659a750f2d1bcd4cf32cd88ba2537864bc41b00d5bf",
+          "sha256": "805b0c41077540dad2d00659a750f2d1bcd4cf32cd88ba2537864bc41b00d5bf"
+        },
+        "references/python-layouts.md": {
+          "worker_sha256": "fe211070532316546fa2f9a6c7db4f3075b6659706619cbd80fb2671c6b9b974",
+          "sha256": "fe211070532316546fa2f9a6c7db4f3075b6659706619cbd80fb2671c6b9b974"
+        },
+        "references/r-layouts.md": {
+          "worker_sha256": "2a9ed61afee06f703c8ad9b1d08c7ee91dde2661db1e6dc4fca1ca958560a296",
+          "sha256": "2a9ed61afee06f703c8ad9b1d08c7ee91dde2661db1e6dc4fca1ca958560a296"
+        },
+        "routes/interactive.md": {
+          "worker_sha256": "156a30db0fb57da8cc6f67156297556ee565016423f682f9a0d442cbae946e31",
+          "sha256": "156a30db0fb57da8cc6f67156297556ee565016423f682f9a0d442cbae946e31"
+        },
+        "routes/r-layouts.md": {
+          "worker_sha256": "aee2c3d6dc5799bc21857fc0c67435a7e6ecdee9a8f030bfc6f70f9a19b2427c",
+          "sha256": "aee2c3d6dc5799bc21857fc0c67435a7e6ecdee9a8f030bfc6f70f9a19b2427c"
+        },
+        "routes/static.md": {
+          "worker_sha256": "50273c5c7ed89d3f7be19f13ced52569e50baaa5c147c0658f38da97900e0edd",
+          "sha256": "50273c5c7ed89d3f7be19f13ced52569e50baaa5c147c0658f38da97900e0edd"
+        },
+        "scripts/directed_network.py": {
+          "worker_sha256": "1298139542ebe4b45c2c7656ecde3948f90b6e132e67dd14234be9a55df14d97",
+          "sha256": "1298139542ebe4b45c2c7656ecde3948f90b6e132e67dd14234be9a55df14d97"
+        },
+        "scripts/edge_bundling.R": {
+          "worker_sha256": "9daa9a79ac2af0d8c39ed0a2f4b58ad87caffe3621a0c2de38540dbcbdff7c96",
+          "sha256": "9daa9a79ac2af0d8c39ed0a2f4b58ad87caffe3621a0c2de38540dbcbdff7c96"
+        },
+        "scripts/ggraph_layouts.R": {
+          "worker_sha256": "56f8630e5d414f60bd1ccbcc1ccf3827e9d712ae3a9df09d2c7c3e84b4b4a3bc",
+          "sha256": "56f8630e5d414f60bd1ccbcc1ccf3827e9d712ae3a9df09d2c7c3e84b4b4a3bc"
+        },
+        "scripts/layouts.py": {
+          "worker_sha256": "c4ea26a7bcc95f31692ebf9e6095e866ad3c0efbf709de7172b44f877ca78682",
+          "sha256": "c4ea26a7bcc95f31692ebf9e6095e866ad3c0efbf709de7172b44f877ca78682"
+        }
+      },
+      "published_identity": "098d14789e330eed9710dbf3ce034a3d232b4d66f49c5203b633728bf5159878"
     },
     {
       "id": "ca-bio-differential-expression-deseq2-basics",
@@ -7234,6 +7798,166 @@
         }
       },
       "published_identity": "c7138abf2d40264005de574944896c9c041ae2352a0121f02f48d779045cc484"
+    },
+    {
+      "id": "ca-bio-experimental-design-randomization-blocking",
+      "recut_of": "bio-experimental-design-randomization-blocking",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-experimental-design-randomization-blocking",
+      "upstream_path": "experimental-design/randomization-blocking",
+      "status_notes": "skills/ca-bio-experimental-design-randomization-blocking/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "faf4ecbbfa94e2956259e1e7cde1a241511f7e1de8dc643f835fa7249284c8f9",
+      "normalization_summary": "File-based blocked assignment and experimental-unit summary routes, with source design and model guidance.",
+      "known_gaps": [
+        "No scientific runs, simulations, package installs or API checks.",
+        "Two-label blocked assignment is not a general constrained or sequential randomizer; odd blocks favor first label by one.",
+        "Unit aggregation is not universally appropriate; source mixed-model designs require study-specific adaptation.",
+        "Skill-root LICENSE warning: cite repository license in manifest."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "experimental units and pseudoreplication": "routes/units.md",
+        "blocked and processing-order randomization": "routes/assignment.md",
+        "factorial, incomplete block, split-plot, nested and repeated measures": "routes/design.md and references/design-guidance.md",
+        "source simulation findings and citations": "references/design-guidance.md"
+      },
+      "reviewed_source_files": [
+        "examples/randomization_blocking.R",
+        "SKILL.md",
+        "usage-guide.md"
+      ],
+      "scripts_added_or_changed": [
+        "scripts/randomize_blocks.R (added)",
+        "scripts/summarize_units.R (added)"
+      ],
+      "documentation_sources": [
+        "Complete original source tree; numerical simulation findings not repeated."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "dea1473d98a25d6cbe9e29ba66e95f5b0ff75823b13eec20556ad978cacfe7ba",
+          "sha256": "dea1473d98a25d6cbe9e29ba66e95f5b0ff75823b13eec20556ad978cacfe7ba"
+        },
+        "references/design-guidance.md": {
+          "worker_sha256": "62291f5339ab72f047b12b9b63fd4cb912440ca2c78b7cd4f82c016136b2ec5e",
+          "sha256": "62291f5339ab72f047b12b9b63fd4cb912440ca2c78b7cd4f82c016136b2ec5e"
+        },
+        "routes/assignment.md": {
+          "worker_sha256": "08d07e2848738e790ee552c20773ce20acb513a5105f80912a12d132b8397319",
+          "sha256": "08d07e2848738e790ee552c20773ce20acb513a5105f80912a12d132b8397319"
+        },
+        "routes/design.md": {
+          "worker_sha256": "dcbf53b611690d93e876809f5939e10b96fffa6e2990bdca10e875611ee90a97",
+          "sha256": "dcbf53b611690d93e876809f5939e10b96fffa6e2990bdca10e875611ee90a97"
+        },
+        "routes/units.md": {
+          "worker_sha256": "81378ef5d1ea67c65354ff412dc43b7f2b7cec12fd96ff7c848e8640c211f401",
+          "sha256": "81378ef5d1ea67c65354ff412dc43b7f2b7cec12fd96ff7c848e8640c211f401"
+        },
+        "scripts/randomize_blocks.R": {
+          "worker_sha256": "5b4476c92f35e858f3192b013e2bbcbc3b8ff68c56c0322c818017141e5107af",
+          "sha256": "5b4476c92f35e858f3192b013e2bbcbc3b8ff68c56c0322c818017141e5107af"
+        },
+        "scripts/summarize_units.R": {
+          "worker_sha256": "7283075ff36607016161511244e64326e37e3023d3ba526002a904e66fb8baf5",
+          "sha256": "7283075ff36607016161511244e64326e37e3023d3ba526002a904e66fb8baf5"
+        }
+      },
+      "published_identity": "cc434b7d8b60f3a97c3d67dd953e9d03ce7664281d9772b6f1c61d2a425ea43d"
+    },
+    {
+      "id": "ca-bio-experimental-design-sample-size",
+      "recut_of": "bio-experimental-design-sample-size",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-experimental-design-sample-size",
+      "upstream_path": "experimental-design/sample-size",
+      "status_notes": "skills/ca-bio-experimental-design-sample-size/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "d6512e3b1dc8a7a8bf0570c895c2e5c5d43fe9913e8d54c88ac8d5e2fd397ead",
+      "normalization_summary": "File-based single-parameter sizing and retained pilot and donor scripts, adding donor alignment validation and explicit PROPER summary printing.",
+      "known_gaps": [
+        "No scientific runs, simulations, installations or package verification.",
+        "PROPER script reports actual FDR but does not enforce its target; review error rates and Monte Carlo uncertainty before selecting a design.",
+        "NaN FDR requires inspecting discovery counts; do not assume a cause.",
+        "Study-specific pilot quality, dispersion, experimental units and failure rates require review.",
+        "Skill-root LICENSE warning: cite repository license in manifest."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "single parameter and fixed-n check": "routes/single.md and references/methods.md",
+        "pilot dispersion and PROPER simulation": "routes/pilot.md and scripts/proper_power.R",
+        "donor pseudobulk": "routes/pseudobulk.md",
+        "unreachable sizes, assay floors, proteomics and budget": "routes/review.md and references/methods.md"
+      },
+      "reviewed_source_files": [
+        "examples/sample_size_estimation.R",
+        "scripts/proper_power.R",
+        "scripts/pseudobulk_donor_ssize.R",
+        "SKILL.md",
+        "usage-guide.md"
+      ],
+      "scripts_added_or_changed": [
+        "scripts/single_size.R (added)",
+        "scripts/proper_power.R (explicit summary printing)",
+        "scripts/pseudobulk_donor_ssize.R (donor and gene alignment validation)"
+      ],
+      "documentation_sources": [
+        "Complete original source tree; historical numerical findings not repeated."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "077e06cbc62e75dc62ecb11f37339116888f2479efd2a6c3bbc8f45cb07c3061",
+          "sha256": "077e06cbc62e75dc62ecb11f37339116888f2479efd2a6c3bbc8f45cb07c3061"
+        },
+        "references/methods.md": {
+          "worker_sha256": "f429ec8080286f7deb9a0d9bd43e568ca519b3215e205ae1c5df70db6e5b2ef6",
+          "sha256": "f429ec8080286f7deb9a0d9bd43e568ca519b3215e205ae1c5df70db6e5b2ef6"
+        },
+        "routes/pilot.md": {
+          "worker_sha256": "4a856c03d7008a6260f07f102c9028ebda1c973b8509deda91d65bbd56ea228d",
+          "sha256": "4a856c03d7008a6260f07f102c9028ebda1c973b8509deda91d65bbd56ea228d"
+        },
+        "routes/pseudobulk.md": {
+          "worker_sha256": "b4a380df9eba4e0f620ebf763c41381990701be0b702feefe19213f591c603d4",
+          "sha256": "b4a380df9eba4e0f620ebf763c41381990701be0b702feefe19213f591c603d4"
+        },
+        "routes/review.md": {
+          "worker_sha256": "0464aa47b51cb7b536cac2ee09bb1e9af5eb50c0705896de16e29f8a845d6eca",
+          "sha256": "0464aa47b51cb7b536cac2ee09bb1e9af5eb50c0705896de16e29f8a845d6eca"
+        },
+        "routes/single.md": {
+          "worker_sha256": "99d3e66c148765c8e7455b9d900ce3693cdafb7f6eb3fd18b3153a1fa889e6cb",
+          "sha256": "99d3e66c148765c8e7455b9d900ce3693cdafb7f6eb3fd18b3153a1fa889e6cb"
+        },
+        "scripts/proper_power.R": {
+          "worker_sha256": "486cff72a59c1a94ebbea0ef70a648f50f7d875da410840ee2eca533f438e876",
+          "sha256": "486cff72a59c1a94ebbea0ef70a648f50f7d875da410840ee2eca533f438e876"
+        },
+        "scripts/pseudobulk_donor_ssize.R": {
+          "worker_sha256": "c2b8d34a5f3bccb61869f3e44df1dad14fcaeb77c16126e082c352c21360b2dc",
+          "sha256": "c2b8d34a5f3bccb61869f3e44df1dad14fcaeb77c16126e082c352c21360b2dc"
+        },
+        "scripts/single_size.R": {
+          "worker_sha256": "6a7dac3fb80038fe26947835b137db91e7cb0f195f0c64314a9817d054b1802f",
+          "sha256": "6a7dac3fb80038fe26947835b137db91e7cb0f195f0c64314a9817d054b1802f"
+        }
+      },
+      "published_identity": "0266fba0ca85da1fc42f643cb78b4ff0f8f9b0c04aa25d6514cab2fbcec64698"
     },
     {
       "id": "ca-bio-geo-data",
@@ -11904,7 +12628,7 @@
     "source_scope": 195,
     "existing_drafts": 24,
     "remaining_skills_requested": 171,
-    "new_drafts_published": 94,
+    "new_drafts_published": 102,
     "phase": "normalization only",
     "scientific_execution": "not performed for these new drafts"
   }

@@ -1,0 +1,3 @@
+# Design and analysis structure
+Choose complete or incomplete blocks, factorial interactions, split-plot, nesting or repeated measures according to actual randomization. Whole-plot factors require their own error stratum. Model terms and random effects need adaptation to the experiment; the source example is illustrative, not a turnkey study analysis. Review [design guidance](../references/design-guidance.md), including few-block uncertainty and pseudoreplication.
+Related shelf skills: bio-experimental-design-batch-design, bio-experimental-design-sample-size and bio-experimental-design-power-analysis.

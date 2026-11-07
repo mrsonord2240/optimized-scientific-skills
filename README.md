@@ -9,7 +9,7 @@ The audit/evaluation campaign was closed out on **2026-11-07**, preserving the
 195 audited scientific Skills, six process Skills, and evaluation evidence in
 the [pipeline archive](pipeline/README.md).
 
-Sam then authorized publishing the **118 partially complete normalized
+Sam then authorized publishing the **126 partially complete normalized
 candidates** under [experimental/](experimental/README.md), and resumed
 normalization of the other 171 Skills already on this shelf. These drafts have
 their own status notes; their changed bytes do not inherit the published
@@ -75,7 +75,7 @@ under `audits/skills/<skill-id>/`.
 
 ## Experimental revisions
 
-The [118 experimental candidates](experimental/README.md) are now included with
+The [126 experimental candidates](experimental/README.md) are now included with
 their recorded limitations and individual status notes. New normalization-only
 work is published in the same section as it is reviewed. The evaluation's draft
 arms also remain experimental. The [evidence index](pipeline/EVIDENCE.md)
