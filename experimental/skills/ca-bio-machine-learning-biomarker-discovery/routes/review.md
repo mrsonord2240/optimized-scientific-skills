@@ -1,0 +1,3 @@
+# Method choice and interpretation
+Boruta seeks all-relevant features; LASSO and elastic net seek a sparse predictive set and may choose among correlated alternatives. mRMR and Boruta source examples are illustrative and require study-specific implementation and fold-safe evaluation. Never preselect features across the full data before performance estimation. Compare against size-matched random signatures and clinical covariates, quantify stability, and seek external validation. [Methods](../references/methods.md) and [failure modes](../references/failure-modes.md) retain source caveats.
+Related shelf skills: bio-machine-learning-model-validation, bio-machine-learning-omics-classifiers and bio-experimental-design-multiple-testing.

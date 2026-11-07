@@ -1,0 +1,16 @@
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) != 4) stop('usage: gsea_table.R ranking.csv term2gene.csv result.csv result.rds')
+library(clusterProfiler)
+rank <- read.csv(args[1], stringsAsFactors = FALSE, colClasses = c(gene = 'character'))
+sets <- read.csv(args[2], stringsAsFactors = FALSE, colClasses = c(term = 'character', gene = 'character'))
+if (!all(c('gene', 'stat') %in% names(rank)) || !all(c('term', 'gene') %in% names(sets))) stop('missing required columns')
+if (anyNA(rank$gene) || any(!nzchar(rank$gene)) || anyDuplicated(rank$gene) || any(!is.finite(rank$stat))) stop('ranking IDs and statistics must be unique and finite')
+if (anyNA(sets[, c('term', 'gene')]) || any(!nzchar(sets$term)) || any(!nzchar(sets$gene))) stop('invalid gene-set rows')
+gene_list <- sort(setNames(rank$stat, rank$gene), decreasing = TRUE)
+term2gene <- unique(sets[, c('term', 'gene')])
+set.seed(123)
+result <- GSEA(geneList = gene_list, TERM2GENE = term2gene, exponent = 1,
+               minGSSize = 10, maxGSSize = 500, eps = 0, pvalueCutoff = 0.05,
+               pAdjustMethod = 'BH', seed = TRUE, verbose = FALSE)
+write.csv(as.data.frame(result), args[3], row.names = FALSE)
+saveRDS(result, args[4])

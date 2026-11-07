@@ -1,0 +1,3 @@
+# Reactome interpretation
+
+GPTomics source describes reaction-level curation and nested pathways, local ReactomePA annotation and Entrez-based joins. Shared genes can drive parent and child results; inspect overlap instead of counting rows as independent discoveries. Choose a measured universe and disclose mapping losses. Local package snapshots and the live web service may differ in release, background and mapping; record the actual versions. The source notes that non-human coverage includes orthology projections and can miss species-specific biology; check the supported organism and annotation package. Results are research hypotheses, not individual diagnoses. BH and pathway dependence have assumptions; overlapping pathways are not automatically independent evidence.

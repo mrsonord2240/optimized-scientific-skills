@@ -1,0 +1,9 @@
+# Methods and provenance
+
+Derived from GPTomics `bio-pathway-wikipathways` (MIT). WikiPathways content is described in the source as CC0 and community curated; check individual pathway provenance and curation. Complementary resources include `bio-pathway-kegg-pathways`, `bio-pathway-reactome`, and `bio-pathway-go-enrichment`; database sets overlap and differences in coverage do not imply independent evidence.
+
+ORA uses Entrez identifiers and an assayed/tested-gene universe. Conversion losses, duplicates and species mismatches can cause empty or biased results. The source example uses BH adjustment, p-value cutoff 0.05, q-value cutoff 0.2, and gene-set sizes 10–500; its significant genes have adjusted p < 0.05 and absolute log2 fold change > 1. The dated script uses `enricher` defaults. GSEA uses the whole decreasing named ranking, not a separate universe; report NES direction and leading-edge genes. Interpret adjusted p values, gene ratios, background ratios, counts, and mapped genes, and inspect the underlying pathway.
+
+The source describes `enrichWP`, `gseWP`, and `gson_WP` as retrieving current data. A GSON object freezes a session, not a historical release. For dated GMTs the source uses `format='gmt'` and splits the compound `name%version%wpid%org` field into term-to-gene and term-to-name tables. Its stated monthly archive retention and API names are historical source claims, not independently verified here. The source points to the Zenodo WikiPathways community for older releases. A noncanonical species name, unexpected archive format or absent release can fail; check before interpreting empty outputs.
+
+References from source: Pico et al. 2008, PLoS Biology 6:e184; Martens et al. 2021, Nucleic Acids Research 49:D613–D621; Agrawal et al. 2024, Nucleic Acids Research 52:D679–D689; Hanspers et al. 2020, Genome Biology 21:273; Shin and Pico 2023, BMC Genomics 24:713; Wu et al. 2021, The Innovation 2:100141.
