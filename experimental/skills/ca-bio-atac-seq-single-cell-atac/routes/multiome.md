@@ -1,10 +1,9 @@
 # Multiome and specialist analyses
 
-```r
-library(Signac)
-library(Seurat)
+```bash
+Rscript scripts/multiome_wnn.R paired_multiome.rds integrated.rds
 ```
 
-Verify RNA and ATAC are paired from the same cells. WNN embedding and modality-weight checks are in `references/ecosystem-workflows.md`; chemistry and barcode distinctions, cell-cycle and sex QC, PEAKVI reference mapping and cluster-level chromBPNet are in `references/specialized-topics.md`. For linkage use `bio-atac-seq-co-accessibility` or `bio-atac-seq-enhancer-gene-linking` as appropriate.
+Input must be a Seurat object with paired RNA and ATAC assays for the same cells. The command runs the source PCA, LSI and WNN workflow and saves an RDS; inspect modality weights. Cell-cycle and sex QC, PEAKVI mapping and cluster-level chromBPNet require additional inputs and source-specific adaptation described in `references/specialized-topics.md`; they are not performed by this entry point. For linkage use `bio-atac-seq-co-accessibility` or `bio-atac-seq-enhancer-gene-linking` as appropriate.
 
 Done when the requested integration or specialist result is produced with matching features, barcodes, genome and limitations recorded.

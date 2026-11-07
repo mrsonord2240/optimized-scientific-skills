@@ -25,11 +25,12 @@
       "upstream_path": "chemoinformatics/admet-prediction",
       "status_notes": "skills/ca-bio-admet-prediction/STATUS.md",
       "normalization_worker": "gpt-6.1-terra",
-      "worker_identity_before_status_note": "0d0c31d168d0c2e338df69268e5d6b1e740e76ff4eba0ed8f95a3d5e0ad72c51",
-      "normalization_summary": "Routed offline, hosted, custom model, property, and endpoint intents; preserved source functions and defaults; moved detailed evidence to references.",
+      "worker_identity_before_status_note": "04fbc4d29c841fa61921d552572492f04e882cc3b6e6552eef6c63fd9159da66",
+      "normalization_summary": "Routed offline, hosted, custom model, property, and endpoint intents; preserved source functions and defaults; moved detailed evidence to references. Repair: replaced import-only task routes with file-based workflows or a documented unsupported boundary.",
       "known_gaps": [
         "Normalization only; no scientific execution or behavioral audit.",
-        "Current hosted API contract and chemprop flags must be checked before use; source versions are not newly verified."
+        "Current hosted API contract and chemprop flags must be checked before use; source versions are not newly verified.",
+        "The source Chemprop command requires version-specific CLI verification before use."
       ],
       "preflight_warnings": [
         "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
@@ -40,7 +41,7 @@
         "hosted ADMETlab CSV": "routes/hosted.md -> references/admetlab.md",
         "chemprop modeling": "routes/custom.md -> references/chemprop.md",
         "properties, PAINS, alerts": "routes/properties.md -> scripts/predict_admet.py, references/properties.md",
-        "hERG CYP, limitations and disagreement": "routes/endpoints.md -> references/endpoints.md, references/troubleshooting.md",
+        "hERG CYP, limitations and disagreement": "routes/endpoints.md -> scripts/predict_admet.py, references/endpoints.md, references/troubleshooting.md",
         "OECD and applicability": "routes/offline.md -> references/selection.md"
       },
       "reviewed_source_files": [
@@ -54,7 +55,7 @@
       "documentation_sources": [
         "Original provider skill and GPTomics MIT attribution"
       ],
-      "packaging_text_normalization": "Markdown trailing blank lines reduced to one final newline; scientific code unchanged",
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
       "normalized_files": {
         "SKILL.md": {
           "worker_sha256": "206c0c02f0f6d1e29bdc174929f03b3c609cb72eb04f817e1a0bf8c85dd02c54",
@@ -93,16 +94,16 @@
           "sha256": "3e34166d258333b464ce1e569c13e3c6b36dbdde58f0a9bb14662612d2434714"
         },
         "routes/custom.md": {
-          "worker_sha256": "9e7780ff29439c74cd56c1ac29cabd9421ed45710cafd4960d49f484ac73751a",
-          "sha256": "9e7780ff29439c74cd56c1ac29cabd9421ed45710cafd4960d49f484ac73751a"
+          "worker_sha256": "de249ae71ae9752b0cf7c608c97e8ed3c6396275349ee97d7ac66f1d32088b27",
+          "sha256": "de249ae71ae9752b0cf7c608c97e8ed3c6396275349ee97d7ac66f1d32088b27"
         },
         "routes/endpoints.md": {
-          "worker_sha256": "cb88d2ee9ad0a5f97a9a6a55a7ab6fe1d260c8a1fa998f1894db25c27d249268",
-          "sha256": "cb88d2ee9ad0a5f97a9a6a55a7ab6fe1d260c8a1fa998f1894db25c27d249268"
+          "worker_sha256": "6130cbc3a8e20c507e35948de651c45e4eea5c02e7bd9f064a65abd68df40292",
+          "sha256": "6130cbc3a8e20c507e35948de651c45e4eea5c02e7bd9f064a65abd68df40292"
         },
         "routes/hosted.md": {
-          "worker_sha256": "e87b2264429087cd9ee09a3c822111e770222c1360dbbde1cb42d47ff3146884",
-          "sha256": "e87b2264429087cd9ee09a3c822111e770222c1360dbbde1cb42d47ff3146884"
+          "worker_sha256": "8afc7ecf73b2412bd7e05bff611946327594eb4975cbe014ab1e9da1b8f2f6af",
+          "sha256": "8afc7ecf73b2412bd7e05bff611946327594eb4975cbe014ab1e9da1b8f2f6af"
         },
         "routes/offline.md": {
           "worker_sha256": "252d707aba484bcb127e0854e2209245078100983e58106cc9d02a855e770821",
@@ -121,7 +122,15 @@
           "sha256": "505e6d000d86e87c7ffdf80f457083eeccd7a9d55259bcfa6e6a422b057e7bbe"
         }
       },
-      "published_identity": "0eb6d36800af5e82486323102808fe7b90ebe8e900dd10168181efa6247bdcba"
+      "published_identity": "9562c37944f67d80690bcd50339aacbc4f16dae78dfea04a141a4a7f4361d955",
+      "revision_history": [
+        {
+          "shelf_commit": "214828083b7327cde781548d8bd553549039dc39",
+          "published_identity": "0eb6d36800af5e82486323102808fe7b90ebe8e900dd10168181efa6247bdcba",
+          "worker_identity": "0d0c31d168d0c2e338df69268e5d6b1e740e76ff4eba0ed8f95a3d5e0ad72c51",
+          "reason": "Replace package-only route stubs with task entry points or explicit source-incomplete boundaries"
+        }
+      ]
     },
     {
       "id": "ca-bio-alignment-amplicon-clipping",
@@ -2477,20 +2486,20 @@
       "upstream_path": "atac-seq/single-cell-atac",
       "status_notes": "skills/ca-bio-atac-seq-single-cell-atac/STATUS.md",
       "normalization_worker": "gpt-6.1-terra",
-      "worker_identity_before_status_note": "4a2cf64bf3ef4c0b9daf22e1ff9380767a1cce87cb959b5f879f92920fd71a08",
-      "normalization_summary": "Routed Signac, ecosystems, doublets and multiome; retained source implementation and references with MIT notice.",
+      "worker_identity_before_status_note": "82fbcc7251ef6334e97eff38c47e099e5a85795cbcbe5238ba8d11464d51d248",
+      "normalization_summary": "Routed Signac, ArchR, SnapATAC2, cluster peak calling and WNN; added file-based entry points from source workflows.",
       "known_gaps": [
-        "Normalization only; all scientific workflows unexecuted. Script fixed to hg38 and does not run doublet detection or expose output prefix in CLI.",
-        "ARC blacklist ratio is computed from the peak matrix and may not behave like singlecell.csv blacklist fraction; source warns it may remove no cells.",
-        "ArchR, SnapATAC2, WNN, PEAKVI and AMULET reference workflows need their own tool environments and were not run here."
+        "Normalization only; all scientific workflows and APIs remain unexecuted. ArchR and SnapATAC2 entry points assume hg38 and require installed matching tools and MACS3. SnapATAC2 gene activity remains an input-dependent source reference and is not saved by the CLI.",
+        "Signac script assumes hg38 and does not run doublet detection or expose an output prefix. ARC blacklist ratio comes from the peak matrix and may not behave like the ATAC singlecell.csv fraction.",
+        "Cell-cycle correction, sex QC, PEAKVI mapping, chromBPNet and AMULET remain source-specific workflows requiring additional inputs and adaptation."
       ],
       "preflight_warnings": [],
       "license_evidence": "../LICENSE",
       "capability_route_map": {
         "Signac 10X ATAC ARC QC LSI clustering gene activity": "routes/signac.md",
-        "ArchR SnapATAC2": "routes/ecosystems.md",
-        "doublets per-cluster pseudobulk MACS3 consensus": "routes/peaks.md",
-        "WNN cell cycle PEAKVI and specialist workflow": "routes/multiome.md"
+        "ArchR and SnapATAC2 fragment QC clustering and peak calling": "routes/ecosystems.md",
+        "doublets and per-cluster MACS3 peak calls": "routes/peaks.md",
+        "WNN from paired Seurat object and specialist guidance": "routes/multiome.md"
       },
       "reviewed_source_files": [
         "LICENSE",
@@ -2501,12 +2510,16 @@
         "SKILL.md"
       ],
       "scripts_added_or_changed": [
-        "scripts/signac_workflow.R (copied source)"
+        "scripts/signac_workflow.R (source copy)",
+        "scripts/archr_workflow.R",
+        "scripts/snapatac_workflow.py",
+        "scripts/multiome_wnn.R",
+        "scripts/cluster_peaks.R"
       ],
       "documentation_sources": [
         "Provider skill tree; no upgrades assumed."
       ],
-      "packaging_text_normalization": "Markdown trailing blank lines reduced to one final newline; scientific code unchanged",
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
       "normalized_files": {
         "LICENSE": {
           "worker_sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f",
@@ -2537,27 +2550,51 @@
           "sha256": "64e4c579ac5cef4ab9e8aa49afba1bf57b758e18491b73a408eeb633d11ace1e"
         },
         "routes/ecosystems.md": {
-          "worker_sha256": "8feb06ff8e9454cf9f583c6a1bbfca3e7f029bbcf7202577af5683b6ef2f5941",
-          "sha256": "8feb06ff8e9454cf9f583c6a1bbfca3e7f029bbcf7202577af5683b6ef2f5941"
+          "worker_sha256": "affa6366bb466bbdc86ea2ad68d2303845ff142ab2df5578a55b9ac5ae911504",
+          "sha256": "affa6366bb466bbdc86ea2ad68d2303845ff142ab2df5578a55b9ac5ae911504"
         },
         "routes/multiome.md": {
-          "worker_sha256": "830c1f12f5a508f255e21cb33da4ccba44c9c8f4bb7d0a834882052e292e4534",
-          "sha256": "830c1f12f5a508f255e21cb33da4ccba44c9c8f4bb7d0a834882052e292e4534"
+          "worker_sha256": "35c9989ac394e0c1ebab2b3e6ef4861a07c8bf99db88c41500bdf29ad071291b",
+          "sha256": "35c9989ac394e0c1ebab2b3e6ef4861a07c8bf99db88c41500bdf29ad071291b"
         },
         "routes/peaks.md": {
-          "worker_sha256": "c6dfda099e11c6422f3ba4a241c709a3b8c43bc0fb692bcc23b54a1ddcc7a05f",
-          "sha256": "c6dfda099e11c6422f3ba4a241c709a3b8c43bc0fb692bcc23b54a1ddcc7a05f"
+          "worker_sha256": "054f943971956751636ca72e1199cbd0bc8fd55bb6c4b4d3d2c3f0e7dc46be79",
+          "sha256": "054f943971956751636ca72e1199cbd0bc8fd55bb6c4b4d3d2c3f0e7dc46be79"
         },
         "routes/signac.md": {
           "worker_sha256": "3e36f3ab6a3e99edcfcf2e213eee45720aa0aa898175aaed67676ea833495a91",
           "sha256": "3e36f3ab6a3e99edcfcf2e213eee45720aa0aa898175aaed67676ea833495a91"
         },
+        "scripts/archr_workflow.R": {
+          "worker_sha256": "1c5fbde80290cdda913ccb29b2180cac672286af1dea4be3d1b094c1826ccbbe",
+          "sha256": "1c5fbde80290cdda913ccb29b2180cac672286af1dea4be3d1b094c1826ccbbe"
+        },
+        "scripts/cluster_peaks.R": {
+          "worker_sha256": "42549194db10e7156ac729e6391f3c5f4fb6dbd58758ec980ae8ae84b09517b3",
+          "sha256": "42549194db10e7156ac729e6391f3c5f4fb6dbd58758ec980ae8ae84b09517b3"
+        },
+        "scripts/multiome_wnn.R": {
+          "worker_sha256": "8fad97b316790f5cd92e03102d200166da097e3377becdf6d0a7813510944a1a",
+          "sha256": "8fad97b316790f5cd92e03102d200166da097e3377becdf6d0a7813510944a1a"
+        },
         "scripts/signac_workflow.R": {
           "worker_sha256": "d5edfce299fc979ece9518e7c956688fc8c6b37dbf94aab37c2afc7d79702c0c",
           "sha256": "d5edfce299fc979ece9518e7c956688fc8c6b37dbf94aab37c2afc7d79702c0c"
+        },
+        "scripts/snapatac_workflow.py": {
+          "worker_sha256": "2ab82e60fa4f9736581acda346dd7d4871f4a6e5b309f3de1c15011612e95501",
+          "sha256": "2ab82e60fa4f9736581acda346dd7d4871f4a6e5b309f3de1c15011612e95501"
         }
       },
-      "published_identity": "78d1097b4e380ce702663fee776e3426253c6a43393015acd40428b5a06677fb"
+      "published_identity": "a3fb33b8889e32447aa8627bf6b9059dc3971bce8e2fa5ec41cd587e460edf5c",
+      "revision_history": [
+        {
+          "shelf_commit": "214828083b7327cde781548d8bd553549039dc39",
+          "published_identity": "78d1097b4e380ce702663fee776e3426253c6a43393015acd40428b5a06677fb",
+          "worker_identity": "4a2cf64bf3ef4c0b9daf22e1ff9380767a1cce87cb959b5f879f92920fd71a08",
+          "reason": "Replace package-only route stubs with task entry points or explicit source-incomplete boundaries"
+        }
+      ]
     },
     {
       "id": "ca-bio-bam-statistics",
@@ -2936,12 +2973,15 @@
       "upstream_path": "causal-genomics/colocalization-analysis",
       "status_notes": "skills/ca-bio-causal-genomics-colocalization-analysis/STATUS.md",
       "normalization_worker": "gpt-6.1-terra",
-      "worker_identity_before_status_note": "758477b8794b12889cf857f95e6d7adca287defb2d3da78681f8a2f069197fa3",
-      "normalization_summary": "Normalized the source into progressively routed instructions and reusable helpers.",
+      "worker_identity_before_status_note": "2490ce3f58435cecc2bea1f7686e79a360582f0d352ec73691991fe8c9b5655a",
+      "normalization_summary": "Replaced package-only route stubs with file-based task entry points; source-incomplete paths remain explicitly identified.",
       "known_gaps": [
         "No scientific runs.",
         "Harmonized output requires manual conversion into two tables; ABF wrapper does not pass MAF to coloc when sdY omitted, so p-value/MAF or estimated sdY needs separate implementation.",
-        "SharePro lacks a runnable source workflow."
+        "SharePro lacks a runnable source workflow.",
+        "HyPrColoc wrapper and region check are syntax-only; tool execution not verified.",
+        "Region check covers a single supplied position, so the entire locus window requires independent review.",
+        "moloc remains an input-dependent source example requiring adaptation."
       ],
       "preflight_warnings": [
         "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
@@ -2951,9 +2991,9 @@
         "ABF and harmonization": "routes/abf.md",
         "SuSiE and LD": "routes/susie.md",
         "conditional and eCAVIAR": "routes/multicausal.md",
-        "HyPrColoc and moloc": "routes/multitrait.md",
+        "HyPrColoc and moloc": "routes/multitrait.md (HyPrColoc wrapper; moloc example needs adaptation)",
         "SMR/HEIDI": "routes/smr.md",
-        "region gates and reporting": "routes/exception.md"
+        "region gates and reporting": "routes/exception.md (position check and manual whole-window review)"
       },
       "reviewed_source_files": [
         "examples\\coloc_abf_pipeline.R",
@@ -2983,13 +3023,15 @@
         "coloc_abf.R",
         "coloc_susie.R",
         "flag_excluded_region.R",
-        "harmonise.R"
+        "harmonise.R",
+        "hyprcoloc_traits.R",
+        "check_excluded_region.R"
       ],
       "documentation_sources": [
         "source skill",
         "PROVENANCE.json GPTomics/bioSkills d91ed3d563019e649dc854c56ccd62551359488a"
       ],
-      "packaging_text_normalization": "Markdown trailing blank lines reduced to one final newline; scientific code unchanged",
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
       "normalized_files": {
         "SKILL.md": {
           "worker_sha256": "cbe5ee06b32fdc33c79f2d9148e61291106a590a2ce90ddb33a6a62b4964f148",
@@ -3048,16 +3090,16 @@
           "sha256": "8a9a0b595d065c3583e49d02fe94c79889483227e1d9548fdea918abc64e58f9"
         },
         "routes/exception.md": {
-          "worker_sha256": "24802e773d44b8971b5a83152b584451d3bf6c2aee8da351506aaefdbb3adbc8",
-          "sha256": "24802e773d44b8971b5a83152b584451d3bf6c2aee8da351506aaefdbb3adbc8"
+          "worker_sha256": "62eee0cf4661fd88a569e1ef6c0a3c930dae8a40e88bff5ca4182da41d47abfd",
+          "sha256": "62eee0cf4661fd88a569e1ef6c0a3c930dae8a40e88bff5ca4182da41d47abfd"
         },
         "routes/multicausal.md": {
           "worker_sha256": "55098bd6ae2c6f4a18f071bdb3350b613adcbe00d1728c0d238be60f5cfc658b",
           "sha256": "55098bd6ae2c6f4a18f071bdb3350b613adcbe00d1728c0d238be60f5cfc658b"
         },
         "routes/multitrait.md": {
-          "worker_sha256": "8420b92a6040ca1737d5e473162b979d634d04d2aeb739f6c4857eadea9fb1f3",
-          "sha256": "8420b92a6040ca1737d5e473162b979d634d04d2aeb739f6c4857eadea9fb1f3"
+          "worker_sha256": "81f3002841ecdd071f5bc7667d296872b391311a244e81a6bd4302ae07bbaaf0",
+          "sha256": "81f3002841ecdd071f5bc7667d296872b391311a244e81a6bd4302ae07bbaaf0"
         },
         "routes/smr.md": {
           "worker_sha256": "8dfc83270d7a343f31e84fb5985ab7b1bbc77bd962c798e0da03533a1066b2f0",
@@ -3066,6 +3108,10 @@
         "routes/susie.md": {
           "worker_sha256": "396b84c9c85ae7c39c1e118d90694422a238d9309b48787a1992561e82b0dc8d",
           "sha256": "396b84c9c85ae7c39c1e118d90694422a238d9309b48787a1992561e82b0dc8d"
+        },
+        "scripts/check_excluded_region.R": {
+          "worker_sha256": "9927f85de8e50ead651d3227f09cc7060881eef723ebde78cfafcaab6d9c9a88",
+          "sha256": "9927f85de8e50ead651d3227f09cc7060881eef723ebde78cfafcaab6d9c9a88"
         },
         "scripts/coloc_abf.R": {
           "worker_sha256": "0e3ecf3dc3bb438df5fb8cd2d1340f7cce8984193dc2b84a80d3105ba6467787",
@@ -3082,9 +3128,21 @@
         "scripts/harmonise.R": {
           "worker_sha256": "410033c57088f2ab548d6bd45bbf9d3010d18cf1ed1e0ad498f6297d9f8d974d",
           "sha256": "410033c57088f2ab548d6bd45bbf9d3010d18cf1ed1e0ad498f6297d9f8d974d"
+        },
+        "scripts/hyprcoloc_traits.R": {
+          "worker_sha256": "bf8933ba7deb873aedd6fd88f48835f95ce63716288eadb7c01d178ebfaa6cc1",
+          "sha256": "bf8933ba7deb873aedd6fd88f48835f95ce63716288eadb7c01d178ebfaa6cc1"
         }
       },
-      "published_identity": "5905987a4fd7ae08eb341369d6c15424bb87c81659ce4fc980c3badd2a184c85"
+      "published_identity": "f5091305eff78ddc7877f3d87e08c0020fb6798fc3d0277f413c9f03da817141",
+      "revision_history": [
+        {
+          "shelf_commit": "214828083b7327cde781548d8bd553549039dc39",
+          "published_identity": "5905987a4fd7ae08eb341369d6c15424bb87c81659ce4fc980c3badd2a184c85",
+          "worker_identity": "758477b8794b12889cf857f95e6d7adca287defb2d3da78681f8a2f069197fa3",
+          "reason": "Replace package-only route stubs with task entry points or explicit source-incomplete boundaries"
+        }
+      ]
     },
     {
       "id": "ca-bio-causal-genomics-effector-gene-prioritization",
@@ -3809,8 +3867,8 @@
       "upstream_path": "chemoinformatics/conformer-generation",
       "status_notes": "skills/ca-bio-conformer-generation/STATUS.md",
       "normalization_worker": "gpt-6.1-terra",
-      "worker_identity_before_status_note": "5f54a70656bf0925a09ae548a62cb2fada764778a39aca5740cf3fe632c5e8d2",
-      "normalization_summary": "Separated conformer, macrocycle, CREST and property workflows; preserved source implementation and default settings.",
+      "worker_identity_before_status_note": "1b01a134921de57c85781552f12c409adc421f8118e627b4787547130f82333c",
+      "normalization_summary": "Separated conformer, macrocycle, CREST and property workflows; preserved source implementation and default settings. Repair: replaced import-only task routes with file-based workflows or a documented unsupported boundary.",
       "known_gaps": [
         "Normalization only; no scientific execution or behavioral audit.",
         "Source CREST platform and CLI claims are version-specific; confirm installed documentation before use."
@@ -3823,7 +3881,7 @@
         "ETKDGv3, MMFF UFF, RMSD and energy filters": "routes/ensemble.md -> references/etkdg.md, scripts/gen_conformers.py",
         "macrocycle torsion comparison": "routes/macrocycle.md -> references/macrocycles.md, scripts/compare_macrocycle_embedding.py",
         "CREST and xTB": "routes/crest.md -> references/crest.md",
-        "Boltzmann average": "routes/averaging.md -> references/averaging.md",
+        "Boltzmann average": "routes/averaging.md -> scripts/gen_conformers.py, references/averaging.md",
         "model choices and failure modes": "routes/ensemble.md -> references/troubleshooting.md; references/selection.md"
       },
       "reviewed_source_files": [
@@ -3839,7 +3897,7 @@
       "documentation_sources": [
         "Original provider skill and GPTomics MIT attribution"
       ],
-      "packaging_text_normalization": "Markdown trailing blank lines reduced to one final newline; scientific code unchanged",
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
       "normalized_files": {
         "SKILL.md": {
           "worker_sha256": "54f465c8f2d4b9709aabb9f930f8dba75972542667c9c0b6bc62c0415a2edb37",
@@ -3874,8 +3932,8 @@
           "sha256": "36d59dde6ef1c7685fb0306a5cbb9325b6cee98d276008a0e947a881847892e6"
         },
         "routes/averaging.md": {
-          "worker_sha256": "5e34eb9bd5bb078ab8dfede183cd89669bfb419df982169da4439a00f7b93461",
-          "sha256": "5e34eb9bd5bb078ab8dfede183cd89669bfb419df982169da4439a00f7b93461"
+          "worker_sha256": "6d998641d3fa5e7b5ad8acaee2c36ea6570939a7c4c84c74d01d6b81e2194c62",
+          "sha256": "6d998641d3fa5e7b5ad8acaee2c36ea6570939a7c4c84c74d01d6b81e2194c62"
         },
         "routes/crest.md": {
           "worker_sha256": "f6d2e8015d3c67e1b497f09318147b21a953cb67c94e639a9b87ab7b87b2c080",
@@ -3902,7 +3960,15 @@
           "sha256": "259918e2c7b443b7dcb1582f86a0aaebcdc8604f10b2d79ebb093ee123066ef3"
         }
       },
-      "published_identity": "27fb7562f7cc3f0a9bd5cb3546e297f7909cc76ff46727d5503cef9ad681e24e"
+      "published_identity": "edab47a6db9b62ef50994665427a7c409d0052d2a083f9fcd8b1a892c9c5af6c",
+      "revision_history": [
+        {
+          "shelf_commit": "214828083b7327cde781548d8bd553549039dc39",
+          "published_identity": "27fb7562f7cc3f0a9bd5cb3546e297f7909cc76ff46727d5503cef9ad681e24e",
+          "worker_identity": "5f54a70656bf0925a09ae548a62cb2fada764778a39aca5740cf3fe632c5e8d2",
+          "reason": "Replace package-only route stubs with task entry points or explicit source-incomplete boundaries"
+        }
+      ]
     },
     {
       "id": "ca-bio-covalent-design",
@@ -3915,11 +3981,12 @@
       "upstream_path": "chemoinformatics/covalent-design",
       "status_notes": "skills/ca-bio-covalent-design/STATUS.md",
       "normalization_worker": "gpt-6.1-terra",
-      "worker_identity_before_status_note": "5464a04c20ce3951212de1975604a0d2e6032ab9f1c73b0d1f3275bda5faceb4",
-      "normalization_summary": "Separated existing classification, structural feature, kinetics and docking workflows; source scope and limitations retained.",
+      "worker_identity_before_status_note": "246a02ca718be1bd86fa0981b99d2295aa19def26f03269911d580d7462e6aa3",
+      "normalization_summary": "Separated existing classification, structural feature, kinetics and docking workflows; source scope and limitations retained. Repair: replaced import-only task routes with file-based workflows or a documented unsupported boundary.",
       "known_gaps": [
         "Normalization only; no scientific execution or behavioral audit.",
-        "Covalent docking commands assume prepared inputs and source-version-specific tools."
+        "Covalent docking commands assume prepared inputs and source-version-specific tools.",
+        "Kinetic route calculates a ratio from already-fitted values; it does not fit a kinetic model."
       ],
       "preflight_warnings": [
         "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
@@ -3928,7 +3995,7 @@
       "capability_route_map": {
         "warhead taxonomy, residue context, classifier": "routes/classify.md -> references/warheads.md, scripts/warhead_classifier.py",
         "acrylamide structural feature, SAR illustration": "routes/substitution.md -> references/design.md, scripts/acrylamide_alpha_substitution.py",
-        "kinetics and intrinsic reactivity": "routes/kinetics.md -> references/kinetics.md",
+        "kinetics and intrinsic reactivity": "routes/kinetics.md -> fitted kinact/Ki file calculation, references/kinetics.md",
         "covalent docking and geometry": "routes/docking.md -> references/docking.md",
         "failure modes and reversible/irreversible reconciliation": "routes/docking.md -> references/troubleshooting.md"
       },
@@ -3945,7 +4012,7 @@
       "documentation_sources": [
         "Original provider skill and GPTomics MIT attribution"
       ],
-      "packaging_text_normalization": "Markdown trailing blank lines reduced to one final newline; scientific code unchanged",
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
       "normalized_files": {
         "SKILL.md": {
           "worker_sha256": "7fcc5cd570c9c65e30e9d1b16db258e0c542a9c00efd0e37acf0c295aa04e964",
@@ -3980,12 +4047,12 @@
           "sha256": "e64cbf35ff13d00254c8a9081e0812aab4b84d53e1cc958d8752cc6d7a116ef2"
         },
         "routes/docking.md": {
-          "worker_sha256": "dc777c49fe37df9d4ef31f8ec4f2bcc550cb3f36671929c9b6c7c48fa5b1f1a8",
-          "sha256": "dc777c49fe37df9d4ef31f8ec4f2bcc550cb3f36671929c9b6c7c48fa5b1f1a8"
+          "worker_sha256": "6f0fa2d23275c58558e7da5609a4fd9b9f09e4d94bc04d7f9ddcb960169f9acf",
+          "sha256": "6f0fa2d23275c58558e7da5609a4fd9b9f09e4d94bc04d7f9ddcb960169f9acf"
         },
         "routes/kinetics.md": {
-          "worker_sha256": "71a04af6ef11827e07a7b3540a75689a1e587381bc0215ba31becb1938a3f320",
-          "sha256": "71a04af6ef11827e07a7b3540a75689a1e587381bc0215ba31becb1938a3f320"
+          "worker_sha256": "9d836ab089bff4092f659e9a4ba3ee2f8ad10cfbccb578f12d3620adf702b323",
+          "sha256": "9d836ab089bff4092f659e9a4ba3ee2f8ad10cfbccb578f12d3620adf702b323"
         },
         "routes/related.md": {
           "worker_sha256": "33a1662fb48bb2ea03a9997a80484948239dbff706d22ceb7ba0b2bc338194ca",
@@ -4004,7 +4071,15 @@
           "sha256": "602c72c921fd2bc12655ee5b8ee7e7d56a1226d5ef8a08ab123837b586ccade0"
         }
       },
-      "published_identity": "2978b9384b56e257c20bfd08c8ad463588cf0898a9cf8f4b0e23aa0a179bf545"
+      "published_identity": "c2fa935ba12829a2f78b39806abddcba41a558ece1f97ca7c0a49d26bfed4e0c",
+      "revision_history": [
+        {
+          "shelf_commit": "214828083b7327cde781548d8bd553549039dc39",
+          "published_identity": "2978b9384b56e257c20bfd08c8ad463588cf0898a9cf8f4b0e23aa0a179bf545",
+          "worker_identity": "5464a04c20ce3951212de1975604a0d2e6032ab9f1c73b0d1f3275bda5faceb4",
+          "reason": "Replace package-only route stubs with task entry points or explicit source-incomplete boundaries"
+        }
+      ]
     },
     {
       "id": "ca-bio-differential-expression-deseq2-basics",
@@ -4625,11 +4700,12 @@
       "upstream_path": "alternative-splicing/isoform-switching",
       "status_notes": "skills/ca-bio-isoform-switching/STATUS.md",
       "normalization_worker": "gpt-6.1-terra",
-      "worker_identity_before_status_note": "8af91f28b99e845d24da31d1f4fabe0c6e1cd6afd22881e3d30cb82e18e0ed34",
-      "normalization_summary": "Split workflow by statistical intent and functional annotation; retained original executable scripts and their defaults.",
+      "worker_identity_before_status_note": "e8291b944ffb5c3ea872ed88faf2c1cb7c406a229af580c0f39a526b8da68199",
+      "normalization_summary": "Split workflow by statistical intent and functional annotation; retained original executable scripts and their defaults. Repair: made source-backed DTU and DTE routines file-based; identified unsupported custom count-only paths.",
       "known_gaps": [
         "Normalization only; scripts and scientific commands unexecuted; no behavioral audit.",
-        "Raw count route and small-sample null behavior remain source-described limitations."
+        "Raw count route and small-sample null behavior remain source-described limitations.",
+        "Count-only IsoformSwitchAnalyzeR and single-cell import are source-incomplete or untested; route marks custom or sibling workflow."
       ],
       "preflight_warnings": [
         "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
@@ -4637,10 +4713,10 @@
       "license_evidence": "../LICENSE",
       "capability_route_map": {
         "Salmon switch workflow, sample mapping, count route, permutation": "routes/switches.md -> references/switch-workflow.md",
-        "manual DRIMSeq DEXSeq stageR": "routes/manual-dtu.md -> references/manual-dtu.md",
-        "fishpond swish DTE": "routes/swish.md -> references/swish.md",
+        "manual DRIMSeq DEXSeq stageR": "routes/manual-dtu.md -> scripts/manual_dtu.R, references/manual-dtu.md",
+        "fishpond swish DTE": "routes/swish.md -> scripts/swish_dte.R, references/swish.md",
         "ORF, NMD, CPC2, Pfam and licensed annotators": "routes/consequences.md -> references/consequences.md, references/nmd.md",
-        "long-read and single-cell": "routes/counts.md -> references/switch-workflow.md, references/interpretation.md",
+        "long-read and single-cell": "routes/counts.md -> explicitly custom or sibling skills",
         "visualization, reconciliation, thresholds, errors": "routes/switches.md -> references/interpretation.md"
       },
       "reviewed_source_files": [
@@ -4651,83 +4727,101 @@
       ],
       "scripts_added_or_changed": [
         "scripts/isoform_switch_analysis.R",
-        "scripts/hmmscan_to_pfamscan.py"
+        "scripts/hmmscan_to_pfamscan.py",
+        "scripts/manual_dtu.R",
+        "scripts/swish_dte.R"
       ],
       "documentation_sources": [
         "Original provider skill and GPTomics MIT attribution"
       ],
       "normalized_files": {
         "SKILL.md": {
-          "sha256": "97a9947774721a570c5ceeddf0ca4b2837f2d6d8cece819bc3c5a2d982855b07",
-          "worker_sha256": "97a9947774721a570c5ceeddf0ca4b2837f2d6d8cece819bc3c5a2d982855b07"
+          "worker_sha256": "97a9947774721a570c5ceeddf0ca4b2837f2d6d8cece819bc3c5a2d982855b07",
+          "sha256": "97a9947774721a570c5ceeddf0ca4b2837f2d6d8cece819bc3c5a2d982855b07"
         },
         "references/citations.md": {
-          "sha256": "8859f888b7890d32274f06e14232f89249a4012a20d9ada5108ed21470e23c5b",
-          "worker_sha256": "8859f888b7890d32274f06e14232f89249a4012a20d9ada5108ed21470e23c5b"
+          "worker_sha256": "8859f888b7890d32274f06e14232f89249a4012a20d9ada5108ed21470e23c5b",
+          "sha256": "8859f888b7890d32274f06e14232f89249a4012a20d9ada5108ed21470e23c5b"
         },
         "references/consequences.md": {
-          "sha256": "11e575196285cb7d773871472388c68d5f53250d5434ac995374db9fa5224878",
-          "worker_sha256": "e8ca58cc6d5874b8fed2b22f9cb6c9d04fa55c3f34eb55f645580fc5adea0d96"
+          "worker_sha256": "11e575196285cb7d773871472388c68d5f53250d5434ac995374db9fa5224878",
+          "sha256": "11e575196285cb7d773871472388c68d5f53250d5434ac995374db9fa5224878"
         },
         "references/interpretation.md": {
-          "sha256": "5fe285fd61434bffed1756bd5c9a075ca56932e31bb488efb64dc732ec3f7c4d",
-          "worker_sha256": "089cfd50a2280a45e1bf45ade9ff4048c25f83445e513b4a9263b00db6adb657"
+          "worker_sha256": "5fe285fd61434bffed1756bd5c9a075ca56932e31bb488efb64dc732ec3f7c4d",
+          "sha256": "5fe285fd61434bffed1756bd5c9a075ca56932e31bb488efb64dc732ec3f7c4d"
         },
         "references/manual-dtu.md": {
-          "sha256": "76a52a98d199e8ebd31c18ec093a499c1361102868275af5bcd5880edcec291a",
-          "worker_sha256": "eaeac61cdbd6fb3b3f34ba60af25826d7d29b5c3c5cf421f2afef877c4279669"
+          "worker_sha256": "76a52a98d199e8ebd31c18ec093a499c1361102868275af5bcd5880edcec291a",
+          "sha256": "76a52a98d199e8ebd31c18ec093a499c1361102868275af5bcd5880edcec291a"
         },
         "references/nmd.md": {
-          "sha256": "afcac61b92f7ffe299be9ef2e79888d31bc342f9856e2d8e2ec7a04578fdf37d",
-          "worker_sha256": "1febf9ba9f29d8bbe8fea2a4f3fd97aefbe02ed2898574cbaed435d8a5a60e5e"
+          "worker_sha256": "afcac61b92f7ffe299be9ef2e79888d31bc342f9856e2d8e2ec7a04578fdf37d",
+          "sha256": "afcac61b92f7ffe299be9ef2e79888d31bc342f9856e2d8e2ec7a04578fdf37d"
         },
         "references/selection.md": {
-          "sha256": "84a27044447db9dada4ad52c7a3e2f9f1f502ec1c51304ee9c60aaa806ee80fb",
-          "worker_sha256": "6d53350cea252c0e9a23e82c1315da66d60ee65654048ab22c4757a399ac4e54"
+          "worker_sha256": "84a27044447db9dada4ad52c7a3e2f9f1f502ec1c51304ee9c60aaa806ee80fb",
+          "sha256": "84a27044447db9dada4ad52c7a3e2f9f1f502ec1c51304ee9c60aaa806ee80fb"
         },
         "references/swish.md": {
-          "sha256": "f9bb62260b2628e74be8280029436fbf56cf5cff91574e3d4c89a9f0b7f030bf",
-          "worker_sha256": "e9f79d8c5c05749d4cb87adaa9117aa43be90c504648ff6b71e5382e3651dbaa"
+          "worker_sha256": "f9bb62260b2628e74be8280029436fbf56cf5cff91574e3d4c89a9f0b7f030bf",
+          "sha256": "f9bb62260b2628e74be8280029436fbf56cf5cff91574e3d4c89a9f0b7f030bf"
         },
         "references/switch-workflow.md": {
-          "sha256": "cf6dbd80cbc5dbf48cf782a6ad6e0d4f62b5752b8a726e8c9f9d1efda8bcb69f",
-          "worker_sha256": "90c0e823ed4de7cb70346aca93761050f5164a9fdf32e2f0be605f6be767de75"
+          "worker_sha256": "cf6dbd80cbc5dbf48cf782a6ad6e0d4f62b5752b8a726e8c9f9d1efda8bcb69f",
+          "sha256": "cf6dbd80cbc5dbf48cf782a6ad6e0d4f62b5752b8a726e8c9f9d1efda8bcb69f"
         },
         "routes/consequences.md": {
-          "sha256": "e78747706261c8416feba947b66deca89c4aad3074178a095e4066dcc8ffcabe",
-          "worker_sha256": "e78747706261c8416feba947b66deca89c4aad3074178a095e4066dcc8ffcabe"
+          "worker_sha256": "e78747706261c8416feba947b66deca89c4aad3074178a095e4066dcc8ffcabe",
+          "sha256": "e78747706261c8416feba947b66deca89c4aad3074178a095e4066dcc8ffcabe"
         },
         "routes/counts.md": {
-          "sha256": "61abd8da48f34d4ac7e5d9c5419489ec108eefdd5618cfb33c07d2a1117e0861",
-          "worker_sha256": "61abd8da48f34d4ac7e5d9c5419489ec108eefdd5618cfb33c07d2a1117e0861"
+          "worker_sha256": "a5585777727378f4847b8c303f97415e2e808756b4e411bf570a86a68cf14df2",
+          "sha256": "a5585777727378f4847b8c303f97415e2e808756b4e411bf570a86a68cf14df2"
         },
         "routes/manual-dtu.md": {
-          "sha256": "3a0e3e7afa1c349ab96b27118a4bad0461f2431ae6ab118fc5363f747c586851",
-          "worker_sha256": "3a0e3e7afa1c349ab96b27118a4bad0461f2431ae6ab118fc5363f747c586851"
+          "worker_sha256": "b3d577a5b7cdfd6b5efc75fdedd8402dce30167975be3b0e67786beb982aa60c",
+          "sha256": "b3d577a5b7cdfd6b5efc75fdedd8402dce30167975be3b0e67786beb982aa60c"
         },
         "routes/related.md": {
-          "sha256": "3997c97fb4966acea7ffccbed9e41df8b3529b6e2974c41f4ade158dbc4b45b2",
-          "worker_sha256": "3997c97fb4966acea7ffccbed9e41df8b3529b6e2974c41f4ade158dbc4b45b2"
+          "worker_sha256": "3997c97fb4966acea7ffccbed9e41df8b3529b6e2974c41f4ade158dbc4b45b2",
+          "sha256": "3997c97fb4966acea7ffccbed9e41df8b3529b6e2974c41f4ade158dbc4b45b2"
         },
         "routes/swish.md": {
-          "sha256": "da514cce35ca978cccf64dd298896c20e827be8b2e199b71907681d27455b668",
-          "worker_sha256": "da514cce35ca978cccf64dd298896c20e827be8b2e199b71907681d27455b668"
+          "worker_sha256": "cad3507b389900166dc8496bcb19b73d18c14486ab1f7c96b31f16b2f58f8345",
+          "sha256": "cad3507b389900166dc8496bcb19b73d18c14486ab1f7c96b31f16b2f58f8345"
         },
         "routes/switches.md": {
-          "sha256": "6aa85af1cd666af2fabc81431cd9f635dd713a3604af85ac89c58e6b7064c4bc",
-          "worker_sha256": "6aa85af1cd666af2fabc81431cd9f635dd713a3604af85ac89c58e6b7064c4bc"
+          "worker_sha256": "6aa85af1cd666af2fabc81431cd9f635dd713a3604af85ac89c58e6b7064c4bc",
+          "sha256": "6aa85af1cd666af2fabc81431cd9f635dd713a3604af85ac89c58e6b7064c4bc"
         },
         "scripts/hmmscan_to_pfamscan.py": {
-          "sha256": "1f7b12003b09d30d81d7bb49e668f1f97ec4a8fce0f0509c10f06fb610344e79",
-          "worker_sha256": "1f7b12003b09d30d81d7bb49e668f1f97ec4a8fce0f0509c10f06fb610344e79"
+          "worker_sha256": "1f7b12003b09d30d81d7bb49e668f1f97ec4a8fce0f0509c10f06fb610344e79",
+          "sha256": "1f7b12003b09d30d81d7bb49e668f1f97ec4a8fce0f0509c10f06fb610344e79"
         },
         "scripts/isoform_switch_analysis.R": {
-          "sha256": "b250aee485511074f602842e20f8f4c223ce9b8309a301142be96f3c2301a451",
-          "worker_sha256": "b250aee485511074f602842e20f8f4c223ce9b8309a301142be96f3c2301a451"
+          "worker_sha256": "b250aee485511074f602842e20f8f4c223ce9b8309a301142be96f3c2301a451",
+          "sha256": "b250aee485511074f602842e20f8f4c223ce9b8309a301142be96f3c2301a451"
+        },
+        "scripts/manual_dtu.R": {
+          "worker_sha256": "75eaf1a9d5a3e175f58526e9c9220d5682e3a74b2f11333557aadd54ab3948a8",
+          "sha256": "75eaf1a9d5a3e175f58526e9c9220d5682e3a74b2f11333557aadd54ab3948a8"
+        },
+        "scripts/swish_dte.R": {
+          "worker_sha256": "e709e5ccdb92e67e067fb47180aa5df239c73d3b6f4f69733a9d5dd63715474d",
+          "sha256": "e709e5ccdb92e67e067fb47180aa5df239c73d3b6f4f69733a9d5dd63715474d"
         }
       },
-      "published_identity": "fe0c5cbbe7c28ea9fe2d36a82628cc954b69f1491d4e202b187787c3492bcb06",
-      "packaging_text_normalization": "Markdown trailing blank lines reduced to one final newline; scientific code unchanged"
+      "published_identity": "864876619564b1c594d62b52d740a04d0026df7741e4f8d66d554cc41cb0266a",
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "revision_history": [
+        {
+          "shelf_commit": "214828083b7327cde781548d8bd553549039dc39",
+          "published_identity": "fe0c5cbbe7c28ea9fe2d36a82628cc954b69f1491d4e202b187787c3492bcb06",
+          "worker_identity": "8af91f28b99e845d24da31d1f4fabe0c6e1cd6afd22881e3d30cb82e18e0ed34",
+          "reason": "Replace package-only route stubs with task entry points or explicit source-incomplete boundaries"
+        }
+      ]
     },
     {
       "id": "ca-bio-long-read-splicing",
@@ -4740,11 +4834,12 @@
       "upstream_path": "alternative-splicing/long-read-splicing",
       "status_notes": "skills/ca-bio-long-read-splicing/STATUS.md",
       "normalization_worker": "gpt-6.1-terra",
-      "worker_identity_before_status_note": "1f35d476947c2e02de435f4e4d9ffd19dfce1b5b9c19e3cf8743d3c74af5c34b",
-      "normalization_summary": "Routed long-read workflows by intent; split alignment, microexon, discovery, curation and differential methods into topic references.",
+      "worker_identity_before_status_note": "3e90ffdd32eb62ab4818fa6a9f443c73a75a77362951dbeef28b5ee5ba768a11",
+      "normalization_summary": "Routed long-read workflows by intent; split alignment, microexon, discovery, curation and differential methods into topic references. Repair: made source-backed DTU and DTE routines file-based; identified unsupported custom count-only paths.",
       "known_gaps": [
         "Normalization only; all scientific workflows unexecuted and no behavioral audit.",
-        "Kinnex source reports synthetic only; no real Kinnex validation."
+        "Kinnex source reports synthetic only; no real Kinnex validation.",
+        "FLAIR ID parsing assumes gene IDs without underscores; route requires explicit confirmation."
       ],
       "preflight_warnings": [
         "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
@@ -4757,7 +4852,7 @@
         "IsoQuant and Bambu discovery": "routes/discovery.md -> references/isoquant.md, references/bambu.md",
         "SQANTI classification and artifact filters": "routes/sqanti.md -> references/sqanti.md",
         "rMATS-long ASM and abundance modes": "routes/rmats.md -> references/rmats-long.md",
-        "DRIMSeq stageR on long-read counts": "routes/dtu.md -> references/dtu.md",
+        "DRIMSeq stageR on long-read counts": "routes/dtu.md -> scripts/dtu.R, references/dtu.md",
         "Kinnex single cell processing": "routes/single-cell.md -> references/single-cell.md",
         "reconciliation and failure modes": "references/interpretation.md"
       },
@@ -4768,103 +4863,116 @@
         "usage-guide.md"
       ],
       "scripts_added_or_changed": [
-        "scripts/longread_splicing_pipeline.sh"
+        "scripts/longread_splicing_pipeline.sh",
+        "scripts/dtu.R"
       ],
       "documentation_sources": [
         "Original provider skill and GPTomics MIT attribution"
       ],
       "normalized_files": {
         "SKILL.md": {
-          "sha256": "5e975b40fa2f1f072e4bfe83513217662e6cbffcddf4ce42b580eeddf65bab96",
-          "worker_sha256": "5e975b40fa2f1f072e4bfe83513217662e6cbffcddf4ce42b580eeddf65bab96"
+          "worker_sha256": "5e975b40fa2f1f072e4bfe83513217662e6cbffcddf4ce42b580eeddf65bab96",
+          "sha256": "5e975b40fa2f1f072e4bfe83513217662e6cbffcddf4ce42b580eeddf65bab96"
         },
         "references/alignment.md": {
-          "sha256": "5404f70c7b89ce8ca5ca71b5f822d8067bc4f5e99b721a9ed9a9b325274c106f",
-          "worker_sha256": "f2b473b9ecf206a1bb3fab92291b188bc28413d138fae0ed400bcef090abcbe9"
+          "worker_sha256": "5404f70c7b89ce8ca5ca71b5f822d8067bc4f5e99b721a9ed9a9b325274c106f",
+          "sha256": "5404f70c7b89ce8ca5ca71b5f822d8067bc4f5e99b721a9ed9a9b325274c106f"
         },
         "references/bambu.md": {
-          "sha256": "386cd893a93c1dd1495a3c3029df677e5c7a7e9887b7be3df7850b230918efdf",
-          "worker_sha256": "1412d236900a9eb906ad7c7bc7a749709222cdeb5878e7939e39914330c01307"
+          "worker_sha256": "386cd893a93c1dd1495a3c3029df677e5c7a7e9887b7be3df7850b230918efdf",
+          "sha256": "386cd893a93c1dd1495a3c3029df677e5c7a7e9887b7be3df7850b230918efdf"
         },
         "references/citations.md": {
-          "sha256": "b221a917db6db33b74d8a501ba752f8160e66e93c595e415082622d986ceff0b",
-          "worker_sha256": "b221a917db6db33b74d8a501ba752f8160e66e93c595e415082622d986ceff0b"
+          "worker_sha256": "b221a917db6db33b74d8a501ba752f8160e66e93c595e415082622d986ceff0b",
+          "sha256": "b221a917db6db33b74d8a501ba752f8160e66e93c595e415082622d986ceff0b"
         },
         "references/dtu.md": {
-          "sha256": "c5e652b296a8236c541c4e5bfdfa903491c81ed6279f9df99dca107d86fd0f1a",
-          "worker_sha256": "6df0ae13526abf4c8cd77515874dd0ae46207368eccf574d769967bdc361817c"
+          "worker_sha256": "c5e652b296a8236c541c4e5bfdfa903491c81ed6279f9df99dca107d86fd0f1a",
+          "sha256": "c5e652b296a8236c541c4e5bfdfa903491c81ed6279f9df99dca107d86fd0f1a"
         },
         "references/flair.md": {
-          "sha256": "07fd7bb84e657934732f608e5c6879c600df6597990366588f1f3b190a4354e8",
-          "worker_sha256": "3a0eacbdbedacd01ef68dced26cd88d22b0f5e2d58d4982b11c0784db5a650ff"
+          "worker_sha256": "07fd7bb84e657934732f608e5c6879c600df6597990366588f1f3b190a4354e8",
+          "sha256": "07fd7bb84e657934732f608e5c6879c600df6597990366588f1f3b190a4354e8"
         },
         "references/interpretation.md": {
-          "sha256": "b639d93ee223804bf6d55b5b5ed4b731bf66c4a75a92b5985d58674e786c684a",
-          "worker_sha256": "b46962859248a3319121d0541044375ee42b0a90c36f8fc28c20eb19ab162d24"
+          "worker_sha256": "b639d93ee223804bf6d55b5b5ed4b731bf66c4a75a92b5985d58674e786c684a",
+          "sha256": "b639d93ee223804bf6d55b5b5ed4b731bf66c4a75a92b5985d58674e786c684a"
         },
         "references/isoquant.md": {
-          "sha256": "e1b07a148191dfa909f3650f55d3b7b9cf4f6ff6f3a6a97c5281c1ff234374c7",
-          "worker_sha256": "6ba96fb33d3e8d0872ecfe2f2d100a9be7521f71b3ebc51b87c4395fefa71f90"
+          "worker_sha256": "e1b07a148191dfa909f3650f55d3b7b9cf4f6ff6f3a6a97c5281c1ff234374c7",
+          "sha256": "e1b07a148191dfa909f3650f55d3b7b9cf4f6ff6f3a6a97c5281c1ff234374c7"
         },
         "references/microexons.md": {
-          "sha256": "daeb75bdcf9dc6d42b9061034686546e756a4181a1a25e695962b423136c317e",
-          "worker_sha256": "daeb75bdcf9dc6d42b9061034686546e756a4181a1a25e695962b423136c317e"
+          "worker_sha256": "daeb75bdcf9dc6d42b9061034686546e756a4181a1a25e695962b423136c317e",
+          "sha256": "daeb75bdcf9dc6d42b9061034686546e756a4181a1a25e695962b423136c317e"
         },
         "references/rmats-long.md": {
-          "sha256": "4ea684853aa48fae7b793f37749a63f0cde203275ee0085fdf51f8e0cc292078",
-          "worker_sha256": "8960fa57558eb504f68be0e4821a76ed9968ca72a1ec3ec4ecef8b21a84db7ef"
+          "worker_sha256": "4ea684853aa48fae7b793f37749a63f0cde203275ee0085fdf51f8e0cc292078",
+          "sha256": "4ea684853aa48fae7b793f37749a63f0cde203275ee0085fdf51f8e0cc292078"
         },
         "references/single-cell.md": {
-          "sha256": "97d94b0dca03f47d1b0784a76831ab108c2f26abde950dde86d77a5dac738205",
-          "worker_sha256": "35512e03e2df6b7b620a88d126428d52ceea11816cbeae5cc747003f3136acb0"
+          "worker_sha256": "97d94b0dca03f47d1b0784a76831ab108c2f26abde950dde86d77a5dac738205",
+          "sha256": "97d94b0dca03f47d1b0784a76831ab108c2f26abde950dde86d77a5dac738205"
         },
         "references/sqanti.md": {
-          "sha256": "32cff88ac1701567ed8bd645bdeb58ca5291a5049684dce6e0c7e8effe4a6d4a",
-          "worker_sha256": "37e3867c6785e5920b9ea1356f1cf8f6f5a5a715b6d36fd8dc5009569032a21a"
+          "worker_sha256": "32cff88ac1701567ed8bd645bdeb58ca5291a5049684dce6e0c7e8effe4a6d4a",
+          "sha256": "32cff88ac1701567ed8bd645bdeb58ca5291a5049684dce6e0c7e8effe4a6d4a"
         },
         "routes/alignment.md": {
-          "sha256": "952a775e1db433646d376f663d189e5b18d4d50b48c3e6eadef358d327fe4d25",
-          "worker_sha256": "952a775e1db433646d376f663d189e5b18d4d50b48c3e6eadef358d327fe4d25"
+          "worker_sha256": "952a775e1db433646d376f663d189e5b18d4d50b48c3e6eadef358d327fe4d25",
+          "sha256": "952a775e1db433646d376f663d189e5b18d4d50b48c3e6eadef358d327fe4d25"
         },
         "routes/discovery.md": {
-          "sha256": "22a39b4bd59cf7722e5586541fa1d15e19b011a2b78a3ce308df7025479c6863",
-          "worker_sha256": "22a39b4bd59cf7722e5586541fa1d15e19b011a2b78a3ce308df7025479c6863"
+          "worker_sha256": "22a39b4bd59cf7722e5586541fa1d15e19b011a2b78a3ce308df7025479c6863",
+          "sha256": "22a39b4bd59cf7722e5586541fa1d15e19b011a2b78a3ce308df7025479c6863"
         },
         "routes/dtu.md": {
-          "sha256": "35f7c4af8ad6db395d4c129cd5a539962ee82b70cd9b37db9ad37719b7a3c140",
-          "worker_sha256": "35f7c4af8ad6db395d4c129cd5a539962ee82b70cd9b37db9ad37719b7a3c140"
+          "worker_sha256": "f38b2d7b2ad9fa60b09b661e3a43fe500790f8b5bf1e7eb69172a175ba88f2de",
+          "sha256": "f38b2d7b2ad9fa60b09b661e3a43fe500790f8b5bf1e7eb69172a175ba88f2de"
         },
         "routes/flair.md": {
-          "sha256": "a7a710c8818eea1bed6bdc71a3a7fc65ba484f139afbaac52611354efc97d1f2",
-          "worker_sha256": "a7a710c8818eea1bed6bdc71a3a7fc65ba484f139afbaac52611354efc97d1f2"
+          "worker_sha256": "a7a710c8818eea1bed6bdc71a3a7fc65ba484f139afbaac52611354efc97d1f2",
+          "sha256": "a7a710c8818eea1bed6bdc71a3a7fc65ba484f139afbaac52611354efc97d1f2"
         },
         "routes/pipeline.md": {
-          "sha256": "f632d1ba1237a17d821a1638d9a3c8bfa1f551166473ff13a2a5f8fbcb48853c",
-          "worker_sha256": "f632d1ba1237a17d821a1638d9a3c8bfa1f551166473ff13a2a5f8fbcb48853c"
+          "worker_sha256": "f632d1ba1237a17d821a1638d9a3c8bfa1f551166473ff13a2a5f8fbcb48853c",
+          "sha256": "f632d1ba1237a17d821a1638d9a3c8bfa1f551166473ff13a2a5f8fbcb48853c"
         },
         "routes/related.md": {
-          "sha256": "4ae6a007a33a76043c2ba635da3b1a862444acf87f486a5d04354fa272734c66",
-          "worker_sha256": "4ae6a007a33a76043c2ba635da3b1a862444acf87f486a5d04354fa272734c66"
+          "worker_sha256": "4ae6a007a33a76043c2ba635da3b1a862444acf87f486a5d04354fa272734c66",
+          "sha256": "4ae6a007a33a76043c2ba635da3b1a862444acf87f486a5d04354fa272734c66"
         },
         "routes/rmats.md": {
-          "sha256": "8b8831879bef455ab007ef9d53388d5722b43c04d32d24fe3b16eee59358646d",
-          "worker_sha256": "8b8831879bef455ab007ef9d53388d5722b43c04d32d24fe3b16eee59358646d"
+          "worker_sha256": "8b8831879bef455ab007ef9d53388d5722b43c04d32d24fe3b16eee59358646d",
+          "sha256": "8b8831879bef455ab007ef9d53388d5722b43c04d32d24fe3b16eee59358646d"
         },
         "routes/single-cell.md": {
-          "sha256": "4482f82dc3413e235132effb01a97cce4058f3c727170e7e522a34d49855270c",
-          "worker_sha256": "4482f82dc3413e235132effb01a97cce4058f3c727170e7e522a34d49855270c"
+          "worker_sha256": "4482f82dc3413e235132effb01a97cce4058f3c727170e7e522a34d49855270c",
+          "sha256": "4482f82dc3413e235132effb01a97cce4058f3c727170e7e522a34d49855270c"
         },
         "routes/sqanti.md": {
-          "sha256": "e6f796ddc8a788f773d5d7f405411fd39f73bd48a3c94583a1f0bd80ecfb92e9",
-          "worker_sha256": "e6f796ddc8a788f773d5d7f405411fd39f73bd48a3c94583a1f0bd80ecfb92e9"
+          "worker_sha256": "e6f796ddc8a788f773d5d7f405411fd39f73bd48a3c94583a1f0bd80ecfb92e9",
+          "sha256": "e6f796ddc8a788f773d5d7f405411fd39f73bd48a3c94583a1f0bd80ecfb92e9"
+        },
+        "scripts/dtu.R": {
+          "worker_sha256": "2037f413c987ccc30080b599402c4aedf07e9b99953bed41b1f21a0960a3ce05",
+          "sha256": "2037f413c987ccc30080b599402c4aedf07e9b99953bed41b1f21a0960a3ce05"
         },
         "scripts/longread_splicing_pipeline.sh": {
-          "sha256": "1dd603b00ca64649322a122564d55a7f50b08dea1bce6bb0f3c82540f7dcc8ca",
-          "worker_sha256": "1dd603b00ca64649322a122564d55a7f50b08dea1bce6bb0f3c82540f7dcc8ca"
+          "worker_sha256": "1dd603b00ca64649322a122564d55a7f50b08dea1bce6bb0f3c82540f7dcc8ca",
+          "sha256": "1dd603b00ca64649322a122564d55a7f50b08dea1bce6bb0f3c82540f7dcc8ca"
         }
       },
-      "published_identity": "a4d3e5523ba39c2313dcf0fcc9cbb97b65a8ccb850a416ce10a024ee4663f263",
-      "packaging_text_normalization": "Markdown trailing blank lines reduced to one final newline; scientific code unchanged"
+      "published_identity": "1797e7ebd24a4fd45dce66e11ee96bad071151116dbc00dc0d830a0327871cf9",
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "revision_history": [
+        {
+          "shelf_commit": "214828083b7327cde781548d8bd553549039dc39",
+          "published_identity": "a4d3e5523ba39c2313dcf0fcc9cbb97b65a8ccb850a416ce10a024ee4663f263",
+          "worker_identity": "1f35d476947c2e02de435f4e4d9ffd19dfce1b5b9c19e3cf8743d3c74af5c34b",
+          "reason": "Replace package-only route stubs with task entry points or explicit source-incomplete boundaries"
+        }
+      ]
     },
     {
       "id": "ca-bio-machine-learning-model-validation",
@@ -5230,8 +5338,8 @@
       "upstream_path": "chemoinformatics/molecular-descriptors",
       "status_notes": "skills/ca-bio-molecular-descriptors/STATUS.md",
       "normalization_worker": "gpt-6.1-terra",
-      "worker_identity_before_status_note": "6109be9c14edaa2d48805e9db7e37973228470cca91dd27226270972598565b6",
-      "normalization_summary": "Split fingerprint, 2D property, shape, charge and MinHash workflows; retained provider helper.",
+      "worker_identity_before_status_note": "a96d29abe8878de163cb46e41785d52acb40124b519f1fe3285d96880f3b435d",
+      "normalization_summary": "Split fingerprint, 2D property, shape, charge and MinHash workflows; retained provider helper. Repair: replaced import-only task routes with file-based workflows or a documented unsupported boundary.",
       "known_gaps": [
         "Normalization only; no scientific execution or behavioral audit.",
         "Source MAP4 availability and MHFP/NumPy constraints require current verification if used."
@@ -5244,8 +5352,8 @@
         "fingerprints and bit/count semantics": "routes/fingerprints.md -> references/fingerprints.md",
         "physchem, QED, rule sets": "routes/properties.md -> references/properties.md",
         "3D shape and conformer convergence": "routes/shape.md -> references/shape.md",
-        "partial charge methods": "routes/charges.md -> references/charges.md",
-        "MAP4/MHFP6": "routes/minhash.md -> references/minhash.md",
+        "partial charge methods": "routes/charges.md -> scripts/gasteiger_charges.py, references/charges.md",
+        "MAP4/MHFP6": "routes/minhash.md -> MHFP6 file output, references/minhash.md",
         "common errors": "routes/shape.md -> references/errors.md"
       },
       "reviewed_source_files": [
@@ -5254,12 +5362,13 @@
         "usage-guide.md"
       ],
       "scripts_added_or_changed": [
-        "scripts/calculate_descriptors.py"
+        "scripts/calculate_descriptors.py",
+        "scripts/gasteiger_charges.py"
       ],
       "documentation_sources": [
         "Original provider skill and GPTomics MIT attribution"
       ],
-      "packaging_text_normalization": "Markdown trailing blank lines reduced to one final newline; scientific code unchanged",
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
       "normalized_files": {
         "SKILL.md": {
           "worker_sha256": "0422d1b7192a1356a9cafa86d484176eb2ebb84ecb31ec2a747535ed796cb3a2",
@@ -5294,16 +5403,16 @@
           "sha256": "3ebae1a569c172f5070d615b813212fe372a28e3d034224d05a2f566110c523e"
         },
         "routes/charges.md": {
-          "worker_sha256": "c991fa1c1f839ecab7d6b42b649f4676e56ca3480f9490ee107d2f4b343d5332",
-          "sha256": "c991fa1c1f839ecab7d6b42b649f4676e56ca3480f9490ee107d2f4b343d5332"
+          "worker_sha256": "fcdf4ad160a1678abe3867aa5d1ceb464b326596402a0e2bad6fe42194360395",
+          "sha256": "fcdf4ad160a1678abe3867aa5d1ceb464b326596402a0e2bad6fe42194360395"
         },
         "routes/fingerprints.md": {
           "worker_sha256": "f376d9c0a7da3917635694bc1b825767136d4d3f1411f59b17f79e9e1308eac5",
           "sha256": "f376d9c0a7da3917635694bc1b825767136d4d3f1411f59b17f79e9e1308eac5"
         },
         "routes/minhash.md": {
-          "worker_sha256": "d0f4944d8db76d9c8105c47130ebdca1a4f8350241be8874bfd98edf2164b589",
-          "sha256": "d0f4944d8db76d9c8105c47130ebdca1a4f8350241be8874bfd98edf2164b589"
+          "worker_sha256": "5660dfa80764d348ceac566c0f1d075899eb959cce0b48d88a10cb4d5985dd4f",
+          "sha256": "5660dfa80764d348ceac566c0f1d075899eb959cce0b48d88a10cb4d5985dd4f"
         },
         "routes/properties.md": {
           "worker_sha256": "7f87b0793f1877e71308d57871d46afff0906a995539b3137937f74e99c7e5fd",
@@ -5320,9 +5429,21 @@
         "scripts/calculate_descriptors.py": {
           "worker_sha256": "484764309895cc63029c4e47abae43acbd487bb3e2c3c0deaff398da8ecca8ec",
           "sha256": "484764309895cc63029c4e47abae43acbd487bb3e2c3c0deaff398da8ecca8ec"
+        },
+        "scripts/gasteiger_charges.py": {
+          "worker_sha256": "f1cf9d29017ab7e17084c255c880bb1fd98e7388e2be6347d8f6616d8ec8aced",
+          "sha256": "f1cf9d29017ab7e17084c255c880bb1fd98e7388e2be6347d8f6616d8ec8aced"
         }
       },
-      "published_identity": "66829fe5c0575fecd100841d58c31875b48c891880df0c95b981609216b935dc"
+      "published_identity": "a8fe17de5213950fa83d3a278de0b32c2cd387ab55d146d2ef4f64b115ffd09a",
+      "revision_history": [
+        {
+          "shelf_commit": "214828083b7327cde781548d8bd553549039dc39",
+          "published_identity": "66829fe5c0575fecd100841d58c31875b48c891880df0c95b981609216b935dc",
+          "worker_identity": "6109be9c14edaa2d48805e9db7e37973228470cca91dd27226270972598565b6",
+          "reason": "Replace package-only route stubs with task entry points or explicit source-incomplete boundaries"
+        }
+      ]
     },
     {
       "id": "ca-bio-molecular-io",
@@ -6908,11 +7029,12 @@
       "upstream_path": "alternative-splicing/single-cell-splicing",
       "status_notes": "skills/ca-bio-single-cell-splicing/STATUS.md",
       "normalization_worker": "gpt-6.1-terra",
-      "worker_identity_before_status_note": "0b6e4e00731da1c7c7a80b31101be22e63fa3f721bac03aec3aa737cd5a762ad",
-      "normalization_summary": "Normalized the source into progressively routed instructions and reusable helpers.",
+      "worker_identity_before_status_note": "46ce4271f741393175609ec59401d42944fd348362f839dc7bbca77bee1a353e",
+      "normalization_summary": "Replaced package-only route stubs with file-based task entry points; source-incomplete paths remain explicitly identified.",
       "known_gaps": [
-        "Scientific workflows unexecuted; SpliZ source workflow previously unrun.",
-        "Several routes require adapting source reference snippets rather than an executable file-based wrapper."
+        "All three newly added wrappers are syntax-only and require tooling validation; no scientific workflows executed.",
+        "MARVEL modality and donor-aware group comparisons require adapting the source reference.",
+        "Sierra, BRIE quantification and pseudobulk aggregation retain multi-step reference workflows; SpliZ source workflow was previously unrun."
       ],
       "preflight_warnings": [
         "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
@@ -6920,11 +7042,11 @@
       "license_evidence": "../LICENSE",
       "capability_route_map": {
         "chemistry gate": "routes/chemistry.md",
-        "MARVEL": "routes/marvel.md",
+        "MARVEL": "routes/marvel.md (file-based PSI, input-dependent modality and comparison)",
         "BRIE2": "routes/brie2.md",
-        "scQuint": "routes/scquint.md",
+        "scQuint": "routes/scquint.md (file-based group and intron results)",
         "SpliZ": "routes/spliz.md",
-        "Psix": "routes/psix.md",
+        "Psix": "routes/psix.md (file-based trajectory results)",
         "Sierra APA": "routes/sierra.md",
         "replicate pseudobulk": "routes/pseudobulk.md",
         "long reads": "routes/related.md"
@@ -6942,13 +7064,16 @@
         "usage-guide.md"
       ],
       "scripts_added_or_changed": [
-        "sc_splicing_brie2.py"
+        "sc_splicing_brie2.py",
+        "marvel_psi.R",
+        "psix_trajectory.py",
+        "scquint_groups.py"
       ],
       "documentation_sources": [
         "source skill",
         "PROVENANCE.json GPTomics/bioSkills d91ed3d563019e649dc854c56ccd62551359488a"
       ],
-      "packaging_text_normalization": "Markdown trailing blank lines reduced to one final newline; scientific code unchanged",
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
       "normalized_files": {
         "SKILL.md": {
           "worker_sha256": "85db1b9343aa6579fb3c569b4dbdbd5869e5852c7c38d15af8077e1a3bf681d2",
@@ -6999,24 +7124,24 @@
           "sha256": "93a90d5b417fd75f15bb594041ccfea7c069a1fec244bbbf728151c516595dcf"
         },
         "routes/marvel.md": {
-          "worker_sha256": "98b2879da7d90173fbf2ec14ce99b98f766bfcc52e6fecb1523fcc9978bec65c",
-          "sha256": "98b2879da7d90173fbf2ec14ce99b98f766bfcc52e6fecb1523fcc9978bec65c"
+          "worker_sha256": "e8610b8dc044496cbe834cd8d3771888535895d81791b4e5746eadfdb6b17e13",
+          "sha256": "e8610b8dc044496cbe834cd8d3771888535895d81791b4e5746eadfdb6b17e13"
         },
         "routes/pseudobulk.md": {
           "worker_sha256": "5e69ecaf9ac39ab6e9c7d9194b8daa760d4e67cb916916317a008e4db9ce8cb0",
           "sha256": "5e69ecaf9ac39ab6e9c7d9194b8daa760d4e67cb916916317a008e4db9ce8cb0"
         },
         "routes/psix.md": {
-          "worker_sha256": "c1658b3818c861174b3f4b2b116fc867749bd683b6249bb40e502245d8c2bfc3",
-          "sha256": "c1658b3818c861174b3f4b2b116fc867749bd683b6249bb40e502245d8c2bfc3"
+          "worker_sha256": "32fe7f5799c3b7e94207e6bc1d63be5d4077c125a3499a91d397462f28c5d92f",
+          "sha256": "32fe7f5799c3b7e94207e6bc1d63be5d4077c125a3499a91d397462f28c5d92f"
         },
         "routes/related.md": {
           "worker_sha256": "799777be0d2ce4825167e76e4b8593a41567a1235b7514b60713d42ee12ec9c0",
           "sha256": "799777be0d2ce4825167e76e4b8593a41567a1235b7514b60713d42ee12ec9c0"
         },
         "routes/scquint.md": {
-          "worker_sha256": "38b987fce84ff4a996ca11f445663efa91e7f4c40e355db3e9656fd7aa9f579b",
-          "sha256": "38b987fce84ff4a996ca11f445663efa91e7f4c40e355db3e9656fd7aa9f579b"
+          "worker_sha256": "c4c2d4d52e091f181b72e1e1494c3ea781a23082f1a6063b94e3c9cf046d1cc3",
+          "sha256": "c4c2d4d52e091f181b72e1e1494c3ea781a23082f1a6063b94e3c9cf046d1cc3"
         },
         "routes/sierra.md": {
           "worker_sha256": "77df986236609ff902c1d141a12ffcd47f1e75c1e35ead587ba557580682420d",
@@ -7026,12 +7151,32 @@
           "worker_sha256": "42abfd6aa4fe57374533120ebdf07f094fed7b1419d1fcc5e24eaa776a0a4651",
           "sha256": "42abfd6aa4fe57374533120ebdf07f094fed7b1419d1fcc5e24eaa776a0a4651"
         },
+        "scripts/marvel_psi.R": {
+          "worker_sha256": "a758db34fd7db8895633476dbe3bd58f80ff054870e2d6ce8ee3edf2dfb09226",
+          "sha256": "a758db34fd7db8895633476dbe3bd58f80ff054870e2d6ce8ee3edf2dfb09226"
+        },
+        "scripts/psix_trajectory.py": {
+          "worker_sha256": "502c68f40fc67a6414ddddaea49963343287e117f30cbe9711e1968613ed3612",
+          "sha256": "502c68f40fc67a6414ddddaea49963343287e117f30cbe9711e1968613ed3612"
+        },
+        "scripts/scquint_groups.py": {
+          "worker_sha256": "05f07f3aebd858d5218a1ac0c3cb79dc2d1ff5d562ef093be738049caf38b7d0",
+          "sha256": "05f07f3aebd858d5218a1ac0c3cb79dc2d1ff5d562ef093be738049caf38b7d0"
+        },
         "scripts/sc_splicing_brie2.py": {
           "worker_sha256": "6be4b74486714198c99e10b425299be27bf85648a45f8b43c8d8aaf5bfa21bb6",
           "sha256": "6be4b74486714198c99e10b425299be27bf85648a45f8b43c8d8aaf5bfa21bb6"
         }
       },
-      "published_identity": "309e65bbaeaa3c7c27630b5b27ef9042f0ff35532a3bebbef44e6e9ee391c97e"
+      "published_identity": "fb027ae010770e074147706de686413ad1ac2e5ba195422b55e8df2218a754cf",
+      "revision_history": [
+        {
+          "shelf_commit": "214828083b7327cde781548d8bd553549039dc39",
+          "published_identity": "309e65bbaeaa3c7c27630b5b27ef9042f0ff35532a3bebbef44e6e9ee391c97e",
+          "worker_identity": "0b6e4e00731da1c7c7a80b31101be22e63fa3f721bac03aec3aa737cd5a762ad",
+          "reason": "Replace package-only route stubs with task entry points or explicit source-incomplete boundaries"
+        }
+      ]
     },
     {
       "id": "ca-bio-splice-variant-prediction",

@@ -1,9 +1,9 @@
 # Uncertainty-aware transcript expression
 
-```r
-library(fishpond); library(tximeta)
+```bash
+Rscript scripts/swish_dte.R salmon_quant metadata.tsv dte_results.csv
 ```
 
-Salmon quantifications need Gibbs or bootstrap replicates; use `--numGibbsSamples 20` at quantification. Construct the metadata and run `references/swish.md`; condition must be a factor. This is DTE, not a DTU test.
+Metadata TSV needs unique sample_id and condition. Quantifications need Gibbs or bootstrap replicates; the source uses Salmon --numGibbsSamples 20. This is DTE, not DTU. See `references/swish.md` for interpretation and uncertainty.
 
-Done when transcript effects, q values and inferential uncertainty are reported.
+Done when transcript effects, q values and inferential uncertainty are saved.

@@ -1,9 +1,9 @@
 # scQuint plate junctions
 
-```python
-from scquint.data import load_adata_from_starsolo, add_gene_annotation, group_introns
+```bash
+python scripts/scquint_groups.py Solo.out/SJ/raw annotation.gtf.gz cell_labels.tsv neuron glia scquint
 ```
 
-Use the complete input and analysis sequence in `references/scquint.md`, including its version-specific junction/GTF contig contract and nonempty annotation check. Do not use 10X 3-prime or 5-prime for this route. Report changed sparse-support thresholds.
+The label TSV uses cell ID as its first column and cell_type as a column; select the user's actual groups. The wrapper follows `references/scquint.md` with 10-cell thresholds and writes group and intron tables. The source version expects chr-prefixed junctions and an unprefixed GTF; inspect annotation and report the threshold choice. Do not use 10X 3-prime or 5-prime for this route. Group comparisons need donor-aware interpretation.
 
-Done when supported intron-group results are produced.
+Done when supported intron-group results are produced and replication limitations are reported.

@@ -1,9 +1,9 @@
 # MARVEL plate data
 
-```r
-library(MARVEL)
+```bash
+Rscript scripts/marvel_psi.R annotation.gtf rmats_out star_pass2 cells.rds intron_counts.tsv gene_features.tsv tpm.tsv marvel.rds SE
 ```
 
-Prepare wide junction counts, event tables and metadata and run the workflow in `references/marvel.md`. The RI path requires intron counts, at least two threads and the actual read length. Match contig names. CoverageThreshold 10 is the source example; check support. Group comparisons require donor-aware interpretation.
+The inputs and filenames follow `references/marvel.md`; all five rMATS event tables must exist. The wrapper saves an object with PSI for the requested event class using CoverageThreshold 10. For RI append the actual read length after RI; it uses two threads. Match contig names and check coverage and alignment. Modality and group-comparison code remains input-dependent in the reference; adapt it to real cell labels and interpret comparisons with donor replication.
 
-Done when PSI, alignment checks and requested comparisons are available.
+Done when the requested PSI object and alignment checks are available, and any requested comparisons are reviewed.

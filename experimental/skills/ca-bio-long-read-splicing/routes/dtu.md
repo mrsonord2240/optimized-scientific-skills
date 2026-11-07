@@ -1,9 +1,9 @@
 # Differential transcript usage
 
-```r
-library(DRIMSeq); library(stageR)
+```bash
+Rscript scripts/dtu.R reads_manifest.tsv flair_quantified.counts.tsv results.csv gene_ids_without_underscores
 ```
 
-Use transcript counts and a sample manifest with the pipeline in `references/dtu.md`. The source's FLAIR ID parsing assumes gene IDs contain no underscores; validate mapping for the data. Ambiguous and truncated reads leave assignment uncertainty.
+The no-header manifest has sample_id, condition, batch and reads columns. The required final argument confirms the source workflow's FLAIR ID assumption: gene IDs have no underscores. Validate the mapping before running. Ambiguous and truncated reads leave assignment uncertainty; see `references/dtu.md`.
 
-Done when stage-wise gene and transcript results are reported.
+Done when stage-wise gene and transcript results are saved and interpreted.

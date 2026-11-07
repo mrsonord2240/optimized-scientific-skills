@@ -1,9 +1,5 @@
 # Long-read and single-cell transcript counts
 
-```r
-library(IsoformSwitchAnalyzeR)
-```
+The source describes passing long-read counts directly to IsoformSwitchAnalyzeR importRdata but does not supply a complete file-based count-only workflow; this route requires a custom implementation and validation. The source did not test single-cell count import. For a supplied long-read count workflow use `bio-long-read-splicing`; for single-cell considerations use `bio-single-cell-splicing`. See `references/switch-workflow.md` and `references/interpretation.md`.
 
-For long-read data pass the transcript count matrix and design to importRdata as in `references/switch-workflow.md`. For single-cell data pseudobulk by cell type and consult `references/interpretation.md`; the source did not test single-cell count import.
-
-Done when the requested count-based switch analysis is interpreted with its limitations.
+Done when a validated method has been selected and its limitations recorded.
