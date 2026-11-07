@@ -1,0 +1,8 @@
+# Citations
+
+
+
+- Sayers EW et al. (2024) Database resources of the National Center for Biotechnology Information in 2024. *Nucleic Acids Res* 52:D33-D43.
+- Kans J. (2024) Entrez Direct: E-utilities on the Unix Command Line. NCBI Bookshelf NBK179288.
+- NCBI. EPost help and Usage Guidelines. NBK25499.
+- NCBI Datasets documentation: https://www.ncbi.nlm.nih.gov/datasets/docs/v2/

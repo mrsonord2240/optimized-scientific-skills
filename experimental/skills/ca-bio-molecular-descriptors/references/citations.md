@@ -1,0 +1,25 @@
+## References
+
+- Rogers & Hahn, *J. Chem. Inf. Model.* 50:742-754 (2010) -- ECFP fingerprints. https://doi.org/10.1021/ci100050t
+- Probst & Reymond, *J. Cheminformatics* 10:66 (2018) -- MHFP6 fingerprint. https://doi.org/10.1186/s13321-018-0321-8
+- Capecchi et al., *J. Cheminformatics* 12:43 (2020) -- MAP4 fingerprint. https://doi.org/10.1186/s13321-020-00445-4
+- MAP4, official package -- installation and current Python interface. https://pypi.org/project/map4/
+- OpenFF Recharge, official documentation -- supported charge-model generation and fitting workflows. https://docs.openforcefield.org/projects/recharge/en/stable/
+- AutoDock Vina, official documentation -- Vina/Vinardo charge semantics. https://autodock-vina.readthedocs.io/en/stable/
+- Gardiner et al., *Future Med. Chem.* 3:405-414 (2011) -- scaffold-hopping fingerprint comparison. https://doi.org/10.4155/fmc.11.4
+- Riniker & Landrum, *J. Cheminformatics* 5:26 (2013) -- fingerprint benchmarking. https://doi.org/10.1186/1758-2946-5-26
+- O'Boyle & Sayle, *J. Cheminformatics* 8:36 (2016) -- fingerprint folding and virtual-screening performance. https://doi.org/10.1186/s13321-016-0148-0
+- Wu et al., *Chem. Sci.* 9:513-530 (2018) -- MoleculeNet benchmarks. https://doi.org/10.1039/C7SC02664A
+- Bickerton et al., *Nat. Chem.* 4:90-98 (2012) -- QED weighted drug-likeness. https://doi.org/10.1038/nchem.1243
+- Lipinski et al., *Adv. Drug Deliv. Rev.* 23:3-25 (1997) -- Rule of 5. https://doi.org/10.1016/S0169-409X(96)00423-1
+- Veber et al., *J. Med. Chem.* 45:2615-2623 (2002) -- oral bioavailability criteria. https://doi.org/10.1021/jm020017n
+- Ghose et al., *J. Comb. Chem.* 1:55-68 (1999) -- physicochemical property ranges. https://doi.org/10.1021/cc9800071
+- Egan et al., *J. Med. Chem.* 43:3867-3877 (2000) -- absorption model. https://doi.org/10.1021/jm000292e
+- Muegge et al., *J. Med. Chem.* 44:1841-1846 (2001) -- drug-like property filters. https://doi.org/10.1021/jm015507e
+- Teague et al., *Angew. Chem. Int. Ed.* 38:3743-3748 (1999) -- lead-like libraries. https://doi.org/10.1002/%28SICI%291521-3773%2819991216%2938%3A24%3C3743%3A%3AAID-ANIE3743%3E3.0.CO%3B2-U
+- Congreve et al., *Drug Discov. Today* 8:876-877 (2003) -- Rule of 3. https://doi.org/10.1016/S1359-6446(03)02831-9
+- Lovering et al., *J. Med. Chem.* 52:6752-6756 (2009) -- fraction sp3 and clinical progression. https://doi.org/10.1021/jm901241e
+- Ritchie & Macdonald, *Drug Discov. Today* 14:1011-1020 (2009) -- aromatic ring count and developability. https://doi.org/10.1016/j.drudis.2009.07.014
+- Ertl & Schuffenhauer, *J. Cheminformatics* 1:8 (2009) -- synthetic accessibility score. https://doi.org/10.1186/1758-2946-1-8
+- Wager et al., *ACS Chem. Neurosci.* 1:435-449 (2010) -- CNS multiparameter optimization. https://doi.org/10.1021/cn100008c
+- Doak et al., *Chem. Biol.* 21:1115-1142 (2014) -- orally bioavailable drugs beyond the Rule of 5. https://doi.org/10.1016/j.chembiol.2014.08.013

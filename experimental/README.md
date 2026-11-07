@@ -1,6 +1,6 @@
 # Experimental normalized Skills
 
-This collection contains **60 partially complete `ca-` (context-aware)
+This collection contains **69 partially complete `ca-` (context-aware)
 revisions** of the audited Skills. They use short entry points, task routes,
 scripts, and progressively deeper references. Publication does not certify
 their scientific behavior or confer Marketplace acceptance.
@@ -9,7 +9,7 @@ their scientific behavior or confer Marketplace acceptance.
 | --- | ---: |
 | Historical candidate-ready relay result | 1 |
 | Limited evaluation experiments, not audited | 3 |
-| Normalization only, not audited | 56 |
+| Normalization only, not audited | 65 |
 
 Sam authorized publishing the original 24 drafts and using Terra workers to
 normalize the other 171 Skills already on the optimized shelf. This is
@@ -51,6 +51,12 @@ skills directory and read its status notes before use.
 | [ca-bio-atac-seq-nucleosome-positioning](skills/ca-bio-atac-seq-nucleosome-positioning/STATUS.md) | Normalized only; not audited |
 | [ca-bio-atac-seq-single-cell-atac](skills/ca-bio-atac-seq-single-cell-atac/STATUS.md) | Normalized only; not audited |
 | [ca-bio-bam-statistics](skills/ca-bio-bam-statistics/STATUS.md) | Normalized only; not audited |
+| [ca-bio-batch-downloads](skills/ca-bio-batch-downloads/STATUS.md) | Normalized only; not audited |
+| [ca-bio-biomart-queries](skills/ca-bio-biomart-queries/STATUS.md) | Normalized only; not audited |
+| [ca-bio-blast-searches](skills/ca-bio-blast-searches/STATUS.md) | Normalized only; not audited |
+| [ca-bio-causal-genomics-colocalization-analysis](skills/ca-bio-causal-genomics-colocalization-analysis/STATUS.md) | Normalized only; not audited |
+| [ca-bio-causal-genomics-effector-gene-prioritization](skills/ca-bio-causal-genomics-effector-gene-prioritization/STATUS.md) | Normalized only; not audited |
+| [ca-bio-causal-genomics-fine-mapping](skills/ca-bio-causal-genomics-fine-mapping/STATUS.md) | Normalized only; not audited |
 | [ca-bio-conformer-generation](skills/ca-bio-conformer-generation/STATUS.md) | Normalized only; not audited |
 | [ca-bio-covalent-design](skills/ca-bio-covalent-design/STATUS.md) | Normalized only; not audited |
 | [ca-bio-differential-expression-deseq2-basics](skills/ca-bio-differential-expression-deseq2-basics/STATUS.md) | Evaluation experiment; not audited |
@@ -63,6 +69,9 @@ skills directory and read its status notes before use.
 | [ca-bio-machine-learning-prediction-explanation](skills/ca-bio-machine-learning-prediction-explanation/STATUS.md) | Normalized only; not audited |
 | [ca-bio-microbiome-amplicon-processing](skills/ca-bio-microbiome-amplicon-processing/STATUS.md) | Normalized only; not audited |
 | [ca-bio-microbiome-taxonomy-assignment](skills/ca-bio-microbiome-taxonomy-assignment/STATUS.md) | Normalized only; not audited |
+| [ca-bio-molecular-descriptors](skills/ca-bio-molecular-descriptors/STATUS.md) | Normalized only; not audited |
+| [ca-bio-molecular-io](skills/ca-bio-molecular-io/STATUS.md) | Normalized only; not audited |
+| [ca-bio-molecular-standardization](skills/ca-bio-molecular-standardization/STATUS.md) | Normalized only; not audited |
 | [ca-bio-outlier-splicing-detection](skills/ca-bio-outlier-splicing-detection/STATUS.md) | Normalized only; not audited |
 | [ca-bio-pathway-go-enrichment](skills/ca-bio-pathway-go-enrichment/STATUS.md) | Normalized only; not audited |
 | [ca-bio-pileup-generation](skills/ca-bio-pileup-generation/STATUS.md) | Normalized only; not audited |
