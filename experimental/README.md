@@ -1,5 +1,7 @@
 # Experimental normalized Skills
 
+Project retired on 2026-11-07; no further normalization or audit campaign is active.
+
 This collection contains **195 partially complete `ca-` (context-aware)
 revisions** of the audited Skills. They use short entry points, task routes,
 scripts, and progressively deeper references. Publication does not certify
@@ -11,11 +13,7 @@ their scientific behavior or confer Marketplace acceptance.
 | Limited evaluation experiments, not audited | 3 |
 | Normalization only, not audited | 191 |
 
-Sam authorized publishing the original 24 drafts and using Terra workers to
-normalize the other 171 Skills already on the optimized shelf. This is
-normalization-only work; tool installation and scientific audit are outside
-the resumed scope. Read each Skill's status notes for missing work and known
-issues. The earlier version's audit score does not certify a changed draft.
+Sam ended this effort on 2026-11-07. The [work account](WORK_SUMMARY.md) preserves the normalization history in prose. Detailed worker reports and execution receipts were retired. Source, status notes and the attribution catalog remain; the earlier version's audit score does not certify a changed draft.
 
 The canonical drafts live in optimized-scientific-skills; bioSkills-Improved
 receives matching copies. Each candidate keeps a `ca-` identity. To select a
@@ -221,7 +219,7 @@ skills directory and read its status notes before use.
 | [ca-bio-workflows-scrnaseq-pipeline](skills/ca-bio-workflows-scrnaseq-pipeline/STATUS.md) | Normalized only; not audited |
 
 The [manifest](CANDIDATES.json) records source commits, file hashes, upstream
-paths, capability coverage and status. GPTomics/bioSkills supplied the original
+paths, capability coverage and historical status. GPTomics/bioSkills supplied the original
 scientific Skills under the repository [MIT license](../LICENSE).
 The two historical DESeq2 pointer edits remain unapplied to the published
 collection and are preserved in the

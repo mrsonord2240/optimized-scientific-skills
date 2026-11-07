@@ -37,36 +37,12 @@
       "bytes": 1350
     },
     {
-      "path": "pipeline/evaluation/history/EVAL_PLAN.md",
-      "source_root": "evals",
-      "source_path": "EVAL_PLAN.md",
-      "source_sha256": "db7b1496213da28125c498e651811ad123c0b4a8d7f2974f91a9e1c539fcf6e6",
-      "sha256": "db7b1496213da28125c498e651811ad123c0b4a8d7f2974f91a9e1c539fcf6e6",
-      "bytes": 7171
-    },
-    {
-      "path": "pipeline/evaluation/history/TASK_CANDIDATES.md",
-      "source_root": "evals",
-      "source_path": "TASK_CANDIDATES.md",
-      "source_sha256": "6683d115cdb3894bf693a524e57c00307cccf793a6b50ba04807cca0e0d164af",
-      "sha256": "6683d115cdb3894bf693a524e57c00307cccf793a6b50ba04807cca0e0d164af",
-      "bytes": 9112
-    },
-    {
       "path": "pipeline/evaluation/runner/Dockerfile",
       "source_root": "evals",
       "source_path": "runner/Dockerfile",
       "source_sha256": "3652f83e2babadbbdeb0a9c2be97fcae75a6d0a356df08873c914be084cebe46",
       "sha256": "a0b9439ae1f565d0fae44c324bb34ba738ad1f393e574ceb5cbb7220f26e567b",
       "bytes": 1969
-    },
-    {
-      "path": "pipeline/evaluation/runner/arms/MANIFEST.json",
-      "source_root": "evals",
-      "source_path": "runner/arms/MANIFEST.json",
-      "source_sha256": "0980648f61b01e36b9684d13fd5c76cf2823fa95cb26eb4af232064aca102ffd",
-      "sha256": "0127f4b848ec3a3e05099f29960eee4fdef440033ac2ae5e9fd50f7045da6756",
-      "bytes": 84092
     },
     {
       "path": "pipeline/evaluation/runner/build_arms.py",
@@ -901,10 +877,5 @@
       "bytes": 333
     }
   ],
-  "results": {
-    "count": 263,
-    "path": "pipeline/evaluation/results.jsonl",
-    "sha256": "ca7070fd0cf005b2c74ee2939f07bcf8ee1e06a8dc591af5e1a3a9198b5425af",
-    "source_hashes": "Each JSONL record carries its original result.json hash and source path."
-  }
+  "retention": "Historical source files and provenance only; detailed execution evidence retired at Sam\u2019s request on 2026-11-07. See EVIDENCE.md."
 }
