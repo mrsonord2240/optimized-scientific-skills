@@ -5515,6 +5515,272 @@
       "published_identity": "bcea8631f31a81dea48fe472d24047f05e2a18dae1c4814c240de365066ed744"
     },
     {
+      "id": "ca-bio-crispr-screens-combinatorial-screens",
+      "recut_of": "bio-crispr-screens-combinatorial-screens",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-crispr-screens-combinatorial-screens",
+      "upstream_path": "crispr-screens/combinatorial-screens",
+      "status_notes": "skills/ca-bio-crispr-screens-combinatorial-screens/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "c5cc08b477230bb62b87560998ea799ca833fb9cad98ec69354ed7995d1ab728",
+      "normalization_summary": "Split scoring, interaction-model and architecture guidance into routes; retained GPTomics MIT credit and source method caveats.",
+      "known_gaps": [
+        "Library design, counting, Perturb-seq and annotation lack complete source implementations; custom work or canonical sibling skills required.",
+        "Source makes conflicting claims about MLE interaction FDR and formal testing; route flags uncertainty.",
+        "Z-score null and BH interpretation require scientific review; source uses fixed filenames and overwrites duplicate singleton IDs.",
+        "Scientific execution, dependencies and API compatibility unverified.",
+        "Preflight root LICENSE warning: publication manifest must cite repository license evidence."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "GI scoring and BH": "routes/gi.md",
+        "MAGeCK interaction MLE": "routes/mle.md",
+        "Big Papi, Cas12a, Inzolia and perturb-seq selection": "routes/architecture.md",
+        "paralog interpretation, thresholds and failure modes": "references/architecture.md",
+        "references": "references/citations.md"
+      },
+      "reviewed_source_files": [
+        "SKILL.md",
+        "usage-guide.md",
+        "examples/gi_scoring.py"
+      ],
+      "scripts_added_or_changed": [],
+      "documentation_sources": [
+        "GPTomics source skill and citations; no API upgrades."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "1d5bf6557120aa6492b75464a96c444cf90a4531a988343d552132a8c25caa4b",
+          "sha256": "1d5bf6557120aa6492b75464a96c444cf90a4531a988343d552132a8c25caa4b"
+        },
+        "references/architecture.md": {
+          "worker_sha256": "26ad68de15b884b5be9993bd0f90cf8305f096116358c4b0a593e55a52462586",
+          "sha256": "26ad68de15b884b5be9993bd0f90cf8305f096116358c4b0a593e55a52462586"
+        },
+        "references/citations.md": {
+          "worker_sha256": "5146c9020b63f75c7884640673b9f224e9f0d6c3a5820535b3aa48e3060eb4e8",
+          "sha256": "5146c9020b63f75c7884640673b9f224e9f0d6c3a5820535b3aa48e3060eb4e8"
+        },
+        "references/mle.md": {
+          "worker_sha256": "405b2ace37adbda3a3deb599bc434475808c21f119a4650cb7508f9f319aee9f",
+          "sha256": "405b2ace37adbda3a3deb599bc434475808c21f119a4650cb7508f9f319aee9f"
+        },
+        "references/scoring.md": {
+          "worker_sha256": "c88ce4e6c679426414af036c4545cbb6cd20a3720d410bdcce7c1a0ea50566a5",
+          "sha256": "c88ce4e6c679426414af036c4545cbb6cd20a3720d410bdcce7c1a0ea50566a5"
+        },
+        "routes/architecture.md": {
+          "worker_sha256": "d287c5b5d0c9c08c09a5c5364f66cb11b3d969f296d20f7279ab49a9a75a36b9",
+          "sha256": "d287c5b5d0c9c08c09a5c5364f66cb11b3d969f296d20f7279ab49a9a75a36b9"
+        },
+        "routes/gi.md": {
+          "worker_sha256": "57f5e93fce84926c8d6320ccc05a814fdd703403fe9644fc1f7b83940cc7436f",
+          "sha256": "57f5e93fce84926c8d6320ccc05a814fdd703403fe9644fc1f7b83940cc7436f"
+        },
+        "routes/mle.md": {
+          "worker_sha256": "9e1effc06bce3c0c2d1aa6ffe61783daef009de68bb712e2393ea646eadf1f86",
+          "sha256": "9e1effc06bce3c0c2d1aa6ffe61783daef009de68bb712e2393ea646eadf1f86"
+        },
+        "scripts/gi_scoring.py": {
+          "worker_sha256": "bd17a08e082b13998e970d845bd1082bf19fb3b90da75ee9b046a5c2f1bb530e",
+          "sha256": "bd17a08e082b13998e970d845bd1082bf19fb3b90da75ee9b046a5c2f1bb530e"
+        }
+      },
+      "published_identity": "48cf20992f894ed978de22b79a169dd71e3d703dd25fc8eb786507b77629433b"
+    },
+    {
+      "id": "ca-bio-crispr-screens-copy-number-correction",
+      "recut_of": "bio-crispr-screens-copy-number-correction",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-crispr-screens-copy-number-correction",
+      "upstream_path": "crispr-screens/copy-number-correction",
+      "status_notes": "skills/ca-bio-crispr-screens-copy-number-correction/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "e85617c9c195a5f86501130c272d51ba4c77d3b739d52172019219cda1807b53",
+      "normalization_summary": "Split diagnostic, CRISPRcleanR and panel methods; extracted diagnostic CLI, retained source example and GPTomics MIT credit.",
+      "known_gaps": [
+        "Chronos and CERES lack complete file-based pipelines.",
+        "CRISPRcleanR example uses KY annotation and does not export the downstream TSV named in comments.",
+        "Source broadly calls all amplified essential hits false positives; independent validation is required.",
+        "Methods, dependencies and API compatibility were not executed or verified.",
+        "Root LICENSE preflight warning: publication manifest must cite repository license evidence."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "Spearman and focal amplified versus diploid diagnostic": "routes/diagnose.md",
+        "CRISPRcleanR pre-hoc correction": "routes/cleanr.md",
+        "Chronos and CERES": "routes/panel.md",
+        "mechanism, modalities, thresholds and failure modes": "references/methods.md",
+        "citations": "references/citations.md"
+      },
+      "reviewed_source_files": [
+        "SKILL.md",
+        "usage-guide.md",
+        "examples/run_crispr_cleanr.R"
+      ],
+      "scripts_added_or_changed": [
+        "scripts/detect_cn_bias.py"
+      ],
+      "documentation_sources": [
+        "GPTomics source and included citations; no API upgrades."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "faba607648cc096f804da12e1454ab47e7fc6a4cfc034173bf80865abd954473",
+          "sha256": "faba607648cc096f804da12e1454ab47e7fc6a4cfc034173bf80865abd954473"
+        },
+        "references/citations.md": {
+          "worker_sha256": "4b105efa06ae7617f0a49360dd4021e52d9a3ac4162a31a9f65a2129eab4be52",
+          "sha256": "4b105efa06ae7617f0a49360dd4021e52d9a3ac4162a31a9f65a2129eab4be52"
+        },
+        "references/diagnostic.md": {
+          "worker_sha256": "3bd6023aecce27ea13ec27957fa63a796908b490fdfb812ae160b7d3488c51fe",
+          "sha256": "3bd6023aecce27ea13ec27957fa63a796908b490fdfb812ae160b7d3488c51fe"
+        },
+        "references/methods.md": {
+          "worker_sha256": "bb1ec1bb88d175b363589f7ca372ffc37684496d9062bd908832b2a5921c6347",
+          "sha256": "bb1ec1bb88d175b363589f7ca372ffc37684496d9062bd908832b2a5921c6347"
+        },
+        "references/panel.md": {
+          "worker_sha256": "24afa6b7d486f9f5ea5bce80b38b4dbebe8d86d3e3f956290ddcd550c8370d25",
+          "sha256": "24afa6b7d486f9f5ea5bce80b38b4dbebe8d86d3e3f956290ddcd550c8370d25"
+        },
+        "routes/cleanr.md": {
+          "worker_sha256": "e15ae4b1a32827e0ec9055b9d9edf84f8f2e0a654a32abed2c70aa7c8b22c469",
+          "sha256": "e15ae4b1a32827e0ec9055b9d9edf84f8f2e0a654a32abed2c70aa7c8b22c469"
+        },
+        "routes/diagnose.md": {
+          "worker_sha256": "eb6b75a77e98118cf625dd6bda1eec7cfc844abcb649dde415add3689993ef97",
+          "sha256": "eb6b75a77e98118cf625dd6bda1eec7cfc844abcb649dde415add3689993ef97"
+        },
+        "routes/panel.md": {
+          "worker_sha256": "69002193e7c0ff47efff1c5304145144d509f829e3ee148709b1a6ac94964e2a",
+          "sha256": "69002193e7c0ff47efff1c5304145144d509f829e3ee148709b1a6ac94964e2a"
+        },
+        "scripts/detect_cn_bias.py": {
+          "worker_sha256": "0de614aa729355869150cea016364fdd06e2218b4701cceace93226917ecbc40",
+          "sha256": "0de614aa729355869150cea016364fdd06e2218b4701cceace93226917ecbc40"
+        },
+        "scripts/run_crispr_cleanr.R": {
+          "worker_sha256": "ee80f9e8d16c168b982d1c5c54fa44a4772dbd3e4f371bad59ce97df49ff4f05",
+          "sha256": "ee80f9e8d16c168b982d1c5c54fa44a4772dbd3e4f371bad59ce97df49ff4f05"
+        }
+      },
+      "published_identity": "c33bb2b3760c5683c48b2baf2567ec2c2c49716d747152c96822e337cfb656ba"
+    },
+    {
+      "id": "ca-bio-crispr-screens-crispresso-editing",
+      "recut_of": "bio-crispr-screens-crispresso-editing",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-crispr-screens-crispresso-editing",
+      "upstream_path": "crispr-screens/crispresso-editing",
+      "status_notes": "skills/ca-bio-crispr-screens-crispresso-editing/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "19ea167d0bdd3b812a064b2c0c20e33682f5a9737ef6e5b701e709ad3fd20002",
+      "normalization_summary": "Split single, base/prime, multiple-mode and result workflows; preserved scripts, reference guidance and GPTomics MIT credit.",
+      "known_gaps": [
+        "Source gives inconsistent base-editing window center suggestions; verify coordinates and installed-version semantics.",
+        "Source editing thresholds are conventions and require context-specific interpretation.",
+        "Parser divides by input reads, which must be nonzero; example shell contains fixed sequences.",
+        "CRISPResso APIs, version, outputs and scientific workflows not executed or verified.",
+        "Root LICENSE warning: publication manifest must cite repository license evidence."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "single amplicon indels and HDR": "routes/single.md",
+        "CBE, ABE and prime editing": "routes/editors.md and editor references",
+        "batch, pooled and WGS": "routes/multiple.md",
+        "parse and pairwise compare": "routes/results.md",
+        "window, alignment, byproducts and limitations": "references/interpretation.md",
+        "citations": "references/citations.md"
+      },
+      "reviewed_source_files": [
+        "SKILL.md",
+        "usage-guide.md",
+        "examples/crispresso_analysis.sh",
+        "references/base-editor.md",
+        "references/batch-pooled-wgs.md",
+        "references/prime-editor.md",
+        "scripts/parse_crispresso.py"
+      ],
+      "scripts_added_or_changed": [],
+      "documentation_sources": [
+        "GPTomics source and included references; no API upgrades."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "f6db6391069fdf022c69209587e7ee77584b802ad5ccb49434f76fcea7cf0542",
+          "sha256": "f6db6391069fdf022c69209587e7ee77584b802ad5ccb49434f76fcea7cf0542"
+        },
+        "references/base-editor.md": {
+          "worker_sha256": "69466f991114d43f41d1dbf514b735e6d7999ac063e577697e6da2ce4b376b70",
+          "sha256": "69466f991114d43f41d1dbf514b735e6d7999ac063e577697e6da2ce4b376b70"
+        },
+        "references/batch-pooled-wgs.md": {
+          "worker_sha256": "a4e946ccc62ce2fd374617d193f386248ffbcdd3ec751e6e64cf1485aa95024b",
+          "sha256": "a4e946ccc62ce2fd374617d193f386248ffbcdd3ec751e6e64cf1485aa95024b"
+        },
+        "references/citations.md": {
+          "worker_sha256": "1823ae70e6be1cb68bba57bed6859816aeec2dc8fb9a10eb2007a214fe18ea16",
+          "sha256": "1823ae70e6be1cb68bba57bed6859816aeec2dc8fb9a10eb2007a214fe18ea16"
+        },
+        "references/interpretation.md": {
+          "worker_sha256": "144ac5f179cd305ebf3e8b44dc1835746b2b2e0b7ee2c1462084d496169eb8f7",
+          "sha256": "144ac5f179cd305ebf3e8b44dc1835746b2b2e0b7ee2c1462084d496169eb8f7"
+        },
+        "references/prime-editor.md": {
+          "worker_sha256": "fdcce4959adddc6ddbb693c513d6e696f4bfd79f9f2f7e4c1bed234193da7c0d",
+          "sha256": "fdcce4959adddc6ddbb693c513d6e696f4bfd79f9f2f7e4c1bed234193da7c0d"
+        },
+        "routes/editors.md": {
+          "worker_sha256": "ae17d754a01b45f78a0a4e797fd26a2615600ba79f8f547b2ffe93a5b1ec76cb",
+          "sha256": "ae17d754a01b45f78a0a4e797fd26a2615600ba79f8f547b2ffe93a5b1ec76cb"
+        },
+        "routes/multiple.md": {
+          "worker_sha256": "9d78bc6bb86607ff932611b9cf3616b9fb29633c8e444b54445d9a0158714f39",
+          "sha256": "9d78bc6bb86607ff932611b9cf3616b9fb29633c8e444b54445d9a0158714f39"
+        },
+        "routes/results.md": {
+          "worker_sha256": "e4f9203e0a5c9049b05b6f4e10baa5ef38c1e7e07fb310178ed7e60fdb64ba25",
+          "sha256": "e4f9203e0a5c9049b05b6f4e10baa5ef38c1e7e07fb310178ed7e60fdb64ba25"
+        },
+        "routes/single.md": {
+          "worker_sha256": "12dabefa6608dcc92cb255f7e0f3f9990659a4c853ed3561067f52add2e519f8",
+          "sha256": "12dabefa6608dcc92cb255f7e0f3f9990659a4c853ed3561067f52add2e519f8"
+        },
+        "scripts/crispresso_analysis.sh": {
+          "worker_sha256": "fcb73f597a6f4a860ffb27ba150185b3be2c9dcfe1c277b249163d8383b23e8d",
+          "sha256": "fcb73f597a6f4a860ffb27ba150185b3be2c9dcfe1c277b249163d8383b23e8d"
+        },
+        "scripts/parse_crispresso.py": {
+          "worker_sha256": "3bcfd0fe65333061d80bb977f122f51b728fc832a6daf115186b4fe3ad41fa9c",
+          "sha256": "3bcfd0fe65333061d80bb977f122f51b728fc832a6daf115186b4fe3ad41fa9c"
+        }
+      },
+      "published_identity": "7618c4dc35b318cf2f1c72509b2b86d3fe23d7761f4e85b217971a6b68067fb9"
+    },
+    {
       "id": "ca-bio-differential-expression-deseq2-basics",
       "recut_of": "bio-differential-expression-deseq2-basics",
       "status": "evaluation-experiment-not-audited",
@@ -10870,7 +11136,7 @@
     "source_scope": 195,
     "existing_drafts": 24,
     "remaining_skills_requested": 171,
-    "new_drafts_published": 82,
+    "new_drafts_published": 85,
     "phase": "normalization only",
     "scientific_execution": "not performed for these new drafts"
   }

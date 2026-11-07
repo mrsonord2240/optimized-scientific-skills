@@ -1,0 +1,3 @@
+# Select architecture and review design
+**Source-incomplete:** Selecting Big Papi, Cas12a in4mer or Inzolia and designing libraries require annotation and custom work; the source provides guidance rather than a complete file-based library-design implementation. Preserve singleton controls and inspect editing efficiency, coverage and recombination. See [architecture and limitations](../references/architecture.md) and canonical bio-crispr-screens-library-design and bio-crispr-screens-screen-qc.
+Done when architecture and required controls are documented; use [GI scoring](gi.md) when suitable inputs exist.

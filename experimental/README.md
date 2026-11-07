@@ -1,6 +1,6 @@
 # Experimental normalized Skills
 
-This collection contains **106 partially complete `ca-` (context-aware)
+This collection contains **109 partially complete `ca-` (context-aware)
 revisions** of the audited Skills. They use short entry points, task routes,
 scripts, and progressively deeper references. Publication does not certify
 their scientific behavior or confer Marketplace acceptance.
@@ -9,7 +9,7 @@ their scientific behavior or confer Marketplace acceptance.
 | --- | ---: |
 | Historical candidate-ready relay result | 1 |
 | Limited evaluation experiments, not audited | 3 |
-| Normalization only, not audited | 102 |
+| Normalization only, not audited | 105 |
 
 Sam authorized publishing the original 24 drafts and using Terra workers to
 normalize the other 171 Skills already on the optimized shelf. This is
@@ -75,6 +75,9 @@ skills directory and read its status notes before use.
 | [ca-bio-crispr-screens-bagel-essentiality](skills/ca-bio-crispr-screens-bagel-essentiality/STATUS.md) | Normalized only; not audited |
 | [ca-bio-crispr-screens-base-editing-analysis](skills/ca-bio-crispr-screens-base-editing-analysis/STATUS.md) | Normalized only; not audited |
 | [ca-bio-crispr-screens-batch-correction](skills/ca-bio-crispr-screens-batch-correction/STATUS.md) | Normalized only; not audited |
+| [ca-bio-crispr-screens-combinatorial-screens](skills/ca-bio-crispr-screens-combinatorial-screens/STATUS.md) | Normalized only; not audited |
+| [ca-bio-crispr-screens-copy-number-correction](skills/ca-bio-crispr-screens-copy-number-correction/STATUS.md) | Normalized only; not audited |
+| [ca-bio-crispr-screens-crispresso-editing](skills/ca-bio-crispr-screens-crispresso-editing/STATUS.md) | Normalized only; not audited |
 | [ca-bio-differential-expression-deseq2-basics](skills/ca-bio-differential-expression-deseq2-basics/STATUS.md) | Evaluation experiment; not audited |
 | [ca-bio-differential-splicing](skills/ca-bio-differential-splicing/STATUS.md) | Normalized only; not audited |
 | [ca-bio-duplicate-handling](skills/ca-bio-duplicate-handling/STATUS.md) | Normalized only; not audited |
