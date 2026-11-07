@@ -41,6 +41,7 @@ F:\OpenScience\archives\2026-11-07-bioskills-closeout\
 | `shelf-readme-before-closeout.md` | The pre-existing README edit, including its 195-Skill count correction | Original working copy |
 | `records-untracked-validate.bats` | The pre-existing untracked records test, kept outside the closeout commit | Original working copy |
 | `handoff-before-closeout.md` | The former canonical handoff, retained as history | Original working copy |
+| `environment-cleanup/` | Package metadata, recovered container outputs, exact removal plans, and completion receipts from the subsequent environment teardown | See [ENVIRONMENT_CLEANUP.md](ENVIRONMENT_CLEANUP.md) |
 
 The four main archive checksums are also committed in
 [local-archives.json](local-archives.json). Git verified all three bundles;
@@ -56,16 +57,24 @@ copy on the same drive, not an off-machine backup.
 
 ## Material retained in place
 
-The large `F:\OpenScience` audit trees, environments, datasets, fix evidence,
-raw outputs, and caches were **not deleted or fully duplicated**. The Git
-bundles preserve the published reports and saved scripts, not all those raw
-working files. Some raw audit paths contain WSL links that Windows cannot
-resolve; use the original `science` WSL environment if those paths are needed.
+The initial closeout preserved the large working trees in place. Sam then
+authorized removal of the audit environments. Installed Python, Conda, and R
+packages, selected scientific containers/images, and Linux package caches were
+removed after their metadata and unique container outputs were preserved.
+The exact scope and storage outcome are in
+[ENVIRONMENT_CLEANUP.md](ENVIRONMENT_CLEANUP.md).
+
+The large `F:\OpenScience` datasets, fix evidence, raw outputs, scripts, and
+original repositories remain in place and were **not fully duplicated**. The
+Git bundles preserve published reports and saved scripts, not every raw working
+file. Some audit paths contain WSL links that Windows cannot resolve. The
+`science` WSL distribution is retained, but its removed audit environments must
+be rebuilt before rerunning their tools.
 
 Do not delete `F:\OpenScience`, `F:\Bio-Evals`, the original repositories, or
-their environments on the assumption that this compact package contains every
-raw file. This closeout performs no disk reclamation. Machine-specific
-settings and unrelated working changes are left in their original checkouts.
+the WSL distribution on the assumption that this compact package contains every
+raw file. Machine-specific settings and unrelated working changes remain in
+their original checkouts.
 
 ## Recovery
 

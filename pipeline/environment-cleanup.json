@@ -1,0 +1,222 @@
+{
+  "recorded_on": "2026-11-07",
+  "authorization": "Sam requested removal of audit environments after the BioSkills preservation closeout.",
+  "archive_root": "F:\\OpenScience\\archives\\2026-11-07-bioskills-closeout",
+  "original_archives_reverified": [
+    "audit-records.bundle",
+    "optimized-shelf-pre-closeout.bundle",
+    "bioskills-compatibility.bundle",
+    "evaluation-evidence.zip",
+    "workspace-notes.zip",
+    "optimized-shelf-closeout.bundle"
+  ],
+  "windows": {
+    "root": "F:\\OpenScience\\audit-envs",
+    "python_environments": 46,
+    "R_libraries": 19,
+    "conda_environments": 1,
+    "removed_components": 235,
+    "protected_nodes_checked": 254,
+    "failures": 0,
+    "missing_protected_nodes": 0,
+    "observed_free_bytes_increase_during_removal": 74178236416
+  },
+  "linux": {
+    "distribution": "science",
+    "final_state": "Stopped",
+    "conda_environments": 114,
+    "R_library": "/home/sci/R-lib (recognized packages only)",
+    "removed_components": 1529,
+    "environment_free_bytes_increase": 127301742592,
+    "package_cache_entries_removed": 9038,
+    "package_cache_free_bytes_increase": 91628728320,
+    "failures": 0,
+    "retained_general_environment": "/home/sci/micromamba/envs/pdf-render-poppler",
+    "retained_extras": [
+      "/home/sci/micromamba/envs/atac-dl-tf/lib64",
+      "/home/sci/micromamba/envs/atac-sc/LICENSE",
+      "/home/sci/micromamba/envs/bio-atac-seq-motif-deviation-dc2/LICENSE",
+      "/home/sci/micromamba/envs/bio-atac-seq-motif-deviation-py/LICENSE",
+      "/home/sci/micromamba/envs/dlatac-tf/lib64",
+      "/home/sci/R-lib/RcppArmadillo"
+    ],
+    "trim_succeeded": true,
+    "compaction": {
+      "path": "F:\\WSL\\science\\ext4.vhdx",
+      "bytes_before": 275840499712,
+      "status": "not_compacted",
+      "reason": "You do not have the required permission to complete this task. Contact the administrator of the authorization policy for the computer 'THELAIR'.",
+      "error_id": "Unspecified,Microsoft.Vhd.PowerShell.Cmdlets.OptimizeVhd",
+      "bytes_after": 275840499712
+    }
+  },
+  "docker": {
+    "removed_containers": [
+      {
+        "name": "/ccr2",
+        "id": "a9e15cbcc53c80f3450a19aae028c6f9f602a295209d423189dd16d5f759fdff"
+      },
+      {
+        "name": "/ccr3",
+        "id": "2c60eb1d3e488fd511612981c30cae8b2fc47b9a330394317dee45048273e56d"
+      }
+    ],
+    "removed_images": [
+      {
+        "name": "bioeval-env:latest",
+        "id": "sha256:300d12d7c5a19a833f12a47cc65d35fb80f46f4f80192c9f393770630b7c2f54"
+      },
+      {
+        "name": "vaca-audit:1",
+        "id": "sha256:1186606c8b586157a3248cbd89dc9f99505d57d6395e23e6007edf59ac8a0d0f"
+      },
+      {
+        "name": "pinellolab/crispresso2:latest",
+        "id": "sha256:b35aed09bec0d9e0c82830cc0801abaff106691cce52a1e15b6ffc879f8e33ab"
+      },
+      {
+        "name": "bioconductor/bioconductor_docker:RELEASE_3_21",
+        "id": "sha256:359702d482e70e343d2a436731b7c6deffd1ec184a1f1700de5d64b0c97cacba"
+      }
+    ],
+    "retained_running_services": [
+      "gbrain-llm-shim",
+      "gbrain-litellm-proxy"
+    ],
+    "physical_host_space_reclaimed": "not measured"
+  },
+  "preservation_archives": [
+    {
+      "file": "environment-cleanup/windows-environment-metadata.zip",
+      "files": 9442,
+      "bytes": 51159734,
+      "sha256": "0f206b3edeeede6cbd18d563349fe9dbfd92a99ac4d8c71a6991261c2a406d6f",
+      "manifest": "environment-cleanup/windows-metadata-files.json",
+      "manifest_sha256": "5df85df7df0e93c4595f399776265e8f0624d7455b977cecdacaac5e68ca8ca6",
+      "verified": "Every ZIP member read back with CRC and SHA-256 checks; complete manifest coverage"
+    },
+    {
+      "file": "environment-cleanup/linux-environment-metadata.zip",
+      "files": 42766,
+      "bytes": 343767094,
+      "sha256": "d24fe8e26f3d28cd0201742ae9448b345f461d140e8672e12113c6c1c4bc37d0",
+      "manifest": "environment-cleanup/linux-metadata-files.json",
+      "manifest_sha256": "ed30920296e1bfd30bc07a6f1770ce3273b1483b3bdb7993e2836c2c3e25a643",
+      "verified": "Every ZIP member read back with CRC and SHA-256 checks; complete manifest coverage"
+    },
+    {
+      "file": "environment-cleanup/ccr3-evidence.zip",
+      "files": 15,
+      "bytes": 14339530,
+      "sha256": "1f7226bc16fd6b4b110727fbc5d4850372a00ae6484e1185ba145d8650d8e389",
+      "manifest": "environment-cleanup/ccr3-evidence-files.json",
+      "manifest_sha256": "68817dfad3aaaaf30d3a56b832f3263dcf11f00dbe2eae2bca145b76d555c389",
+      "verified": "Every ZIP member read back with CRC and SHA-256 checks; complete manifest coverage"
+    }
+  ],
+  "local_evidence": [
+    {
+      "file": "environment-cleanup/windows-removal-plan.json",
+      "bytes": 72003,
+      "sha256": "348afcd9957da2bf367bb785ad83667bd85946616fb9286c4a9c06fa29b511ad"
+    },
+    {
+      "file": "environment-cleanup/windows-removal-receipt.json",
+      "bytes": 52061,
+      "sha256": "602a923aefce53badfb0d66497b1b8558bf1212261fc5866eb764abc28fd85f9"
+    },
+    {
+      "file": "environment-cleanup/windows-removal-journal.jsonl",
+      "bytes": 65078,
+      "sha256": "2cf62815faba9843b5e4882db68036e93574c3ec9bf3a945d4c1483e7dd7fc9f"
+    },
+    {
+      "file": "environment-cleanup/windows-empty-prefixes-removed.json",
+      "bytes": 2144,
+      "sha256": "5e785e7e16d68e4a54801bf4545c1979bda704ff3cb6b7901c04d275eed0e015"
+    },
+    {
+      "file": "environment-cleanup/linux-removal-plan.json",
+      "bytes": 265771,
+      "sha256": "1bc05ec4d07e89688f3652750a2a0205b40c88009bb7c05ad7246e41d42147de"
+    },
+    {
+      "file": "environment-cleanup/linux-removal-receipt.json",
+      "bytes": 91638,
+      "sha256": "b5a124c352ddd85790ee1b7783bf43e501b6a61566c4833e830711dafd307ba8"
+    },
+    {
+      "file": "environment-cleanup/linux-removal-journal.jsonl",
+      "bytes": 166553,
+      "sha256": "90be80842a5360ed6a4eec0ed2b2aa5be068940ef75d619946f5323af37191e1"
+    },
+    {
+      "file": "environment-cleanup/package-cache-removal-plan.json",
+      "bytes": 1502778,
+      "sha256": "36a122da78b7e9a2f390a591d00edd7d878887b56904ba1dd74ca28430cd3752"
+    },
+    {
+      "file": "environment-cleanup/package-cache-removal-receipt.json",
+      "bytes": 367,
+      "sha256": "1e18f49333fecc9a262bcc34437abc1382f12d7ba0e8f09c839a24c35b5976d8"
+    },
+    {
+      "file": "environment-cleanup/package-cache-removal-journal.jsonl",
+      "bytes": 1217155,
+      "sha256": "257bce922869fbd89f8b37e86b097dbced217bc9d4bf08bd62900d1c8cc01b83"
+    },
+    {
+      "file": "environment-cleanup/docker-containers.json",
+      "bytes": 1796,
+      "sha256": "2447cb4d0dde8532cc2228cf9fe5f798eb5e89fab89762689951edf71d18242b"
+    },
+    {
+      "file": "environment-cleanup/docker-images.json",
+      "bytes": 19553,
+      "sha256": "2456106974e9adc2ce2ad1cfe5766faf56b377276232b9f49b3247317eec9ea2"
+    },
+    {
+      "file": "environment-cleanup/docker-removal-receipt.json",
+      "bytes": 1459,
+      "sha256": "5169d9d2e7ae995140068ca6ed6ae8787635780dbc83c45866f6a6c67ebba838"
+    },
+    {
+      "file": "environment-cleanup/ccr2-container.log",
+      "bytes": 5464,
+      "sha256": "1b139d419a810196f0e4acadc84509182590053993ceed88d47699a1d3dc95b4"
+    },
+    {
+      "file": "environment-cleanup/ccr3-container.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "environment-cleanup/linux-trim.json",
+      "bytes": 98,
+      "sha256": "5203ead412104373bc03ec989ec401e19349b425f5efc36c6c500279562ef531"
+    },
+    {
+      "file": "environment-cleanup/compaction-receipt.json",
+      "bytes": 409,
+      "sha256": "d76c85d247762b49ad6a0948c2fc88b902dfe1ab480955be650e293670be0c3b"
+    },
+    {
+      "file": "environment-cleanup/wsl-final-state.txt",
+      "bytes": 72,
+      "sha256": "cc6b329db5d654313d2ac8954a61a886d0b4e627ab950c4b21f9af0d754baf00"
+    }
+  ],
+  "retained_material": [
+    "Scientific Skills, process Skills, evaluation records, original repositories and closeout archives",
+    "Raw data, source, logs, fix evidence, standalone tools and unclassified leftovers",
+    "Original F:\\Bio-Evals workspace",
+    "science WSL distribution, base installation, /home/sci evidence and agent configuration",
+    "Other Docker services, images and volumes"
+  ],
+  "limits": [
+    "Package metadata supports reconstruction but is not a binary snapshot.",
+    "Archives are local on the same drive; raw working trees are not fully duplicated.",
+    "Internal Linux free space has not yet been returned to F: because virtual-disk compaction lacked permission.",
+    "Native free-space delta is measured during removal, before later metadata copies; Docker reclamation is not inferred."
+  ]
+}

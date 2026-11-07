@@ -14,6 +14,7 @@ Marketplace submission queue.
 | [EVALUATION.md](EVALUATION.md) | What the evaluation actually tested, results, limits, and reproduction steps |
 | [evaluation/](evaluation/) | Historical harness, synthetic task definitions/generators/solvers, and saved result records |
 | [EVIDENCE.md](EVIDENCE.md) | Pinned audit records, experimental recuts, and local preservation archives |
+| [ENVIRONMENT_CLEANUP.md](ENVIRONMENT_CLEANUP.md) | Removed audit installations, preserved metadata, and disk reclamation limits |
 | [MANIFEST.json](MANIFEST.json) | Source revisions and SHA-256 identities of the preserved source files |
 | [LICENSE](LICENSE), [NOTICE](NOTICE) | Process/evaluation attribution and third-party license boundaries |
 
