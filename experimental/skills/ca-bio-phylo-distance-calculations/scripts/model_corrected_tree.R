@@ -1,0 +1,15 @@
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) < 2 || length(args) > 3) stop('Usage: Rscript model_corrected_tree.R alignment.fasta tree.nwk [bootstrap_reps]')
+library(ape)
+library(phangorn)
+aln <- read.dna(args[1], format = 'fasta')
+aln_phy <- phyDat(aln, type = 'DNA')
+fit <- optim.pml(pml(nj(dist.dna(aln, model = 'JC69')), aln_phy, k = 4), optGamma = TRUE, model = 'GTR', rearrangement = 'none')
+alpha <- fit$shape
+method <- function(x) fastme.bal(dist.dna(x, model = 'TN93', gamma = alpha), nni = TRUE, spr = TRUE)
+tree <- method(aln)
+B <- if (length(args) == 3) as.integer(args[3]) else 100L
+set.seed(42)
+tree$node.label <- boot.phylo(tree, as.matrix(aln), method, B = B, quiet = TRUE)
+write.tree(tree, args[2])
+cat('gamma shape:', alpha, ' bootstrap replicates:', B, '\n')

@@ -1,0 +1,3 @@
+# Interpretation and alternatives
+Pseudotime is an ordering, not elapsed time. A static snapshot does not identify a unique dynamic process; root choice, graph construction, sampling gaps and biological context can change the answer. Palantir, Slingshot, Monocle3 and tradeSeq need study-specific roots, topology and compatible inputs; source examples and limitations are in [methods](../references/methods.md). Treat fate probabilities and velocity arrows as predictions and corroborate with time-resolved or lineage evidence.
+Related shelf skills: bio-single-cell-clustering, bio-single-cell-preprocessing and bio-single-cell-lineage-tracing.

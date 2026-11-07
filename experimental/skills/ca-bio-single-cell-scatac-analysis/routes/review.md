@@ -1,0 +1,3 @@
+# QC, peaks and alternatives
+Choose QC thresholds from the dataset and annotation rather than copying examples. Zeros are ambiguous; fragment counts retain information, and gene activity is an imperfect cluster-level proxy for expression. Consensus peaks and differential accessibility require careful attention to peak-selection circularity and independent replicates. The source describes Signac fragment loading, ArchR, SnapATAC2, AMULET and multimodal workflows in [methods](../references/methods.md); their inputs and APIs require adaptation. Check all reference builds and preserve raw fragments and counts.
+Related shelf skills: bio-single-cell-preprocessing, bio-single-cell-clustering and bio-single-cell-doublet-detection.

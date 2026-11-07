@@ -9953,6 +9953,245 @@
       "published_identity": "9ce51ac31d40e40784c6a1dabae23bd1b3118c5a3b1263d02e2097abfdbb9ae1"
     },
     {
+      "id": "ca-bio-metabolomics-statistical-analysis",
+      "recut_of": "bio-metabolomics-statistical-analysis",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-metabolomics-statistical-analysis",
+      "upstream_path": "metabolomics/statistical-analysis",
+      "status_notes": "skills/ca-bio-metabolomics-statistical-analysis/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "24c127b1073542340f6580715a3e44c1609043f5e4fb59f7821be66d2f033dd4",
+      "normalization_summary": "Intent routes, file-based Welch wrapper and retained PCA/model examples.",
+      "known_gaps": [
+        "No computations or scientific runs executed.",
+        "Differential wrapper omits features with fewer than three observations per group; CI, paired, covariate and mixed models require adaptation.",
+        "Supervised model demonstration is synthetic and not full external validation.",
+        "No source LICENSE file; repository license evidence required."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "PCA scaling and T2": "routes/pca.md",
+        "Welch and BH univariate": "routes/differential.md",
+        "PLS/OPLS permutation and validation": "routes/models.md",
+        "multiplicity, scaling and design": "references/interpretation.md"
+      },
+      "reviewed_source_files": [
+        "SKILL.md",
+        "usage-guide.md",
+        "examples\\metabolomics_differential.py",
+        "examples\\metabolomics_stats.R",
+        "scripts\\pca_hotelling.R"
+      ],
+      "scripts_added_or_changed": [
+        "scripts/differential_csv.py added",
+        "source scripts and examples copied"
+      ],
+      "documentation_sources": [
+        "Source citations only; no live docs consulted"
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "ff0679a793525056ab6ea0f10a02fc8dbd934a7d3fe352c25447debfed2edbb5",
+          "sha256": "ff0679a793525056ab6ea0f10a02fc8dbd934a7d3fe352c25447debfed2edbb5"
+        },
+        "examples/metabolomics_differential.py": {
+          "worker_sha256": "425df5284d2bb6e39b740216953ffd31406f8f73c906a87eae07d1559405e583",
+          "sha256": "425df5284d2bb6e39b740216953ffd31406f8f73c906a87eae07d1559405e583"
+        },
+        "examples/metabolomics_stats.R": {
+          "worker_sha256": "69e8a36d1fa6264f51cafd40921ced47dc535db47bf9f6af1343aaf9300722f6",
+          "sha256": "69e8a36d1fa6264f51cafd40921ced47dc535db47bf9f6af1343aaf9300722f6"
+        },
+        "references/citations.md": {
+          "worker_sha256": "7c23823844df60e4e7717b635d7f5216ad604d9783c32064b87262a5dbea4ed1",
+          "sha256": "7c23823844df60e4e7717b635d7f5216ad604d9783c32064b87262a5dbea4ed1"
+        },
+        "references/interpretation.md": {
+          "worker_sha256": "ac771226932d8e926115dcf0d7e304489bfbb050d2687ed2dedf5efbc7d06447",
+          "sha256": "ac771226932d8e926115dcf0d7e304489bfbb050d2687ed2dedf5efbc7d06447"
+        },
+        "routes/differential.md": {
+          "worker_sha256": "1122093a6d2f7fbb8230359e0ddf1795dac6b4e01f4bd18c9d80d715d67549b6",
+          "sha256": "1122093a6d2f7fbb8230359e0ddf1795dac6b4e01f4bd18c9d80d715d67549b6"
+        },
+        "routes/models.md": {
+          "worker_sha256": "c743f31241c1318e6fa13d6a8bda0a047b3c61394bc3ee7473241045944fcd15",
+          "sha256": "c743f31241c1318e6fa13d6a8bda0a047b3c61394bc3ee7473241045944fcd15"
+        },
+        "routes/pca.md": {
+          "worker_sha256": "c4854d71e32df8f1058440599a2f9362f7a5a2349db36ab67b02865de7ae4f69",
+          "sha256": "c4854d71e32df8f1058440599a2f9362f7a5a2349db36ab67b02865de7ae4f69"
+        },
+        "scripts/differential_csv.py": {
+          "worker_sha256": "b0a6ea1f7adffa453132425ea578c861a3cb8f0f6ae41187cf58635618a0f413",
+          "sha256": "b0a6ea1f7adffa453132425ea578c861a3cb8f0f6ae41187cf58635618a0f413"
+        },
+        "scripts/pca_hotelling.R": {
+          "worker_sha256": "d882cb3f0bc7cf590a930f303afd26f20c2f6db9b18b5aa33bf6d0ae493ca4f1",
+          "sha256": "d882cb3f0bc7cf590a930f303afd26f20c2f6db9b18b5aa33bf6d0ae493ca4f1"
+        }
+      },
+      "published_identity": "c5a353dd122ae2eaea27d7c72fd7471886fffadc66d94bc3748893435bbb3aa6"
+    },
+    {
+      "id": "ca-bio-metabolomics-targeted-analysis",
+      "recut_of": "bio-metabolomics-targeted-analysis",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-metabolomics-targeted-analysis",
+      "upstream_path": "metabolomics/targeted-analysis",
+      "status_notes": "skills/ca-bio-metabolomics-targeted-analysis/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "9477e3ce1d189ee46315c2bdab046605cf4c5170e07e66392c887accd1a29ea9",
+      "normalization_summary": "Intent routes with source file-based quality checks and synthetic calibration demonstration.",
+      "known_gaps": [
+        "No computations or scientific workflows executed.",
+        "Calibration example is synthetic and LLOQ accuracy-only; source LOD formula mixes raw area with ratio slope and is explicitly flagged.",
+        "Scripts do not establish full assay validation or clinical fitness.",
+        "No source LICENSE file; repository license evidence required."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "calibration, weighting, LLOQ and ion ratios": "routes/calibration.md",
+        "precision, matrix factor, recovery, carryover": "routes/quality.md",
+        "standards, reporting and validation limits": "references/limitations.md"
+      },
+      "reviewed_source_files": [
+        "SKILL.md",
+        "usage-guide.md",
+        "examples\\targeted_quantification.R",
+        "scripts\\matrix_recovery_carryover.R",
+        "scripts\\precision_nested_anova.R"
+      ],
+      "scripts_added_or_changed": [
+        "source scripts and example copied"
+      ],
+      "documentation_sources": [
+        "Source citations only; no live docs consulted"
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "56f9e70cbb10d03413f742cb418d888929c3dcb3341e4dc0ba510ea3ed1fcd74",
+          "sha256": "56f9e70cbb10d03413f742cb418d888929c3dcb3341e4dc0ba510ea3ed1fcd74"
+        },
+        "examples/targeted_quantification.R": {
+          "worker_sha256": "3ceb57ab1f8c21630a2e32d07172cd44be7f0a1ca5f7991cee238096d11ab906",
+          "sha256": "3ceb57ab1f8c21630a2e32d07172cd44be7f0a1ca5f7991cee238096d11ab906"
+        },
+        "references/citations.md": {
+          "worker_sha256": "a9afcf73509c803b03be13152491a472c2c54a4c0c4a0c2fbe74ea3b63a61f8e",
+          "sha256": "a9afcf73509c803b03be13152491a472c2c54a4c0c4a0c2fbe74ea3b63a61f8e"
+        },
+        "references/limitations.md": {
+          "worker_sha256": "67209a7f727ae0771c30058aafb5196250bfd3defd1cccfb78471bee455b58ad",
+          "sha256": "67209a7f727ae0771c30058aafb5196250bfd3defd1cccfb78471bee455b58ad"
+        },
+        "routes/calibration.md": {
+          "worker_sha256": "cd9a24dab7363992c52ef205e19a843eb2aee982310477972126164dd6af4af2",
+          "sha256": "cd9a24dab7363992c52ef205e19a843eb2aee982310477972126164dd6af4af2"
+        },
+        "routes/quality.md": {
+          "worker_sha256": "d665028c7648551a4bb3d6600ff8ee7f4e7e479d42b9ebc368b0c520661a9cfa",
+          "sha256": "d665028c7648551a4bb3d6600ff8ee7f4e7e479d42b9ebc368b0c520661a9cfa"
+        },
+        "scripts/matrix_recovery_carryover.R": {
+          "worker_sha256": "7e5c8bdafe497f791ce34eacab71520c0a4151636684bfce417213d847838298",
+          "sha256": "7e5c8bdafe497f791ce34eacab71520c0a4151636684bfce417213d847838298"
+        },
+        "scripts/precision_nested_anova.R": {
+          "worker_sha256": "fe4e4c8e60acdc12e0765610fe9191e0a0170b503bb77df9fe4a7b68659a8901",
+          "sha256": "fe4e4c8e60acdc12e0765610fe9191e0a0170b503bb77df9fe4a7b68659a8901"
+        }
+      },
+      "published_identity": "415cd0581652029124da6b92831f0cdfe52cee0d81b3620ae8e1e0137f7da4df"
+    },
+    {
+      "id": "ca-bio-metabolomics-xcms-preprocessing",
+      "recut_of": "bio-metabolomics-xcms-preprocessing",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-metabolomics-xcms-preprocessing",
+      "upstream_path": "metabolomics/xcms-preprocessing",
+      "status_notes": "skills/ca-bio-metabolomics-xcms-preprocessing/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "1cbf0fe3fad147cbc4086c460f88f70715225be317f4d8c2175099a0b9c1ccb8",
+      "normalization_summary": "Intent routes and metadata-file workflow preserving source example parameters and both filled and unfilled matrices.",
+      "known_gaps": [
+        "No computations or scientific workflows executed.",
+        "Wrapper requires adapting broad-HPLC example parameters; per-feature filled fraction not calculated, saved object supports further inspection.",
+        "CAMERA, QC filters and alternate peak detection need adaptation.",
+        "No source LICENSE file; repository license evidence required."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "centWave, obiwarp, grouping and fill": "routes/workflow.md",
+        "matched filter, QC anchored alignment and CAMERA": "routes/review.md and references/parameters.md",
+        "gap-fill and QC caveats": "routes/review.md and references/parameters.md"
+      },
+      "reviewed_source_files": [
+        "SKILL.md",
+        "usage-guide.md",
+        "examples\\xcms_workflow.R"
+      ],
+      "scripts_added_or_changed": [
+        "scripts/process_files.R added",
+        "source example copied"
+      ],
+      "documentation_sources": [
+        "Source citations only; no live docs consulted"
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "64b0deebcbc9bb9b98efdbabe0fe474f4d7a5a9554208dee5bfdfefb316cf03f",
+          "sha256": "64b0deebcbc9bb9b98efdbabe0fe474f4d7a5a9554208dee5bfdfefb316cf03f"
+        },
+        "examples/xcms_workflow.R": {
+          "worker_sha256": "56aba757c21dd65699b1da793d36a1ee048224a59605284910741f6b9725500c",
+          "sha256": "56aba757c21dd65699b1da793d36a1ee048224a59605284910741f6b9725500c"
+        },
+        "references/citations.md": {
+          "worker_sha256": "6f10031a0534ab11ad92467cd13dd9dcd59bbe9177d0d899fabc76f771a5f5ce",
+          "sha256": "6f10031a0534ab11ad92467cd13dd9dcd59bbe9177d0d899fabc76f771a5f5ce"
+        },
+        "references/parameters.md": {
+          "worker_sha256": "b1e67d8c543b4495c5d446bc923d6ddb81f6667d3e6141c6054689f852815e6a",
+          "sha256": "b1e67d8c543b4495c5d446bc923d6ddb81f6667d3e6141c6054689f852815e6a"
+        },
+        "routes/review.md": {
+          "worker_sha256": "f3fbfdad524a3ae11a96238fad08f8f1daf6b5777c97deb42859d21ce08b49ca",
+          "sha256": "f3fbfdad524a3ae11a96238fad08f8f1daf6b5777c97deb42859d21ce08b49ca"
+        },
+        "routes/workflow.md": {
+          "worker_sha256": "d2a33da0119cead7ebb28c8e75aad9de9dce0f6b590e7b70836e72f8a1bdb68b",
+          "sha256": "d2a33da0119cead7ebb28c8e75aad9de9dce0f6b590e7b70836e72f8a1bdb68b"
+        },
+        "scripts/process_files.R": {
+          "worker_sha256": "7c046786aaf54609d9ca91f75bbc56f01140c5bc62cedfb6139c14d70f8c497c",
+          "sha256": "7c046786aaf54609d9ca91f75bbc56f01140c5bc62cedfb6139c14d70f8c497c"
+        }
+      },
+      "published_identity": "e70416d62d3ac6183ec07bfd25c9d52b7679dbb6645ac4560dfc630d5d06b681"
+    },
+    {
       "id": "ca-bio-microbiome-amplicon-processing",
       "recut_of": "bio-microbiome-amplicon-processing",
       "status": "normalized-only-not-audited",
@@ -10884,6 +11123,275 @@
         }
       },
       "published_identity": "180fae7997948957b1afda00567ae0efd1c36d38f7c67a9a381eeb2b5ccd435a"
+    },
+    {
+      "id": "ca-bio-phylo-bayesian-inference",
+      "recut_of": "bio-phylo-bayesian-inference",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-phylo-bayesian-inference",
+      "upstream_path": "phylogenetics/bayesian-inference",
+      "status_notes": "skills/ca-bio-phylo-bayesian-inference/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "553a9c7cafb14c2212ebca8145fbe630b5614172a8acdb83b5fb1609b477f20d",
+      "normalization_summary": "Split configured inference, scalar/topology convergence, stepping-stone comparison and CAT chain diagnostics; retained source script and GPTomics MIT attribution.",
+      "known_gaps": [
+        "RevBayes models and BEAST XML require bespoke preparation.",
+        "No tree inference, simulations, calculations or installations performed.",
+        "Root LICENSE warning: publication manifest must cite repository license evidence.",
+        "Original scalar helper returned PSRF 1 for zero within-chain variance even when constant chains differed; candidate now rejects the undefined PSRF and requires inspection."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "MrBayes and BEAST configuration": "routes/inference.md and references/model-comparison.md",
+        "scalar and topology diagnostics": "routes/convergence.md",
+        "stepping-stone model comparison": "routes/models.md",
+        "PhyloBayes CAT chain diagnostics": "routes/cat.md",
+        "priors, failure modes and support caveats": "references/methods.md"
+      },
+      "reviewed_source_files": [
+        "SKILL.md",
+        "usage-guide.md",
+        "examples/bayesian_convergence.py"
+      ],
+      "scripts_added_or_changed": [
+        "scripts/bayesian_convergence.py: reject undefined PSRF when within-chain variance is zero"
+      ],
+      "documentation_sources": [
+        "GPTomics source and included citations; no API upgrades."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "591e1be6326ceb20e1f9d80525278e3a9573ef80f01f4a589eab49b0d31e5517",
+          "sha256": "591e1be6326ceb20e1f9d80525278e3a9573ef80f01f4a589eab49b0d31e5517"
+        },
+        "references/citations.md": {
+          "worker_sha256": "281480f7d5f84a86b584a94eb8600f120ae7ac31c62c1ae031f7893a97339807",
+          "sha256": "281480f7d5f84a86b584a94eb8600f120ae7ac31c62c1ae031f7893a97339807"
+        },
+        "references/methods.md": {
+          "worker_sha256": "505d8587424bedd37a4559a57fdd731630b1ca9bc83e7e77516f762f181a5301",
+          "sha256": "505d8587424bedd37a4559a57fdd731630b1ca9bc83e7e77516f762f181a5301"
+        },
+        "references/model-comparison.md": {
+          "worker_sha256": "383f5dfcc9343e50fc8e9abec80b7e6fe301dcd48cdac035a956938a7c4dafc2",
+          "sha256": "383f5dfcc9343e50fc8e9abec80b7e6fe301dcd48cdac035a956938a7c4dafc2"
+        },
+        "routes/cat.md": {
+          "worker_sha256": "58003f0903b9cd725e6c4543b2abb7e18542a5b37288a94995dfee4911da73a7",
+          "sha256": "58003f0903b9cd725e6c4543b2abb7e18542a5b37288a94995dfee4911da73a7"
+        },
+        "routes/convergence.md": {
+          "worker_sha256": "bb0591b0d42d1287c75ec234469ff6ef10e0a6afeffb0134649f8c1631ba68c6",
+          "sha256": "bb0591b0d42d1287c75ec234469ff6ef10e0a6afeffb0134649f8c1631ba68c6"
+        },
+        "routes/inference.md": {
+          "worker_sha256": "c2a19ec6fa3e957173d3dfacd95db18135e645acc396d45d304bcf99766a1223",
+          "sha256": "c2a19ec6fa3e957173d3dfacd95db18135e645acc396d45d304bcf99766a1223"
+        },
+        "routes/models.md": {
+          "worker_sha256": "6e1246a46d7f35e5c93e58daf5b58405adc9cc99f046414a448ed315f74ba702",
+          "sha256": "6e1246a46d7f35e5c93e58daf5b58405adc9cc99f046414a448ed315f74ba702"
+        },
+        "scripts/bayesian_convergence.py": {
+          "worker_sha256": "1d06ee24cfdb09e97d0ce216ca98a3b6448698714037a76e75f79244111157ea",
+          "sha256": "1d06ee24cfdb09e97d0ce216ca98a3b6448698714037a76e75f79244111157ea"
+        }
+      },
+      "published_identity": "30673e8913bc63d35650982ecdfab92aa2eae4d4285d45bf8a3cbbf0e9bdd4f7"
+    },
+    {
+      "id": "ca-bio-phylo-distance-calculations",
+      "recut_of": "bio-phylo-distance-calculations",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-phylo-distance-calculations",
+      "upstream_path": "phylogenetics/distance-calculations",
+      "status_notes": "skills/ca-bio-phylo-distance-calculations/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "6171fe52bf9b23cce0962427f0bfcc20e9c1570b7463cb8368af34b431d092c3",
+      "normalization_summary": "Extracted source identity NJ, corrected TN93+gamma/FastME, rooted bootstrap and saturation proxy into file-based routes; retained GPTomics MIT attribution.",
+      "known_gaps": [
+        "Bootstrap helper retains gaps unless user preprocesses; identity is uncorrected.",
+        "Saturation proxy is not Xia formal test and requires nonfinite/missing-data review.",
+        "Source broad claims of ML immunity to equal distance matrices are overstatements; model and alignment still matter.",
+        "No inference, simulations, calculations or installations.",
+        "Root LICENSE warning: publication manifest must cite repository license evidence."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "uncorrected identity NJ": "routes/nj.md",
+        "model corrected TN93+gamma FastME": "routes/corrected.md",
+        "rooted identity NJ bootstrap": "routes/bootstrap.md",
+        "ape saturation proxy": "routes/saturation.md",
+        "other distances, UPGMA and BIONJ concepts": "references/methods.md",
+        "synthetic alignment and topology": "reviewed, not copied or run"
+      },
+      "reviewed_source_files": [
+        "SKILL.md",
+        "usage-guide.md",
+        "examples/bootstrap_consensus.py",
+        "examples/build_nj_tree.py",
+        "examples/model_corrected_tree.R",
+        "examples/data/README.txt",
+        "examples/data/sim8.fasta",
+        "examples/data/sim8_true.nwk"
+      ],
+      "scripts_added_or_changed": [
+        "scripts/nj_identity.py",
+        "scripts/model_corrected_tree.R",
+        "scripts/bootstrap_consensus.py",
+        "scripts/saturation.R"
+      ],
+      "documentation_sources": [
+        "GPTomics source and included citations; no API upgrades."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "56e137b631f57201590ff4b22483e9df376da4d09538bb2f32d052ae49c482ca",
+          "sha256": "56e137b631f57201590ff4b22483e9df376da4d09538bb2f32d052ae49c482ca"
+        },
+        "references/citations.md": {
+          "worker_sha256": "cc5e1d3df5d23a958fa1ab59bb7502b8d8e222c2add74dfedc17a4efd5d63a60",
+          "sha256": "cc5e1d3df5d23a958fa1ab59bb7502b8d8e222c2add74dfedc17a4efd5d63a60"
+        },
+        "references/methods.md": {
+          "worker_sha256": "dde0207d3b1c1450cfe367c5442f83122d232a6a2ff22b1ba51e67651961a667",
+          "sha256": "dde0207d3b1c1450cfe367c5442f83122d232a6a2ff22b1ba51e67651961a667"
+        },
+        "routes/bootstrap.md": {
+          "worker_sha256": "9a131044c129e975d99206924efb7662f66aa9c6afad0e53768f7f0bb2bc025d",
+          "sha256": "9a131044c129e975d99206924efb7662f66aa9c6afad0e53768f7f0bb2bc025d"
+        },
+        "routes/corrected.md": {
+          "worker_sha256": "654d3bbfe4d8285d99a722976e9d07591383c01f9e44bcc4ec965ed29c596356",
+          "sha256": "654d3bbfe4d8285d99a722976e9d07591383c01f9e44bcc4ec965ed29c596356"
+        },
+        "routes/nj.md": {
+          "worker_sha256": "db410e97a9977f0815b285e4effb05551b36eaa0ccf7a70dab9b372c17c4051b",
+          "sha256": "db410e97a9977f0815b285e4effb05551b36eaa0ccf7a70dab9b372c17c4051b"
+        },
+        "routes/saturation.md": {
+          "worker_sha256": "34601f48edc645d5d23434eda4a7d9d5d609b32e0be5411c765541c70e59084b",
+          "sha256": "34601f48edc645d5d23434eda4a7d9d5d609b32e0be5411c765541c70e59084b"
+        },
+        "scripts/bootstrap_consensus.py": {
+          "worker_sha256": "5e5a9fa482d10d97f8dcb322026c1917e54dd07be6ad10965ae4ee4aad1c8374",
+          "sha256": "5e5a9fa482d10d97f8dcb322026c1917e54dd07be6ad10965ae4ee4aad1c8374"
+        },
+        "scripts/model_corrected_tree.R": {
+          "worker_sha256": "b943e25b0997d04c76d7e5b33f91ba058c7f72707098da538e15498814849727",
+          "sha256": "b943e25b0997d04c76d7e5b33f91ba058c7f72707098da538e15498814849727"
+        },
+        "scripts/nj_identity.py": {
+          "worker_sha256": "6c97f8770ae0463f5c933f5d978c77d599b6bc579e2943f0469ee9fc637c77da",
+          "sha256": "6c97f8770ae0463f5c933f5d978c77d599b6bc579e2943f0469ee9fc637c77da"
+        },
+        "scripts/saturation.R": {
+          "worker_sha256": "4105365a3c8c0ea751bfdf309bfa8349814677c83245a66c08b5c3b939fdec60",
+          "sha256": "4105365a3c8c0ea751bfdf309bfa8349814677c83245a66c08b5c3b939fdec60"
+        }
+      },
+      "published_identity": "ea9868c20f12e7741dc94fb80ebc47f7de2485b5a78a9cf9b60bdaf483683e0f"
+    },
+    {
+      "id": "ca-bio-phylo-divergence-dating",
+      "recut_of": "bio-phylo-divergence-dating",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-phylo-divergence-dating",
+      "upstream_path": "phylogenetics/divergence-dating",
+      "status_notes": "skills/ca-bio-phylo-divergence-dating/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "fcc7e9f68a2fb0c3d33a87ef7492209532ce992754dd6ccf8887a63e7c6f9ae7",
+      "normalization_summary": "Split calibrated prior/posterior dating, temporal signal and infinite-sites analysis; retained source helpers and GPTomics MIT attribution.",
+      "known_gaps": [
+        "Randomization helper uses fixed filenames and IQ-TREE -redo; use a fresh dedicated directory. It compares point estimates against a randomized range, not CI overlap, and does not check subprocess exit before parsing.",
+        "MCMCTree setup with two inputs immediately runs a full pipeline and uses source default priors; review before use.",
+        "Root-to-tip optimized R-squared is exploratory and does not prove temporal signal.",
+        "No tree inference, simulations, analyses or installations.",
+        "Root LICENSE warning: publication manifest must cite repository license evidence."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "MCMCTree and BEAST prior/posterior": "routes/dating.md and references/methods.md",
+        "root-to-tip and date randomization": "routes/temporal.md",
+        "infinite-sites trend": "routes/infinite.md",
+        "clock, fossil calibration, TreePL/LSD2": "references/methods.md"
+      },
+      "reviewed_source_files": [
+        "SKILL.md",
+        "usage-guide.md",
+        "examples/date_randomization.py",
+        "examples/infinite_sites_plot.py",
+        "examples/mcmctree_setup.py",
+        "examples/root_to_tip.py"
+      ],
+      "scripts_added_or_changed": [],
+      "documentation_sources": [
+        "GPTomics source and included citations; no API upgrades."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "07a8088eaad4814438cb2c81b01e9c726b5a4501a05b301135ebf839806bed6f",
+          "sha256": "07a8088eaad4814438cb2c81b01e9c726b5a4501a05b301135ebf839806bed6f"
+        },
+        "references/citations.md": {
+          "worker_sha256": "050433bf6201a6ab75bf53493b0bf9b2341d058ea2e7a61dd942711216d0cd2c",
+          "sha256": "050433bf6201a6ab75bf53493b0bf9b2341d058ea2e7a61dd942711216d0cd2c"
+        },
+        "references/methods.md": {
+          "worker_sha256": "42f8b15d4b198fe4b876733407a9f35d9665f4994f39591d8dc601031062cdbd",
+          "sha256": "42f8b15d4b198fe4b876733407a9f35d9665f4994f39591d8dc601031062cdbd"
+        },
+        "routes/dating.md": {
+          "worker_sha256": "ec396d0e8c461b3d4453859809ab23c3858c4750f89baaa86c85c2ba2d09acb5",
+          "sha256": "ec396d0e8c461b3d4453859809ab23c3858c4750f89baaa86c85c2ba2d09acb5"
+        },
+        "routes/infinite.md": {
+          "worker_sha256": "6381bd9d59a0f480abc708097bc2584948ff13d40b9fc050aac12dddd23a01b1",
+          "sha256": "6381bd9d59a0f480abc708097bc2584948ff13d40b9fc050aac12dddd23a01b1"
+        },
+        "routes/temporal.md": {
+          "worker_sha256": "e31527c08fa3741e2e2a874167a4cd8b625dd0be6637c463ea38eef06d562de3",
+          "sha256": "e31527c08fa3741e2e2a874167a4cd8b625dd0be6637c463ea38eef06d562de3"
+        },
+        "scripts/date_randomization.py": {
+          "worker_sha256": "ccda9bf6c53db115f75b582318581a30bf072006ace26942d2b9b5c57647d5fe",
+          "sha256": "ccda9bf6c53db115f75b582318581a30bf072006ace26942d2b9b5c57647d5fe"
+        },
+        "scripts/infinite_sites_plot.py": {
+          "worker_sha256": "ea69df7701c587296a844972514f36edaf599cd248f8d4fe6a8066db4c07a940",
+          "sha256": "ea69df7701c587296a844972514f36edaf599cd248f8d4fe6a8066db4c07a940"
+        },
+        "scripts/mcmctree_setup.py": {
+          "worker_sha256": "f19b934dc8b7cf36de1a24b2be006805ec3309992c699b7583bbf318b0a5844d",
+          "sha256": "f19b934dc8b7cf36de1a24b2be006805ec3309992c699b7583bbf318b0a5844d"
+        },
+        "scripts/root_to_tip.py": {
+          "worker_sha256": "728e6fc002ce802a8c0b28c097646e201e8a56a1b0f1cdfdc6b68b8744b0430f",
+          "sha256": "728e6fc002ce802a8c0b28c097646e201e8a56a1b0f1cdfdc6b68b8744b0430f"
+        }
+      },
+      "published_identity": "f0713feb131c34b52bb9b6e8f41177ae6fcc493930370f00a94bc1693cbdf08b"
     },
     {
       "id": "ca-bio-pileup-generation",
@@ -12034,6 +12542,110 @@
         }
       },
       "published_identity": "0e0f84ae59d65763b6088f635ab3edb71462b18ed30d0c0af139fa713181ff5d"
+    },
+    {
+      "id": "ca-bio-proteomics-spectral-libraries",
+      "recut_of": "bio-proteomics-spectral-libraries",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-proteomics-spectral-libraries",
+      "upstream_path": "proteomics/spectral-libraries",
+      "status_notes": "skills/ca-bio-proteomics-spectral-libraries/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "a73991d72463637116422ea3eb148729dbe25a215690cbd270d523c7530cff4c",
+      "normalization_summary": "Split iRT calibration, format conversion, library merging and prediction guidance; extracted source calibration and merge methods into file CLI; retained GPTomics MIT attribution.",
+      "known_gaps": [
+        "Prediction and empirical/chromatogram generation lack complete source file workflows; external APIs unverified.",
+        "OpenSWATH helper uses illustrative 1000/i intensities, not measured or predicted values.",
+        "Linear calibration assumes sufficient valid anchors and is not an automatic nonlinear fit; R-squared alone does not ensure correctness.",
+        "No downloads, predictions, scientific calculations or installations performed.",
+        "Root LICENSE warning: publication manifest must cite repository license evidence."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "linear iRT calibration": "routes/calibrate.md",
+        "Spectronaut conversion and OpenSWATH template": "routes/convert.md",
+        "full-key merge and library QC": "routes/merge.md",
+        "Koina, MS2PIP, DeepLC and empirical library concepts": "routes/predict.md and references/koina-prediction.md",
+        "format/decoy and acquisition caveats": "references/format-conversion.md and references/methods.md"
+      },
+      "reviewed_source_files": [
+        "SKILL.md",
+        "usage-guide.md",
+        "examples/build_library.py",
+        "references/format-conversion.md",
+        "references/koina-prediction.md",
+        "references/library-qc-merge.md",
+        "scripts/build_openswath_tsv.py",
+        "scripts/spectronaut_to_diann.py"
+      ],
+      "scripts_added_or_changed": [
+        "scripts/library_tools.py"
+      ],
+      "documentation_sources": [
+        "GPTomics source and included citations; no API upgrades."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "d2da58eab3e3600669b6ae43ec711e05d075510559ab7e307d989662dbfa31a1",
+          "sha256": "d2da58eab3e3600669b6ae43ec711e05d075510559ab7e307d989662dbfa31a1"
+        },
+        "references/citations.md": {
+          "worker_sha256": "03860da5beda414693bba4d5fa320d4c998088f31bc3078df5cc0030c42df34d",
+          "sha256": "03860da5beda414693bba4d5fa320d4c998088f31bc3078df5cc0030c42df34d"
+        },
+        "references/format-conversion.md": {
+          "worker_sha256": "085d4e7d83f3778d7dd6ea10eaa87fa4ecba17a353be7e5b75ed567eccc0c6d5",
+          "sha256": "085d4e7d83f3778d7dd6ea10eaa87fa4ecba17a353be7e5b75ed567eccc0c6d5"
+        },
+        "references/koina-prediction.md": {
+          "worker_sha256": "ee8dedaf509ae18c9b3f1c0ae284d008f61bb57b802272b9f2df56a6d39c460e",
+          "sha256": "ee8dedaf509ae18c9b3f1c0ae284d008f61bb57b802272b9f2df56a6d39c460e"
+        },
+        "references/library-qc-merge.md": {
+          "worker_sha256": "3a37dbb26e79e4c2345392763d1807d5d9681ba9c1fb4c30d823254b6a15e60b",
+          "sha256": "3a37dbb26e79e4c2345392763d1807d5d9681ba9c1fb4c30d823254b6a15e60b"
+        },
+        "references/methods.md": {
+          "worker_sha256": "8cac75afad9b0aade99b86aa01f072b582e8821fdedd676b8d2b218004922e39",
+          "sha256": "8cac75afad9b0aade99b86aa01f072b582e8821fdedd676b8d2b218004922e39"
+        },
+        "routes/calibrate.md": {
+          "worker_sha256": "6ae3c4f8279f9b0ac51b4042894f3fe1429237a18ef0894b90a69fb88224f844",
+          "sha256": "6ae3c4f8279f9b0ac51b4042894f3fe1429237a18ef0894b90a69fb88224f844"
+        },
+        "routes/convert.md": {
+          "worker_sha256": "f9a2c94ff4c43ab47559411c33213e942ea0fc0512998bd6f359b9a4fc32dd60",
+          "sha256": "f9a2c94ff4c43ab47559411c33213e942ea0fc0512998bd6f359b9a4fc32dd60"
+        },
+        "routes/merge.md": {
+          "worker_sha256": "1b4e9c82663794138ae18a3b2cba86e7f47234b3cc3bd614870d275ee10b611e",
+          "sha256": "1b4e9c82663794138ae18a3b2cba86e7f47234b3cc3bd614870d275ee10b611e"
+        },
+        "routes/predict.md": {
+          "worker_sha256": "88cbdd514aec8dfcf9def9f1e4e8b138bd14c36d6a0e77dba51c32d712090333",
+          "sha256": "88cbdd514aec8dfcf9def9f1e4e8b138bd14c36d6a0e77dba51c32d712090333"
+        },
+        "scripts/build_openswath_tsv.py": {
+          "worker_sha256": "cb85e1cf30c44e497f20fd80c2454878c37846601127a24b02e1b81e0458269e",
+          "sha256": "cb85e1cf30c44e497f20fd80c2454878c37846601127a24b02e1b81e0458269e"
+        },
+        "scripts/library_tools.py": {
+          "worker_sha256": "14993bbf067836a160934d344269e0307de174136af8402f7dc6106629a7d872",
+          "sha256": "14993bbf067836a160934d344269e0307de174136af8402f7dc6106629a7d872"
+        },
+        "scripts/spectronaut_to_diann.py": {
+          "worker_sha256": "427bd3d107502e1b0ecd96378da14c2f9fa2b5f7f1e1ef72cea89afc46b87507",
+          "sha256": "427bd3d107502e1b0ecd96378da14c2f9fa2b5f7f1e1ef72cea89afc46b87507"
+        }
+      },
+      "published_identity": "c756481eeaf9f4353e3db4aa72d330b7ffec565f8746a9a59f01bad1f99f44b7"
     },
     {
       "id": "ca-bio-qsar-modeling",
@@ -13762,6 +14374,78 @@
       "published_identity": "3a0d6087b9a30de9a4c840832d609b954070e1056255c247bede2be30309d155"
     },
     {
+      "id": "ca-bio-single-cell-metabolite-communication",
+      "recut_of": "bio-single-cell-metabolite-communication",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-single-cell-metabolite-communication",
+      "upstream_path": "single-cell/metabolite-communication",
+      "status_notes": "skills/ca-bio-single-cell-metabolite-communication/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "6412753344711b16680e00d7bcdc8335784cae22fb5194092fd8c168ec1a5240",
+      "normalization_summary": "File-based guarded MEBOCOST task and source model/config context; no automatic normalization inferred from matrix maximum.",
+      "known_gaps": [
+        "No scientific analyses, installations, resource downloads or API checks.",
+        "Expression is an indirect proxy and cannot establish metabolite flux or exchange.",
+        "Condition comparison requires independent replicate-aware design; source alternatives need input-specific adaptation.",
+        "Source example config has placeholders requiring local database files.",
+        "Skill-root LICENSE warning: cite repository license in manifest."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "MEBOCOST and permutation FDR": "routes/mebocost.md",
+        "condition comparison, confounds and orthogonal validation": "routes/review.md and references/methods.md",
+        "scFEA, Compass and NeuronChat alternatives": "references/methods.md"
+      },
+      "reviewed_source_files": [
+        "examples/make_synthetic_fixture.py",
+        "examples/mebocost.conf.example",
+        "examples/metabolite_communication.py",
+        "examples/README.md",
+        "SKILL.md",
+        "usage-guide.md"
+      ],
+      "scripts_added_or_changed": [
+        "scripts/mebocost_run.py (added)"
+      ],
+      "documentation_sources": [
+        "Complete original source tree; source API and numerical claims not repeated."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "bafe099e49c57d74c0f3545ede018dd268832bbceba604d467ab23c7003e00e8",
+          "sha256": "bafe099e49c57d74c0f3545ede018dd268832bbceba604d467ab23c7003e00e8"
+        },
+        "references/mebocost.conf.example": {
+          "worker_sha256": "a33f5938bf144c5f83f05f43a79a1b5941d36ffa25576e1c6fb6ea547e75b68b",
+          "sha256": "a33f5938bf144c5f83f05f43a79a1b5941d36ffa25576e1c6fb6ea547e75b68b"
+        },
+        "references/methods.md": {
+          "worker_sha256": "4bb20bbaaff63741e6609cdedc9e824c6a7a7de4e981fde8a733ff8180a25014",
+          "sha256": "4bb20bbaaff63741e6609cdedc9e824c6a7a7de4e981fde8a733ff8180a25014"
+        },
+        "routes/mebocost.md": {
+          "worker_sha256": "1f011b325b3c489a857c20a669844f95439ef098b7734869362d5b3e3455eaa2",
+          "sha256": "1f011b325b3c489a857c20a669844f95439ef098b7734869362d5b3e3455eaa2"
+        },
+        "routes/review.md": {
+          "worker_sha256": "e795b27294ce18795c457a265ef64c745e6a376ee5dae0e2d595915a9db92f43",
+          "sha256": "e795b27294ce18795c457a265ef64c745e6a376ee5dae0e2d595915a9db92f43"
+        },
+        "scripts/mebocost_run.py": {
+          "worker_sha256": "8fc3a2632dfb5396b446767418c66278ee9adf71ab8c0d0fc2a74115632510b6",
+          "sha256": "8fc3a2632dfb5396b446767418c66278ee9adf71ab8c0d0fc2a74115632510b6"
+        }
+      },
+      "published_identity": "08b4b3b52c3652e64092c79c0b24a9db0f4680138ab0dfc76e2f3e0b342e4329"
+    },
+    {
       "id": "ca-bio-single-cell-multimodal-integration",
       "recut_of": "bio-single-cell-multimodal-integration",
       "status": "normalized-only-not-audited",
@@ -13863,6 +14547,82 @@
       }
     },
     {
+      "id": "ca-bio-single-cell-perturb-seq",
+      "recut_of": "bio-single-cell-perturb-seq",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-single-cell-perturb-seq",
+      "upstream_path": "single-cell/perturb-seq",
+      "status_notes": "skills/ca-bio-single-cell-perturb-seq/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "ff9d23842f1399f3961e5eb1a871acad02305f63870f282a7a1d31f74020a9fa",
+      "normalization_summary": "File-based mixture guide assignment and Mixscape workflows for existing data, with source testing and inference context.",
+      "known_gaps": [
+        "No scientific analyses, installations or API checks.",
+        "SCEPTRE source demonstration requires genuine calibration assessment before discovery; no turnkey study-specific workflow provided.",
+        "E-distance testing, pseudobulk and abundance models require study-specific design and adaptation.",
+        "Mixscape densifies sparse input and can require substantial memory; NP does not prove lack of function.",
+        "Skill-root LICENSE warning: cite repository license in manifest."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "guide assignment": "routes/assignment.md",
+        "Mixscape signatures": "routes/mixscape.md",
+        "SCEPTRE, E-distance, pseudobulk, differential abundance and model evaluation": "routes/review.md and references/methods.md"
+      },
+      "reviewed_source_files": [
+        "examples/mixscape_analysis.R",
+        "examples/pertpy_analysis.py",
+        "examples/sceptre_calibration_discovery.R",
+        "SKILL.md",
+        "usage-guide.md"
+      ],
+      "scripts_added_or_changed": [
+        "scripts/assign_guides.py (added)",
+        "scripts/mixscape_run.py (added)"
+      ],
+      "documentation_sources": [
+        "Complete original source tree; source API and numerical claims not independently reverified."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "1cf96dc24e070f74a50dbf198cbf40b627265e7106f0758b5494de3583b5cf19",
+          "sha256": "1cf96dc24e070f74a50dbf198cbf40b627265e7106f0758b5494de3583b5cf19"
+        },
+        "references/methods.md": {
+          "worker_sha256": "951fd1ab851a318c06853cc2c18612b47da3a81d7e9bd3d720db1642c19bca47",
+          "sha256": "951fd1ab851a318c06853cc2c18612b47da3a81d7e9bd3d720db1642c19bca47"
+        },
+        "routes/assignment.md": {
+          "worker_sha256": "c1a2d2d432ee06d4e4eef0ba969a02cc310951a012788f5ef2ff0d6cacf23064",
+          "sha256": "c1a2d2d432ee06d4e4eef0ba969a02cc310951a012788f5ef2ff0d6cacf23064"
+        },
+        "routes/mixscape.md": {
+          "worker_sha256": "2b1fd20d7e5db34f8bdf4af132d695a67e7fc56667a03d3841b979403987bd63",
+          "sha256": "2b1fd20d7e5db34f8bdf4af132d695a67e7fc56667a03d3841b979403987bd63"
+        },
+        "routes/review.md": {
+          "worker_sha256": "16269f9df98b84389a3df3801c368071d0a03cc7291fbf58b12cb8ca37360576",
+          "sha256": "16269f9df98b84389a3df3801c368071d0a03cc7291fbf58b12cb8ca37360576"
+        },
+        "scripts/assign_guides.py": {
+          "worker_sha256": "e44d98d7b1ad8ea33cf18dd9af6722f10f9d19dc1e4d0482ee35a9789a0d4767",
+          "sha256": "e44d98d7b1ad8ea33cf18dd9af6722f10f9d19dc1e4d0482ee35a9789a0d4767"
+        },
+        "scripts/mixscape_run.py": {
+          "worker_sha256": "ebdbd6d11b2a5fbe0ab42db246001bea6fc73788dee836967c15726f51795ca0",
+          "sha256": "ebdbd6d11b2a5fbe0ab42db246001bea6fc73788dee836967c15726f51795ca0"
+        }
+      },
+      "published_identity": "343528ec7620c1ab42ed5060bb9932b3c49c0d96e1f5178e0ee7b2f3f33bf838"
+    },
+    {
       "id": "ca-bio-single-cell-preprocessing",
       "recut_of": "bio-single-cell-preprocessing",
       "status": "normalized-only-not-audited",
@@ -13918,6 +14678,82 @@
           "published_sha256": "74b53da73dd4465433a1723238329200bbfa25f8fa44e931ef31d199b27086e8"
         }
       }
+    },
+    {
+      "id": "ca-bio-single-cell-scatac-analysis",
+      "recut_of": "bio-single-cell-scatac-analysis",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-single-cell-scatac-analysis",
+      "upstream_path": "single-cell/scatac-analysis",
+      "status_notes": "skills/ca-bio-single-cell-scatac-analysis/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "1e84cc0e58d60b41898b3daaa509752621f31ec924d8ce1df7606080da2b5f61",
+      "normalization_summary": "File-based prepared-object LSI and retained chromVAR workflow; source QC, peaks and alternate framework context routed.",
+      "known_gaps": [
+        "No scientific analyses, installations or API checks.",
+        "Prepared-object LSI examines only component 1 automatically; inspect all components and tailor QC.",
+        "chromVAR source helper densifies counts and requires substantial memory; cell-level differential motif results are descriptive without replicate-aware design.",
+        "ArchR, SnapATAC2, peak calling and doublet methods require adapted workflows.",
+        "Skill-root LICENSE warning: cite repository license in manifest."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "TF-IDF, LSI and clustering": "routes/lsi.md",
+        "chromVAR and motif limitations": "routes/motifs.md",
+        "QC, consensus peaks, DA, gene activity, doublets and alternatives": "routes/review.md and references/methods.md"
+      },
+      "reviewed_source_files": [
+        "examples/scatac_workflow.py",
+        "examples/signac_workflow.R",
+        "scripts/run_chromvar.R",
+        "SKILL.md",
+        "usage-guide.md"
+      ],
+      "scripts_added_or_changed": [
+        "scripts/lsi_run.R (added)",
+        "scripts/run_chromvar.R (copied)"
+      ],
+      "documentation_sources": [
+        "Complete original source tree; historical versions and observations not independently reverified."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "f83270beac0f490b470df2b6e603edf25b76065cbd0c5862cdfe51dc0aac45c3",
+          "sha256": "f83270beac0f490b470df2b6e603edf25b76065cbd0c5862cdfe51dc0aac45c3"
+        },
+        "references/methods.md": {
+          "worker_sha256": "9f15274484acfc1bfed6bf2c860a3bfdfc2d273195cef52d6d706fea97383f5d",
+          "sha256": "9f15274484acfc1bfed6bf2c860a3bfdfc2d273195cef52d6d706fea97383f5d"
+        },
+        "routes/lsi.md": {
+          "worker_sha256": "7cfe2fc94359386041808105dbe134b70de7103c80e055b684d75aafd48a686f",
+          "sha256": "7cfe2fc94359386041808105dbe134b70de7103c80e055b684d75aafd48a686f"
+        },
+        "routes/motifs.md": {
+          "worker_sha256": "85af7b26818cb16385d6887942f4a6c1dbaac0de2ea3d7e7a8ec7e9394901997",
+          "sha256": "85af7b26818cb16385d6887942f4a6c1dbaac0de2ea3d7e7a8ec7e9394901997"
+        },
+        "routes/review.md": {
+          "worker_sha256": "ba17f12ca837f4e4fe393e3f0781c831a165e0a00ac96969f7b24ec993093b74",
+          "sha256": "ba17f12ca837f4e4fe393e3f0781c831a165e0a00ac96969f7b24ec993093b74"
+        },
+        "scripts/lsi_run.R": {
+          "worker_sha256": "1628b2f7d33be3ee58eca3a41d04864e9e8dfd8d414eb670960449962c1d0510",
+          "sha256": "1628b2f7d33be3ee58eca3a41d04864e9e8dfd8d414eb670960449962c1d0510"
+        },
+        "scripts/run_chromvar.R": {
+          "worker_sha256": "a7a1bfecc791f55efa29200d49258467e7f93345eb98fbbed91b659cd6142d80",
+          "sha256": "a7a1bfecc791f55efa29200d49258467e7f93345eb98fbbed91b659cd6142d80"
+        }
+      },
+      "published_identity": "e7bcf7dcc7abe508bda786f87fcf453a768ff8acc8d4d5da36ff4fd27b2bd644"
     },
     {
       "id": "ca-bio-single-cell-splicing",
@@ -14078,6 +14914,92 @@
           "reason": "Replace package-only route stubs with task entry points or explicit source-incomplete boundaries"
         }
       ]
+    },
+    {
+      "id": "ca-bio-single-cell-trajectory-inference",
+      "recut_of": "bio-single-cell-trajectory-inference",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-single-cell-trajectory-inference",
+      "upstream_path": "single-cell/trajectory-inference",
+      "status_notes": "skills/ca-bio-single-cell-trajectory-inference/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "fec4630541557f83bfe3944e53c3a76f1da3c7691d97b190286480dcee7c1247",
+      "normalization_summary": "File-based PAGA/DPT and deterministic velocity routes plus retained CellRank script, with topology, root and model caveats.",
+      "known_gaps": [
+        "No trajectory inference, scientific analysis, installation or API checks.",
+        "CellRank output persistence of fate probabilities is version-dependent and must be verified on actual output.",
+        "Palantir, Slingshot, Monocle3, tradeSeq and alternate velocity modes need study-specific adapted workflows.",
+        "PAGA connectivity and velocity confidence are not proof of temporal direction; root and quantifier need orthogonal support.",
+        "Skill-root LICENSE warning: cite repository license in manifest."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "PAGA topology and DPT root": "routes/paga.md",
+        "CellRank directed fate": "routes/cellrank.md",
+        "scVelo deterministic velocity and diagnostics": "routes/velocity.md",
+        "Palantir, Slingshot, Monocle3, tradeSeq and interpretation": "routes/review.md and references/methods.md"
+      },
+      "reviewed_source_files": [
+        "examples/monocle3_trajectory.R",
+        "examples/scvelo_velocity.py",
+        "scripts/cellrank_fate.py",
+        "SKILL.md",
+        "usage-guide.md"
+      ],
+      "scripts_added_or_changed": [
+        "scripts/paga_dpt.py (added)",
+        "scripts/velocity_run.py (added)",
+        "scripts/cellrank_fate.py (copied)"
+      ],
+      "documentation_sources": [
+        "Complete original source tree; historical compatibility and numerical claims not independently reverified."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "fcf480d84f5102d130422fc2bb7b061ec540277142a959e43cb7350685e2b219",
+          "sha256": "fcf480d84f5102d130422fc2bb7b061ec540277142a959e43cb7350685e2b219"
+        },
+        "references/methods.md": {
+          "worker_sha256": "a3b072bd8dc2791d56e37f1010b68a7ca90cebd2c3d0891453b2069975c453ea",
+          "sha256": "a3b072bd8dc2791d56e37f1010b68a7ca90cebd2c3d0891453b2069975c453ea"
+        },
+        "routes/cellrank.md": {
+          "worker_sha256": "c28d4f7f436ecf2225be06c9ee1735379cde7e2474268cc85361ddff14cb66a4",
+          "sha256": "c28d4f7f436ecf2225be06c9ee1735379cde7e2474268cc85361ddff14cb66a4"
+        },
+        "routes/paga.md": {
+          "worker_sha256": "a514a6bb14723b89bd2310e25cec4eda19db939b726cc0dac09ac3b712ee82e7",
+          "sha256": "a514a6bb14723b89bd2310e25cec4eda19db939b726cc0dac09ac3b712ee82e7"
+        },
+        "routes/review.md": {
+          "worker_sha256": "b880b09d0a3e91d375c4f9a31b0a5f0e7475cded746d0ec56983b343392d46e9",
+          "sha256": "b880b09d0a3e91d375c4f9a31b0a5f0e7475cded746d0ec56983b343392d46e9"
+        },
+        "routes/velocity.md": {
+          "worker_sha256": "49744d5e8fa28f6c2d2281bda11695fc788dfc7ef30d10475e1bccdcf1066d8c",
+          "sha256": "49744d5e8fa28f6c2d2281bda11695fc788dfc7ef30d10475e1bccdcf1066d8c"
+        },
+        "scripts/cellrank_fate.py": {
+          "worker_sha256": "00574839e224c9070633afbeb686d4407f842f02748de1bad9e2cad7a4debde2",
+          "sha256": "00574839e224c9070633afbeb686d4407f842f02748de1bad9e2cad7a4debde2"
+        },
+        "scripts/paga_dpt.py": {
+          "worker_sha256": "bb2ad8e2721abcc2314ec441f2849b9019a625d18dba9a3078676b44deb8fa39",
+          "sha256": "bb2ad8e2721abcc2314ec441f2849b9019a625d18dba9a3078676b44deb8fa39"
+        },
+        "scripts/velocity_run.py": {
+          "worker_sha256": "571c562d3c45869067a9618a925e4654fd5d732f034059e3026dd5a1dd965528",
+          "sha256": "571c562d3c45869067a9618a925e4654fd5d732f034059e3026dd5a1dd965528"
+        }
+      },
+      "published_identity": "3db4d4124823470690ddd4750d54760bc19b493336a93c02ff141047a0dd79cb"
     },
     {
       "id": "ca-bio-splice-variant-prediction",
@@ -15271,7 +16193,7 @@
     "source_scope": 195,
     "existing_drafts": 24,
     "remaining_skills_requested": 171,
-    "new_drafts_published": 130,
+    "new_drafts_published": 141,
     "publication_complete": false,
     "phase": "normalization only",
     "scientific_execution": "not performed for these new drafts"

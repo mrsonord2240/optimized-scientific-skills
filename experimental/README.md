@@ -1,6 +1,6 @@
 # Experimental normalized Skills
 
-This collection contains **154 partially complete `ca-` (context-aware)
+This collection contains **165 partially complete `ca-` (context-aware)
 revisions** of the audited Skills. They use short entry points, task routes,
 scripts, and progressively deeper references. Publication does not certify
 their scientific behavior or confer Marketplace acceptance.
@@ -9,7 +9,7 @@ their scientific behavior or confer Marketplace acceptance.
 | --- | ---: |
 | Historical candidate-ready relay result | 1 |
 | Limited evaluation experiments, not audited | 3 |
-| Normalization only, not audited | 150 |
+| Normalization only, not audited | 161 |
 
 Sam authorized publishing the original 24 drafts and using Terra workers to
 normalize the other 171 Skills already on the optimized shelf. This is
@@ -123,6 +123,9 @@ skills directory and read its status notes before use.
 | [ca-bio-metabolomics-msdial-preprocessing](skills/ca-bio-metabolomics-msdial-preprocessing/STATUS.md) | Normalized only; not audited |
 | [ca-bio-metabolomics-normalization-qc](skills/ca-bio-metabolomics-normalization-qc/STATUS.md) | Normalized only; not audited |
 | [ca-bio-metabolomics-pathway-mapping](skills/ca-bio-metabolomics-pathway-mapping/STATUS.md) | Normalized only; not audited |
+| [ca-bio-metabolomics-statistical-analysis](skills/ca-bio-metabolomics-statistical-analysis/STATUS.md) | Normalized only; not audited |
+| [ca-bio-metabolomics-targeted-analysis](skills/ca-bio-metabolomics-targeted-analysis/STATUS.md) | Normalized only; not audited |
+| [ca-bio-metabolomics-xcms-preprocessing](skills/ca-bio-metabolomics-xcms-preprocessing/STATUS.md) | Normalized only; not audited |
 | [ca-bio-microbiome-amplicon-processing](skills/ca-bio-microbiome-amplicon-processing/STATUS.md) | Normalized only; not audited |
 | [ca-bio-microbiome-taxonomy-assignment](skills/ca-bio-microbiome-taxonomy-assignment/STATUS.md) | Normalized only; not audited |
 | [ca-bio-molecular-descriptors](skills/ca-bio-molecular-descriptors/STATUS.md) | Normalized only; not audited |
@@ -133,6 +136,9 @@ skills directory and read its status notes before use.
 | [ca-bio-outlier-splicing-detection](skills/ca-bio-outlier-splicing-detection/STATUS.md) | Normalized only; not audited |
 | [ca-bio-pathway-go-enrichment](skills/ca-bio-pathway-go-enrichment/STATUS.md) | Normalized only; not audited |
 | [ca-bio-pharmacophore-modeling](skills/ca-bio-pharmacophore-modeling/STATUS.md) | Normalized only; not audited |
+| [ca-bio-phylo-bayesian-inference](skills/ca-bio-phylo-bayesian-inference/STATUS.md) | Normalized only; not audited |
+| [ca-bio-phylo-distance-calculations](skills/ca-bio-phylo-distance-calculations/STATUS.md) | Normalized only; not audited |
+| [ca-bio-phylo-divergence-dating](skills/ca-bio-phylo-divergence-dating/STATUS.md) | Normalized only; not audited |
 | [ca-bio-pileup-generation](skills/ca-bio-pileup-generation/STATUS.md) | Normalized only; not audited |
 | [ca-bio-pose-validation](skills/ca-bio-pose-validation/STATUS.md) | Normalized only; not audited |
 | [ca-bio-protac-degraders](skills/ca-bio-protac-degraders/STATUS.md) | Normalized only; not audited |
@@ -144,6 +150,7 @@ skills directory and read its status notes before use.
 | [ca-bio-proteomics-proteomics-qc](skills/ca-bio-proteomics-proteomics-qc/STATUS.md) | Normalized only; not audited |
 | [ca-bio-proteomics-ptm-analysis](skills/ca-bio-proteomics-ptm-analysis/STATUS.md) | Normalized only; not audited |
 | [ca-bio-proteomics-quantification](skills/ca-bio-proteomics-quantification/STATUS.md) | Normalized only; not audited |
+| [ca-bio-proteomics-spectral-libraries](skills/ca-bio-proteomics-spectral-libraries/STATUS.md) | Normalized only; not audited |
 | [ca-bio-qsar-modeling](skills/ca-bio-qsar-modeling/STATUS.md) | Normalized only; not audited |
 | [ca-bio-reference-operations](skills/ca-bio-reference-operations/STATUS.md) | Normalized only; not audited |
 | [ca-bio-remote-homology](skills/ca-bio-remote-homology/STATUS.md) | Normalized only; not audited |
@@ -163,9 +170,13 @@ skills directory and read its status notes before use.
 | [ca-bio-single-cell-hashing-demultiplexing](skills/ca-bio-single-cell-hashing-demultiplexing/STATUS.md) | Normalized only; not audited |
 | [ca-bio-single-cell-lineage-tracing](skills/ca-bio-single-cell-lineage-tracing/STATUS.md) | Normalized only; not audited |
 | [ca-bio-single-cell-markers-annotation](skills/ca-bio-single-cell-markers-annotation/STATUS.md) | Normalized only; not audited |
+| [ca-bio-single-cell-metabolite-communication](skills/ca-bio-single-cell-metabolite-communication/STATUS.md) | Normalized only; not audited |
 | [ca-bio-single-cell-multimodal-integration](skills/ca-bio-single-cell-multimodal-integration/STATUS.md) | Normalized only; not audited |
+| [ca-bio-single-cell-perturb-seq](skills/ca-bio-single-cell-perturb-seq/STATUS.md) | Normalized only; not audited |
 | [ca-bio-single-cell-preprocessing](skills/ca-bio-single-cell-preprocessing/STATUS.md) | Normalized only; not audited |
+| [ca-bio-single-cell-scatac-analysis](skills/ca-bio-single-cell-scatac-analysis/STATUS.md) | Normalized only; not audited |
 | [ca-bio-single-cell-splicing](skills/ca-bio-single-cell-splicing/STATUS.md) | Normalized only; not audited |
+| [ca-bio-single-cell-trajectory-inference](skills/ca-bio-single-cell-trajectory-inference/STATUS.md) | Normalized only; not audited |
 | [ca-bio-splice-variant-prediction](skills/ca-bio-splice-variant-prediction/STATUS.md) | Normalized only; not audited |
 | [ca-bio-splicing-qc](skills/ca-bio-splicing-qc/STATUS.md) | Normalized only; not audited |
 | [ca-bio-splicing-quantification](skills/ca-bio-splicing-quantification/STATUS.md) | Normalized only; not audited |
