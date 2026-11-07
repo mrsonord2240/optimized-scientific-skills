@@ -1,0 +1,3 @@
+# Review existing screen data
+**Source-incomplete:** Sample-level QC and bottleneck interpretation depend on supplied data; the source gives no complete general-purpose analysis program for CRISPR-StAR or a paired barcode workflow. Use canonical bio-crispr-screens-screen-qc and bio-crispr-screens-hit-calling for compatible count and result files. Review guide representation, replicate variability, context-specific reference sets and matched comparison interpretation; see [analysis notes](../references/analysis.md).
+Done when data provenance, quality, missingness and context-specific limitations are documented.

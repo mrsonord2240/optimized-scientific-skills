@@ -1,0 +1,3 @@
+# Planning assumptions
+Use the minimum scientifically meaningful effect, consider dispersion and expression heterogeneity, and distinguish per-feature from marginal power. Observed power calculated from an observed effect adds no independent interpretation of a null result; report effect estimates and uncertainty. Sequencing-depth tradeoffs are study-specific: pilot data and cost constraints matter. [Methods](../references/methods.md) retain source depth conversion, CV examples, ATAC/ChIP/methylation and scRNA-seq caveats.
+Related shelf skills: bio-experimental-design-sample-size, bio-experimental-design-randomization-blocking and bio-experimental-design-batch-design.
