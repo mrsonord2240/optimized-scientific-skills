@@ -78,3 +78,27 @@ returned to F:**. Compaction from an appropriately elevated session remains
 the next storage step; it does not require deleting the distribution.
 
 The cleanup is documented locally and does not publish or push the repository.
+
+## Subsequent C: cache cleanup
+
+Sam separately approved removing `C:\Users\User\.basilisk` and
+`C:\Users\User\.ms2pip`. Both roots were removed after preserving 1,106
+package/model records, including the four downloaded MS2PIP model identities
+and both Basilisk Conda prefixes. The metadata ZIP passed individual member
+SHA-256 checks. No active process, loaded module, scheduled task, or service
+reference to either root was found. Only their two Conda registration entries
+were removed from the user's environment list.
+
+The removed files totaled 4.04 GiB in logical lengths; observed C: free space
+increased by **2.83 GiB**. Logical lengths can double-count hard-linked
+package files, and free-space observations can include other system activity.
+Receipts and metadata are in the local `environment-cleanup/basilisk-ms2pip/`
+directory and indexed in [environment-cleanup.json](environment-cleanup.json).
+
+The standalone Anaconda and Miniconda installations have no named environments
+and no active process, loaded-module, scheduled-task, or service references were
+found. They remain installed pending a decision; Miniconda still has a PATH
+entry. Claude Science's three application environments remain separate from
+these standalone installations. Two older Basilisk prefixes also remain under
+the F: single-cell audit cache, outside this C: deletion scope. The exact
+remaining paths and findings are in local `remaining-conda-review.json`.

@@ -218,5 +218,29 @@
     "Archives are local on the same drive; raw working trees are not fully duplicated.",
     "Internal Linux free space has not yet been returned to F: because virtual-disk compaction lacked permission.",
     "Native free-space delta is measured during removal, before later metadata copies; Docker reclamation is not inferred."
-  ]
+  ],
+  "subsequent_C_cache_cleanup": {
+    "recorded_on": "2026-11-07",
+    "removed": [
+      "C:\\Users\\User\\.basilisk",
+      "C:\\Users\\User\\.ms2pip"
+    ],
+    "removed_conda_prefixes": [
+      "C:\\Users\\User\\.basilisk\\1.18.0\\0",
+      "C:\\Users\\User\\.basilisk\\1.18.0\\MOFA2\\1.16.0\\mofa_env"
+    ],
+    "logical_file_bytes_removed": 4340024417,
+    "observed_C_free_bytes_increase": 3034906624,
+    "metadata_archive": {
+      "file": "environment-cleanup/basilisk-ms2pip/package-and-model-records.zip",
+      "bytes": 3850939,
+      "sha256": "4d10d50808d1bdd6d69ad198cd580251639837aa1fb9cb3eb3ddd336c14b5ca9",
+      "files": 1106,
+      "verified": "Every ZIP member CRC and SHA-256 checked before removal; archive hash checked again afterward"
+    },
+    "removal_receipt": "environment-cleanup/basilisk-ms2pip/removal-receipt.json",
+    "removal_receipt_sha256": "6def6fd341d3aa3482f91f62b8cb46e635c94e7cd7f3ae526d97e1c8a3b21a81",
+    "remaining_conda_review": "environment-cleanup/remaining-conda-review.json",
+    "remaining_conda_review_sha256": "f189ead998cedc858a34f65f246fd146f415a25af540bcfa2649b39f5057eb41"
+  }
 }
