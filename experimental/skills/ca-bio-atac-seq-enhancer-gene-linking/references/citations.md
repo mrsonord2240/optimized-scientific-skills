@@ -1,0 +1,10 @@
+# Literature
+- Fulco CP et al 2019 Nat Genet 51:1664 (ABC; CRISPRi-FlowFISH validation)
+- Nasser J et al 2021 Nature 593:238 (ABC genome-wide application)
+- Gschwind AR et al 2026 "An encyclopedia of human enhancer-gene regulatory interactions" (ENCODE-rE2G v1.0.0; preprint bioRxiv 2023.11.09.563812)
+- Mumbach MR et al 2017 Nat Genet 49:1602 (HiChIP H3K27ac)
+- Bhattacharyya S et al 2019 Nat Commun 10:4221 (FitHiChIP)
+- Boix CA et al 2021 Nature 590:300 (EpiMap)
+- Gasperini M et al 2019 Cell 176:377 (CRISPRi at scale)
+- Schraivogel D et al 2020 Nat Methods 17:629 (TAP-seq enhancer screen, K562)
+- Pliner HA et al 2018 Mol Cell 71:858 (Cicero)

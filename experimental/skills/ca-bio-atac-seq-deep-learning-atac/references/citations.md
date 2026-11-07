@@ -1,0 +1,10 @@
+# Literature
+- Pampari A et al 2024 bioRxiv 2024.12.25.630221 (chromBPNet; preprint)
+- Avsec Z et al 2021 Nat Genet 53:354-366 (BPNet)
+- Avsec Z et al 2021 Nat Methods 18:1196-1203 (Enformer)
+- Linder J et al 2025 Nat Genet (Borzoi; consult the publication for volume/pages)
+- Yuan H & Kelley DR 2022 Nat Methods 19:1088 (scBasset)
+- Shrikumar A et al 2017 ICML (DeepLIFT)
+- Schreiber J 2025 bioRxiv 2025.08.08.669296 (tangermeme)
+- Shrikumar A et al 2018 arXiv:1811.00416 (TF-MoDISco)
+- Kelley DR 2020 PLoS Comput Biol 16:e1008050 (Basenji2)
