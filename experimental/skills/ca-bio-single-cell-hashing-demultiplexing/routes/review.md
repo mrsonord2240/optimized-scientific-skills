@@ -1,0 +1,3 @@
+# Background and alternative approaches
+HTO, genetic and expression-based methods have different detection limits. Ambient tags, weak staining, unequal pooling and failed tags can distort assignments; inspect each tag and avoid interpreting a low doublet fraction alone as success. The source describes MULTIseqDemux, demuxEM, demuxmix and GMM-Demux but their setup and data are method-specific; see [methods](../references/methods.md). Check convergence and complete output rather than assuming that a partial file after an error proves a successful run.
+Related shelf skills: bio-single-cell-doublet-detection, bio-single-cell-preprocessing and bio-single-cell-batch-integration.

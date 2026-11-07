@@ -1,0 +1,3 @@
+# Interpretation and downstream work
+Signature and cell-cycle scores are dataset-relative and need supplied gene panels; avoid automatic regression of genuine cycling biology. For condition DE, aggregate raw integer counts per sample and cell type, then use a donor-aware model. The source's pseudobulk, module-score and PBMC marker patterns are in [methods](../references/methods.md); adapt them to the data. Marker p-values after clustering are descriptive and do not establish that a split is real.
+Related shelf skills: bio-single-cell-clustering, bio-single-cell-cell-annotation and bio-single-cell-differential-abundance.

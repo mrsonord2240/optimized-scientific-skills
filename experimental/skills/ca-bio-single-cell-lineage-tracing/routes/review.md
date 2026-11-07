@@ -1,0 +1,3 @@
+# Assay and solver interpretation
+mtDNA can support clonal grouping but sparse coverage, recurrent sites, NUMTs and selection limit deep tree claims. Startle refinement, indel-prior weighting and raw-read preprocessing require study-specific inputs and version-verified workflows; see [methods](../references/methods.md). Cassiopeia and CoSpar source versions reportedly needed separate environments, and ILP uses a licensed solver; neither dependency is installed or verified by this draft. A lineage tree cannot establish malignancy or treatment need.
+Related shelf skills: bio-single-cell-trajectory-inference, bio-single-cell-preprocessing and bio-single-cell-clustering.

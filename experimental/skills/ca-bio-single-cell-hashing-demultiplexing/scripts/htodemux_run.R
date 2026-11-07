@@ -1,0 +1,8 @@
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) != 3) stop("Usage: Rscript htodemux_run.R input.rds assay output.rds")
+library(Seurat)
+obj <- readRDS(args[1])
+if (!args[2] %in% names(obj@assays)) stop("Missing HTO assay")
+obj <- NormalizeData(obj, assay = args[2], normalization.method = "CLR", margin = 2)
+obj <- HTODemux(obj, assay = args[2], positive.quantile = 0.99)
+saveRDS(obj, args[3])

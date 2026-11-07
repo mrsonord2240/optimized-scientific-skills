@@ -1,0 +1,22 @@
+## References
+
+- Cox J, Hein MY, Luber CA, Paron I, Nagaraj N, Mann M. 2014. Accurate proteome-wide label-free quantification by delayed normalization and maximal peptide ratio extraction, termed MaxLFQ. *Mol Cell Proteomics* 13(9):2513-2526.
+- Silva JC, Gorenstein MV, Li GZ, Vissers JPC, Geromanos SJ. 2006. Absolute quantification of proteins by LCMSE: a virtue of parallel MS acquisition. *Mol Cell Proteomics* 5(1):144-156.
+- Wisniewski JR, Hein MY, Cox J, Mann M. 2014. A "proteomic ruler" for protein copy number and concentration estimation without spike-in standards. *Mol Cell Proteomics* 13(12):3497-3506.
+- Zybailov B, Mosley AL, Sardiu ME, et al. 2006. Statistical analysis of membrane proteome expression changes in Saccharomyces cerevisiae. *J Proteome Res* 5(9):2339-2347.
+- Ong SE, Blagoev B, Kratchmarova I, et al. 2002. Stable isotope labeling by amino acids in cell culture, SILAC, as a simple and accurate approach to expression proteomics. *Mol Cell Proteomics* 1(5):376-386.
+- Ting L, Rad R, Gygi SP, Haas W. 2011. MS3 eliminates ratio distortion in isobaric multiplexed quantitative proteomics. *Nat Methods* 8(11):937-940.
+- McAlister GC, Nusinow DP, Jedrychowski MP, Wuhr M, et al. 2014. MultiNotch MS3 enables accurate, sensitive, and multiplexed detection of differential expression across cancer cell line proteomes. *Anal Chem* 86(14):7150-7158.
+- Savitski MM, Mathieson T, Zinn N, et al. 2013. Measuring and managing ratio compression for accurate iTRAQ/TMT quantification. *J Proteome Res* 12(8):3586-3598.
+- Thompson A, Wolmer N, Koncarevic S, et al. 2019. TMTpro: design, synthesis, and initial evaluation of a proline-based isobaric 16-plex tandem mass tag reagent set. *Anal Chem* 91(24):15941-15950.
+- Plubell DL, Wilmarth PA, Zhao Y, et al. 2017. Extended multiplexing of tandem mass tags (TMT) labeling reveals age and high fat diet specific proteome changes in mouse epididymal adipose tissue. *Mol Cell Proteomics* 16(5):873-890.
+- Choi M, Chang CY, Clough T, et al. 2014. MSstats: an R package for statistical analysis of quantitative mass spectrometry-based proteomic experiments. *Bioinformatics* 30(17):2524-2526.
+- Goeminne LJE, Gevaert K, Clement L. 2016. Peptide-level robust ridge regression improves estimation, sensitivity, and specificity in data-dependent quantitative label-free shotgun proteomics. *Mol Cell Proteomics* 15(2):657-668.
+- Sticker A, Goeminne L, Martens L, Clement L. 2020. Robust summarization and inference in proteome-wide label-free quantification. *Mol Cell Proteomics* 19(7):1209-1219.
+- Demichev V, Messner CB, Vernardis SI, Lilley KS, Ralser M. 2020. DIA-NN: neural networks and interference correction enable deep proteome coverage in high throughput. *Nat Methods* 17(1):41-44.
+- Pham TV, Henneman AA, Jimenez CR. 2020. iq: an R package to estimate relative protein abundances from ion quantification in DIA-MS-based proteomics. *Bioinformatics* 36(8):2611-2613.
+- Ong SE, Mann M. 2006. A practical recipe for stable isotope labeling by amino acids in cell culture (SILAC). *Nat Protoc* 1(6):2650-2660. (Incorporation check and Arg->Pro.)
+- Sowa ME, Bennett EJ, Gygi SP, Harper JW. 2009. Defining the human deubiquitinating enzyme interaction landscape. *Cell* 138(2):389-403. (CompPASS.)
+- Teo G, Liu G, Zhang J, Nesvizhskii AI, Gingras AC, Choi H. 2014. SAINTexpress: improvements and additional features in Significance Analysis of INTeractome software. *J Proteomics* 100:37-43.
+- Mellacheruvu D, Wright Z, Couzens AL, et al. 2013. The CRAPome: a contaminant repository for affinity purification mass spectrometry data. *Nat Methods* 10(8):730-736.
+- Lin MH, Wu PS, Wong TH, Lin IY, Lin J, Cox J, Yu SH. 2022. Benchmarking differential expression, imputation and quantification methods for proteomics data. *Brief Bioinform* 23(3):bbac138.
