@@ -4610,13 +4610,14 @@
       "upstream_path": "liquid-biopsy/cfdna-preprocessing",
       "status_notes": "skills/ca-bio-cfdna-preprocessing/STATUS.md",
       "normalization_worker": "gpt-6.1-terra",
-      "worker_identity_before_status_note": "5da072b6bdda06823b789f617ef4d8a7e6862d99147ee4720950ccee61fa8c4a",
+      "worker_identity_before_status_note": "4e6122ebe347a620b6419027b22eb3bac6fa9621760805778213e294e3268834",
       "normalization_summary": "Intent router, file-based CLI wrapper, focused routes and retained source references, implementation and tests.",
       "known_gaps": [
         "No science, external tools or tests executed; installed tool version and flag semantics require verification.",
         "Minimal sWGS and native-end fragmentomics paths are guidance, not complete pipelines.",
         "Fixed source wrapper thresholds may need assay-specific adaptation; intermediate filenames can overwrite existing files.",
-        "Repository-root license evidence is outside candidate."
+        "Repository-root license evidence is outside candidate.",
+        "QC JSON output is overwritten if it exists; route requires a fresh output path."
       ],
       "preflight_warnings": [
         "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
@@ -4667,8 +4668,8 @@
           "sha256": "c6671ea644bddede2d5c4e4447fbee92aa2fa770724008f4de302bafc0510af8"
         },
         "routes/fragment-qc.md": {
-          "worker_sha256": "ee6a04b112e74c916debf80c9c142f21544fecccd59e7157f15d4b02e6ea5ab6",
-          "sha256": "ee6a04b112e74c916debf80c9c142f21544fecccd59e7157f15d4b02e6ea5ab6"
+          "worker_sha256": "2452af1352823b4eb0800c8cb6b37fc2dac1ca493c6c045cce424dae72890dc6",
+          "sha256": "2452af1352823b4eb0800c8cb6b37fc2dac1ca493c6c045cce424dae72890dc6"
         },
         "routes/selection.md": {
           "worker_sha256": "b08b959ea527d7adeaaddc7e3f0c18d2402094c3f5f2db434af841e5deee44cb",
@@ -4687,7 +4688,15 @@
           "sha256": "f5ae69d4704149919af7e62dfc7b18e28a54a31fcd79cfe44d6b9071e7ede8ac"
         }
       },
-      "published_identity": "3841e8477360fff87887e1aac30255d17881d217c78241b9cf6dadf5d967afdb"
+      "published_identity": "61f21d2b658ee2ed6b5283bcea2be32d59b6dbcb53b0f92bc4a6087ba87a36a3",
+      "revision_history": [
+        {
+          "shelf_commit": "7068da82bced80008d0ef23ab6f87f15053cb231",
+          "published_identity": "3841e8477360fff87887e1aac30255d17881d217c78241b9cf6dadf5d967afdb",
+          "worker_identity": "5da072b6bdda06823b789f617ef4d8a7e6862d99147ee4720950ccee61fa8c4a",
+          "reason": "Disclose the QC JSON overwrite behavior and require a fresh destination"
+        }
+      ]
     },
     {
       "id": "ca-bio-chipseq-allele-specific-binding",
