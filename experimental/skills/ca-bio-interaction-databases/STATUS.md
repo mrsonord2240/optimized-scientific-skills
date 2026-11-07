@@ -21,6 +21,8 @@ the next phases before relying on results.
 - Commercial OmniPath screening is source-level only; computed fields and per-source terms require independent review. Aggregate defaults to academic scope, source caller identity, undirected edges and no self-interactions.
 - IntAct, Reactome, HuRI and HuMAP remain selection guidance; no source runnable client is supplied.
 
+- Normalization only; no network or scientific workflows run. Source-pinned STRING host, service schemas and resource license claims need current verification.
+
 ## Source and credit
 
 Derived from [the published source Skill](https://github.com/mrsonord2240/optimized-scientific-skills/tree/7346d93559e1e5222dfd462ce4d0c2dac70ef35f/skills/bio-interaction-databases). Original author:

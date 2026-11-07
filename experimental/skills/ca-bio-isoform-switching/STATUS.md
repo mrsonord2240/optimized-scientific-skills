@@ -24,6 +24,8 @@ preparation and meaningful behavioral validation remain before relying on result
 - Raw count route and small-sample null behavior remain source-described limitations.
 - Count-only IsoformSwitchAnalyzeR and single-cell import are source-incomplete or untested; route marks custom or sibling workflow.
 
+- Licensed annotators and single-cell import remain unverified.
+
 ## Source and credit
 
 Derived from [the published source Skill](https://github.com/mrsonord2240/optimized-scientific-skills/tree/7346d93559e1e5222dfd462ce4d0c2dac70ef35f/skills/bio-isoform-switching).

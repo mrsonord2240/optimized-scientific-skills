@@ -5296,6 +5296,7 @@
       "worker_identity_before_status_note": "4ab1b3b301b15653e55451381231707595f35b070647da27ed45c77baf83b732",
       "normalization_summary": "User-file resource query wrapper and task routes around preserved source clients and license.",
       "known_gaps": [
+        "Normalization only; no network or scientific workflows run. Source-pinned STRING host, service schemas and resource license claims need current verification.",
         "Commercial OmniPath screening is source-level only; computed fields and per-source terms require independent review. Aggregate defaults to academic scope, source caller identity, undirected edges and no self-interactions.",
         "IntAct, Reactome, HuRI and HuMAP remain selection guidance; no source runnable client is supplied."
       ],
@@ -5366,7 +5367,14 @@
           "sha256": "42c1f2aa88fcdd93f7493b01a1251d5c821da059e0e039a04172e32913e12fea"
         }
       },
-      "published_identity": "b6da6d0a6b8b10fc65e4a1b9fec04d713cc8e7a16c0aa006b3cbcc3e90fdc054"
+      "published_identity": "1a5e62a430939a366c52d0792cd3dcab926d417516f874f16edc3a62d880a2d6",
+      "revision_history": [
+        {
+          "shelf_commit": "9ee5d78512d03448d57cd275ffaf5faf23cc7f52",
+          "published_identity": "b6da6d0a6b8b10fc65e4a1b9fec04d713cc8e7a16c0aa006b3cbcc3e90fdc054",
+          "reason": "Retain tool and resource license limitations separately from resolved repository-license evidence"
+        }
+      ]
     },
     {
       "id": "ca-bio-isoform-switching",
@@ -5384,6 +5392,7 @@
       "known_gaps": [
         "Normalization only; scripts and scientific commands unexecuted; no behavioral audit.",
         "Raw count route and small-sample null behavior remain source-described limitations.",
+        "Licensed annotators and single-cell import remain unverified.",
         "Count-only IsoformSwitchAnalyzeR and single-cell import are source-incomplete or untested; route marks custom or sibling workflow."
       ],
       "preflight_warnings": [
@@ -5491,7 +5500,7 @@
           "sha256": "e709e5ccdb92e67e067fb47180aa5df239c73d3b6f4f69733a9d5dd63715474d"
         }
       },
-      "published_identity": "864876619564b1c594d62b52d740a04d0026df7741e4f8d66d554cc41cb0266a",
+      "published_identity": "fda7bf537e97d7fe62d665cca606a18fdb877ca796e77984b57095610a88821f",
       "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
       "revision_history": [
         {
@@ -5499,6 +5508,11 @@
           "published_identity": "fe0c5cbbe7c28ea9fe2d36a82628cc954b69f1491d4e202b187787c3492bcb06",
           "worker_identity": "8af91f28b99e845d24da31d1f4fabe0c6e1cd6afd22881e3d30cb82e18e0ed34",
           "reason": "Replace package-only route stubs with task entry points or explicit source-incomplete boundaries"
+        },
+        {
+          "shelf_commit": "9ee5d78512d03448d57cd275ffaf5faf23cc7f52",
+          "published_identity": "864876619564b1c594d62b52d740a04d0026df7741e4f8d66d554cc41cb0266a",
+          "reason": "Retain tool and resource license limitations separately from resolved repository-license evidence"
         }
       ]
     },
