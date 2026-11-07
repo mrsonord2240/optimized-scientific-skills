@@ -1,6 +1,6 @@
 # Experimental normalized Skills
 
-This collection contains **78 partially complete `ca-` (context-aware)
+This collection contains **81 partially complete `ca-` (context-aware)
 revisions** of the audited Skills. They use short entry points, task routes,
 scripts, and progressively deeper references. Publication does not certify
 their scientific behavior or confer Marketplace acceptance.
@@ -9,7 +9,7 @@ their scientific behavior or confer Marketplace acceptance.
 | --- | ---: |
 | Historical candidate-ready relay result | 1 |
 | Limited evaluation experiments, not audited | 3 |
-| Normalization only, not audited | 74 |
+| Normalization only, not audited | 77 |
 
 Sam authorized publishing the original 24 drafts and using Terra workers to
 normalize the other 171 Skills already on the optimized shelf. This is
@@ -86,9 +86,12 @@ skills directory and read its status notes before use.
 | [ca-bio-protac-degraders](skills/ca-bio-protac-degraders/STATUS.md) | Normalized only; not audited |
 | [ca-bio-proteomics-differential-abundance](skills/ca-bio-proteomics-differential-abundance/STATUS.md) | Evaluation experiment; not audited |
 | [ca-bio-proteomics-proteomics-qc](skills/ca-bio-proteomics-proteomics-qc/STATUS.md) | Normalized only; not audited |
+| [ca-bio-qsar-modeling](skills/ca-bio-qsar-modeling/STATUS.md) | Normalized only; not audited |
 | [ca-bio-reference-operations](skills/ca-bio-reference-operations/STATUS.md) | Normalized only; not audited |
 | [ca-bio-sam-bam-basics](skills/ca-bio-sam-bam-basics/STATUS.md) | Normalized only; not audited |
 | [ca-bio-sashimi-plots](skills/ca-bio-sashimi-plots/STATUS.md) | Normalized only; not audited |
+| [ca-bio-scaffold-analysis](skills/ca-bio-scaffold-analysis/STATUS.md) | Normalized only; not audited |
+| [ca-bio-shape-similarity](skills/ca-bio-shape-similarity/STATUS.md) | Normalized only; not audited |
 | [ca-bio-single-cell-clustering](skills/ca-bio-single-cell-clustering/STATUS.md) | Normalized only; not audited |
 | [ca-bio-single-cell-data-io](skills/ca-bio-single-cell-data-io/STATUS.md) | Normalized only; not audited |
 | [ca-bio-single-cell-multimodal-integration](skills/ca-bio-single-cell-multimodal-integration/STATUS.md) | Normalized only; not audited |
