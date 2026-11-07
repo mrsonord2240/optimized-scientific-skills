@@ -97,8 +97,22 @@ directory and indexed in [environment-cleanup.json](environment-cleanup.json).
 
 The standalone Anaconda and Miniconda installations have no named environments
 and no active process, loaded-module, scheduled-task, or service references were
-found. They remain installed pending a decision; Miniconda still has a PATH
-entry. Claude Science's three application environments remain separate from
+found. That initial review was followed by Sam's explicit removal approval; the
+standalone installations are now removed as recorded below. Claude Science's three application environments remain separate from
 these standalone installations. Two older Basilisk prefixes also remain under
 the F: single-cell audit cache, outside this C: deletion scope. The exact
 remaining paths and findings are in local `remaining-conda-review.json`.
+
+## Standalone Anaconda and Miniconda removal
+
+Sam approved removing both standalone C: installations. Their registered silent
+uninstallers completed successfully; the two installation roots and Windows
+uninstall registrations are absent. Their environment-list entries and the
+remaining Miniconda PATH entry were cleaned up while retaining other entries.
+
+Preserved 4,638 package metadata records in
+`environment-cleanup/standalone-conda/package-metadata.zip`, verified before
+removal and by archive hash afterward. The observed C: free-space increase was
+**8.07 GiB**. The independent `C:\Python314` interpreter, `C:\R`, and
+Claude Science's application-managed environments remain present. Exact
+receipts are indexed in [environment-cleanup.json](environment-cleanup.json).

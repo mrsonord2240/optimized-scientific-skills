@@ -242,5 +242,32 @@
     "removal_receipt_sha256": "6def6fd341d3aa3482f91f62b8cb46e635c94e7cd7f3ae526d97e1c8a3b21a81",
     "remaining_conda_review": "environment-cleanup/remaining-conda-review.json",
     "remaining_conda_review_sha256": "f189ead998cedc858a34f65f246fd146f415a25af540bcfa2649b39f5057eb41"
+  },
+  "standalone_conda_uninstall": {
+    "recorded_on": "2026-11-07",
+    "removed": [
+      "C:\\Users\\User\\anaconda3",
+      "C:\\Users\\User\\AppData\\Local\\Miniconda3"
+    ],
+    "method": "Registered silent uninstallers; both exited 0; roots and uninstall registry entries absent",
+    "observed_C_free_bytes_increase": 8661823488,
+    "package_metadata": {
+      "file": "environment-cleanup/standalone-conda/package-metadata.zip",
+      "files": 4638,
+      "bytes": 12741587,
+      "sha256": "0dcb59b4259b4cb9cd11090fa1a4c98eab7fdc00d75ab2887253de742469c369",
+      "verified": "Every ZIP member CRC and SHA-256 checked; final archive hash rechecked after uninstall"
+    },
+    "receipt": "environment-cleanup/standalone-conda/receipt.json",
+    "receipt_sha256": "f4ed7bf2421983b910b9c572ec334a51f5cf7c6c1a49544eecd1b1c4e6d8cc2a",
+    "shared_paths_retained": [
+      "C:\\Python314\\python.exe",
+      "C:\\R\\bin\\x64\\R.exe",
+      "C:\\Users\\User\\.claude-science\\conda\\envs"
+    ],
+    "retained_conda_registrations": [
+      "F:\\OpenScience\\audit-envs\\single-cell-transcriptomics-analyst\\cache\\basilisk\\1.18.0\\0",
+      "F:\\OpenScience\\audit-envs\\single-cell-transcriptomics-analyst\\cache\\basilisk\\1.18.0\\zellkonverter\\1.16.0\\zellkonverterAnnDataEnv-0.10.9"
+    ]
   }
 }

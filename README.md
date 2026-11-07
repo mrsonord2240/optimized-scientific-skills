@@ -5,16 +5,16 @@ audit demonstrated a defect, the Skill is fixed and then re-audited by an agent 
 
 ## Project status
 
-This work was closed out on **2026-11-07**. The 195 scientific Skills and their
-evidence remain available. The preserved [pipeline](pipeline/README.md) contains
-the six process Skills, the [evaluation method and results](pipeline/EVALUATION.md),
-and an [evidence and recovery index](pipeline/EVIDENCE.md). Further audits,
-experimental recuts, and Open Science Marketplace follow-up are no longer an active queue.
+The audit/evaluation campaign was closed out on **2026-11-07**, preserving the
+195 audited scientific Skills, six process Skills, and evaluation evidence in
+the [pipeline archive](pipeline/README.md).
 
-The closeout preserves prior results; it is not a new scientific audit or
-Marketplace acceptance. Each Skill's recorded status is in
-[PROVENANCE.json](PROVENANCE.json). [REMAINING.md](REMAINING.md) retains the
-historical unprocessed/excluded inventory, not a commitment to resume it.
+Sam then authorized publishing the **24 partially complete normalized
+candidates** under [experimental/](experimental/README.md), and resumed
+normalization of the other 171 Skills already on this shelf. These drafts have
+their own status notes; their changed bytes do not inherit the published
+versions' audit grades. No new scientific audit or Marketplace acceptance is
+claimed. [PROVENANCE.json](PROVENANCE.json) describes the 195 audited versions.
 
 ## Attribution
 
@@ -32,11 +32,11 @@ preserved pipeline has its own [license and attribution](pipeline/NOTICE).
 
 ## Status
 
-These counts describe the committed provenance snapshot, not fresh execution:
+These counts describe the 195 audited versions under `skills/`, excluding the experimental drafts:
 
 | | count |
 | --- | ---: |
-| Skills in this repository | **195** |
+| Audited Skills under `skills/` | **195** |
 | marked modified, each with a fix-log reference | 195 |
 | unmodified apart from declared `license: MIT` and `author: GPTomics` lines | 0 |
 | **fix pass still needed** (first audit only, whatever the score) | **0** |
@@ -57,6 +57,7 @@ Audited Skills that failed (open P0 or not deployable) are **not here**: they ar
 skills/<skill-id>/        SKILL.md, usually usage-guide.md, and examples/ or scripts/
 PROVENANCE.json           per-Skill upstream repository, commit, path, modification status, audit result
 REMAINING.json            what has not been refined yet, and what was audited and excluded
+experimental/             partially complete ca- revisions, individual status notes and source hashes
 pipeline/                 preserved process Skills, evaluation, and evidence/recovery index
 LICENSE                   the upstream MIT licence, verbatim
 ```
@@ -72,11 +73,10 @@ each modified Skill — is published separately in
 [optimizing-agent-science-skills](https://github.com/mrsonord2240/optimizing-agent-science-skills)
 under `audits/skills/<skill-id>/`.
 
-## Preserved experiments
+## Experimental revisions
 
-The records repository retains 24 `ca-` experimental recuts with their individual
-states. They are not installed into this repository's scientific Skill collection.
-The evaluation's draft arms also remain experimental. The
-[evidence index](pipeline/EVIDENCE.md) pins their source revision and records the
-local preservation archives. This closeout does not change scientific Skill bytes
-or their provenance.
+The [24 experimental candidates](experimental/README.md) are now included with
+their recorded limitations and individual status notes. New normalization-only
+work is published in the same section as it is reviewed. The evaluation's draft
+arms also remain experimental. The [evidence index](pipeline/EVIDENCE.md)
+records the original source revisions and local preservation archives.

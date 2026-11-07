@@ -1,10 +1,12 @@
 # Preserved BioSkills pipeline
 
-This work is closed out as of 2026-11-07. Sam reported no further response
+The audit/evaluation campaign was closed out on 2026-11-07. Sam reported no further response
 from Open Science and decided the project had done enough. The retained
 deliverables are the published Skills, the pipeline Skills, the audit evidence,
-and the evaluation method and results. There is no active audit, recut, or
-Marketplace submission queue.
+and the evaluation method and results. Sam later resumed normalization-only
+work and authorized publishing partially complete drafts under
+[experimental/](../experimental/README.md). Audits and Marketplace follow-up
+remain outside that resumed scope.
 
 ## Contents
 
@@ -48,8 +50,9 @@ and the original `skill-auditor.zip`. They are preserved in the records Git
 bundle described in [EVIDENCE.md](EVIDENCE.md), rather than duplicated here.
 
 No new scientific audit, model evaluation, or promotion was performed for this
-closeout. The 24 `ca-` recuts remain experimental in the records repository;
-they are not additions to the 195 published Skills under the root `skills/`.
+closeout. The 24 original `ca-` recuts are also preserved under
+[experimental/](../experimental/README.md) with their partial status; they are
+not additions to the 195 audited versions under the root `skills/`.
 
 To inspect the saved evaluation without Docker, dependencies, or model calls:
 
