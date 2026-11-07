@@ -1,6 +1,6 @@
 # Experimental normalized Skills
 
-This collection contains **185 partially complete `ca-` (context-aware)
+This collection contains **190 partially complete `ca-` (context-aware)
 revisions** of the audited Skills. They use short entry points, task routes,
 scripts, and progressively deeper references. Publication does not certify
 their scientific behavior or confer Marketplace acceptance.
@@ -9,7 +9,7 @@ their scientific behavior or confer Marketplace acceptance.
 | --- | ---: |
 | Historical candidate-ready relay result | 1 |
 | Limited evaluation experiments, not audited | 3 |
-| Normalization only, not audited | 181 |
+| Normalization only, not audited | 186 |
 
 Sam authorized publishing the original 24 drafts and using Terra workers to
 normalize the other 171 Skills already on the optimized shelf. This is
@@ -52,6 +52,7 @@ skills directory and read its status notes before use.
 | [ca-bio-atac-seq-single-cell-atac](skills/ca-bio-atac-seq-single-cell-atac/STATUS.md) | Normalized only; not audited |
 | [ca-bio-bam-statistics](skills/ca-bio-bam-statistics/STATUS.md) | Normalized only; not audited |
 | [ca-bio-batch-downloads](skills/ca-bio-batch-downloads/STATUS.md) | Normalized only; not audited |
+| [ca-bio-batch-processing](skills/ca-bio-batch-processing/STATUS.md) | Normalized only; not audited |
 | [ca-bio-biomart-queries](skills/ca-bio-biomart-queries/STATUS.md) | Normalized only; not audited |
 | [ca-bio-blast-searches](skills/ca-bio-blast-searches/STATUS.md) | Normalized only; not audited |
 | [ca-bio-causal-genomics-colocalization-analysis](skills/ca-bio-causal-genomics-colocalization-analysis/STATUS.md) | Normalized only; not audited |
@@ -66,6 +67,7 @@ skills directory and read its status notes before use.
 | [ca-bio-causal-genomics-proteome-mr-drug-target](skills/ca-bio-causal-genomics-proteome-mr-drug-target/STATUS.md) | Normalized only; not audited |
 | [ca-bio-causal-genomics-transcriptome-wide-association](skills/ca-bio-causal-genomics-transcriptome-wide-association/STATUS.md) | Normalized only; not audited |
 | [ca-bio-cfdna-preprocessing](skills/ca-bio-cfdna-preprocessing/STATUS.md) | Normalized only; not audited |
+| [ca-bio-chipseq-allele-specific-binding](skills/ca-bio-chipseq-allele-specific-binding/STATUS.md) | Normalized only; not audited |
 | [ca-bio-clinical-databases-acmg-classification](skills/ca-bio-clinical-databases-acmg-classification/STATUS.md) | Normalized only; not audited |
 | [ca-bio-clinical-databases-clinvar-lookup](skills/ca-bio-clinical-databases-clinvar-lookup/STATUS.md) | Normalized only; not audited |
 | [ca-bio-clinical-databases-dbsnp-queries](skills/ca-bio-clinical-databases-dbsnp-queries/STATUS.md) | Normalized only; not audited |
@@ -209,6 +211,9 @@ skills directory and read its status notes before use.
 | [ca-bio-vcf-statistics](skills/ca-bio-vcf-statistics/STATUS.md) | Normalized only; not audited |
 | [ca-bio-virtual-screening](skills/ca-bio-virtual-screening/STATUS.md) | Normalized only; not audited |
 | [ca-bio-workflows-crispr-screen-pipeline](skills/ca-bio-workflows-crispr-screen-pipeline/STATUS.md) | Historical candidate-ready; see limits |
+| [ca-bio-workflows-metabolomics-pipeline](skills/ca-bio-workflows-metabolomics-pipeline/STATUS.md) | Normalized only; not audited |
+| [ca-bio-workflows-proteomics-pipeline](skills/ca-bio-workflows-proteomics-pipeline/STATUS.md) | Normalized only; not audited |
+| [ca-bio-workflows-scrnaseq-pipeline](skills/ca-bio-workflows-scrnaseq-pipeline/STATUS.md) | Normalized only; not audited |
 
 The [manifest](CANDIDATES.json) records source commits, file hashes, upstream
 paths, capability coverage and status. GPTomics/bioSkills supplied the original
