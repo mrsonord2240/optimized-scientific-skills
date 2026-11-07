@@ -11,8 +11,8 @@ the [pipeline archive](pipeline/README.md).
 
 Sam then authorized publication of the original 24 drafts and normalization
 of the other 171 Skills already on this shelf. The collection now contains
-**190 partially complete normalized
-candidates** under [experimental/](experimental/README.md). 166 of the 171 new drafts in this shelf pass are published.
+**195 partially complete normalized
+candidates** under [experimental/](experimental/README.md). All 171 new drafts in this shelf pass are published.
 Each draft has its own status notes; changed bytes do not inherit the original
 version's audit grade. No new scientific audit or Marketplace acceptance is
 claimed. [PROVENANCE.json](PROVENANCE.json) describes the 195 audited originals.
@@ -76,7 +76,7 @@ under `audits/skills/<skill-id>/`.
 
 ## Experimental revisions
 
-The [190 experimental candidates](experimental/README.md) are now included with
+The [195 experimental candidates](experimental/README.md) are now included with
 their recorded limitations and individual status notes. New normalization-only
 work is published in the same section as it is reviewed. The evaluation's draft
 arms also remain experimental. The [evidence index](pipeline/EVIDENCE.md)

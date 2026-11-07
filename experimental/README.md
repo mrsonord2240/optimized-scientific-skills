@@ -1,6 +1,6 @@
 # Experimental normalized Skills
 
-This collection contains **190 partially complete `ca-` (context-aware)
+This collection contains **195 partially complete `ca-` (context-aware)
 revisions** of the audited Skills. They use short entry points, task routes,
 scripts, and progressively deeper references. Publication does not certify
 their scientific behavior or confer Marketplace acceptance.
@@ -9,7 +9,7 @@ their scientific behavior or confer Marketplace acceptance.
 | --- | ---: |
 | Historical candidate-ready relay result | 1 |
 | Limited evaluation experiments, not audited | 3 |
-| Normalization only, not audited | 186 |
+| Normalization only, not audited | 191 |
 
 Sam authorized publishing the original 24 drafts and using Terra workers to
 normalize the other 171 Skills already on the optimized shelf. This is
@@ -68,11 +68,15 @@ skills directory and read its status notes before use.
 | [ca-bio-causal-genomics-transcriptome-wide-association](skills/ca-bio-causal-genomics-transcriptome-wide-association/STATUS.md) | Normalized only; not audited |
 | [ca-bio-cfdna-preprocessing](skills/ca-bio-cfdna-preprocessing/STATUS.md) | Normalized only; not audited |
 | [ca-bio-chipseq-allele-specific-binding](skills/ca-bio-chipseq-allele-specific-binding/STATUS.md) | Normalized only; not audited |
+| [ca-bio-clinical-biostatistics-adaptive-designs](skills/ca-bio-clinical-biostatistics-adaptive-designs/STATUS.md) | Normalized only; not audited |
 | [ca-bio-clinical-databases-acmg-classification](skills/ca-bio-clinical-databases-acmg-classification/STATUS.md) | Normalized only; not audited |
 | [ca-bio-clinical-databases-clinvar-lookup](skills/ca-bio-clinical-databases-clinvar-lookup/STATUS.md) | Normalized only; not audited |
 | [ca-bio-clinical-databases-dbsnp-queries](skills/ca-bio-clinical-databases-dbsnp-queries/STATUS.md) | Normalized only; not audited |
 | [ca-bio-clinical-databases-gnomad-frequencies](skills/ca-bio-clinical-databases-gnomad-frequencies/STATUS.md) | Normalized only; not audited |
 | [ca-bio-clinical-databases-myvariant-queries](skills/ca-bio-clinical-databases-myvariant-queries/STATUS.md) | Normalized only; not audited |
+| [ca-bio-clip-seq-ago-clip-mirna-targets](skills/ca-bio-clip-seq-ago-clip-mirna-targets/STATUS.md) | Normalized only; not audited |
+| [ca-bio-codon-usage](skills/ca-bio-codon-usage/STATUS.md) | Normalized only; not audited |
+| [ca-bio-comparative-genomics-ancestral-reconstruction](skills/ca-bio-comparative-genomics-ancestral-reconstruction/STATUS.md) | Normalized only; not audited |
 | [ca-bio-conformer-generation](skills/ca-bio-conformer-generation/STATUS.md) | Normalized only; not audited |
 | [ca-bio-covalent-design](skills/ca-bio-covalent-design/STATUS.md) | Normalized only; not audited |
 | [ca-bio-crispr-screens-bagel-essentiality](skills/ca-bio-crispr-screens-bagel-essentiality/STATUS.md) | Normalized only; not audited |
@@ -160,6 +164,7 @@ skills directory and read its status notes before use.
 | [ca-bio-phylo-tree-manipulation](skills/ca-bio-phylo-tree-manipulation/STATUS.md) | Normalized only; not audited |
 | [ca-bio-phylo-tree-visualization](skills/ca-bio-phylo-tree-visualization/STATUS.md) | Normalized only; not audited |
 | [ca-bio-pileup-generation](skills/ca-bio-pileup-generation/STATUS.md) | Normalized only; not audited |
+| [ca-bio-population-genetics-rare-variant-association](skills/ca-bio-population-genetics-rare-variant-association/STATUS.md) | Normalized only; not audited |
 | [ca-bio-pose-validation](skills/ca-bio-pose-validation/STATUS.md) | Normalized only; not audited |
 | [ca-bio-protac-degraders](skills/ca-bio-protac-degraders/STATUS.md) | Normalized only; not audited |
 | [ca-bio-proteomics-data-import](skills/ca-bio-proteomics-data-import/STATUS.md) | Normalized only; not audited |

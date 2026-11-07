@@ -1,0 +1,5 @@
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) != 2L) stop("Usage: Rscript scripts/continuous_file.R tree.nwk traits.csv")
+tree <- ape::read.tree(args[[1L]])
+traits <- read.csv(args[[2L]], row.names = 1)
+source("scripts/continuous_trait_asr.R")

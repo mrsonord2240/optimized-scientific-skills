@@ -4803,6 +4803,103 @@
       "published_identity": "1fb9bedd5453b65eff273eb3235fda6ff8edbdcc2504b42ae00fcc04113527ab"
     },
     {
+      "id": "ca-bio-clinical-biostatistics-adaptive-designs",
+      "recut_of": "bio-clinical-biostatistics-adaptive-designs",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-clinical-biostatistics-adaptive-designs",
+      "upstream_path": "clinical-biostatistics/adaptive-designs",
+      "status_notes": "skills/ca-bio-clinical-biostatistics-adaptive-designs/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "f1a5e3cd3ca845639c598e6fe6c3fb26372288ccccda07323c5f12aec7ac541b",
+      "normalization_summary": "Separate file-based source examples from documented-only adaptations; preserve original methods, assumptions and historical regulatory context with GPTomics MIT license.",
+      "known_gaps": [
+        "No scientific execution, simulations, installed API verification or current regulatory verification.",
+        "Promising-zone SSR, enrichment, RAR and platform graduation require trial-specific implementation and validation.",
+        "MAP example is not EXNEX.",
+        "Shell redirects overwrite existing text and the sequential R plot may overwrite Rplots.pdf; routes require a new empty working/output directory."
+      ],
+      "preflight_warnings": [],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "group-sequential OBF, Lan-DeMets, survival and blinded SSR": "routes/sequential.md and references/group-sequential-ssr-enrichment.md",
+        "BOIN, CRM and MAP prior": "routes/dose.md and references/platform-rar-dose-finding.md",
+        "unblinded SSR, enrichment, platform graduation, RAR and combination tests": "routes/scaffolds.md and references",
+        "dated guidance, error control, firewall and review": "routes/review.md and references/regulatory-and-review.md"
+      },
+      "reviewed_source_files": [
+        "LICENSE",
+        "SKILL.md",
+        "usage-guide.md",
+        "references/group-sequential-ssr-enrichment.md",
+        "references/platform-rar-dose-finding.md",
+        "references/provenance.md",
+        "references/regulatory-and-review.md",
+        "scripts/adaptive_designs.R",
+        "scripts/test_adaptive_designs.R"
+      ],
+      "scripts_added_or_changed": [
+        "scripts/sequential.R, scripts/dose.R and scripts/map.R extracted from source combined example without parameter upgrades"
+      ],
+      "documentation_sources": [
+        "Source skill and its references; original citations retained in references/regulatory-and-review.md."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "LICENSE": {
+          "worker_sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f",
+          "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+        },
+        "SKILL.md": {
+          "worker_sha256": "c81630a8b53031a4a26ab2222b840faa94d3f416734db7cdd6ee37448d21f639",
+          "sha256": "c81630a8b53031a4a26ab2222b840faa94d3f416734db7cdd6ee37448d21f639"
+        },
+        "references/group-sequential-ssr-enrichment.md": {
+          "worker_sha256": "2973ec2b079d28b5c9ec8f0adecd3e75092618329e0f466976110356a1f9d53e",
+          "sha256": "2973ec2b079d28b5c9ec8f0adecd3e75092618329e0f466976110356a1f9d53e"
+        },
+        "references/platform-rar-dose-finding.md": {
+          "worker_sha256": "12f7d1de319c37b4799e54d487a56de347c131a4c26fc09499d1ce08b56239d2",
+          "sha256": "12f7d1de319c37b4799e54d487a56de347c131a4c26fc09499d1ce08b56239d2"
+        },
+        "references/regulatory-and-review.md": {
+          "worker_sha256": "f3e3c377c9519fbb0c36353c7c95efcd6c64042d85c7230b1152c44266400918",
+          "sha256": "f3e3c377c9519fbb0c36353c7c95efcd6c64042d85c7230b1152c44266400918"
+        },
+        "routes/dose.md": {
+          "worker_sha256": "1228e868b356177dc738b56669541e958edeb518d19b3f8b3e3f29820ba59c4b",
+          "sha256": "1228e868b356177dc738b56669541e958edeb518d19b3f8b3e3f29820ba59c4b"
+        },
+        "routes/review.md": {
+          "worker_sha256": "1d1eb86015a56de5add5b835db594740d6e0e21fcc4be7dd9ab32952917c7617",
+          "sha256": "1d1eb86015a56de5add5b835db594740d6e0e21fcc4be7dd9ab32952917c7617"
+        },
+        "routes/scaffolds.md": {
+          "worker_sha256": "77ccafe514639fd966289631746852190c2614f8a4d2b6f55a3e40818e5ed122",
+          "sha256": "77ccafe514639fd966289631746852190c2614f8a4d2b6f55a3e40818e5ed122"
+        },
+        "routes/sequential.md": {
+          "worker_sha256": "7465b28172feb6a8f0bcdf543d23d34b078f82e5e41ddf0274196e5cda8955da",
+          "sha256": "7465b28172feb6a8f0bcdf543d23d34b078f82e5e41ddf0274196e5cda8955da"
+        },
+        "scripts/dose.R": {
+          "worker_sha256": "e14d1ca9b13ed7865daa2103fa06a9e7f4dc3ea9b24c85386361f29e33e07b75",
+          "sha256": "e14d1ca9b13ed7865daa2103fa06a9e7f4dc3ea9b24c85386361f29e33e07b75"
+        },
+        "scripts/map.R": {
+          "worker_sha256": "8f1f6c1c0706667274603dcda85278ca41796ddddc18eb648b3ede6e85129ce1",
+          "sha256": "8f1f6c1c0706667274603dcda85278ca41796ddddc18eb648b3ede6e85129ce1"
+        },
+        "scripts/sequential.R": {
+          "worker_sha256": "af4b7d4bc67a82f8b34cd14dc5b94a20b4cf03f3c8a1223bb9fb4bf0b7426c21",
+          "sha256": "af4b7d4bc67a82f8b34cd14dc5b94a20b4cf03f3c8a1223bb9fb4bf0b7426c21"
+        }
+      },
+      "published_identity": "7436bf495722de474af21dc276ff07a95810d09bd76e5ef600cce41dac7d1f01"
+    },
+    {
       "id": "ca-bio-clinical-databases-acmg-classification",
       "recut_of": "bio-clinical-databases-acmg-classification",
       "status": "normalized-only-not-audited",
@@ -5201,6 +5298,348 @@
         }
       },
       "published_identity": "6b3ebd4f6a79621093e15871c956e7cdcddd6736044ce3944baa6228bdcba775"
+    },
+    {
+      "id": "ca-bio-clip-seq-ago-clip-mirna-targets",
+      "recut_of": "bio-clip-seq-ago-clip-mirna-targets",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-clip-seq-ago-clip-mirna-targets",
+      "upstream_path": "clip-seq/ago-clip-mirna-targets",
+      "status_notes": "skills/ca-bio-clip-seq-ago-clip-mirna-targets/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "51628d1ed263da4cf104a0ced910a871733599b0b5166f8be5b24698a4aeb252",
+      "normalization_summary": "Preserved optimized source scripts, methods, provenance and failure references; split direct chimera, targeted UMI and AGO-prediction routes.",
+      "known_gaps": [
+        "Standard AGO peaks do not establish a direct miRNA pairing; seed scan and peak calling are separate workflows.",
+        "Named Hyb database, protocol-specific preprocessing and reference mapping must be prepared independently; exact interfaces require verification.",
+        "TargetScan converter overwrites output paths; use new paths.",
+        "No scientific execution, installs or testing; source tests reviewed but not run.",
+        "Manifest must cite repository license evidence."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "Hyb multi-run chimeric analysis and consensus": "routes/chimeric.md and scripts/consensus_hyb.py",
+        "targeted protocol-declared UMI": "routes/targeted.md",
+        "TargetScan coordinate projection and AGO overlaps": "routes/predictions.md",
+        "method choice, seed classes and reconciliation": "references/method-selection-and-pairing.md",
+        "diagnostics, protocol and provenance": "references/failure-modes.md and references/provenance.md"
+      },
+      "reviewed_source_files": [
+        "SKILL.md",
+        "references/failure-modes.md",
+        "references/method-selection-and-pairing.md",
+        "references/provenance.md",
+        "references/workflows-and-commands.md",
+        "scripts/consensus_hyb.py",
+        "scripts/extract_targeted_umi.py",
+        "scripts/run_chimeric_eclip.sh",
+        "scripts/targetscan_sites_to_bed12.py",
+        "tests/test_scripts.py"
+      ],
+      "scripts_added_or_changed": [],
+      "documentation_sources": [
+        "GPTomics source, optimized provenance and cited source literature; no API upgrades."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "6f27fe03064c05bea0e61d94bd3a9ab46315fc4c2dc5e8316ce6f756447eb7a2",
+          "sha256": "6f27fe03064c05bea0e61d94bd3a9ab46315fc4c2dc5e8316ce6f756447eb7a2"
+        },
+        "references/failure-modes.md": {
+          "worker_sha256": "c042ad22c3fc262809998ce582f690746efb8f0ca7443439749902aefba7288e",
+          "sha256": "c042ad22c3fc262809998ce582f690746efb8f0ca7443439749902aefba7288e"
+        },
+        "references/method-selection-and-pairing.md": {
+          "worker_sha256": "2540d012f97b4fd56b9d96e15ae4e0df71b70db2525dc144ed16bc56dbe7dd92",
+          "sha256": "2540d012f97b4fd56b9d96e15ae4e0df71b70db2525dc144ed16bc56dbe7dd92"
+        },
+        "references/provenance.md": {
+          "worker_sha256": "f529183737de0ddfe47f0e33597fdd65360bcaaaaea2386bfec8052f2a239404",
+          "sha256": "f529183737de0ddfe47f0e33597fdd65360bcaaaaea2386bfec8052f2a239404"
+        },
+        "references/workflows-and-commands.md": {
+          "worker_sha256": "1dd43414b787940236977b782afbbe273218548dc4fb1da8b0d4066aece11263",
+          "sha256": "1dd43414b787940236977b782afbbe273218548dc4fb1da8b0d4066aece11263"
+        },
+        "routes/chimeric.md": {
+          "worker_sha256": "10f570a24e0c6142d473a35817bc2d12f233e4c7b9293f2638fad814c8181626",
+          "sha256": "10f570a24e0c6142d473a35817bc2d12f233e4c7b9293f2638fad814c8181626"
+        },
+        "routes/predictions.md": {
+          "worker_sha256": "99f7bcb7ac4c6cfec9687261098d04c1c9c12bdb252f336f304d312dcd2285ef",
+          "sha256": "99f7bcb7ac4c6cfec9687261098d04c1c9c12bdb252f336f304d312dcd2285ef"
+        },
+        "routes/targeted.md": {
+          "worker_sha256": "6828d47b29347d7af886db3edd3e58a2098a9c9c8c4bf7534490f3923b32cd74",
+          "sha256": "6828d47b29347d7af886db3edd3e58a2098a9c9c8c4bf7534490f3923b32cd74"
+        },
+        "scripts/consensus_hyb.py": {
+          "worker_sha256": "36d791220ab29cdcfbc07e5d772f500f22ee20a2e8b7a849745432d605b3dca9",
+          "sha256": "36d791220ab29cdcfbc07e5d772f500f22ee20a2e8b7a849745432d605b3dca9"
+        },
+        "scripts/extract_targeted_umi.py": {
+          "worker_sha256": "8da720c6172d35158f8ff835261053e7508568763e2dcb73071539761f91dea0",
+          "sha256": "8da720c6172d35158f8ff835261053e7508568763e2dcb73071539761f91dea0"
+        },
+        "scripts/run_chimeric_eclip.sh": {
+          "worker_sha256": "535985c8bb2d2881dd96d4a3b47c2d6248da7c6d2067b0a35888e59a0f89a8b8",
+          "sha256": "535985c8bb2d2881dd96d4a3b47c2d6248da7c6d2067b0a35888e59a0f89a8b8"
+        },
+        "scripts/targetscan_sites_to_bed12.py": {
+          "worker_sha256": "4c64f7158915cef30a538b9fd4ef3abfb843b29b80900d7dbca0c03850f9b034",
+          "sha256": "4c64f7158915cef30a538b9fd4ef3abfb843b29b80900d7dbca0c03850f9b034"
+        }
+      },
+      "published_identity": "e3d3163af4db49d609822760dc827e629ebeef4c024b28afcc56618514dbd2d3"
+    },
+    {
+      "id": "ca-bio-codon-usage",
+      "recut_of": "bio-codon-usage",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-codon-usage",
+      "upstream_path": "sequence-manipulation/codon-usage",
+      "status_notes": "skills/ca-bio-codon-usage/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "f781320537477ee78a393a2153652cf817d4744b23d6667b149eaf8df05dbb26",
+      "normalization_summary": "Intent router and honest example routes; retained source license, references, examples, helpers and tests.",
+      "known_gaps": [
+        "No sequence analyses, test runs or installations performed.",
+        "Examples use hard-coded toy inputs and require adaptation for file input.",
+        "Nc and tAI are not implemented; max-CAI example is not a screened design.",
+        "Biopython version-specific behavior not independently verified in this pass."
+      ],
+      "preflight_warnings": [],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "codon counts, frequencies, amino acid usage and GC123": "routes/composition.md",
+        "RSCU and low-RSCU display": "routes/rscu.md",
+        "reference-relative CAI and source naive max-CAI example": "routes/cai.md",
+        "validation, alternate code, compatibility, tAI/Nc limitations": "references/metrics-and-methods.md and references/compatibility-and-errors.md",
+        "constraints, source and citations": "references/optimization-constraints.md and references/provenance.md",
+        "regression suite": "tests/test_codon_usage.py"
+      },
+      "reviewed_source_files": [
+        "LICENSE",
+        "SKILL.md",
+        "references\\compatibility-and-errors.md",
+        "references\\metrics-and-methods.md",
+        "references\\optimization-constraints.md",
+        "references\\provenance.md",
+        "scripts\\basic_analysis.py",
+        "scripts\\cai_optimization.py",
+        "scripts\\codon_utils.py",
+        "scripts\\rscu_analysis.py",
+        "tests\\test_codon_usage.py"
+      ],
+      "scripts_added_or_changed": [
+        "Copied source scripts and test with normalized EOF; no scientific logic changed."
+      ],
+      "documentation_sources": [
+        "Source references and bibliography; no live documentation consulted."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "LICENSE": {
+          "worker_sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f",
+          "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+        },
+        "SKILL.md": {
+          "worker_sha256": "4a61e2445549f0dd6b32623d6365ef45b15193eff7b629776cc2cc1d82d6f566",
+          "sha256": "4a61e2445549f0dd6b32623d6365ef45b15193eff7b629776cc2cc1d82d6f566"
+        },
+        "references/compatibility-and-errors.md": {
+          "worker_sha256": "9169adf20eee5a79b6adb13fe77a6ee542ea6594230a996e778e9df468929c14",
+          "sha256": "9169adf20eee5a79b6adb13fe77a6ee542ea6594230a996e778e9df468929c14"
+        },
+        "references/metrics-and-methods.md": {
+          "worker_sha256": "b262b9d11661c8dac67bbc0fb6ffb39edfff58a67975b3783c743f96f87f50db",
+          "sha256": "b262b9d11661c8dac67bbc0fb6ffb39edfff58a67975b3783c743f96f87f50db"
+        },
+        "references/optimization-constraints.md": {
+          "worker_sha256": "198d93454798e8a587a264962088814544fa0d24dbfa54adb712e3d3b4140468",
+          "sha256": "198d93454798e8a587a264962088814544fa0d24dbfa54adb712e3d3b4140468"
+        },
+        "references/provenance.md": {
+          "worker_sha256": "3c48e7a3fa214287e6001abf6f0766b34513607b56a2a17fd00ce160ad24583a",
+          "sha256": "3c48e7a3fa214287e6001abf6f0766b34513607b56a2a17fd00ce160ad24583a"
+        },
+        "routes/cai.md": {
+          "worker_sha256": "456c3c07f8a8f7ee1dfa1be4bda8a97793e13c943b5e7172b03920fabb76628c",
+          "sha256": "456c3c07f8a8f7ee1dfa1be4bda8a97793e13c943b5e7172b03920fabb76628c"
+        },
+        "routes/composition.md": {
+          "worker_sha256": "2f34339605c298449ef37171dd149fc7cd1a2e3140055c906ec15aa6b50c1278",
+          "sha256": "2f34339605c298449ef37171dd149fc7cd1a2e3140055c906ec15aa6b50c1278"
+        },
+        "routes/rscu.md": {
+          "worker_sha256": "373e29c1ad8b51c36cda9bdf48711886c818c7c8d8136dd0d605f202ffbd94ff",
+          "sha256": "373e29c1ad8b51c36cda9bdf48711886c818c7c8d8136dd0d605f202ffbd94ff"
+        },
+        "scripts/basic_analysis.py": {
+          "worker_sha256": "43325901d4ef2902a49e51def6843b8a5d47a61ddf8b9e03469e86c42c181e16",
+          "sha256": "43325901d4ef2902a49e51def6843b8a5d47a61ddf8b9e03469e86c42c181e16"
+        },
+        "scripts/cai_optimization.py": {
+          "worker_sha256": "bbe89ffc15c4cae9fdd660e5621164178a99b4f14fc89cff14210691aa248bd8",
+          "sha256": "bbe89ffc15c4cae9fdd660e5621164178a99b4f14fc89cff14210691aa248bd8"
+        },
+        "scripts/codon_utils.py": {
+          "worker_sha256": "1e9898adc27c21a8e6575201b71956b434da04d93be0986fae436828ce9be92c",
+          "sha256": "1e9898adc27c21a8e6575201b71956b434da04d93be0986fae436828ce9be92c"
+        },
+        "scripts/rscu_analysis.py": {
+          "worker_sha256": "8bd3e30ffcacc4a7024cda6ce690dd99b81a3dfe3d442361553aed4663c3c43b",
+          "sha256": "8bd3e30ffcacc4a7024cda6ce690dd99b81a3dfe3d442361553aed4663c3c43b"
+        },
+        "tests/test_codon_usage.py": {
+          "worker_sha256": "931cd698f954f535b43e233a3fbb909e75e1bcff3d360faca6ad20b2dddbeb43",
+          "sha256": "931cd698f954f535b43e233a3fbb909e75e1bcff3d360faca6ad20b2dddbeb43"
+        }
+      },
+      "published_identity": "95bbe43e43120e6891a1794dc9ce8a70f55ffee3581da1f860747955e483c7e8"
+    },
+    {
+      "id": "ca-bio-comparative-genomics-ancestral-reconstruction",
+      "recut_of": "bio-comparative-genomics-ancestral-reconstruction",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-comparative-genomics-ancestral-reconstruction",
+      "upstream_path": "comparative-genomics/ancestral-reconstruction",
+      "status_notes": "skills/ca-bio-comparative-genomics-ancestral-reconstruction/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "a001ee7d1bc08623845e81ce5ff76c9d8bd059bdb1c7b40f9103174241aa20eb",
+      "normalization_summary": "Separate sequence, discrete and continuous intent routes with model and uncertainty references; retain source examples and add continuous file wrapper. GPTomics MIT license preserved.",
+      "known_gaps": [
+        "No scientific execution or API verification; dependency support claims are source historical statements.",
+        "Discrete script currently prints metadata rather than full node and map results; adapt output persistence.",
+        "Codeml helper functions and Bayesian/gene-content methods need task-specific workflows.",
+        "The original construct-design examples are outside this assignment and were not routed as a task."
+      ],
+      "preflight_warnings": [
+        "script no instruction file or script names: scripts/codeml_asr.py",
+        "script no instruction file or script names: scripts/paml_rst.py"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "PAML, IQ-TREE, GRASP and parsing": "routes/sequences.md and references/method-workflows.md",
+        "discrete ER/SYM/ARD, stochastic maps and hidden-rate alternative": "routes/discrete.md",
+        "continuous BM/OU and other model selection with explicit stop": "routes/continuous.md",
+        "Bayesian and gene-content methods, sensitivity, failure modes and reporting": "routes/review.md and references"
+      },
+      "reviewed_source_files": [
+        "LICENSE",
+        "SKILL.md",
+        "usage-guide.md",
+        "references/failure-modes-and-thresholds.md",
+        "references/method-selection.md",
+        "references/method-workflows.md",
+        "references/provenance.md",
+        "references/reporting-and-troubleshooting.md",
+        "scripts/ancestral_reconstruction.py",
+        "scripts/codeml_asr.py",
+        "scripts/continuous_trait_asr.R",
+        "scripts/grasp_asr.sh",
+        "scripts/iqtree_ancestral.sh",
+        "scripts/iqtree_state.py",
+        "scripts/paml_rst.py",
+        "scripts/stochastic_mapping.R",
+        "tests/test_paml_rst.py"
+      ],
+      "scripts_added_or_changed": [
+        "Source codeml, PAML parser, IQ-TREE parser/shell, GRASP shell and discrete/continuous R scripts copied",
+        "scripts/continuous_file.R added file-based wrapper"
+      ],
+      "documentation_sources": [
+        "Source SKILL, usage guide, references, scripts and tests; original references retained."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "LICENSE": {
+          "worker_sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f",
+          "sha256": "b6438355ac356d6b2dad8a3a0fafa76d5b8d371ee5fb457d97811132899b986f"
+        },
+        "SKILL.md": {
+          "worker_sha256": "d287e80698a669bdfa03308ba3f3c52a3bb10f77cf8001fd09f9a5f9803a2921",
+          "sha256": "d287e80698a669bdfa03308ba3f3c52a3bb10f77cf8001fd09f9a5f9803a2921"
+        },
+        "references/failure-modes-and-thresholds.md": {
+          "worker_sha256": "3caed4010d570d145f2d2a5f7d3635a62a8f7b5199ce4c77949cacd04701aada",
+          "sha256": "3caed4010d570d145f2d2a5f7d3635a62a8f7b5199ce4c77949cacd04701aada"
+        },
+        "references/method-selection.md": {
+          "worker_sha256": "7142400b67ecd55087d3fcc5e22546f62fcd0788a8c25f5aa3a216c8b8c073b3",
+          "sha256": "7142400b67ecd55087d3fcc5e22546f62fcd0788a8c25f5aa3a216c8b8c073b3"
+        },
+        "references/method-workflows.md": {
+          "worker_sha256": "b27fd1af9214c28b7d86a35938d4924f724d8575a601643d810357151d6cb619",
+          "sha256": "b27fd1af9214c28b7d86a35938d4924f724d8575a601643d810357151d6cb619"
+        },
+        "references/reporting-and-troubleshooting.md": {
+          "worker_sha256": "10539fe66329b75f0711ca04764edc64e83c85519e6174660e3dde109a605b02",
+          "sha256": "10539fe66329b75f0711ca04764edc64e83c85519e6174660e3dde109a605b02"
+        },
+        "routes/continuous.md": {
+          "worker_sha256": "9ca68f59c31f56bf81283ec0977f84849044d0d0b20e19a122fa9b2eb3df2ce1",
+          "sha256": "9ca68f59c31f56bf81283ec0977f84849044d0d0b20e19a122fa9b2eb3df2ce1"
+        },
+        "routes/discrete.md": {
+          "worker_sha256": "d9b0261c8aa049104df10ef7ac1ecd2c1516b643068461419c0c35a5525dac53",
+          "sha256": "d9b0261c8aa049104df10ef7ac1ecd2c1516b643068461419c0c35a5525dac53"
+        },
+        "routes/review.md": {
+          "worker_sha256": "cb7ef7b0116fcb0057fd3e754e53cf79db2362cbccd7508583a1ef1745ece070",
+          "sha256": "cb7ef7b0116fcb0057fd3e754e53cf79db2362cbccd7508583a1ef1745ece070"
+        },
+        "routes/sequences.md": {
+          "worker_sha256": "a7ee040c01e8f76d13d75156e5e29b8d27194db7fdfc0d7823707c9530f03729",
+          "sha256": "a7ee040c01e8f76d13d75156e5e29b8d27194db7fdfc0d7823707c9530f03729"
+        },
+        "scripts/codeml_asr.py": {
+          "worker_sha256": "b09c43fcb27ce5773a59a2bf400e8a7b810b7025a8f2f352357abd33182c8b3c",
+          "sha256": "b09c43fcb27ce5773a59a2bf400e8a7b810b7025a8f2f352357abd33182c8b3c"
+        },
+        "scripts/continuous_file.R": {
+          "worker_sha256": "4ed66c153121a850fc6df822d57f261852647b904439624fd6497f362033767f",
+          "sha256": "4ed66c153121a850fc6df822d57f261852647b904439624fd6497f362033767f"
+        },
+        "scripts/continuous_trait_asr.R": {
+          "worker_sha256": "8be2a16f29f695e6c639dc9e13703227954ca3355515b838282da6e73584f6b4",
+          "sha256": "8be2a16f29f695e6c639dc9e13703227954ca3355515b838282da6e73584f6b4"
+        },
+        "scripts/grasp_asr.sh": {
+          "worker_sha256": "d380f8773fd5dbf7bb3e3d020a7a8c4c6e44e9d12b1f61b807f3659d5d08af76",
+          "sha256": "d380f8773fd5dbf7bb3e3d020a7a8c4c6e44e9d12b1f61b807f3659d5d08af76"
+        },
+        "scripts/iqtree_ancestral.sh": {
+          "worker_sha256": "acbf841363a53e2c1dec540e2ed26505d9313f6cf6ab584c9b58618e0a7ec8cb",
+          "sha256": "acbf841363a53e2c1dec540e2ed26505d9313f6cf6ab584c9b58618e0a7ec8cb"
+        },
+        "scripts/iqtree_state.py": {
+          "worker_sha256": "5f1703116774786016193bbe90b9671632ca6bb7082ddad246f06e3d701029f3",
+          "sha256": "5f1703116774786016193bbe90b9671632ca6bb7082ddad246f06e3d701029f3"
+        },
+        "scripts/paml_rst.py": {
+          "worker_sha256": "fde7506d35c9e7fae6c9ae4af3c6761605105882f2c1d289b65db3ec71c63b79",
+          "sha256": "fde7506d35c9e7fae6c9ae4af3c6761605105882f2c1d289b65db3ec71c63b79"
+        },
+        "scripts/stochastic_mapping.R": {
+          "worker_sha256": "8fd75696b1d7e744127487031aa4a139344e5a9dfe4657274a978f6dbb7fd593",
+          "sha256": "8fd75696b1d7e744127487031aa4a139344e5a9dfe4657274a978f6dbb7fd593"
+        }
+      },
+      "published_identity": "d8febc18b2f10928ac67c7bcae7993572e417218114af72afcb749674d33ed19"
     },
     {
       "id": "ca-bio-conformer-generation",
@@ -13139,6 +13578,80 @@
       "packaging_text_normalization": "Markdown trailing blank lines reduced to one final newline; scientific code unchanged"
     },
     {
+      "id": "ca-bio-population-genetics-rare-variant-association",
+      "recut_of": "bio-population-genetics-rare-variant-association",
+      "status": "normalized-only-not-audited",
+      "recorded_state": "Normalized structure only; scientific workflows unexecuted and unaudited. See per-Skill status notes.",
+      "source_repository": "mrsonord2240/optimized-scientific-skills",
+      "source_commit": "7346d93559e1e5222dfd462ce4d0c2dac70ef35f",
+      "source_path": "skills/bio-population-genetics-rare-variant-association",
+      "upstream_path": "population-genetics/rare-variant-association",
+      "status_notes": "skills/ca-bio-population-genetics-rare-variant-association/STATUS.md",
+      "normalization_worker": "gpt-6.1-terra",
+      "worker_identity_before_status_note": "0eae0b8dc12c299aea9098ed50c9e92c09637d8c15036eaee06e33bb8ac05f0c",
+      "normalization_summary": "Task router and focused routes; retained complete source shell example and extracted method and reference context.",
+      "known_gaps": [
+        "No analyses, simulations, installations, or live API checks performed.",
+        "SAIGE step 1, SKAT file input/export and STAAR are not complete workflows.",
+        "Version contracts and numerical conventions derive from source and need verification at use.",
+        "Repository-root license evidence is outside candidate."
+      ],
+      "preflight_warnings": [
+        "no Skill-root LICENSE (the manifest must then cite repository license evidence)"
+      ],
+      "license_evidence": "../LICENSE",
+      "capability_route_map": {
+        "regenie masks, null and burden/SKAT-O/ACAT-O": "routes/regenie.md and examples/rare_variant_test.sh",
+        "SAIGE-GENE+ step 2": "routes/saige.md",
+        "direct SKAT, burden and SSD": "routes/skat.md",
+        "architecture selection, ACAT/STAAR, thresholds and failure modes": "references/methods.md",
+        "source version claims and citations": "references/provenance.md"
+      },
+      "reviewed_source_files": [
+        "SKILL.md",
+        "usage-guide.md",
+        "examples\\rare_variant_test.sh"
+      ],
+      "scripts_added_or_changed": [
+        "Copied source shell example with normalized EOF; no scientific logic changed."
+      ],
+      "documentation_sources": [
+        "Source citations only; no live documentation consulted."
+      ],
+      "packaging_text_normalization": "Markdown and source-code trailing blank lines reduced to one final newline; executable statements unchanged",
+      "normalized_files": {
+        "SKILL.md": {
+          "worker_sha256": "53b1b9fd851fb7b557e6429816763ab35cd7e40781ca99220edac3f8e0570728",
+          "sha256": "53b1b9fd851fb7b557e6429816763ab35cd7e40781ca99220edac3f8e0570728"
+        },
+        "examples/rare_variant_test.sh": {
+          "worker_sha256": "9f2abb8ce206dcbb60a2fbb5ee4773a828a8cff9370a064b7442c0b29283433a",
+          "sha256": "9f2abb8ce206dcbb60a2fbb5ee4773a828a8cff9370a064b7442c0b29283433a"
+        },
+        "references/methods.md": {
+          "worker_sha256": "7dc83ca08aca73673cb543a2781bd3d57aed47ec761464036b4e2079a655b22e",
+          "sha256": "7dc83ca08aca73673cb543a2781bd3d57aed47ec761464036b4e2079a655b22e"
+        },
+        "references/provenance.md": {
+          "worker_sha256": "84da44643e59d75b53aefec5ba26707840ad9f9962f0fb5e56974446dc9c21ab",
+          "sha256": "84da44643e59d75b53aefec5ba26707840ad9f9962f0fb5e56974446dc9c21ab"
+        },
+        "routes/regenie.md": {
+          "worker_sha256": "d18316121e46852813f4af1a2ede6e710470fe164f2a7df55daef6973d4974a9",
+          "sha256": "d18316121e46852813f4af1a2ede6e710470fe164f2a7df55daef6973d4974a9"
+        },
+        "routes/saige.md": {
+          "worker_sha256": "b5ce25f535a3916d8ac6c5ec665b678d5853ff0cb62caa1fbf25430bec22f2c4",
+          "sha256": "b5ce25f535a3916d8ac6c5ec665b678d5853ff0cb62caa1fbf25430bec22f2c4"
+        },
+        "routes/skat.md": {
+          "worker_sha256": "6e2521e30c96fc027591bb3699af178788f00e85a5cb2f3793c95223e0120400",
+          "sha256": "6e2521e30c96fc027591bb3699af178788f00e85a5cb2f3793c95223e0120400"
+        }
+      },
+      "published_identity": "14963cb4bcb1410e71701c7e76370530e4bd84a18c07fdb66adc2010c75e0002"
+    },
+    {
       "id": "ca-bio-pose-validation",
       "recut_of": "bio-pose-validation",
       "status": "normalized-only-not-audited",
@@ -18314,8 +18827,8 @@
     "source_scope": 195,
     "existing_drafts": 24,
     "remaining_skills_requested": 171,
-    "new_drafts_published": 166,
-    "publication_complete": false,
+    "new_drafts_published": 171,
+    "publication_complete": true,
     "phase": "normalization only",
     "scientific_execution": "not performed for these new drafts"
   }
