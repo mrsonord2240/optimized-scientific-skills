@@ -1,54 +1,75 @@
 # Experimental normalized Skills
 
-These 24 `ca-` (context-aware) Skills preserve partially complete revisions of
-the audited collection. Their short entry points route to task instructions,
-scripts, and deeper references. They are available for inspection and further
-work; publication does not certify their scientific behavior.
+This collection contains **42 partially complete `ca-` (context-aware)
+revisions** of the audited Skills. They use short entry points, task routes,
+scripts, and progressively deeper references. Publication does not certify
+their scientific behavior or confer Marketplace acceptance.
 
-One has a historical candidate-ready relay result, three have limited evaluation
-results without an audit, and twenty were normalized without an audit. Read
-each linked status note for executed surfaces, known defects, and missing work.
-Do not transfer the original Skill's audit score to a changed candidate.
+| Recorded state | Candidates |
+| --- | ---: |
+| Historical candidate-ready relay result | 1 |
+| Limited evaluation experiments, not audited | 3 |
+| Normalization only, not audited | 38 |
 
-Sam authorized publication of these drafts and resumed normalization-only work
-on the other 171 optimized shelf Skills on 2026-11-07. Scientific audits and
-Open Science Marketplace follow-up remain outside this resumed scope.
+Sam authorized publishing the original 24 drafts and using Terra workers to
+normalize the other 171 Skills already on the optimized shelf. This is
+normalization-only work; tool installation and scientific audit are outside
+the resumed scope. Read each Skill's status notes for missing work and known
+issues. The earlier version's audit score does not certify a changed draft.
 
 The canonical drafts live in optimized-scientific-skills; bioSkills-Improved
-receives matching copies. Existing published versions remain available under
-their original IDs. Install a candidate explicitly by copying its entire
-`skills/ca-<id>` folder into your agent's skills directory. Each folder's
-frontmatter name matches its `ca-` directory name.
+receives matching copies. Each candidate keeps a `ca-` identity. To select a
+candidate, copy its complete `skills/ca-<id>` directory into your agent's
+skills directory and read its status notes before use.
 
-| Candidate | Recorded status |
+| Candidate | Recorded state |
 | --- | --- |
-| [ca-bio-workflows-crispr-screen-pipeline](skills/ca-bio-workflows-crispr-screen-pipeline/STATUS.md) | Through the full relay; candidate-ready in `audits/skills/bio-workflows-crispr-screen-pipeline/candidate@e609525649bd-reaudit-delta-001` (final 89). Only the frontmatter `name` differs from the audited bytes. |
-| [ca-bio-differential-expression-deseq2-basics](skills/ca-bio-differential-expression-deseq2-basics/STATUS.md) | Not audited. Eval: pseudobulk task 5 of 5 with a cheap model (old layout 2 of 5); routing check 7 of 7 routes. Eleven older reference files only lightly cleaned. |
-| [ca-bio-proteomics-differential-abundance](skills/ca-bio-proteomics-differential-abundance/STATUS.md) | Not audited. Eval: 5 of 5 (old layout 2 of 5). DEqMS, proDA, msqrob2 and MSstats scripts and `shrink=ashr` never executed. No routing cases. |
-| [ca-bio-machine-learning-model-validation](skills/ca-bio-machine-learning-model-validation/STATUS.md) | Not audited. Eval: 3 of 5 (old layout 2 of 5); routing check 9 of 9 routes. Known defects: the decision-curve route needs a predictions file nothing produces; one route overstates that leave-one-out cannot give an AUC. |
-| [ca-bio-duplicate-handling](skills/ca-bio-duplicate-handling/STATUS.md) | Normalized only, not audited. Executed: all five scripts (samtools, pysam, umi_tools, fgbio on staged BAMs). Unexecuted: `umi_tools_dedup.sh scrna` success path, alternative-marker commands. |
-| [ca-bio-variant-calling-filtering-best-practices](skills/ca-bio-variant-calling-filtering-best-practices/STATUS.md) | Normalized only, not audited. All scripts unexecuted (`hard_filter.sh`, `genotype_filter.sh`, `somatic_filter.sh`, `cyvcf2_filter.py`, `filter_stats.sh`); VQSR commands shown only. |
-| [ca-bio-single-cell-clustering](skills/ca-bio-single-cell-clustering/STATUS.md) | Normalized only, not audited. All scripts unexecuted (`cluster_scanpy.py`, `cluster_seurat.R`, `validate_partition.py`, `subcluster.py`). |
-| [ca-bio-single-cell-preprocessing](skills/ca-bio-single-cell-preprocessing/STATUS.md) | Normalized only, not audited. All scripts unexecuted (`preprocess_scanpy.py`, `preprocess_seurat.R`, `soupx.R`). |
-| [ca-bio-single-cell-data-io](skills/ca-bio-single-cell-data-io/STATUS.md) | Normalized only, not audited. All scripts unexecuted (`load_10x.py`, `load_10x.R`, `h5ad_inventory.py`). |
-| [ca-bio-proteomics-proteomics-qc](skills/ca-bio-proteomics-proteomics-qc/STATUS.md) | Normalized only, not audited. Executed once earlier: `raw_qc.py`, `matrix_metrics.py`, `pca_batch.py`, `tmt_balance.py`, `diann_level1.py` (synthetic MaxQuant/TMT, real DIA-NN report). Unexecuted: `ptxqc_report.R`. |
-| [ca-bio-analytical-validation](skills/ca-bio-analytical-validation/STATUS.md) | Normalized only, not audited. Executed: `ge_and_poisson.py`, `lod95_probit.py`, `panel_integrated_lod.py` (contrived dilution series; ETAM-seq-derived series). |
-| [ca-bio-machine-learning-omics-classifiers](skills/ca-bio-machine-learning-omics-classifiers/STATUS.md) | Normalized only, not audited. Executed once: `logistic_regression.py --signature` on Golub (dense path crashed, fixed, not rerun). Unexecuted: `rf_xgboost_classifier.py`, `batch_checks.py`, `calibration_check.py`; SMOTE path untestable (no imblearn). |
-| [ca-bio-variant-annotation](skills/ca-bio-variant-annotation/STATUS.md) | Normalized only, not audited. All scripts unexecuted (`annotate_vep.sh`, `annotate_vcf.sh`, `parse_csq.py`). |
-| [ca-bio-machine-learning-prediction-explanation](skills/ca-bio-machine-learning-prediction-explanation/STATUS.md) | Normalized only, not audited. All scripts unexecuted (`shap_tree.py`, `lime_local.py`); lime in no WSL environment. |
-| [ca-bio-pathway-go-enrichment](skills/ca-bio-pathway-go-enrichment/STATUS.md) | Normalized only, not audited. All scripts unexecuted (`ora_go.R`, `goseq_ora.R`, `groupgo.R`). |
-| [ca-bio-atac-seq-consensus-peakset](skills/ca-bio-atac-seq-consensus-peakset/STATUS.md) | Normalized only, not audited. Scripts: `iterative_overlap.sh` (shelf copy, unchanged), `iterative_overlap.R`, `per_condition_consensus.sh` (new, unexecuted). |
-| [ca-bio-atac-seq-motif-deviation](skills/ca-bio-atac-seq-motif-deviation/STATUS.md) | Normalized only, not audited. All scripts unexecuted after the recut (`chromvar_bulk.R`, `chromvar_signac.R`, `chromvar_archr.R`). |
-| [ca-bio-atac-seq-atac-qc](skills/ca-bio-atac-seq-atac-qc/STATUS.md) | Normalized only, not audited. No new scripts; shelf copies unchanged (`library_complexity.py`, `atac_qc_metrics.R`, `encode_tss_enrichment.py`, `aggregate_qc.py`). |
-| [ca-bio-single-cell-multimodal-integration](skills/ca-bio-single-cell-multimodal-integration/STATUS.md) | Normalized only, not audited. New, unexecuted: `cite_seq_wnn.R`, `cite_seq_muon.py`, `multiome_wnn.R`, `mofa_muon.py`, `glue_unpaired.py`; shelf copies unchanged: `totalvi_cite_seq.py`, `multivi_mosaic.py`, `seurat_bridge_integration.R`. |
-| [ca-bio-alignment-sorting](skills/ca-bio-alignment-sorting/STATUS.md) | Normalized only, not audited. New, unexecuted: `sort_bam.sh`, `merge_bams.sh`, `check_order.py`; `align_sort.sh` is the shelf `sort_pipeline.sh`, renamed. |
-| [ca-bio-vcf-statistics](skills/ca-bio-vcf-statistics/STATUS.md) | Normalized only, not audited. All scripts unexecuted (`vcf_qc.sh`, `vcf_stats.py`, `missing_hwe.sh`, `het_allele_balance.sh`, `identity_qc.sh`, `stratified_stats.sh`). |
-| [ca-bio-variant-normalization](skills/ca-bio-variant-normalization/STATUS.md) | Normalized only, not audited. All scripts unexecuted (`normalize_vcf.sh`, `check_normalization.py`, `check_ref.sh`, `compare_callers.sh`). |
-| [ca-bio-microbiome-amplicon-processing](skills/ca-bio-microbiome-amplicon-processing/STATUS.md) | Normalized only, not audited. All scripts unexecuted (`remove_primers.sh`, `dada2_asv.R`, `decontam_filter.R`); `dada2_asv.R --single` is new code. |
-| [ca-bio-microbiome-taxonomy-assignment](skills/ca-bio-microbiome-taxonomy-assignment/STATUS.md) | Normalized only, not audited. All scripts unexecuted (`dada2_assign.R`, `idtaxa_classify.R`, `qiime2_region_nb.sh`, `qiime2_vsearch.sh`, `filter_organelle.sh`). |
+| [ca-bio-alignment-amplicon-clipping](skills/ca-bio-alignment-amplicon-clipping/STATUS.md) | Normalized only; not audited |
+| [ca-bio-alignment-filtering](skills/ca-bio-alignment-filtering/STATUS.md) | Normalized only; not audited |
+| [ca-bio-alignment-indexing](skills/ca-bio-alignment-indexing/STATUS.md) | Normalized only; not audited |
+| [ca-bio-alignment-io](skills/ca-bio-alignment-io/STATUS.md) | Normalized only; not audited |
+| [ca-bio-alignment-msa-parsing](skills/ca-bio-alignment-msa-parsing/STATUS.md) | Normalized only; not audited |
+| [ca-bio-alignment-msa-statistics](skills/ca-bio-alignment-msa-statistics/STATUS.md) | Normalized only; not audited |
+| [ca-bio-alignment-multiple](skills/ca-bio-alignment-multiple/STATUS.md) | Normalized only; not audited |
+| [ca-bio-alignment-pairwise](skills/ca-bio-alignment-pairwise/STATUS.md) | Normalized only; not audited |
+| [ca-bio-alignment-sorting](skills/ca-bio-alignment-sorting/STATUS.md) | Normalized only; not audited |
+| [ca-bio-alignment-structural](skills/ca-bio-alignment-structural/STATUS.md) | Normalized only; not audited |
+| [ca-bio-alignment-trimming](skills/ca-bio-alignment-trimming/STATUS.md) | Normalized only; not audited |
+| [ca-bio-alignment-validation](skills/ca-bio-alignment-validation/STATUS.md) | Normalized only; not audited |
+| [ca-bio-analytical-validation](skills/ca-bio-analytical-validation/STATUS.md) | Normalized only; not audited |
+| [ca-bio-atac-seq-atac-qc](skills/ca-bio-atac-seq-atac-qc/STATUS.md) | Normalized only; not audited |
+| [ca-bio-atac-seq-consensus-peakset](skills/ca-bio-atac-seq-consensus-peakset/STATUS.md) | Normalized only; not audited |
+| [ca-bio-atac-seq-motif-deviation](skills/ca-bio-atac-seq-motif-deviation/STATUS.md) | Normalized only; not audited |
+| [ca-bio-bam-statistics](skills/ca-bio-bam-statistics/STATUS.md) | Normalized only; not audited |
+| [ca-bio-differential-expression-deseq2-basics](skills/ca-bio-differential-expression-deseq2-basics/STATUS.md) | Evaluation experiment; not audited |
+| [ca-bio-differential-splicing](skills/ca-bio-differential-splicing/STATUS.md) | Normalized only; not audited |
+| [ca-bio-duplicate-handling](skills/ca-bio-duplicate-handling/STATUS.md) | Normalized only; not audited |
+| [ca-bio-isoform-switching](skills/ca-bio-isoform-switching/STATUS.md) | Normalized only; not audited |
+| [ca-bio-long-read-splicing](skills/ca-bio-long-read-splicing/STATUS.md) | Normalized only; not audited |
+| [ca-bio-machine-learning-model-validation](skills/ca-bio-machine-learning-model-validation/STATUS.md) | Evaluation experiment; not audited |
+| [ca-bio-machine-learning-omics-classifiers](skills/ca-bio-machine-learning-omics-classifiers/STATUS.md) | Normalized only; not audited |
+| [ca-bio-machine-learning-prediction-explanation](skills/ca-bio-machine-learning-prediction-explanation/STATUS.md) | Normalized only; not audited |
+| [ca-bio-microbiome-amplicon-processing](skills/ca-bio-microbiome-amplicon-processing/STATUS.md) | Normalized only; not audited |
+| [ca-bio-microbiome-taxonomy-assignment](skills/ca-bio-microbiome-taxonomy-assignment/STATUS.md) | Normalized only; not audited |
+| [ca-bio-pathway-go-enrichment](skills/ca-bio-pathway-go-enrichment/STATUS.md) | Normalized only; not audited |
+| [ca-bio-pileup-generation](skills/ca-bio-pileup-generation/STATUS.md) | Normalized only; not audited |
+| [ca-bio-proteomics-differential-abundance](skills/ca-bio-proteomics-differential-abundance/STATUS.md) | Evaluation experiment; not audited |
+| [ca-bio-proteomics-proteomics-qc](skills/ca-bio-proteomics-proteomics-qc/STATUS.md) | Normalized only; not audited |
+| [ca-bio-reference-operations](skills/ca-bio-reference-operations/STATUS.md) | Normalized only; not audited |
+| [ca-bio-sam-bam-basics](skills/ca-bio-sam-bam-basics/STATUS.md) | Normalized only; not audited |
+| [ca-bio-single-cell-clustering](skills/ca-bio-single-cell-clustering/STATUS.md) | Normalized only; not audited |
+| [ca-bio-single-cell-data-io](skills/ca-bio-single-cell-data-io/STATUS.md) | Normalized only; not audited |
+| [ca-bio-single-cell-multimodal-integration](skills/ca-bio-single-cell-multimodal-integration/STATUS.md) | Normalized only; not audited |
+| [ca-bio-single-cell-preprocessing](skills/ca-bio-single-cell-preprocessing/STATUS.md) | Normalized only; not audited |
+| [ca-bio-variant-annotation](skills/ca-bio-variant-annotation/STATUS.md) | Normalized only; not audited |
+| [ca-bio-variant-calling-filtering-best-practices](skills/ca-bio-variant-calling-filtering-best-practices/STATUS.md) | Normalized only; not audited |
+| [ca-bio-variant-normalization](skills/ca-bio-variant-normalization/STATUS.md) | Normalized only; not audited |
+| [ca-bio-vcf-statistics](skills/ca-bio-vcf-statistics/STATUS.md) | Normalized only; not audited |
+| [ca-bio-workflows-crispr-screen-pipeline](skills/ca-bio-workflows-crispr-screen-pipeline/STATUS.md) | Historical candidate-ready; see limits |
 
-The [manifest](CANDIDATES.json) records source commits, per-file hashes,
-upstream paths and status. GPTomics/bioSkills supplied the original scientific
-Skills under the repository [MIT license](../LICENSE). The two historical
-DESeq2 pointer edits remain unapplied to the published collection; they are
-preserved as [shelf-pointer-edits.patch](https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/e9dcbbb67b1e3f02922e5d84b6778d757dce08d1/skills/shelf-pointer-edits.patch).
+The [manifest](CANDIDATES.json) records source commits, file hashes, upstream
+paths, capability coverage and status. GPTomics/bioSkills supplied the original
+scientific Skills under the repository [MIT license](../LICENSE).
+The two historical DESeq2 pointer edits remain unapplied to the published
+collection and are preserved in the
+[records repository](https://github.com/mrsonord2240/optimizing-agent-science-skills/blob/e9dcbbb67b1e3f02922e5d84b6778d757dce08d1/skills/shelf-pointer-edits.patch).
