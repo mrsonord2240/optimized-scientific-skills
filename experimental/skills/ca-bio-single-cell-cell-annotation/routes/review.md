@@ -1,0 +1,3 @@
+# Review and alternatives
+Reference mapping is closed-world: novel or out-of-domain states can receive confident incorrect labels. Triage doublets, low quality, batch and ambient contamination before proposing novelty; compare reference predictions with marker patterns while recognizing marker circularity. Calibrate rejection per dataset and report coarse and uncertain fine labels separately. [Method guidance](../references/methods.md) covers normalization, Azimuth, scANVI/scArches and scmap; these alternatives require study-specific reference assets and adapted workflows here.
+Related shelf skills: bio-single-cell-markers-annotation, bio-single-cell-clustering, bio-single-cell-preprocessing and bio-single-cell-batch-integration.

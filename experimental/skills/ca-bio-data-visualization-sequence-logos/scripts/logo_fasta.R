@@ -1,0 +1,18 @@
+args <- commandArgs(trailingOnly = TRUE)
+if (!(length(args) %in% c(3, 7))) stop('usage: logo_fasta.R aligned.fa output.pdf bits | relative A C G T')
+library(ggseqlogo)
+library(ggplot2)
+script <- sub('^--file=', '', grep('^--file=', commandArgs(), value = TRUE)[1])
+source(file.path(dirname(normalizePath(script)), '..', 'examples', 'relative_entropy_logo.R'))
+seqs <- read_aligned_fasta(args[1])
+alphabet <- c('A', 'C', 'G', 'T')
+probabilities <- sequence_probability_matrix(seqs, alphabet)
+if (args[3] == 'bits' && length(args) == 3) {
+    plot <- ggseqlogo(seqs, method = 'bits') + labs(y = 'bits')
+} else if (args[3] == 'relative' && length(args) == 7) {
+    background <- setNames(as.numeric(args[4:7]), alphabet)
+    heights <- relative_entropy_heights(probabilities, background)
+    plot <- ggseqlogo(heights, method = 'custom') + labs(y = 'bits relative to background')
+} else stop('invalid mode or background arguments')
+plot <- plot + labs(title = sprintf('Aligned sequences (N = %d)', length(seqs)))
+ggsave(args[2], plot, width = 89, height = 50, units = 'mm', device = cairo_pdf)

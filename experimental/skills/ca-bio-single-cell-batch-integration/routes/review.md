@@ -1,0 +1,4 @@
+# Design and integration review
+Cross-tabulate condition and batch before integration; a perfectly aliased design cannot identify their separate effects. A condition occurring in only one batch is a warning needing design and model review, not by itself proof that every contrast is non-identifiable. Compare uncorrected and integrated embeddings, batch mixing and cell-type conservation, including rare and condition-specific states. Use raw counts with an appropriate donor-aware model for differential expression rather than corrected expression.
+The source describes fastMNN, Scanorama, BBKNN and reference mapping but does not provide complete file-based pipelines here; adapt validated tools and check APIs. See [method and evaluation guidance](../references/methods.md).
+Related shelf skills: bio-single-cell-preprocessing, bio-single-cell-clustering and bio-single-cell-cell-annotation.

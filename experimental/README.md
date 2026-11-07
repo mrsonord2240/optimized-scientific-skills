@@ -1,6 +1,6 @@
 # Experimental normalized Skills
 
-This collection contains **126 partially complete `ca-` (context-aware)
+This collection contains **135 partially complete `ca-` (context-aware)
 revisions** of the audited Skills. They use short entry points, task routes,
 scripts, and progressively deeper references. Publication does not certify
 their scientific behavior or confer Marketplace acceptance.
@@ -9,7 +9,7 @@ their scientific behavior or confer Marketplace acceptance.
 | --- | ---: |
 | Historical candidate-ready relay result | 1 |
 | Limited evaluation experiments, not audited | 3 |
-| Normalization only, not audited | 122 |
+| Normalization only, not audited | 131 |
 
 Sam authorized publishing the original 24 drafts and using Terra workers to
 normalize the other 171 Skills already on the optimized shelf. This is
@@ -84,12 +84,18 @@ skills directory and read its status notes before use.
 | [ca-bio-crispr-screens-jacks-analysis](skills/ca-bio-crispr-screens-jacks-analysis/STATUS.md) | Normalized only; not audited |
 | [ca-bio-crispr-screens-library-design](skills/ca-bio-crispr-screens-library-design/STATUS.md) | Normalized only; not audited |
 | [ca-bio-crispr-screens-mageck-analysis](skills/ca-bio-crispr-screens-mageck-analysis/STATUS.md) | Normalized only; not audited |
+| [ca-bio-crispr-screens-perturb-seq-analysis](skills/ca-bio-crispr-screens-perturb-seq-analysis/STATUS.md) | Normalized only; not audited |
+| [ca-bio-crispr-screens-prime-editing-screens](skills/ca-bio-crispr-screens-prime-editing-screens/STATUS.md) | Normalized only; not audited |
+| [ca-bio-crispr-screens-screen-qc](skills/ca-bio-crispr-screens-screen-qc/STATUS.md) | Normalized only; not audited |
 | [ca-bio-data-visualization-color-palettes](skills/ca-bio-data-visualization-color-palettes/STATUS.md) | Normalized only; not audited |
 | [ca-bio-data-visualization-dimensionality-reduction-plots](skills/ca-bio-data-visualization-dimensionality-reduction-plots/STATUS.md) | Normalized only; not audited |
 | [ca-bio-data-visualization-forest-funnel-plots](skills/ca-bio-data-visualization-forest-funnel-plots/STATUS.md) | Normalized only; not audited |
 | [ca-bio-data-visualization-ggplot2-fundamentals](skills/ca-bio-data-visualization-ggplot2-fundamentals/STATUS.md) | Normalized only; not audited |
 | [ca-bio-data-visualization-matplotlib-fundamentals](skills/ca-bio-data-visualization-matplotlib-fundamentals/STATUS.md) | Normalized only; not audited |
 | [ca-bio-data-visualization-network-visualization](skills/ca-bio-data-visualization-network-visualization/STATUS.md) | Normalized only; not audited |
+| [ca-bio-data-visualization-oncoprint-mutation-matrices](skills/ca-bio-data-visualization-oncoprint-mutation-matrices/STATUS.md) | Normalized only; not audited |
+| [ca-bio-data-visualization-sequence-logos](skills/ca-bio-data-visualization-sequence-logos/STATUS.md) | Normalized only; not audited |
+| [ca-bio-data-visualization-statistical-annotation](skills/ca-bio-data-visualization-statistical-annotation/STATUS.md) | Normalized only; not audited |
 | [ca-bio-differential-expression-deseq2-basics](skills/ca-bio-differential-expression-deseq2-basics/STATUS.md) | Evaluation experiment; not audited |
 | [ca-bio-differential-splicing](skills/ca-bio-differential-splicing/STATUS.md) | Normalized only; not audited |
 | [ca-bio-duplicate-handling](skills/ca-bio-duplicate-handling/STATUS.md) | Normalized only; not audited |
@@ -133,6 +139,9 @@ skills directory and read its status notes before use.
 | [ca-bio-scaffold-analysis](skills/ca-bio-scaffold-analysis/STATUS.md) | Normalized only; not audited |
 | [ca-bio-shape-similarity](skills/ca-bio-shape-similarity/STATUS.md) | Normalized only; not audited |
 | [ca-bio-similarity-searching](skills/ca-bio-similarity-searching/STATUS.md) | Normalized only; not audited |
+| [ca-bio-single-cell-batch-integration](skills/ca-bio-single-cell-batch-integration/STATUS.md) | Normalized only; not audited |
+| [ca-bio-single-cell-cell-annotation](skills/ca-bio-single-cell-cell-annotation/STATUS.md) | Normalized only; not audited |
+| [ca-bio-single-cell-cell-communication](skills/ca-bio-single-cell-cell-communication/STATUS.md) | Normalized only; not audited |
 | [ca-bio-single-cell-clustering](skills/ca-bio-single-cell-clustering/STATUS.md) | Normalized only; not audited |
 | [ca-bio-single-cell-data-io](skills/ca-bio-single-cell-data-io/STATUS.md) | Normalized only; not audited |
 | [ca-bio-single-cell-multimodal-integration](skills/ca-bio-single-cell-multimodal-integration/STATUS.md) | Normalized only; not audited |

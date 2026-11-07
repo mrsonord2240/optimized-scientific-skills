@@ -1,0 +1,10 @@
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) != 4) stop("Usage: Rscript singler_local.R query.rds reference.rds label_column output.rds")
+library(SingleR)
+query <- readRDS(args[1])
+ref <- readRDS(args[2])
+if (!args[3] %in% colnames(SummarizedExperiment::colData(ref))) stop("Missing reference label column")
+labels <- SummarizedExperiment::colData(ref)[[args[3]]]
+if (anyNA(labels)) stop("Reference labels contain missing values")
+pred <- SingleR(test = query, ref = ref, labels = labels, de.method = "classic", fine.tune = TRUE)
+saveRDS(pred, args[4])

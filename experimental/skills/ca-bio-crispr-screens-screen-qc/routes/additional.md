@@ -1,0 +1,3 @@
+# Review additional QC
+**Source-incomplete:** The source provides importable PCA, depth and composite-score snippets without a complete file-based workflow; adapt them to verified inputs in [PCA and composite](../references/pca-and-composite-score.md) and [depth notes](../references/depth-and-moi.md). The proposed composite averages raw log-depth with nominally 0-1 metrics despite saying all are rescaled; its scale and weighting need independent review before gating. Consider batch/condition confounding and assay-specific reference limitations.
+Done when required metrics, missingness and interpretation limitations are recorded or the custom analysis is deferred.
