@@ -1,6 +1,6 @@
 # Experimental normalized Skills
 
-This collection contains **69 partially complete `ca-` (context-aware)
+This collection contains **78 partially complete `ca-` (context-aware)
 revisions** of the audited Skills. They use short entry points, task routes,
 scripts, and progressively deeper references. Publication does not certify
 their scientific behavior or confer Marketplace acceptance.
@@ -9,7 +9,7 @@ their scientific behavior or confer Marketplace acceptance.
 | --- | ---: |
 | Historical candidate-ready relay result | 1 |
 | Limited evaluation experiments, not audited | 3 |
-| Normalization only, not audited | 65 |
+| Normalization only, not audited | 74 |
 
 Sam authorized publishing the original 24 drafts and using Terra workers to
 normalize the other 171 Skills already on the optimized shelf. This is
@@ -57,11 +57,17 @@ skills directory and read its status notes before use.
 | [ca-bio-causal-genomics-colocalization-analysis](skills/ca-bio-causal-genomics-colocalization-analysis/STATUS.md) | Normalized only; not audited |
 | [ca-bio-causal-genomics-effector-gene-prioritization](skills/ca-bio-causal-genomics-effector-gene-prioritization/STATUS.md) | Normalized only; not audited |
 | [ca-bio-causal-genomics-fine-mapping](skills/ca-bio-causal-genomics-fine-mapping/STATUS.md) | Normalized only; not audited |
+| [ca-bio-causal-genomics-genetic-correlation](skills/ca-bio-causal-genomics-genetic-correlation/STATUS.md) | Normalized only; not audited |
+| [ca-bio-causal-genomics-genomic-sem](skills/ca-bio-causal-genomics-genomic-sem/STATUS.md) | Normalized only; not audited |
+| [ca-bio-causal-genomics-heritability-partitioning](skills/ca-bio-causal-genomics-heritability-partitioning/STATUS.md) | Normalized only; not audited |
 | [ca-bio-conformer-generation](skills/ca-bio-conformer-generation/STATUS.md) | Normalized only; not audited |
 | [ca-bio-covalent-design](skills/ca-bio-covalent-design/STATUS.md) | Normalized only; not audited |
 | [ca-bio-differential-expression-deseq2-basics](skills/ca-bio-differential-expression-deseq2-basics/STATUS.md) | Evaluation experiment; not audited |
 | [ca-bio-differential-splicing](skills/ca-bio-differential-splicing/STATUS.md) | Normalized only; not audited |
 | [ca-bio-duplicate-handling](skills/ca-bio-duplicate-handling/STATUS.md) | Normalized only; not audited |
+| [ca-bio-ensembl-rest](skills/ca-bio-ensembl-rest/STATUS.md) | Normalized only; not audited |
+| [ca-bio-entrez-fetch](skills/ca-bio-entrez-fetch/STATUS.md) | Normalized only; not audited |
+| [ca-bio-entrez-link](skills/ca-bio-entrez-link/STATUS.md) | Normalized only; not audited |
 | [ca-bio-isoform-switching](skills/ca-bio-isoform-switching/STATUS.md) | Normalized only; not audited |
 | [ca-bio-long-read-splicing](skills/ca-bio-long-read-splicing/STATUS.md) | Normalized only; not audited |
 | [ca-bio-machine-learning-model-validation](skills/ca-bio-machine-learning-model-validation/STATUS.md) | Evaluation experiment; not audited |
@@ -74,7 +80,10 @@ skills directory and read its status notes before use.
 | [ca-bio-molecular-standardization](skills/ca-bio-molecular-standardization/STATUS.md) | Normalized only; not audited |
 | [ca-bio-outlier-splicing-detection](skills/ca-bio-outlier-splicing-detection/STATUS.md) | Normalized only; not audited |
 | [ca-bio-pathway-go-enrichment](skills/ca-bio-pathway-go-enrichment/STATUS.md) | Normalized only; not audited |
+| [ca-bio-pharmacophore-modeling](skills/ca-bio-pharmacophore-modeling/STATUS.md) | Normalized only; not audited |
 | [ca-bio-pileup-generation](skills/ca-bio-pileup-generation/STATUS.md) | Normalized only; not audited |
+| [ca-bio-pose-validation](skills/ca-bio-pose-validation/STATUS.md) | Normalized only; not audited |
+| [ca-bio-protac-degraders](skills/ca-bio-protac-degraders/STATUS.md) | Normalized only; not audited |
 | [ca-bio-proteomics-differential-abundance](skills/ca-bio-proteomics-differential-abundance/STATUS.md) | Evaluation experiment; not audited |
 | [ca-bio-proteomics-proteomics-qc](skills/ca-bio-proteomics-proteomics-qc/STATUS.md) | Normalized only; not audited |
 | [ca-bio-reference-operations](skills/ca-bio-reference-operations/STATUS.md) | Normalized only; not audited |
